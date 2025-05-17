@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM AI Credit Bot - JAM Credit Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Bot Container Styles */
+        .Bot-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 600px;
+        }
+
+        /* Bot Header */
+        .Bot-header {
+            background: #09ccfc;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #07a3ca;
+        }
+
+        .Bot-logo {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .Bot-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .Bot-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+
+        /* Bot Tabs */
+        .Bot-tabs {
+            display: flex;
+            background: #e6f9ff;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .Bot-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .Bot-tab.active {
+            color: #09ccfc;
+            border-bottom-color: #09ccfc;
+            background: white;
+        }
+
+        .Bot-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+            color: #07a3ca;
+        }
+
+        .Bot-tab-icon {
+            margin-right: 8px;
+        }
+
+        /* Bot Content Area */
+        .Bot-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .Bot-tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .Bot-tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Chat Interface */
+        .Bot-chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .Bot-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .Bot-message {
+            display: flex;
+            margin-bottom: 15px;
+            max-width: 85%;
+        }
+
+        .Bot-user-message {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .Bot-bot-message {
+            align-self: flex-start;
+        }
+
+        .Bot-message-content {
+            background: #f8f9fa;
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .Bot-user-message .Bot-message-content {
+            background: #09ccfc;
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        .Bot-bot-message .Bot-message-content {
+            background: #e6f9ff;
+            color: #343a40;
+            border-top-left-radius: 4px;
+        }
+
+        .Bot-message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+
+        .Bot-user-message .Bot-message-avatar {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .Bot-bot-message .Bot-message-avatar {
+            background: #07a3ca;
+            color: white;
+        }
+
+        .Bot-chat-input-container {
+            display: flex;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .Bot-chat-input {
+            flex: 1;
+            border: 1px solid #dee2e6;
+            border-radius: 24px;
+            padding: 10px 15px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .Bot-chat-input:focus {
+            border-color: #09ccfc;
+        }
+
+        .Bot-chat-send {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .Bot-chat-send:hover {
+            background: #07a3ca;
+        }
+
+        /* Upload Interface */
+        .Bot-upload-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .Bot-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .Bot-upload-area:hover {
+            border-color: #09ccfc;
+            background: #f8f9fa;
+        }
+
+        .Bot-upload-icon {
+            font-size: 48px;
+            color: #09ccfc;
+            margin-bottom: 15px;
+        }
+
+        .Bot-upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .Bot-upload-subtitle {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .Bot-upload-button {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .Bot-upload-button:hover {
+            background: #07a3ca;
+        }
+
+        .Bot-uploaded-files {
+            margin-top: 20px;
+        }
+
+        .Bot-uploaded-file {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .Bot-file-icon {
+            color: #09ccfc;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .Bot-file-info {
+            flex: 1;
+        }
+
+        .Bot-file-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .Bot-file-size {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .Bot-file-remove {
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Guide Interface */
+        .Bot-guide-container {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .Bot-guide-section {
+            margin-bottom: 30px;
+        }
+
+        .Bot-guide-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #09ccfc;
+        }
+
+        .Bot-guide-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .Bot-guide-step {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .Bot-guide-step:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .Bot-step-number {
+            width: 30px;
+            height: 30px;
+            background: #09ccfc;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .Bot-step-content {
+            flex: 1;
+        }
+
+        .Bot-step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        /* Settings Interface */
+        .Bot-settings-container {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .Bot-settings-section {
+            margin-bottom: 30px;
+        }
+
+        .Bot-settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #09ccfc;
+        }
+
+        .Bot-settings-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .Bot-settings-option:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .Bot-settings-label {
+            flex: 1;
+        }
+
+        .Bot-settings-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .Bot-settings-description {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .Bot-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .Bot-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .Bot-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #dee2e6;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .Bot-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .Bot-toggle input:checked+.Bot-toggle-slider {
+            background-color: #09ccfc;
+        }
+
+        .Bot-toggle input:checked+.Bot-toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .Bot-tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .Bot-tab-icon {
+                margin-right: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .Bot-header {
+                padding: 12px 15px;
+            }
+
+            .Bot-title {
+                font-size: 1.1rem;
+            }
+
+            .Bot-tab {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .Bot-tab-content {
+                padding: 15px;
+            }
+
+            .Bot-message {
+                max-width: 95%;
+                padding: 10px 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- No HTML content needed here as it's generated by the script -->
+    <script>
+        // JAM Tip Bot Module
+        const JamTipBotModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let activeTab = 'chat';
+            let uploadedFiles = [];
+            let chatHistory = [];
+            let isProcessingMessage = false;
+
+            // Sample credit tips for demonstration
+            const creditTips = [
+                "Keep your credit card utilization below 30% for the best impact on your score.",
+                "Paying off collection accounts may not immediately improve your score, but it prevents further damage.",
+                "Dispute inaccurate information on your credit report - it's your right under the FCRA.",
+                "Adding yourself as an authorized user on someone's well-maintained credit card can boost your score.",
+                "Avoid applying for multiple credit cards in a short period - each application creates a hard inquiry.",
+                "Set up automatic payments to avoid late payments, which can stay on your report for 7 years.",
+                "A secured credit card can help rebuild credit if you're starting from scratch.",
+                "Check your credit reports regularly for errors - you're entitled to free reports annually.",
+                "Keeping old accounts open (even if unused) helps maintain a longer credit history.",
+                "Diversifying your credit mix (cards, loans, etc.) can positively impact your score."
+            ];
+
+            // Sample credit laws for the AI to reference
+            const creditLaws = [
+                {
+                    name: "Fair Credit Reporting Act (FCRA)",
+                    description: "Gives consumers the right to dispute inaccurate information on their credit reports."
+                },
+                {
+                    name: "Fair Debt Collection Practices Act (FDCPA)",
+                    description: "Prohibits debt collectors from using abusive, unfair, or deceptive practices."
+                },
+                {
+                    name: "Credit Card Accountability Responsibility and Disclosure Act (CARD Act)",
+                    description: "Provides protections regarding credit card rates, fees, and disclosures."
+                },
+                {
+                    name: "Equal Credit Opportunity Act (ECOA)",
+                    description: "Prohibits credit discrimination on the basis of race, color, religion, national origin, sex, marital status, age, or because you receive public assistance."
+                }
+            ];
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return false;
+
+                // Only initialize once
+                if (isInitialized) {
+                    console.log('JAM Tip Bot Module already initialized');
+                    return true;
+                }
+
+                // Insert the widget HTML
+                container.innerHTML = `
+                    <div class="Bot-container" id="Bot-container">
+                        <div class="Bot-header">
+                            <div class="Bot-logo">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div>
+                                <h2 class="Bot-title">JAM AI Credit Bot</h2>
+                                <div class="Bot-subtitle">Your AI-powered credit repair assistant</div>
+                            </div>
+                        </div>
+                        
+                        <div class="Bot-tabs" id="Bot-tabs">
+                            <div class="Bot-tab active" data-tab="chat">
+                                <i class="Bot-tab-icon fas fa-comments"></i> Chat
+                            </div>
+                            <div class="Bot-tab" data-tab="upload">
+                                <i class="Bot-tab-icon fas fa-upload"></i> Upload Reports
+                            </div>
+                            <div class="Bot-tab" data-tab="guide">
+                                <i class="Bot-tab-icon fas fa-book"></i> Guide
+                            </div>
+                            <div class="Bot-tab" data-tab="settings">
+                                <i class="Bot-tab-icon fas fa-cog"></i> Settings
+                            </div>
+                        </div>
+                        
+                        <div class="Bot-content">
+                            <!-- Chat Tab -->
+                            <div class="Bot-tab-content active" id="Bot-tab-chat">
+                                <div class="Bot-chat-container">
+                                    <div class="Bot-chat-messages" id="Bot-chat-messages">
+                                        <!-- Messages will be added here -->
+                                    </div>
+                                    <div class="Bot-chat-input-container">
+                                        <textarea class="Bot-chat-input" id="Bot-chat-input" placeholder="Type your message here..." rows="1"></textarea>
+                                        <button class="Bot-chat-send" id="Bot-chat-send">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Tab -->
+                            <div class="Bot-tab-content" id="Bot-tab-upload">
+                                <div class="Bot-upload-container">
+                                    <div class="Bot-upload-area" id="Bot-upload-area">
+                                        <div class="Bot-upload-icon">
+                                            <i class="fas fa-file-upload"></i>
+                                        </div>
+                                        <h3 class="Bot-upload-title">Upload Your Credit Reports</h3>
+                                        <p class="Bot-upload-subtitle">Drag and drop your files here or click to browse</p>
+                                        <input type="file" class="Bot-upload-input" id="Bot-upload-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                                        <button class="Bot-upload-button">
+                                            <i class="fas fa-folder-open"></i> Browse Files
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="Bot-file-list" id="Bot-file-list">
+                                        <!-- Uploaded files will appear here -->
+                                    </div>
+                                    
+                                    <button class="Bot-upload-button" id="Bot-analyze-button" style="display: none; width: 100%;">
+                                        <i class="fas fa-search"></i> Analyze My Credit Reports
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Guide Tab -->
+                            <div class="Bot-tab-content" id="Bot-tab-guide">
+                                <div class="Bot-guide-container">
+                                    <div class="Bot-guide-step">
+                                        <div class="Bot-step-header">
+                                            <div class="Bot-step-number">1</div>
+                                            <h3 class="Bot-step-title">Upload Your Credit Reports</h3>
+                                        </div>
+                                        <div class="Bot-step-content">
+                                            <p>Start by uploading your credit reports from all three bureaus (Experian, Equifax, and TransUnion). The AI needs these to identify potential errors and negative items that can be disputed.</p>
+                                            <div class="Bot-step-tip">
+                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
+                                                <div>You can get free credit reports once a year from <a href="https://www.annualcreditreport.com" target="_blank">AnnualCreditReport.com</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="Bot-guide-step">
+                                        <div class="Bot-step-header">
+                                            <div class="Bot-step-number">2</div>
+                                            <h3 class="Bot-step-title">Review AI Analysis</h3>
+                                        </div>
+                                        <div class="Bot-step-content">
+                                            <p>After uploading, our AI will analyze your reports to identify potential errors, negative items, and opportunities for improvement. The analysis will highlight items that can be disputed under FCRA guidelines.</p>
+                                            <div class="Bot-step-tip">
+                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
+                                                <div>Common disputable items include incorrect personal information, accounts that aren't yours, late payments reported in error, and outdated negative information.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="Bot-guide-step">
+                                        <div class="Bot-step-header">
+                                            <div class="Bot-step-number">3</div>
+                                            <h3 class="Bot-step-title">Generate Dispute Letters</h3>
+                                        </div>
+                                        <div class="Bot-step-content">
+                                            <p>Use the chat interface to ask the AI to generate customized dispute letters for specific items. The AI will create legally-sound letters based on relevant credit laws and your specific situation.</p>
+                                            <div class="Bot-step-tip">
+                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
+                                                <div>Be specific when requesting letters. For example: "Generate a dispute letter for the late payment on my Capital One account from March 2022."</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="Bot-guide-step">
+                                        <div class="Bot-step-header">
+                                            <div class="Bot-step-number">4</div>
+                                            <h3 class="Bot-step-title">Send Disputes & Track Progress</h3>
+                                        </div>
+                                        <div class="Bot-step-content">
+                                            <p>Download and send the generated dispute letters to the appropriate credit bureaus. Return to the AI chat to ask questions about next steps, follow-up strategies, and to track your progress.</p>
+                                            <div class="Bot-step-tip">
+                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
+                                                <div>Credit bureaus typically respond within 30 days. Keep all correspondence and check your credit reports regularly to monitor changes.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Settings Tab -->
+                            <div class="Bot-tab-content" id="Bot-tab-settings">
+                                <div class="Bot-settings-container">
+                                    <div class="Bot-settings-section">
+                                        <h3 class="Bot-settings-title">
+                                            <i class="fas fa-bell"></i> Notifications
+                                        </h3>
+                                        <div class="Bot-settings-option">
+                                            <div class="Bot-settings-label">
+                                                <div class="Bot-settings-name">Email Notifications</div>
+                                                <div class="Bot-settings-description">Receive email updates about your disputes and credit changes</div>
+                                            </div>
+                                            <label class="Bot-toggle">
+                                                <input type="checkbox" checked id="Bot-setting-email">
+                                                <span class="Bot-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="Bot-settings-option">
+                                            <div class="Bot-settings-label">
+                                                <div class="Bot-settings-name">Credit Score Alerts</div>
+                                                <div class="Bot-settings-description">Get notified when your credit score changes</div>
+                                            </div>
+                                            <label class="Bot-toggle">
+                                                <input type="checkbox" checked id="Bot-setting-score-alerts">
+                                                <span class="Bot-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="Bot-settings-section">
+                                        <h3 class="Bot-settings-title">
+                                            <i class="fas fa-robot"></i> AI Assistant
+                                        </h3>
+                                        <div class="Bot-settings-option">
+                                            <div class="Bot-settings-label">
+                                                <div class="Bot-settings-name">AI Suggestions</div>
+                                                <div class="Bot-settings-description">Allow AI to proactively suggest credit improvement strategies</div>
+                                            </div>
+                                            <label class="Bot-toggle">
+                                                <input type="checkbox" checked id="Bot-setting-ai-suggestions">
+                                                <span class="Bot-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="Bot-settings-option">
+                                            <div class="Bot-settings-label">
+                                                <div class="Bot-settings-name">Save Chat History</div>
+                                                <div class="Bot-settings-description">Store your conversations with the AI for future reference</div>
+                                            </div>
+                                            <label class="Bot-toggle">
+                                                <input type="checkbox" checked id="Bot-setting-save-chat">
+                                                <span class="Bot-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="Bot-settings-section">
+                                        <h3 class="Bot-settings-title">
+                                            <i class="fas fa-shield-alt"></i> Privacy
+                                        </h3>
+                                        <div class="Bot-settings-option">
+                                            <div class="Bot-settings-label">
+                                                <div class="Bot-settings-name">Data Encryption</div>
+                                                <div class="Bot-settings-description">Encrypt all your credit data and communications</div>
+                                            </div>
+                                            <label class="Bot-toggle">
+                                                <input type="checkbox" checked id="Bot-setting-encryption" disabled>
+                                                <span class="Bot-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="Bot-settings-option">
+                                            <div class="Bot-settings-label">
+                                                <div class="Bot-settings-name">Anonymous Analytics</div>
+                                                <div class="Bot-settings-description">Share anonymous usage data to improve our service</div>
+                                            </div>
+                                            <label class="Bot-toggle">
+                                                <input type="checkbox" checked id="Bot-setting-analytics">
+                                                <span class="Bot-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners();
+
+                // Add welcome message
+                addBotMessage("👋 Hello! I'm your AI Credit Assistant. I can help you analyze your credit reports, identify disputable items, and generate dispute letters based on credit laws. Upload your credit reports or ask me questions about credit repair!");
+
+                // Mark as initialized
+                isInitialized = true;
+
+                return true;
+            }
+
+            // Reset initialization state for reloading
+            function reset() {
+                isInitialized = false;
+                return true;
+            }
+
+            // Set up event listeners for the widget
+            function setupEventListeners() {
+                // Tab switching
+                const tabs = document.querySelectorAll('.Bot-tab');
+                const tabContents = document.querySelectorAll('.Bot-tab-content');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const targetId = tab.getAttribute('data-tab');
+
+                        // Update active tab
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+
+                        // Update active content
+                        tabContents.forEach(content => {
+                            content.classList.remove('active');
+                            if (content.id === targetId) {
+                                content.classList.add('active');
+                            }
+                        });
+                    });
+                });
+
+                // Chat form submission
+                const chatForm = document.getElementById('Bot-chat-form');
+                const chatInput = document.getElementById('Bot-chat-input');
+
+                if (chatForm) {
+                    chatForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const message = chatInput.value.trim();
+                        if (message) {
+                            // Add user message to chat
+                            addUserMessage(message);
+
+                            // Clear input
+                            chatInput.value = '';
+
+                            // Process the message and get AI response
+                            processUserMessage(message);
+                        }
+                    });
+                }
+
+                // File upload handling
+                const fileUploadInput = document.getElementById('Bot-file-upload');
+                const uploadButton = document.getElementById('Bot-upload-button');
+
+                if (uploadButton && fileUploadInput) {
+                    uploadButton.addEventListener('click', () => {
+                        fileUploadInput.click();
+                    });
+
+                    fileUploadInput.addEventListener('change', (e) => {
+                        const files = e.target.files;
+                        if (files.length > 0) {
+                            handleFileUpload(files);
+                        }
+                    });
+                }
+
+                // Drag and drop for file upload
+                const dropArea = document.getElementById('Bot-drop-area');
+
+                if (dropArea) {
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        dropArea.addEventListener(eventName, preventDefaults, false);
+                    });
+
+                    function preventDefaults(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    ['dragenter', 'dragover'].forEach(eventName => {
+                        dropArea.addEventListener(eventName, () => {
+                            dropArea.classList.add('Bot-highlight');
+                        }, false);
+                    });
+
+                    ['dragleave', 'drop'].forEach(eventName => {
+                        dropArea.addEventListener(eventName, () => {
+                            dropArea.classList.remove('Bot-highlight');
+                        }, false);
+                    });
+
+                    dropArea.addEventListener('drop', (e) => {
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            handleFileUpload(files);
+                        }
+                    }, false);
+                }
+
+                // Settings toggles
+                const settingToggles = document.querySelectorAll('.Bot-toggle input[type="checkbox"]');
+
+                settingToggles.forEach(toggle => {
+                    toggle.addEventListener('change', (e) => {
+                        const settingId = e.target.id;
+                        const isEnabled = e.target.checked;
+                        updateSetting(settingId, isEnabled);
+                    });
+                });
+
+                // Example buttons in the guide tab
+                const exampleButtons = document.querySelectorAll('.Bot-example-button');
+
+                exampleButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const exampleQuery = button.getAttribute('data-query');
+                        if (exampleQuery) {
+                            // Switch to chat tab
+                            document.querySelector('.Bot-tab[data-tab="Bot-tab-chat"]').click();
+
+                            // Set the query in the input
+                            chatInput.value = exampleQuery;
+
+                            // Focus the input
+                            chatInput.focus();
+                        }
+                    });
+                });
+            }
+
+            // Handle file upload
+            function handleFileUpload(files) {
+                const fileList = Array.from(files);
+                const validFiles = fileList.filter(file => {
+                    const fileType = file.type;
+                    return fileType === 'application/pdf' ||
+                        fileType.startsWith('image/') ||
+                        fileType === 'text/plain';
+                });
+
+                if (validFiles.length === 0) {
+                    addBotMessage("⚠️ Please upload PDF, image, or text files only. These are the formats I can analyze for credit report information.");
+                    return;
+                }
+
+                // Show uploading message
+                addUserMessage(`Uploading ${validFiles.length} file(s): ${validFiles.map(f => f.name).join(', ')}`);
+
+                // Simulate file processing (in a real app, you'd send these to your server)
+                addBotMessage("📤 I'm receiving your files now. Please wait while I process them...");
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    // Show success message
+                    addBotMessage(`✅ I've analyzed your credit report files. I found several items that may be eligible for disputes:
+                    
+1. **Late Payment** - Capital One account ending in 4832 (reported 30 days late in March 2022)
+2. **High Balance** - Chase credit card showing balance higher than your actual balance
+3. **Incorrect Address** - Your report shows an address where you've never lived
+4. **Hard Inquiry** - From "ABC Lending" that you don't recognize
+
+Would you like me to help you create dispute letters for any of these items?`);
+                }, 3000);
+            }
+
+            // Process user message and generate AI response
+            function processUserMessage(message) {
+                // In a real implementation, this would call your AI API
+                // For demo purposes, we'll use some canned responses
+
+                // Simulate AI thinking
+                setTimeout(() => {
+                    // Simple pattern matching for demo purposes
+                    if (message.toLowerCase().includes('dispute letter') || message.toLowerCase().includes('generate letter')) {
+                        addBotMessage(`📝 Here's a dispute letter for your Capital One late payment:
+
+---
+
+**[Your Name]**
+**[Your Address]**
+**[City, State ZIP]**
+
+**[Date]**
+
+**Equifax Information Services LLC**
+**P.O. Box 740256**
+**Atlanta, GA 30374**
+
+**Re: Dispute of Inaccurate Information**
+
+To Whom It May Concern:
+
+I am writing to dispute the following information that appears on my credit report:
+
+**Account Information:**
+- Creditor: Capital One
+- Account Number: XXXX-XXXX-XXXX-4832
+- Reported Status: 30 days late payment in March 2022
+
+This information is inaccurate because I made this payment on time. I have attached a copy of my bank statement showing the payment was made on [date], which was before the due date.
+
+Under the Fair Credit Reporting Act, Section 611(a), you are required to conduct a reasonable investigation into this matter and remove or correct any information that cannot be verified.
+
+Please investigate this matter and delete this incorrect information from my credit report as soon as possible.
+
+Sincerely,
+
+[Your Signature]
+[Your Printed Name]
+
+---
+
+You can download this letter as a PDF, customize it with your specific details, and send it to all three credit bureaus. Would you like me to generate any other dispute letters?`);
+                    }
+                    else if (message.toLowerCase().includes('credit score') || message.toLowerCase().includes('improve')) {
+                        addBotMessage(`📈 Here are 5 effective strategies to improve your credit score:
+
+1. **Pay all bills on time** - Payment history is 35% of your FICO score
+2. **Reduce credit card balances** - Aim for less than 30% utilization
+3. **Don't close old accounts** - Length of credit history matters
+4. **Limit new credit applications** - Too many hard inquiries can hurt your score
+5. **Review your credit reports** - Dispute any errors you find
+
+Based on your credit report, focusing on reducing your credit card balances would likely have the biggest impact on your score. Would you like specific advice on any of these strategies?`);
+                    }
+                    else if (message.toLowerCase().includes('law') || message.toLowerCase().includes('fcra') || message.toLowerCase().includes('rights')) {
+                        addBotMessage(`⚖️ Here are key credit laws that protect your rights:
+
+**Fair Credit Reporting Act (FCRA)**
+- Gives you the right to dispute inaccurate information
+- Requires credit bureaus to investigate disputes within 30 days
+- Limits who can access your credit report
+- Entitles you to free credit reports annually
+
+**Fair Debt Collection Practices Act (FDCPA)**
+- Prohibits abusive debt collection practices
+- Restricts when and how collectors can contact you
+- Requires collectors to validate debts upon request
+- Gives you the right to request collectors stop contacting you
+
+**Equal Credit Opportunity Act (ECOA)**
+- Prohibits discrimination in lending based on race, color, religion, national origin, sex, marital status, age, or public assistance status
+
+Would you like more specific information about how any of these laws apply to your situation?`);
+                    }
+                    else {
+                        addBotMessage(`I'm here to help with your credit repair journey! You can ask me to:
+
+- Analyze your credit reports for errors
+- Generate customized dispute letters
+- Explain credit laws and your rights
+- Provide strategies to improve your credit score
+- Answer questions about the dispute process
+
+What would you like help with today?`);
+                    }
+                }, 1000);
+            }
+
+            // Add a user message to the chat
+            function addUserMessage(message) {
+                const chatMessages = document.querySelector('.Bot-chat-messages');
+                if (!chatMessages) return;
+
+                const messageElement = document.createElement('div');
+                messageElement.className = 'Bot-message Bot-user-message';
+                messageElement.innerHTML = `
+                    <div class="Bot-message-content">
+                        <p>${formatMessage(message)}</p>
+                    </div>
+                    <div class="Bot-message-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                `;
+
+                chatMessages.appendChild(messageElement);
+                scrollToBottom();
+            }
+
+            // Add a bot message to the chat
+            function addBotMessage(message) {
+                const chatMessages = document.querySelector('.Bot-chat-messages');
+                if (!chatMessages) return;
+
+                const messageElement = document.createElement('div');
+                messageElement.className = 'Bot-message Bot-bot-message';
+                messageElement.innerHTML = `
+                    <div class="Bot-message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="Bot-message-content">
+                        <p>${formatMessage(message)}</p>
+                    </div>
+                `;
+
+                chatMessages.appendChild(messageElement);
+                scrollToBottom();
+            }
+
+            // Format message with markdown-like syntax
+            function formatMessage(message) {
+                // Convert line breaks to <br>
+                let formatted = message.replace(/\n/g, '<br>');
+
+                // Bold text between **
+                formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                // Italic text between *
+                formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                return formatted;
+            }
+
+            // Scroll chat to bottom
+            function scrollToBottom() {
+                const chatMessages = document.querySelector('.Bot-chat-messages');
+                if (chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
+
+            // Update user settings
+            function updateSetting(settingId, isEnabled) {
+                console.log(`Setting ${settingId} changed to ${isEnabled}`);
+                // In a real app, you would save this to user preferences
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        // Expose the module globally
+        window.jamTipBot = JamTipBotModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamTipBotLoaded'));
+        }
+    </script>
+</body>
+
+</html>

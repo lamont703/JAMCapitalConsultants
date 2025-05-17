@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM Credit Solutions - Full Service Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Full Service Container Styles */
+        .full-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .full-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .full-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .full-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Full Service Plan Card */
+        .full-plan-card {
+            border: 2px solid #09ccfc;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .full-plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .full-plan-header {
+            padding: 1.5rem;
+            background: #e6f9ff;
+            border-bottom: 1px solid #dee2e6;
+            position: relative;
+        }
+
+        .full-plan-premium-tag {
+            background: #09ccfc;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 1rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            border-radius: 20px;
+        }
+
+        .full-plan-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #09ccfc;
+        }
+
+        .full-plan-price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .full-plan-price-period {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: normal;
+        }
+
+        .full-plan-target {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .full-plan-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-plan-description {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .full-plan-features {
+            list-style-type: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .full-plan-feature {
+            display: flex;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .full-plan-feature i {
+            color: #28a745;
+            margin-right: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .full-plan-cta {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .full-select-btn {
+            display: inline-block;
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .full-select-btn:hover {
+            background-color: #08b5e0;
+        }
+
+        /* Modal Styles */
+        .full-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .full-modal-content {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            padding: 2rem;
+        }
+
+        .full-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .full-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Payment Form Styles */
+        .full-payment-form-container {
+            display: none;
+        }
+
+        .full-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .full-form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .full-form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .full-form-input:focus {
+            border-color: #09ccfc;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.25);
+        }
+
+        .full-submit-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .full-submit-btn:hover {
+            background-color: #08b5e0;
+        }
+
+        /* Success Message */
+        .full-success-message {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .full-success-message i {
+            font-size: 3rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .full-success-message h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #28a745;
+        }
+
+        .full-success-message p {
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .full-plan-header {
+                padding: 1rem;
+            }
+
+            .full-plan-premium-tag {
+                top: 0.5rem;
+                right: 0.5rem;
+                font-size: 0.7rem;
+                padding: 0.2rem 0.7rem;
+            }
+
+            .full-plan-name {
+                font-size: 1.5rem;
+            }
+
+            .full-plan-price {
+                font-size: 1.8rem;
+            }
+
+            .full-plan-body {
+                padding: 1rem;
+            }
+
+            .full-plan-feature {
+                font-size: 0.95rem;
+            }
+
+            .full-select-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Self-executing function to create the module
+        const FullServicePlanModule = (function () {
+            let isInitialized = false;
+            let isModalOpen = false;
+            
+            // Try to restore state immediately when module is defined
+            try {
+                const savedState = sessionStorage.getItem('jamFullServicePlanState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    console.log('Restored Full Service Plan state during module definition', parsedState);
+                    
+                    if (parsedState.isInitialized) {
+                        isInitialized = parsedState.isInitialized;
+                    }
+                    if (parsedState.isModalOpen) {
+                        isModalOpen = parsedState.isModalOpen;
+                    }
+                }
+            } catch (e) {
+                console.error('Error restoring Full Service Plan state during definition:', e);
+            }
+
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                console.log('Initializing Full Service Plan Module, isInitialized:', isInitialized);
+
+                // Insert the widget HTML
+                container.innerHTML = `
+                    <div class="full-container">
+                        <div class="full-plan-card">
+                            <div class="full-plan-header">
+                                <div class="full-plan-premium-tag">PREMIUM</div>
+                                <h3 class="full-plan-name">Full-Service Plan</h3>
+                                <div class="full-plan-price">$199<span class="full-plan-price-period">/month</span></div>
+                                <div class="full-plan-target">For those who want experts to handle everything</div>
+                            </div>
+                            <div class="full-plan-body">
+                                <div class="full-plan-description">
+                                    Our premium white-glove service where our experts handle every aspect of your credit repair journey.
+                                </div>
+                                <ul class="full-plan-features">
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Dedicated credit repair specialist assigned to your case</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Unlimited custom dispute letters to creditors & bureaus</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Priority processing of all disputes</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Monthly credit score updates & detailed analysis</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Direct creditor negotiations on your behalf</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Identity theft protection & insurance</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Weekly progress updates via phone or email</span>
+                                    </li>
+                                    <li class="full-plan-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Personalized credit building strategy</span>
+                                    </li>
+                                </ul>
+                                <div class="full-plan-cta">
+                                    <button class="full-select-btn" id="full-select-btn">Get Started Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden payment form container -->
+                        <div id="full-payment-form-container" class="full-payment-form-container">
+                            <form id="full-payment-form">
+                                <div class="full-form-group">
+                                    <label for="full-name" class="full-form-label">Full Name</label>
+                                    <input type="text" id="full-name" class="full-form-input" required>
+                                </div>
+                                <div class="full-form-group">
+                                    <label for="full-email" class="full-form-label">Email Address</label>
+                                    <input type="email" id="full-email" class="full-form-input" required>
+                                </div>
+                                <div class="full-form-group">
+                                    <label for="full-phone" class="full-form-label">Phone Number</label>
+                                    <input type="tel" id="full-phone" class="full-form-input" required>
+                                </div>
+                                <div class="full-form-group">
+                                    <label for="full-card-number" class="full-form-label">Credit Card Number</label>
+                                    <input type="text" id="full-card-number" class="full-form-input" required>
+                                </div>
+                                <div class="full-form-group">
+                                    <label for="full-card-expiry" class="full-form-label">Expiration Date</label>
+                                    <input type="text" id="full-card-expiry" class="full-form-input" placeholder="MM/YY" required>
+                                </div>
+                                <div class="full-form-group">
+                                    <label for="full-card-cvv" class="full-form-label">CVV</label>
+                                    <input type="text" id="full-card-cvv" class="full-form-input" required>
+                                </div>
+                                <button type="submit" class="full-submit-btn">Complete Purchase</button>
+                            </form>
+                        </div>
+
+                        <div class="full-modal" id="full-modal">
+                            <div class="full-modal-content">
+                                <span class="full-modal-close" id="full-modal-close">&times;</span>
+                                <h3 class="full-modal-title">Complete Your Full-Service Plan Purchase</h3>
+                                <div id="full-modal-content">
+                                    <!-- Content will be dynamically inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+                
+                // Save state
+                saveState();
+                
+                return true;
+            }
+
+            // Set up event listeners for the module
+            function setupEventListeners(container) {
+                // Select button
+                const selectBtn = container.querySelector('#full-select-btn');
+                if (selectBtn) {
+                    selectBtn.addEventListener('click', openModal);
+                }
+
+                // Modal close button
+                const modalCloseBtn = container.querySelector('#full-modal-close');
+                if (modalCloseBtn) {
+                    modalCloseBtn.addEventListener('click', function () {
+                        closeModal();
+                    });
+                }
+
+                // Close modal when clicking outside
+                const modal = container.querySelector('#full-modal');
+                if (modal) {
+                    modal.addEventListener('click', function (e) {
+                        if (e.target === modal) {
+                            closeModal();
+                        }
+                    });
+                }
+
+                // Payment form submission
+                const paymentForm = container.querySelector('#full-payment-form');
+                if (paymentForm) {
+                    paymentForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        processPayment(container);
+                    });
+                }
+            }
+
+            // Open the modal with payment form
+            function openModal() {
+                const modal = document.getElementById('full-modal');
+                const modalContent = document.getElementById('full-modal-content');
+                const paymentFormContainer = document.getElementById('full-payment-form-container');
+
+                if (!modal || !modalContent || !paymentFormContainer) return;
+
+                // Clone the payment form into the modal
+                modalContent.innerHTML = '';
+                modalContent.appendChild(paymentFormContainer.cloneNode(true));
+
+                // Show the payment form
+                modalContent.querySelector('#full-payment-form-container').style.display = 'block';
+
+                // Set up event listeners for the cloned form
+                const paymentForm = modalContent.querySelector('#full-payment-form');
+                if (paymentForm) {
+                    paymentForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        processPayment(modalContent);
+                    });
+                }
+
+                // Show the modal
+                modal.style.display = 'flex';
+                isModalOpen = true;
+                
+                // Save state
+                saveState();
+            }
+
+            // Close the modal
+            function closeModal() {
+                const modal = document.getElementById('full-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    isModalOpen = false;
+                    
+                    // Save state
+                    saveState();
+                }
+            }
+
+            // Process the payment (mock implementation)
+            function processPayment(container) {
+                // In a real implementation, this would connect to a payment processor
+                console.log('Processing payment for Full Service Plan');
+
+                // Get form values
+                const name = container.querySelector('#full-name').value;
+                const email = container.querySelector('#full-email').value;
+                const phone = container.querySelector('#full-phone').value;
+                const cardNumber = container.querySelector('#full-card-number').value;
+
+                // Log form data (for demonstration only - in production you would send to server)
+                console.log('Payment form data:', { name, email, phone, cardNumber: '****' + cardNumber.slice(-4) });
+
+                // Show processing message
+                const form = container.querySelector('#full-payment-form');
+                form.innerHTML = `
+                    <div class="full-success-message">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Processing your payment...
+                    </div>
+                `;
+
+                // Simulate payment processing
+                setTimeout(() => {
+                    // Show success message
+                    form.innerHTML = `
+                        <div class="full-success-message">
+                            <i class="fas fa-check-circle"></i>
+                            <h4>Payment Successful!</h4>
+                            <p>Thank you for purchasing our Full-Service Plan. We've sent a confirmation email to ${email}.</p>
+                            <p>A credit advisor will contact you within 24 hours to get started on your credit repair journey.</p>
+                            <button class="full-submit-btn" id="full-close-success-btn">Close</button>
+                        </div>
+                    `;
+
+                    // Add event listener to close button
+                    const closeBtn = form.querySelector('#full-close-success-btn');
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', function () {
+                            closeModal();
+                        });
+                    }
+                }, 2000);
+            }
+            
+            // Save state to sessionStorage
+            function saveState() {
+                try {
+                    const state = {
+                        isInitialized: isInitialized,
+                        isModalOpen: isModalOpen
+                    };
+                    sessionStorage.setItem('jamFullServicePlanState', JSON.stringify(state));
+                    console.log('Saved Full Service Plan state to session storage', state);
+                } catch (e) {
+                    console.error('Error saving Full Service Plan state:', e);
+                }
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                isModalOpen = false;
+                try {
+                    sessionStorage.removeItem('jamFullServicePlanState');
+                } catch (e) {
+                    console.error('Error clearing Full Service Plan state:', e);
+                }
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                openModal: function () {
+                    if (isInitialized) {
+                        openModal();
+                        return true;
+                    }
+                    return false;
+                },
+                closeModal: function () {
+                    if (isInitialized && isModalOpen) {
+                        closeModal();
+                        return true;
+                    }
+                    return false;
+                },
+                isModalOpen: function () {
+                    return isModalOpen;
+                }
+            };
+        })();
+
+        // Expose the module globally
+        window.jamFullServicePlan = FullServicePlanModule;
+        
+        // Add a more robust reload mechanism
+        window.addEventListener('pageshow', function(event) {
+            // pageshow fires when the page is shown, including from bfcache
+            if (event.persisted) {
+                console.log('Page was restored from bfcache, reinitializing Full Service Plan module');
+                const container = document.getElementById('fullservice-plan-container');
+                if (container && window.jamFullServicePlan) {
+                    window.jamFullServicePlan.init('fullservice-plan-container');
+                }
+            }
+        });
+        
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM content loaded, checking for Full Service plan container');
+            const container = document.getElementById('fullservice-plan-container');
+            if (container && window.jamFullServicePlan) {
+                console.log('Found Full Service plan container, initializing');
+                window.jamFullServicePlan.init('fullservice-plan-container');
+            }
+        });
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamFullServicePlanLoaded'));
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM Credit Solutions - Plan Comparison</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Comparison Container Styles */
+        .comparison-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .comparison-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Comparison Table Styles */
+        .comparison-table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font-size: 0.95rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .comparison-table th {
+            background-color: #e6f9ff;
+            font-weight: 600;
+            color: #343a40;
+            position: sticky;
+            top: 0;
+        }
+
+        .comparison-table th:first-child {
+            text-align: left;
+            width: 25%;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .comparison-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .comparison-check {
+            color: #09ccfc;
+            font-size: 1.2rem;
+        }
+
+        .comparison-times {
+            color: #dc3545;
+            font-size: 1.2rem;
+        }
+
+        .comparison-highlight {
+            background-color: rgba(9, 204, 252, 0.1);
+        }
+
+        .comparison-plan-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-plan-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .comparison-plan-period {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .comparison-cta {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .comparison-cta-text {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #343a40;
+        }
+
+        .comparison-select-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem 1rem 0.5rem;
+        }
+
+        .comparison-select-btn:hover {
+            background-color: #08b7e4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .comparison-plan-name {
+                font-size: 1rem;
+            }
+
+            .comparison-plan-price {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Self-executing function to create the module
+        const PlanComparisonModule = (function () {
+            let isInitialized = false;
+
+            // Try to restore state immediately when module is defined
+            try {
+                const savedState = sessionStorage.getItem('jamPlanComparisonState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    console.log('Restored Plan Comparison state during module definition', parsedState);
+
+                    if (parsedState.isInitialized) {
+                        isInitialized = parsedState.isInitialized;
+                    }
+                }
+            } catch (e) {
+                console.error('Error restoring Plan Comparison state during definition:', e);
+            }
+
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                console.log('Initializing Plan Comparison Module, isInitialized:', isInitialized);
+
+                // Create the comparison table
+                container.innerHTML = `
+                    <div class="comparison-container">
+                        <div class="comparison-header">
+                            <h2 class="comparison-title">Plan Comparison</h2>
+                            <p class="comparison-subtitle">Compare our plans to find the best fit for your credit repair needs.</p>
+                        </div>
+                        
+                        <div class="comparison-table-container">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Features</th>
+                                        <th>
+                                            <div class="comparison-plan-name">Free Plan</div>
+                                            <div class="comparison-plan-price">$0<span class="comparison-plan-period">/forever</span></div>
+                                        </th>
+                                        <th>
+                                            <div class="comparison-plan-name">DIY Plan</div>
+                                            <div class="comparison-plan-price">$49-$79<span class="comparison-plan-period">/month</span></div>
+                                        </th>
+                                        <th class="comparison-highlight">
+                                            <div class="comparison-plan-name">Full-Service Plan</div>
+                                            <div class="comparison-plan-price">$99<span class="comparison-plan-period">/month</span></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Dispute Letter Library</td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Credit Repair eBook</td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email Support</td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>JAM Dispute Bot Access</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Custom Dispute Letters</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Credit Score Monitoring</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Personal Credit Advisor</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Priority Dispute Processing</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Credit Building Strategies</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monthly Progress Reports</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="comparison-cta">
+                            <p class="comparison-cta-text">Ready to start improving your credit?</p>
+                            <button class="comparison-select-btn" id="comparison-free-btn">Choose Free Plan</button>
+                            <button class="comparison-select-btn" id="comparison-diy-btn">Choose DIY Plan</button>
+                            <button class="comparison-select-btn" id="comparison-full-btn">Choose Full-Service Plan</button>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+
+                // Save state
+                saveState();
+
+                return true;
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // Free Plan button
+                const freeBtn = container.querySelector('#comparison-free-btn');
+                if (freeBtn) {
+                    freeBtn.addEventListener('click', function () {
+                        if (window.jamPricingTiers && typeof window.jamPricingTiers.reloadModule === 'function') {
+                            window.jamPricingTiers.reloadModule('FreePlanModule', 'free-plan-container');
+                            // Scroll to the free plan
+                            const freePlanContainer = document.getElementById('free-plan-container');
+                            if (freePlanContainer) {
+                                freePlanContainer.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }
+                    });
+                }
+
+                // DIY Plan button
+                const diyBtn = container.querySelector('#comparison-diy-btn');
+                if (diyBtn) {
+                    diyBtn.addEventListener('click', function () {
+                        if (window.jamPricingTiers && typeof window.jamPricingTiers.reloadModule === 'function') {
+                            window.jamPricingTiers.reloadModule('DIYPlanModule', 'diy-plan-container');
+                            // Scroll to the DIY plan
+                            const diyPlanContainer = document.getElementById('diy-plan-container');
+                            if (diyPlanContainer) {
+                                diyPlanContainer.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }
+                    });
+                }
+
+                // Full-Service Plan button
+                const fullBtn = container.querySelector('#comparison-full-btn');
+                if (fullBtn) {
+                    fullBtn.addEventListener('click', function () {
+                        if (window.jamPricingTiers && typeof window.jamPricingTiers.reloadModule === 'function') {
+                            window.jamPricingTiers.reloadModule('FullServicePlanModule', 'fullservice-plan-container');
+                            // Scroll to the full-service plan
+                            const fullServicePlanContainer = document.getElementById('fullservice-plan-container');
+                            if (fullServicePlanContainer) {
+                                fullServicePlanContainer.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Save state to sessionStorage
+            function saveState() {
+                try {
+                    const state = {
+                        isInitialized: isInitialized
+                    };
+                    sessionStorage.setItem('jamPlanComparisonState', JSON.stringify(state));
+                    console.log('Saved Plan Comparison state to session storage', state);
+                } catch (e) {
+                    console.error('Error saving Plan Comparison state:', e);
+                }
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                try {
+                    sessionStorage.removeItem('jamPlanComparisonState');
+                } catch (e) {
+                    console.error('Error clearing Plan Comparison state:', e);
+                }
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        // Expose the module globally
+        window.jamPlanComparison = PlanComparisonModule;
+
+        // Add a more robust reload mechanism
+        window.addEventListener('pageshow', function (event) {
+            // pageshow fires when the page is shown, including from bfcache
+            if (event.persisted) {
+                console.log('Page was restored from bfcache, reinitializing Plan Comparison module');
+                const container = document.getElementById('plan-comparison-container');
+                if (container && window.jamPlanComparison) {
+                    window.jamPlanComparison.init('plan-comparison-container');
+                }
+            }
+        });
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM content loaded, checking for Plan Comparison container');
+            const container = document.getElementById('plan-comparison-container');
+            if (container && window.jamPlanComparison) {
+                console.log('Found Plan Comparison container, initializing');
+                window.jamPlanComparison.init('plan-comparison-container');
+            }
+        });
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamPlanComparisonLoaded'));
+        }
+    </script>
+</body>
+
+</html>

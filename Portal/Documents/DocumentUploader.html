@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Document Upload</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #008080;
+            --primary-dark: #006666;
+            --primary-light: #e6f7f7;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+        }
+
+        .document-upload-container {
+            font-family: 'Montserrat', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .document-upload-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .document-upload-title {
+            color: #09ccfc;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .document-upload-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .document-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .document-section-title {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e6f9ff;
+        }
+
+        .document-section-description {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #6c757d;
+        }
+
+        .document-upload-area {
+            border: 2px dashed #b3eafc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .document-upload-area:hover {
+            background-color: #e6f9ff;
+        }
+
+        .document-upload-icon {
+            font-size: 3rem;
+            color: #09ccfc;
+            margin-bottom: 15px;
+        }
+
+        .document-upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+
+        .document-upload-subtext {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .document-list {
+            margin-top: 30px;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .document-item:last-child {
+            border-bottom: none;
+        }
+
+        .document-icon {
+            font-size: 1.5rem;
+            color: #09ccfc;
+            margin-right: 15px;
+        }
+
+        .document-info {
+            flex-grow: 1;
+        }
+
+        .document-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .document-meta {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .document-actions {
+            display: flex;
+        }
+
+        .document-action-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s;
+        }
+
+        .document-action-btn:hover {
+            color: #09ccfc;
+        }
+
+        .document-action-btn.delete:hover {
+            color: #dc3545;
+        }
+
+        .document-upload-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .document-upload-btn:hover {
+            background-color: #07a3ca;
+        }
+
+        .document-upload-btn i {
+            margin-right: 8px;
+        }
+
+        .document-upload-input {
+            display: none;
+        }
+
+        .document-progress {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .document-progress-bar {
+            height: 100%;
+            background-color: #09ccfc;
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        .document-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .document-status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .document-status.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .document-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .document-empty {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+        .document-empty-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .document-empty-text {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .document-empty-subtext {
+            font-size: 0.9rem;
+        }
+
+        /* SmartCredit Login Section */
+        .smartcredit-login-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .smartcredit-login-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .smartcredit-logo {
+            max-width: 180px;
+            margin-right: 20px;
+        }
+
+        .smartcredit-login-title {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .smartcredit-login-description {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: var(--gray-600);
+        }
+
+        .smartcredit-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-top: 5px;
+        }
+
+        .form-submit {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .form-submit:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .form-note {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-top: 15px;
+        }
+
+        .form-divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .form-divider-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--gray-300);
+        }
+
+        .form-divider-text {
+            padding: 0 15px;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .document-section {
+                padding: 20px;
+            }
+
+            .document-upload-area {
+                padding: 20px;
+            }
+
+            .smartcredit-login-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .smartcredit-logo {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Document Upload Module
+        const DocumentUploadModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let uploadedDocuments = [];
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return false;
+
+                console.log(`Initializing Document Upload Module in container: ${containerId}`);
+
+                // Insert the widget HTML
+                container.innerHTML = `
+                    <div class="document-upload-container">
+                        <div class="document-upload-header">
+                            <h2 class="document-upload-title">Document Upload</h2>
+                            <p class="document-upload-subtitle">Upload your documents and provide access to your credit monitoring</p>
+                        </div>
+                        
+                        <!-- SmartCredit Login Section -->
+                        <div class="smartcredit-login-section">
+                            <div class="smartcredit-login-header">
+                                <img src="../assets/images/smartcredit-logo.png" alt="SmartCredit Logo" class="smartcredit-logo">
+                                <div>
+                                    <h3 class="smartcredit-login-title">SmartCredit Account Access</h3>
+                                </div>
+                            </div>
+                            
+                            <p class="smartcredit-login-description">
+                                To provide you with the best service, we need access to your SmartCredit account. 
+                                This allows us to review your credit reports and track progress as we work on your behalf.
+                                Your information is kept secure and is only used for credit repair purposes.
+                            </p>
+                            
+                            <div class="smartcredit-form">
+                                <form id="smartcredit-access-form">
+                                    <div class="form-group">
+                                        <label for="smartcredit-email" class="form-label">SmartCredit Email</label>
+                                        <input type="email" id="smartcredit-email" class="form-input" placeholder="Enter your SmartCredit email" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="smartcredit-password" class="form-label">SmartCredit Password</label>
+                                        <input type="password" id="smartcredit-password" class="form-input" placeholder="Enter your SmartCredit password" required>
+                                        <p class="form-help">Your credentials are encrypted and securely stored. We never share this information with third parties.</p>
+                                    </div>
+                                    
+                                    <button type="submit" class="form-submit">Submit SmartCredit Access</button>
+                                    
+                                    <p class="form-note">Don't have a SmartCredit account yet? <a href="https://smartcredit.com/partners/jamcredit" target="_blank">Sign up here</a></p>
+                                </form>
+                                
+                                <div class="form-divider">
+                                    <div class="form-divider-line"></div>
+                                    <div class="form-divider-text">OR</div>
+                                    <div class="form-divider-line"></div>
+                                </div>
+                                
+                                <p class="form-note">
+                                    If you prefer not to provide login access, you can download and upload your credit reports manually below.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Credit Report Upload Section -->
+                        <div class="document-section">
+                            <h3 class="document-section-title">Credit Reports</h3>
+                            <p class="document-section-description">
+                                Upload your credit reports from all three bureaus (Experian, Equifax, and TransUnion).
+                                PDF format is preferred.
+                            </p>
+                            
+                            <div class="document-upload-area" id="credit-report-upload">
+                                <i class="fas fa-file-upload document-upload-icon"></i>
+                                <p class="document-upload-text">Drag & drop your credit reports here</p>
+                                <p class="document-upload-subtext">or click to browse files</p>
+                                <input type="file" class="document-upload-input" id="credit-report-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                            
+                            <div class="document-list" id="credit-report-list">
+                                <!-- Uploaded documents will appear here -->
+                            </div>
+                        </div>
+                        
+                        <!-- ID Verification Section -->
+                        <div class="document-section">
+                            <h3 class="document-section-title">ID Verification</h3>
+                            <p class="document-section-description">
+                                Please upload a copy of your government-issued ID and a recent utility bill or bank statement
+                                showing your name and current address.
+                            </p>
+                            
+                            <div class="document-upload-area" id="id-upload">
+                                <i class="fas fa-id-card document-upload-icon"></i>
+                                <p class="document-upload-text">Drag & drop your ID documents here</p>
+                                <p class="document-upload-subtext">or click to browse files</p>
+                                <input type="file" class="document-upload-input" id="id-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                            
+                            <div class="document-list" id="id-list">
+                                <!-- Uploaded documents will appear here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Documents Section -->
+                        <div class="document-section">
+                            <h3 class="document-section-title">Additional Documents</h3>
+                            <p class="document-section-description">
+                                Upload any additional documents that may help with your credit repair process,
+                                such as correspondence with creditors, payment receipts, or court documents.
+                            </p>
+                            
+                            <div class="document-upload-area" id="additional-upload">
+                                <i class="fas fa-file-alt document-upload-icon"></i>
+                                <p class="document-upload-text">Drag & drop additional documents here</p>
+                                <p class="document-upload-subtext">or click to browse files</p>
+                                <input type="file" class="document-upload-input" id="additional-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                            </div>
+                            
+                            <div class="document-list" id="additional-list">
+                                <!-- Uploaded documents will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners and other initialization
+                setupEventListeners(container);
+
+                return true;
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // SmartCredit form submission
+                const smartCreditForm = container.querySelector('#smartcredit-access-form');
+                if (smartCreditForm) {
+                    smartCreditForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const email = container.querySelector('#smartcredit-email').value;
+                        const password = container.querySelector('#smartcredit-password').value;
+
+                        // Here you would normally send this data securely to your backend
+                        console.log('SmartCredit access submitted');
+
+                        // Show success message
+                        smartCreditForm.innerHTML = `
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                                <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
+                                <p>Thank you for providing your SmartCredit access. Our team will use this to help with your credit repair process.</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Credit report upload
+                setupUploadArea(container, 'credit-report-upload', 'credit-report-input', 'credit-report-list');
+
+                // ID verification upload
+                setupUploadArea(container, 'id-upload', 'id-input', 'id-list');
+
+                // Additional documents upload
+                setupUploadArea(container, 'additional-upload', 'additional-input', 'additional-list');
+            }
+
+            // Set up upload area functionality
+            function setupUploadArea(container, areaId, inputId, listId) {
+                const uploadArea = container.querySelector(`#${areaId}`);
+                const uploadInput = container.querySelector(`#${inputId}`);
+                const documentList = container.querySelector(`#${listId}`);
+
+                if (uploadArea && uploadInput) {
+                    // Click on upload area to trigger file input
+                    uploadArea.addEventListener('click', function () {
+                        uploadInput.click();
+                    });
+
+                    // Handle file selection
+                    uploadInput.addEventListener('change', function () {
+                        handleFiles(this.files, documentList);
+                    });
+
+                    // Drag and drop functionality
+                    uploadArea.addEventListener('dragover', function (e) {
+                        e.preventDefault();
+                        uploadArea.style.backgroundColor = 'var(--primary-light)';
+                    });
+
+                    uploadArea.addEventListener('dragleave', function () {
+                        uploadArea.style.backgroundColor = '';
+                    });
+
+                    uploadArea.addEventListener('drop', function (e) {
+                        e.preventDefault();
+                        uploadArea.style.backgroundColor = '';
+                        handleFiles(e.dataTransfer.files, documentList);
+                    });
+                }
+            }
+
+            // Handle uploaded files
+            function handleFiles(files, listElement) {
+                if (!files || !listElement) return;
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    // Create a unique ID for this file
+                    const fileId = 'file-' + Date.now() + '-' + i;
+
+                    // Add to our internal array
+                    uploadedDocuments.push({
+                        id: fileId,
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        uploadDate: new Date()
+                    });
+
+                    // Create list item
+                    const listItem = document.createElement('div');
+                    listItem.className = 'document-item';
+                    listItem.id = fileId;
+
+                    // Determine icon based on file type
+                    let iconClass = 'fa-file';
+                    if (file.type.includes('pdf')) {
+                        iconClass = 'fa-file-pdf';
+                    } else if (file.type.includes('image')) {
+                        iconClass = 'fa-file-image';
+                    } else if (file.type.includes('word')) {
+                        iconClass = 'fa-file-word';
+                    }
+
+                    // Format file size
+                    const fileSize = formatFileSize(file.size);
+
+                    // Add content to list item
+                    listItem.innerHTML = `
+                        <i class="fas ${iconClass} document-icon"></i>
+                        <div class="document-info">
+                            <div class="document-name">${file.name}</div>
+                            <div class="document-meta">${fileSize} • Uploaded just now</div>
+                        </div>
+                        <div class="document-actions">
+                            <button class="document-action-btn view" data-id="${fileId}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="document-action-btn delete" data-id="${fileId}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    // Add to list
+                    listElement.appendChild(listItem);
+
+                    // Add event listeners for actions
+                    const deleteBtn = listItem.querySelector('.delete');
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', function () {
+                            const id = this.getAttribute('data-id');
+                            deleteDocument(id);
+                        });
+                    }
+
+                    const viewBtn = listItem.querySelector('.view');
+                    if (viewBtn) {
+                        viewBtn.addEventListener('click', function () {
+                            const id = this.getAttribute('data-id');
+                            viewDocument(id);
+                        });
+                    }
+                }
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Delete a document
+            function deleteDocument(id) {
+                // Remove from DOM
+                const element = container.querySelector(`#${id}`);
+                if (element) {
+                    element.remove();
+                }
+
+                // Remove from our array
+                uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
+            }
+
+            // View a document
+            function viewDocument(id) {
+                const document = uploadedDocuments.find(doc => doc.id === id);
+                if (!document) return;
+
+                // For images, we can create a URL and open it
+                if (document.file.type.includes('image')) {
+                    const url = URL.createObjectURL(document.file);
+                    window.open(url, '_blank');
+                } else if (document.file.type.includes('pdf')) {
+                    // For PDFs, we can also use URL.createObjectURL
+                    const url = URL.createObjectURL(document.file);
+                    window.open(url, '_blank');
+                } else {
+                    // For other file types, we might need to download them
+                    alert('Preview not available for this file type. Please download the file to view it.');
+                }
+            }
+
+            // Reset function to allow reinitialization
+            function reset() {
+                isInitialized = false;
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        // Expose the module globally
+        window.jamDocumentUpload = DocumentUploadModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('documentUploadLoaded'));
+        }
+    </script>
+</body>
+
+</html>

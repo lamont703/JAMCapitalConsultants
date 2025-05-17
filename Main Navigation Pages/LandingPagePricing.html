@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Pricing Plans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--gray-600);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .pricing-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .pricing-plan {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .pricing-plan:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .pricing-header {
+            padding: 30px;
+            background-color: var(--primary-light);
+            text-align: center;
+        }
+
+        .free-plan .pricing-header {
+            background-color: var(--gray-200);
+        }
+
+        .guided-plan .pricing-header {
+            background-color: var(--primary-light);
+        }
+
+        .full-service-plan .pricing-header {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .plan-period {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .plan-target {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .pricing-body {
+            padding: 30px;
+        }
+
+        .plan-description {
+            margin-bottom: 20px;
+            color: var(--gray-600);
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .plan-features li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .plan-features i {
+            color: var(--primary);
+            margin-right: 10px;
+            margin-top: 4px;
+        }
+
+        .free-plan .plan-features i {
+            color: var(--gray-600);
+        }
+
+        .plan-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .plan-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .free-plan .plan-button {
+            background-color: var(--gray-600);
+        }
+
+        .free-plan .plan-button:hover {
+            background-color: var(--gray-800);
+        }
+
+        .popular-tag {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background-color: var(--primary);
+            color: white;
+            padding: 5px 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+            transform-origin: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            padding: 80px 0;
+            background-color: var(--gray-100);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 40px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .comparison-table th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table th:first-child {
+            text-align: left;
+            width: 30%;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table i.fa-check {
+            color: var(--primary);
+        }
+
+        .comparison-table i.fa-times {
+            color: var(--gray-600);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 20px;
+            background-color: var(--white);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .faq-question:hover {
+            background-color: var(--primary-light);
+        }
+
+        .faq-question.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .faq-answer {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: var(--white);
+        }
+
+        .faq-answer div {
+            padding: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .cta-btn-primary {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        .cta-btn-primary:hover {
+            background-color: var(--gray-100);
+            transform: translateY(-3px);
+        }
+
+        .cta-btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .cta-btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .pricing-plans {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Simple, Transparent Pricing</h1>
+            <p>Choose the plan that fits your needs and budget. No hidden fees, no long-term contracts.</p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Pricing Plans</h2>
+                <p>We offer flexible options to help you repair your credit, whether you prefer to do it yourself or
+                    have our experts handle everything.</p>
+            </div>
+
+            <div class="pricing-plans">
+                <!-- Free Plan -->
+                <div class="pricing-plan free-plan">
+                    <div class="pricing-header">
+                        <h3 class="plan-name">Free Plan</h3>
+                        <div class="plan-price">$0<span class="plan-period">/forever</span></div>
+                        <div class="plan-target">Perfect for getting started</div>
+                    </div>
+                    <div class="pricing-body">
+                        <div class="plan-description">
+                            Start your credit repair journey with our essential free tools and resources.
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Dispute Letter Library</li>
+                            <li><i class="fas fa-check"></i> Credit Repair eBook</li>
+                            <li><i class="fas fa-check"></i> Email Support</li>
+                            <li><i class="fas fa-check"></i> Basic Credit Tools</li>
+                            <li><i class="fas fa-check"></i> Credit Repair Strategy Guide</li>
+                        </ul>
+                        <button class="plan-button">Start JAM Engine</button>
+                    </div>
+                </div>
+
+                <!-- DIY Plan -->
+                <div class="pricing-plan">
+                    <div class="pricing-header">
+                        <h3 class="plan-name">DIY Plan</h3>
+                        <div class="plan-price">$49-$79<span class="plan-period">/month</span></div>
+                        <div class="plan-target">Perfect for budget-conscious DIYers</div>
+                    </div>
+                    <div class="pricing-body">
+                        <div class="plan-description">
+                            Take control of your credit repair journey with our powerful self-service tools.
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Full access to JAM Dispute Bot</li>
+                            <li><i class="fas fa-check"></i> Generate custom dispute letters</li>
+                            <li><i class="fas fa-check"></i> Track dispute progress</li>
+                            <li><i class="fas fa-check"></i> Credit score monitoring</li>
+                            <li><i class="fas fa-check"></i> Self-guided credit repair</li>
+                        </ul>
+                        <button class="plan-button">Start JAM Engine</button>
+                    </div>
+                </div>
+
+                <!-- Guided Plan -->
+                <div class="pricing-plan guided-plan">
+                    <div class="popular-tag">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3 class="plan-name">Guided Plan</h3>
+                        <div class="plan-price">$149<span class="plan-period">/month</span></div>
+                        <div class="plan-target">Ideal for those who need guidance</div>
+                    </div>
+                    <div class="pricing-body">
+                        <div class="plan-description">
+                            Get expert support and guidance along with all the tools you need for effective credit
+                            repair.
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Everything in DIY Plan</li>
+                            <li><i class="fas fa-check"></i> Monthly strategy calls</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                            <li><i class="fas fa-check"></i> Personalized dispute strategy</li>
+                            <li><i class="fas fa-check"></i> Credit building guidance</li>
+                        </ul>
+                        <button class="plan-button">Start JAM Engine</button>
+                    </div>
+                </div>
+
+                <!-- Full-Service Plan -->
+                <div class="pricing-plan full-service-plan">
+                    <div class="pricing-header">
+                        <h3 class="plan-name">Full-Service Plan</h3>
+                        <div class="plan-price">$399<span class="plan-period"> signup + $197/month</span></div>
+                        <div class="plan-target">For those who want it all done for them</div>
+                    </div>
+                    <div class="pricing-body">
+                        <div class="plan-description">
+                            Our white-glove service where we handle everything for you from start to finish.
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Everything in Guided Plan</li>
+                            <li><i class="fas fa-check"></i> We write & send all letters</li>
+                            <li><i class="fas fa-check"></i> Handle all follow-ups</li>
+                            <li><i class="fas fa-check"></i> Dedicated credit advisor</li>
+                            <li><i class="fas fa-check"></i> Comprehensive credit building</li>
+                        </ul>
+                        <button class="plan-button">Start JAM Engine</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Plan Comparison</h2>
+                <p>Compare our plans to find the perfect fit for your credit repair needs.</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Features</th>
+                        <th>Free</th>
+                        <th>DIY</th>
+                        <th>Guided</th>
+                        <th>Full-Service</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Credit Report Analysis</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Custom Dispute Letters</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Credit Score Monitoring</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>JAM Dispute Bot Access</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Strategy Calls</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>We Handle All Disputes</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Dedicated Credit Advisor</td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-times"></i></td>
+                        <td><i class="fas fa-check"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Get answers to common questions about our pricing and services.</p>
+            </div>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How long does credit repair take?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            Credit repair is not an overnight process. The timeline varies based on your specific
+                            situation,
+                            but most clients see initial results within 30-45 days after disputes are filed. Significant
+                            improvements typically occur over 3-6 months of consistent effort. Our Full-Service and
+                            Guided
+                            plans can help expedite the process with expert strategies.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can I cancel my subscription at any time?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            Yes, all our paid plans can be canceled at any time with no cancellation fees. You'll
+                            continue
+                            to have access to your plan features until the end of your current billing cycle. The Free
+                            plan
+                            never expires and requires no payment information.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What's the difference between the plans?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            The DIY plan provides you with all the tools and resources to repair your credit yourself.
+                            The
+                            Guided plan adds expert support and strategy sessions to help you along the way. The
+                            Full-Service plan is our white-glove service where we handle everything for you - from
+                            writing
+                            and sending dispute letters to following up with creditors and credit bureaus.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Is there a guarantee for credit score improvement?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            While we cannot legally guarantee specific point increases (no credit repair company can),
+                            our
+                            methods have helped thousands of clients improve their credit scores. Results vary based on
+                            your
+                            unique credit situation, the accuracy of items on your report, and your financial behavior
+                            during the repair process.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What is the JAM Dispute Bot?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            The JAM Dispute Bot is our AI-powered assistant that helps analyze your credit reports,
+                            identify
+                            disputable items, and generate customized dispute letters based on credit laws. It's
+                            available
+                            in all paid plans and provides 24/7 guidance for your credit repair journey.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Start Your Credit Repair Journey?</h2>
+            <p>Choose the plan that works for you and take the first step toward better credit today.</p>
+            <div class="cta-buttons">
+                <a href="#" class="cta-btn cta-btn-primary">Start JAM Engine</a>
+                <a href="contact.html" class="cta-btn cta-btn-secondary">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Toggle FAQ answers
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isOpen = answer.style.maxHeight;
+
+                // Close all other answers
+                document.querySelectorAll('.faq-answer').forEach(item => {
+                    item.style.maxHeight = null;
+                });
+
+                document.querySelectorAll('.faq-question').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Toggle current answer
+                if (!isOpen) {
+                    question.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+        });
+
+        // Plan selection
+        document.querySelectorAll('.plan-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const plan = this.parentElement.parentElement.querySelector('.plan-name').textContent.toLowerCase().split(' ')[0];
+                console.log(`Selected plan: ${plan}`);
+                // For now, buttons stay empty without navigation
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

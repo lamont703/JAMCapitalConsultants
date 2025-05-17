@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Capital FAQ</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f8f9fa;
+            --question-bg: #ffffff;
+            --answer-bg: #e8f4f8;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            background: var(--background-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question {
+            background: var(--question-bg);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .question:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .question h3 {
+            margin: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .answer {
+            display: none;
+            background: var(--answer-bg);
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: var(--answer-bg);
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .answer.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .question,
+            .answer {
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="faq-container">
+        <h1 style="text-align: center; color: var(--primary-color); margin-bottom: 30px; font-weight: bold;">Let's Clear
+            Things Up...</h1>
+        <div id="faq-list"></div>
+    </div>
+
+    <script>
+        const faqData = [
+            {
+                question: "Is this service just about credit restoration?",
+                answer: "Not at all — credit restoration is only one part of the plan. We focus on credit education, financial strategy, and helping you build lasting results through AI-powered support."
+            },
+            {
+                question: "Do I need good credit to get started?",
+                answer: "Nope! We work with people in all stages of their credit journey — even if you're starting from scratch or recovering from major issues. That's what we're here for."
+            },
+            {
+                question: "What do I need to provide to sign up?",
+                answer: "Just two things: a credit monitoring account (we'll give you 3 trusted options to choose from) and ID verification (license + utility bill). We'll walk you through it all."
+            },
+            {
+                question: "How long does the credit repair process take?",
+                answer: "Most clients start seeing results within 30–60 days. The full process typically spans 3–6 months depending on your credit profile. We'll keep you updated every step of the way."
+            },
+            {
+                question: "Is this service legit?",
+                answer: "Absolutely. We're a registered business operating legally in Texas, and everything we do is above board. No gimmicks, no shortcuts — just real credit strategy that works."
+            },
+            {
+                question: "What happens after I sign up?",
+                answer: "You'll receive a Welcome Email with your next steps, including document uploads and progress tracking tools. From there, our back office gets to work — and you'll start seeing results."
+            }
+        ];
+
+        function createFAQElement(faq, index) {
+            const faqItem = document.createElement('div');
+            faqItem.className = 'faq-item';
+            faqItem.style.animationDelay = `${index * 0.1}s`;
+
+            faqItem.innerHTML = `
+                <div class="question">
+                    <h3>❓ You Asked: ${faq.question}</h3>
+                </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+                <div class="answer">
+                    <h3>💡 JAM Answers:</h3>
+                    <p>${faq.answer}</p>
+                </div>
+            `;
+
+            return faqItem;
+        }
+
+        function initializeFAQ() {
+            const faqList = document.getElementById('faq-list');
+
+            faqData.forEach((faq, index) => {
+                const faqElement = createFAQElement(faq, index);
+                faqList.appendChild(faqElement);
+
+                const question = faqElement.querySelector('.question');
+                const typingIndicator = faqElement.querySelector('.typing-indicator');
+                const answer = faqElement.querySelector('.answer');
+
+                question.addEventListener('click', () => {
+                    if (answer.classList.contains('show')) {
+                        answer.classList.remove('show');
+                        return;
+                    }
+
+                    typingIndicator.style.display = 'block';
+
+                    setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                        answer.classList.add('show');
+                    }, 1500);
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeFAQ);
+    </script>
+</body>
+
+</html>

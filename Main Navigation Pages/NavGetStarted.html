@@ -1,0 +1,1026 @@
+<!-- Add viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Styles -->
+<style>
+    /* Quiz Button Styles */
+    .nav-quiz-button-container {
+        margin: 1rem auto;
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    .nav-credit-quiz-btn {
+        background-color: #09ccfc;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: inline-block;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-credit-quiz-btn:hover {
+        background-color: #08b6e2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-credit-quiz-btn .nav-subtext {
+        display: none;
+    }
+
+    .nav-quiz-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-modal-content {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        background: #fff;
+        padding: 1rem;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+        width: 92%;
+        max-width: 800px;
+        height: 92vh;
+        border-radius: 8px;
+        margin: auto;
+    }
+
+    .nav-close-button {
+        position: fixed;
+        top: max(env(safe-area-inset-top), 0.75rem);
+        right: 0.75rem;
+        padding: 0.75rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.3s ease;
+        z-index: 1001;
+    }
+
+    .nav-close-button:hover {
+        color: #000;
+    }
+
+    @media (max-width: 639px) {
+        .nav-quiz-button-container {
+            margin: 0.5rem auto;
+            padding: 0 0.75rem;
+        }
+
+        .nav-credit-quiz-btn {
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+        }
+
+        .nav-credit-quiz-btn .nav-subtext {
+            font-size: 0.813rem;
+        }
+
+        .nav-modal-content {
+            padding: 1rem;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        .nav-quiz-container {
+            padding: 0;
+        }
+
+        .nav-options-grid {
+            padding: 0;
+        }
+
+        .nav-question-title {
+            padding: 0;
+        }
+
+        .nav-quiz-navigation {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 -1rem;
+        }
+
+        .nav-nav-btn {
+            min-height: 44px;
+            flex: 1;
+            font-size: 0.938rem;
+        }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        .nav-modal-content {
+            height: -webkit-fill-available;
+        }
+
+        .nav-quiz-navigation {
+            padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+        }
+    }
+
+    /* Add quiz-specific styles */
+    .nav-quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+        box-sizing: border-box;
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .nav-progress-container {
+        margin: 1rem 0 2rem;
+        padding: 0 1rem;
+    }
+
+    .nav-progress-bar {
+        height: 8px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .nav-progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0%;
+        background: #008080;
+        transition: width 0.3s ease;
+    }
+
+    .nav-progress-text {
+        display: block;
+        text-align: center;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #666;
+    }
+
+    .nav-question-title {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .nav-options-grid {
+        display: grid;
+        gap: 1rem;
+        padding: 0;
+        margin-bottom: 2rem;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .nav-option-btn {
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .nav-option-btn:hover {
+        border-color: #008080;
+        background-color: #f7fafa;
+    }
+
+    .nav-option-btn.nav-active,
+    .nav-option-btn.selected {
+        border-color: #008080;
+        background-color: #e6f3f3;
+        position: relative;
+    }
+
+    .nav-option-btn.nav-active::after,
+    .nav-option-btn.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        color: #008080;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .nav-option-icon {
+        font-size: 1.5rem;
+        min-width: 2rem;
+        text-align: center;
+    }
+
+    .nav-option-text {
+        font-size: 1rem;
+        flex: 1;
+    }
+
+    .nav-quiz-navigation {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .nav-nav-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 100px;
+    }
+
+    #nav-prevBtn {
+        background-color: #f0f0f0;
+        color: #666;
+    }
+
+    #nav-nextBtn {
+        background-color: #008080;
+        color: white;
+    }
+
+    #nav-nextBtn:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    /* Form Styles */
+    .nav-contact-form {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .nav-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-form-input {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .nav-form-input:focus {
+        outline: none;
+        border-color: #008080;
+    }
+
+    /* Success Message */
+    .nav-success-message {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .nav-success-message h2 {
+        color: #008080;
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive Breakpoints */
+    @media (min-width: 640px) {
+        .nav-options-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-question-title {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 639px) {
+        .nav-modal-content {
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            border-radius: 0;
+            padding: 1rem;
+        }
+
+        .nav-question-title {
+            font-size: 1.25rem;
+        }
+
+        .nav-option-btn {
+            padding: 0.875rem;
+        }
+
+        .nav-nav-btn {
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    .nav-get-started-btn {
+        background-color: #09ccfc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-get-started-btn .nav-subtext {
+        font-size: 0.875rem;
+        font-weight: 400;
+        opacity: 0.9;
+    }
+
+    .nav-get-started-btn:hover {
+        background-color: #08b6e2;
+        /* Slightly darker shade for hover */
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(9, 204, 252, 0.2);
+    }
+
+    .nav-get-started-btn:active {
+        background-color: #079fcb;
+        /* Even darker for click state */
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(9, 204, 252, 0.1);
+    }
+
+    .nav-get-started-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.3);
+    }
+
+    /* Registration form styles */
+    .nav-registration-form {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .nav-form-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .nav-form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .nav-form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .nav-form-input:focus {
+        border-color: #008080;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2);
+    }
+
+    .nav-password-hint {
+        display: block;
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+
+    .nav-checkbox-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-checkbox-group input {
+        margin-right: 0.5rem;
+    }
+
+    .nav-checkbox-group label {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .nav-checkbox-group a {
+        color: #008080;
+        text-decoration: none;
+    }
+
+    .nav-checkbox-group a:hover {
+        text-decoration: underline;
+    }
+
+    /* Update button styles for registration */
+    #nav-nextBtn:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    #nav-nextBtn[disabled]:hover {
+        background-color: #cccccc;
+    }
+</style>
+
+<!-- HTML Content -->
+<div class="nav-quiz-button-container">
+    <button class="nav-credit-quiz-btn">
+        Get Started
+    </button>
+</div>
+
+<!-- Modal with Quiz Content -->
+<div id="nav-quizModal" class="nav-quiz-modal">
+    <div class="nav-modal-content">
+        <span class="nav-close-button">&times;</span>
+        <!-- Quiz Content Structure -->
+        <div id="navQuizContent" class="nav-quiz-container">
+            <!-- Progress Bar -->
+            <div class="nav-progress-container">
+                <div class="nav-progress-bar" id="nav-quizProgress"></div>
+                <span class="nav-progress-text">Progress: <span id="nav-progressPercentage">0%</span></span>
+            </div>
+
+            <!-- Quiz Steps Container -->
+            <div class="nav-quiz-steps" id="nav-quizSteps">
+                <!-- Step 1 -->
+                <div class="nav-quiz-step" data-step="1">
+                    <h2 class="nav-question-title">Which best describes your current credit situation?</h2>
+                    <div class="nav-options-grid">
+                        <button class="nav-option-btn" data-value="no_credit">
+                            <span class="nav-option-icon">📊</span>
+                            <span class="nav-option-text">I have no credit history</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="below_580">
+                            <span class="nav-option-icon">📉</span>
+                            <span class="nav-option-text">My score is below 580</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="580_669">
+                            <span class="nav-option-icon">📈</span>
+                            <span class="nav-option-text">My score is between 580-669</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="670_739">
+                            <span class="nav-option-icon">📊</span>
+                            <span class="nav-option-text">My score is between 670-739</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="above_740">
+                            <span class="nav-option-icon">🌟</span>
+                            <span class="nav-option-text">My score is above 740</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="nav-quiz-step" data-step="2" style="display: none;">
+                    <h2 class="nav-question-title">What's your main credit goal right now?</h2>
+                    <div class="nav-options-grid">
+                        <button class="nav-option-btn" data-value="buy_home">
+                            <span class="nav-option-icon">🏠</span>
+                            <span class="nav-option-text">Buy a home</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="new_car">
+                            <span class="nav-option-icon">🚗</span>
+                            <span class="nav-option-text">Get a new car</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="credit_card">
+                            <span class="nav-option-icon">💳</span>
+                            <span class="nav-option-text">Get a credit card or loan</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="improve_score">
+                            <span class="nav-option-icon">📈</span>
+                            <span class="nav-option-text">Improve my credit score overall</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="remove_negative">
+                            <span class="nav-option-icon">🎯</span>
+                            <span class="nav-option-text">Remove negative items from my report</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="nav-quiz-step" data-step="3" style="display: none;">
+                    <h2 class="nav-question-title">How many active credit cards or loans do you currently have?</h2>
+                    <div class="nav-options-grid">
+                        <button class="nav-option-btn" data-value="none">
+                            <span class="nav-option-icon">0️⃣</span>
+                            <span class="nav-option-text">None</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="1-2">
+                            <span class="nav-option-icon">1️⃣</span>
+                            <span class="nav-option-text">1–2</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="3-5">
+                            <span class="nav-option-icon">3️⃣</span>
+                            <span class="nav-option-text">3–5</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="6+">
+                            <span class="nav-option-icon">6️⃣</span>
+                            <span class="nav-option-text">6 or more</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="not_sure">
+                            <span class="nav-option-icon">❓</span>
+                            <span class="nav-option-text">Not sure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="nav-quiz-step" data-step="4" style="display: none;">
+                    <h2 class="nav-question-title">Have you checked your credit report in the last 6 months?</h2>
+                    <div class="nav-options-grid">
+                        <button class="nav-option-btn" data-value="yes">
+                            <span class="nav-option-icon">✅</span>
+                            <span class="nav-option-text">Yes</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="no">
+                            <span class="nav-option-icon">❌</span>
+                            <span class="nav-option-text">No</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="not_sure">
+                            <span class="nav-option-icon">❓</span>
+                            <span class="nav-option-text">I'm not sure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="nav-quiz-step" data-step="5" style="display: none;">
+                    <h2 class="nav-question-title">Which of these credit issues applies to you?</h2>
+                    <div class="nav-options-grid">
+                        <button class="nav-option-btn" data-value="late_payments">
+                            <span class="nav-option-icon">⏰</span>
+                            <span class="nav-option-text">Late payments</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="collections">
+                            <span class="nav-option-icon">📑</span>
+                            <span class="nav-option-text">Collections accounts</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="high_balances">
+                            <span class="nav-option-icon">💰</span>
+                            <span class="nav-option-text">High credit card balances</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="bankruptcy">
+                            <span class="nav-option-icon">⚖️</span>
+                            <span class="nav-option-text">Bankruptcy</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="no_issues">
+                            <span class="nav-option-icon">✨</span>
+                            <span class="nav-option-text">No major issues — just want to improve</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="not_sure">
+                            <span class="nav-option-icon">❓</span>
+                            <span class="nav-option-text">Not sure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="nav-quiz-step" data-step="6" style="display: none;">
+                    <h2 class="nav-question-title">Would you be interested in expert help to fix your credit faster?
+                    </h2>
+                    <div class="nav-options-grid">
+                        <button class="nav-option-btn" data-value="very_interested">
+                            <span class="nav-option-icon">🎯</span>
+                            <span class="nav-option-text">Yes, I'm very interested</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="maybe">
+                            <span class="nav-option-icon">🤔</span>
+                            <span class="nav-option-text">Maybe, tell me more</span>
+                        </button>
+                        <button class="nav-option-btn" data-value="not_now">
+                            <span class="nav-option-icon">📚</span>
+                            <span class="nav-option-text">Not right now, just exploring</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 7 (Final) -->
+                <div class="nav-quiz-step" data-step="7" style="display: none;">
+                    <h2 class="nav-question-title">Create Your JAM Engine Account</h2>
+                    <p class="nav-form-subtitle">Get access to your personalized credit guide and dashboard</p>
+                    <div class="nav-registration-form">
+                        <div class="nav-form-group">
+                            <label for="nav-fullname">Full Name</label>
+                            <input type="text" id="nav-fullname" class="nav-form-input"
+                                placeholder="Enter your full name" required>
+                        </div>
+                        <div class="nav-form-group">
+                            <label for="nav-email">Email Address</label>
+                            <input type="email" id="nav-email" class="nav-form-input" placeholder="Enter your email"
+                                required>
+                        </div>
+                        <div class="nav-form-group">
+                            <label for="nav-phone">Phone Number</label>
+                            <input type="tel" id="nav-phone" class="nav-form-input"
+                                placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="nav-form-group">
+                            <label for="nav-password">Create Password</label>
+                            <input type="password" id="nav-password" class="nav-form-input"
+                                placeholder="Create a secure password" required>
+                            <small class="nav-password-hint">Must be at least 8 characters with a number and special
+                                character</small>
+                        </div>
+                        <div class="nav-form-group">
+                            <label for="nav-confirm-password">Confirm Password</label>
+                            <input type="password" id="nav-confirm-password" class="nav-form-input"
+                                placeholder="Confirm your password" required>
+                        </div>
+                        <div class="nav-form-group nav-checkbox-group">
+                            <input type="checkbox" id="nav-terms" required>
+                            <label for="nav-terms">I agree to the <a href="/terms" target="_blank">Terms of Service</a>
+                                and <a href="/privacy" target="_blank">Privacy Policy</a></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-quiz-navigation">
+                <button id="nav-prevBtn" class="nav-nav-btn" style="display: none;">Previous</button>
+                <button id="nav-nextBtn" class="nav-nav-btn">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Global variables
+        let currentStep = 1;
+        const totalSteps = 7;
+        window.quizData = {};
+
+        // Get DOM elements
+        const quizButton = document.querySelector('.nav-credit-quiz-btn');
+        const quizModal = document.getElementById('nav-quizModal');
+        const closeButton = document.querySelector('.nav-close-button');
+
+        // Fix: Correct ID references for quiz elements
+        const quizSteps = document.getElementById('nav-quizSteps');
+        const nextBtn = document.getElementById('nav-nextBtn');
+        const prevBtn = document.getElementById('nav-prevBtn');
+
+        // Initialize progress bar
+        updateProgress(1, totalSteps);
+
+        // Show first step
+        showStep(1);
+
+        // Open modal when quiz button is clicked
+        window.openQuizModal = function () {
+            if (quizModal) {
+                quizModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                // Reset to first step when opening modal
+                currentStep = 1;
+                showStep(1);
+            } else {
+                console.error("Quiz modal element not found!");
+            }
+        };
+
+        // Close modal function
+        window.closeQuizModal = function () {
+            if (quizModal) {
+                quizModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        };
+
+        // Add event listeners
+        if (quizButton) {
+            quizButton.addEventListener('click', window.openQuizModal);
+        } else {
+            console.error("Quiz button not found!");
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener('click', window.closeQuizModal);
+        } else {
+            console.error("Close button not found!");
+        }
+
+        // Fix: Add direct event listeners to option buttons
+        document.querySelectorAll('.nav-option-btn').forEach(button => {
+            button.addEventListener('click', function (e) {
+                handleOptionSelect(e);
+            });
+        });
+
+        // Next button functionality
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                } else {
+                    submitRegistration();
+                }
+            });
+        } else {
+            console.error("Next button not found!");
+        }
+
+        // Previous button functionality
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
+        } else {
+            console.error("Previous button not found!");
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function (event) {
+            if (event.target === quizModal) {
+                window.closeQuizModal();
+            }
+        });
+
+        // Function to show a specific step
+        function showStep(step) {
+            console.log(`Showing step ${step} of ${totalSteps}`);
+
+            // Hide all steps
+            const steps = document.querySelectorAll('.nav-quiz-step');
+            steps.forEach(s => s.style.display = 'none');
+
+            // Show current step
+            const currentStepEl = document.querySelector(`.nav-quiz-step[data-step="${step}"]`);
+            if (currentStepEl) {
+                currentStepEl.style.display = 'block';
+
+                // Special handling for the final step (registration form)
+                if (step === 7) {
+                    // For the registration form step, we don't need to check for previous selections
+                    console.log("Showing registration form step");
+                } else {
+                    // Highlight previously selected option if exists
+                    const questionId = currentStepEl.getAttribute('data-question') || `question_${step}`;
+                    const selectedValue = window.quizData[questionId];
+
+                    if (selectedValue) {
+                        // Clear any existing selections first
+                        currentStepEl.querySelectorAll('.nav-option-btn').forEach(btn => {
+                            btn.classList.remove('nav-active');
+                            btn.classList.remove('selected');
+                        });
+
+                        // Find and highlight the previously selected option
+                        const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${selectedValue}"]`);
+                        if (selectedOption) {
+                            selectedOption.classList.add('nav-active');
+                            selectedOption.classList.add('selected');
+                        }
+                    }
+                }
+            } else {
+                console.error(`Step ${step} not found!`);
+            }
+
+            // Update progress
+            updateProgress(step, totalSteps);
+
+            // Update navigation buttons
+            updateNavButtons(step, totalSteps);
+        }
+
+        // Function to update progress bar
+        function updateProgress(current, total) {
+            const progressBar = document.querySelector('.nav-progress-bar');
+            const progressText = document.querySelector('.nav-progress-text');
+
+            if (progressBar) {
+                const percentage = (current / total) * 100;
+                progressBar.style.width = `${percentage}%`;
+            }
+
+            if (progressText) {
+                progressText.textContent = `Step ${current} of ${total}`;
+            }
+        }
+
+        // Function to update navigation buttons
+        function updateNavButtons(current, total) {
+            if (prevBtn) {
+                prevBtn.style.display = current === 1 ? 'none' : 'block';
+            }
+
+            if (nextBtn) {
+                nextBtn.textContent = current === total ? 'Create Account' : 'Next';
+
+                // Check if there's a selection for the current step
+                if (current === 7) {
+                    // For the registration form step, check if required fields are filled
+                    validateRegistrationForm();
+                } else {
+                    // For other steps, check if an option is selected
+                    const currentStepEl = document.querySelector(`.nav-quiz-step[data-step="${current}"]`);
+                    const questionId = currentStepEl.getAttribute('data-question') || `question_${current}`;
+                    const hasSelection = window.quizData[questionId] !== undefined;
+
+                    // Enable/disable next button based on selection
+                    nextBtn.disabled = !hasSelection;
+                }
+            }
+        }
+
+        // Function to handle option selection
+        function handleOptionSelect(e) {
+            e.preventDefault();
+            const button = e.target.closest('.nav-option-btn');
+            if (!button) return;
+
+            // Get all options in the current step
+            const currentStepEl = document.querySelector(`.nav-quiz-step[data-step="${currentStep}"]`);
+            const options = currentStepEl.querySelectorAll('.nav-option-btn');
+
+            // Remove active class from all options
+            options.forEach(opt => {
+                opt.classList.remove('nav-active');
+                opt.classList.remove('selected');
+            });
+
+            // Add active class to selected option
+            button.classList.add('nav-active');
+            button.classList.add('selected');
+
+            // Store the selected value
+            const value = button.getAttribute('data-value');
+            const questionId = currentStepEl.getAttribute('data-question') || `question_${currentStep}`;
+
+            // Save to quiz data
+            window.quizData[questionId] = value;
+
+            // Enable next button
+            if (nextBtn) {
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Add form input validation for registration form
+        document.addEventListener('input', function (e) {
+            if (currentStep === 7) {
+                validateRegistrationForm();
+            }
+        });
+
+        // Function to validate registration form
+        function validateRegistrationForm() {
+            const fullname = document.getElementById('nav-fullname');
+            const email = document.getElementById('nav-email');
+            const phone = document.getElementById('nav-phone');
+            const password = document.getElementById('nav-password');
+            const confirmPassword = document.getElementById('nav-confirm-password');
+            const terms = document.getElementById('nav-terms');
+
+            if (!fullname || !email || !phone || !password || !confirmPassword || !terms) {
+                console.error("One or more registration form fields not found");
+                return;
+            }
+
+            // Check if all required fields are filled
+            const isFullnameFilled = fullname.value.trim() !== '';
+            const isEmailFilled = email.value.trim() !== '';
+            const isPhoneFilled = phone.value.trim() !== '';
+            const isPasswordFilled = password.value !== '';
+            const isConfirmPasswordFilled = confirmPassword.value !== '';
+            const isTermsChecked = terms.checked;
+
+            // Check if passwords match
+            const doPasswordsMatch = password.value === confirmPassword.value;
+
+            // Check password strength (at least 8 chars with a number and special char)
+            const isPasswordStrong = /^(?=.*[0-9])(?=.*[!@#$%^&*])(.{8,})$/.test(password.value);
+
+            // Show password mismatch error if needed
+            const passwordHint = document.querySelector('.nav-password-hint');
+            if (passwordHint) {
+                if (isPasswordFilled && isConfirmPasswordFilled && !doPasswordsMatch) {
+                    passwordHint.textContent = "Passwords do not match";
+                    passwordHint.style.color = "red";
+                } else if (isPasswordFilled && !isPasswordStrong) {
+                    passwordHint.textContent = "Password must be at least 8 characters with a number and special character";
+                    passwordHint.style.color = "red";
+                } else {
+                    passwordHint.textContent = "Must be at least 8 characters with a number and special character";
+                    passwordHint.style.color = "";
+                }
+            }
+
+            // Enable/disable submit button based on validation
+            if (nextBtn) {
+                nextBtn.disabled = !(
+                    isFullnameFilled &&
+                    isEmailFilled &&
+                    isPhoneFilled &&
+                    isPasswordFilled &&
+                    isConfirmPasswordFilled &&
+                    doPasswordsMatch &&
+                    isPasswordStrong &&
+                    isTermsChecked
+                );
+            }
+        }
+
+        // Function to submit registration
+        function submitRegistration() {
+            // Get form data
+            const fullname = document.getElementById('nav-fullname').value.trim();
+            const email = document.getElementById('nav-email').value.trim();
+            const phone = document.getElementById('nav-phone').value.trim();
+            const password = document.getElementById('nav-password').value;
+
+            // Combine with quiz data
+            const registrationData = {
+                ...window.quizData,
+                fullname: fullname,
+                email: email,
+                phone: phone,
+                // Don't include password in analytics data for security
+            };
+
+            console.log("Registration submitted with data:", registrationData);
+
+            // Track submission if analytics is available
+            if (typeof analytics !== 'undefined') {
+                analytics.track('AccountRegistration', {
+                    quizData: registrationData,
+                    timestamp: new Date().toISOString()
+                });
+            }
+
+            // Redirect to dashboard
+            window.location.href = "https://jamcapitalconsultants.com/dashboard";
+        }
+
+        // Find and update the button text if it exists
+        document.addEventListener('DOMContentLoaded', function () {
+            const quizButton = document.querySelector('.nav-credit-quiz-btn');
+            if (quizButton) {
+                // Clear any existing content and set to just "Get Started"
+                quizButton.innerHTML = 'Get Started';
+            }
+        });
+    });
+</script>

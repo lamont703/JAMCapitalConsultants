@@ -1,0 +1,390 @@
+<!-- Add viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Add AOS library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<style>
+    .who-ideal-client-section {
+        padding: 4rem 0;
+        background-color: #fff;
+    }
+
+    .who-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        position: relative;
+    }
+
+    .who-section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #333;
+    }
+
+    .who-client-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .who-client-cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    .who-client-card {
+        display: flex;
+        align-items: flex-start;
+        padding: 1.5rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        text-align: left;
+    }
+
+    .who-client-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .who-check-icon {
+        color: #09ccfc;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    .who-not-for-you {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-top: 2rem;
+        width: 100%;
+    }
+
+    .who-not-for-you h3 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .who-not-for-you-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        text-align: left;
+    }
+
+    .who-not-for-you-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    .who-x-icon {
+        color: #ff6b6b;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .who-ideal-client-section {
+            padding: 2rem 0;
+        }
+
+        .who-container {
+            padding: 0 1rem;
+        }
+
+        .who-section-title {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .who-client-grid {
+            gap: 2rem;
+        }
+
+        .who-client-cards-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        .who-client-card {
+            padding: 1rem;
+            margin: 0 0.5rem;
+        }
+
+        .who-check-icon,
+        .who-x-icon {
+            font-size: 1.25rem;
+            min-width: 20px;
+        }
+
+        .who-client-card p,
+        .who-not-for-you-item p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .who-not-for-you {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+
+        .who-not-for-you h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .who-not-for-you-items {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .who-not-for-you-item {
+            padding: 0.75rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .who-section-title {
+            font-size: 1.5rem;
+        }
+
+        .who-client-card {
+            padding: 0.875rem;
+        }
+
+        .who-client-card p,
+        .who-not-for-you-item p {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (hover: none) {
+        .who-client-card {
+            transform: none !important;
+        }
+
+        .who-cta-button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .who-client-card,
+        .who-not-for-you-item {
+            touch-action: manipulation;
+        }
+    }
+
+    /* Animated Mouse Pointer */
+    .animated-pointer {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: rgba(9, 204, 252, 0.7);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 100;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 10px rgba(9, 204, 252, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .animated-pointer::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(9, 204, 252, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.8;
+        }
+
+        70% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0;
+        }
+
+        100% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0;
+        }
+    }
+
+    /* Card highlight effect */
+    .who-card-highlight {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(9, 204, 252, 0.2);
+        border: 1px solid rgba(9, 204, 252, 0.3);
+    }
+
+    /* Hide pointer on mobile */
+    @media (max-width: 768px) {
+        .animated-pointer {
+            display: none;
+        }
+    }
+</style>
+
+<section class="who-ideal-client-section">
+    <div class="who-container">
+        <!-- Add animated mouse pointer -->
+        <div class="animated-pointer"></div>
+
+        <h2 class="who-section-title">You're in the Right Place If...</h2>
+
+        <div class="who-client-grid">
+            <!-- Positive Indicators -->
+            <div class="who-client-cards-container">
+                <div class="who-client-card" data-aos="fade-up">
+                    <div class="who-check-icon">✓</div>
+                    <p>Are rebuilding credit after financial hardship</p>
+                </div>
+
+                <div class="who-client-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="who-check-icon">✓</div>
+                    <p>Want to qualify for a car, mortgage, or new credit line</p>
+                </div>
+
+                <div class="who-client-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="who-check-icon">✓</div>
+                    <p>Are frustrated by trying to fix their credit alone</p>
+                </div>
+
+                <div class="who-client-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="who-check-icon">✓</div>
+                    <p>Have inaccurate items on their credit report</p>
+                </div>
+
+                <div class="who-client-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="who-check-icon">✓</div>
+                    <p>Need guidance — not just templates or apps</p>
+                </div>
+
+                <div class="who-client-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="who-check-icon">✓</div>
+                    <p>Tried credit repair before and didn't see results</p>
+                </div>
+            </div>
+
+            <!-- Not For You Section -->
+            <div class="who-not-for-you" data-aos="fade-up" data-aos-delay="600">
+                <h3>Not for You If...</h3>
+                <div class="who-not-for-you-items">
+                    <div class="who-not-for-you-item">
+                        <div class="who-x-icon">✕</div>
+                        <p>You expect overnight results</p>
+                    </div>
+                    <div class="who-not-for-you-item">
+                        <div class="who-x-icon">✕</div>
+                        <p>You're not ready to take control of your financial future</p>
+                    </div>
+                    <div class="who-not-for-you-item">
+                        <div class="who-x-icon">✕</div>
+                        <p>You're looking for a guaranteed credit score increase</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Container -->
+            <div class="who-cta-container" data-aos="fade-up" data-aos-delay="700">
+                <p class="who-cta-text">If you see yourself here, let's build your credit plan together.</p>
+                <div class="quiz-button-container">
+                    <!-- Main Button -->
+                    <button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
+                        Start JAM Engine
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add AOS library script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    // Animated pointer logic
+    const pointer = document.querySelector('.animated-pointer');
+    const cards = document.querySelectorAll('.who-client-card');
+    let currentCardIndex = 0;
+    let isAnimating = false;
+
+    // Only run the animation on desktop devices
+    if (window.innerWidth > 768) {
+        // Show the pointer
+        setTimeout(() => {
+            pointer.style.opacity = '1';
+            animatePointer();
+        }, 2000);
+
+        function animatePointer() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const card = cards[currentCardIndex];
+            const cardRect = card.getBoundingClientRect();
+            const containerRect = document.querySelector('.who-container').getBoundingClientRect();
+
+            // Calculate position relative to the container
+            const posX = cardRect.left - containerRect.left + cardRect.width / 2;
+            const posY = cardRect.top - containerRect.top + cardRect.height / 2;
+
+            // Move pointer to the card
+            pointer.style.transition = 'transform 1s ease, opacity 0.3s ease';
+            pointer.style.transform = `translate(${posX}px, ${posY}px)`;
+
+            // Add hover effect to the card
+            setTimeout(() => {
+                card.classList.add('who-card-highlight');
+
+                // Click effect
+                setTimeout(() => {
+                    pointer.style.transform = `translate(${posX}px, ${posY}px) scale(0.8)`;
+
+                    setTimeout(() => {
+                        pointer.style.transform = `translate(${posX}px, ${posY}px) scale(1)`;
+                        card.classList.remove('who-card-highlight');
+
+                        // Move to next card
+                        currentCardIndex = (currentCardIndex + 1) % cards.length;
+                        isAnimating = false;
+
+                        // Continue animation after delay
+                        setTimeout(animatePointer, 500);
+                    }, 200);
+                }, 800);
+            }, 1000);
+        }
+    }
+</script>

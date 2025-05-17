@@ -1,0 +1,721 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<style>
+    /* Import headline font */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+
+    /* Modern, Clean Styling with enhanced mobile responsiveness */
+    .dispute-letters-section {
+        padding: 3rem 0;
+        background-color: rgba(240, 242, 245, 0.85);
+        /* Semi-transparent grayish background */
+        font-family: 'Poppins', sans-serif;
+        position: relative;
+    }
+
+    /* Add a subtle texture/pattern overlay */
+    .dispute-letters-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0z' fill='%23f0f0f0' fill-opacity='.1'/%3E%3C/svg%3E");
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    .dispute-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dispute-section-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .dispute-section-header h2 {
+        color: #2c3e50;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        line-height: 1.1;
+        font-weight: 700;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .dispute-subheading {
+        color: #666;
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto 1rem;
+        line-height: 1.5;
+    }
+
+    .dispute-ai-tip {
+        color: #09ccfc;
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+
+    .dispute-prompt-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, auto);
+        gap: 2rem;
+        margin: 2rem auto;
+        padding: 0 0.5rem;
+        max-width: 1200px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .dispute-prompt-card {
+        perspective: 1000px;
+        height: auto;
+        min-height: 280px;
+        width: 100%;
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .dispute-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform-style: preserve-3d;
+        transform-origin: center center;
+    }
+
+    .dispute-card-front,
+    .dispute-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        background-color: #002742;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        color: white;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .dispute-card-front {
+        border-left: 4px solid #09ccfc;
+    }
+
+    .dispute-card-back {
+        border-left: 4px solid #09ccfc;
+        transform: rotateY(180deg);
+        overflow-y: auto;
+    }
+
+    .dispute-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid rgba(9, 204, 252, 0.3);
+    }
+
+    .dispute-ai-icon {
+        font-size: 1.6rem;
+        margin-right: 0.8rem;
+        color: #09ccfc;
+    }
+
+    .dispute-card-header h3 {
+        color: white;
+        font-size: 1.2rem;
+        margin: 0;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .dispute-card-description {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0.6rem 0 1.2rem;
+        flex-grow: 1;
+    }
+
+    .dispute-flip-btn {
+        margin-top: auto;
+        background: rgba(9, 204, 252, 0.15);
+        border: 2px solid rgba(9, 204, 252, 0.4);
+        padding: 0.7rem;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        font-weight: 600;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        width: 100%;
+    }
+
+    .dispute-flip-btn:hover,
+    .dispute-flip-btn:active {
+        background: rgba(9, 204, 252, 0.25);
+        border-color: rgba(9, 204, 252, 0.6);
+    }
+
+    .dispute-card-back h4 {
+        color: #09ccfc;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        text-align: left;
+        line-height: 1.3;
+    }
+
+    .dispute-prompt-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding-bottom: 0.8rem;
+    }
+
+    .dispute-prompt-content pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        background: rgba(9, 204, 252, 0.1);
+        padding: 1.2rem;
+        border-radius: 8px;
+        border: 1px solid rgba(9, 204, 252, 0.3);
+        color: white;
+        overflow-x: auto;
+    }
+
+    .dispute-button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 0.6rem;
+        width: 100%;
+    }
+
+    .dispute-copy-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(9, 204, 252, 0.15);
+        color: white;
+        border: 2px solid rgba(9, 204, 252, 0.4);
+        border-radius: 8px;
+        padding: 0.7rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        flex: 1;
+        font-size: 0.85rem;
+        font-weight: 600;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        margin-top: 0;
+    }
+
+    .dispute-card-back .dispute-flip-btn {
+        margin-top: 0;
+        flex: 0.5;
+    }
+
+    .dispute-cta-section {
+        text-align: center;
+        margin-top: 2.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .dispute-cta-section p {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .dispute-cta-button {
+        display: inline-block;
+        background: #002742;
+        color: white;
+        padding: 0.9rem 1.8rem;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    .dispute-cta-button:hover {
+        background: #003b63;
+        transform: translateY(-2px);
+    }
+
+    .dispute-toast {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        background: #2c3e50;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        opacity: 0;
+        transform: translateY(100%);
+        transition: all 0.3s;
+        z-index: 1000;
+        font-size: 0.9rem;
+        max-width: 90%;
+        text-align: center;
+    }
+
+    .dispute-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Comprehensive mobile responsiveness */
+    @media (max-width: 992px) {
+        .dispute-prompt-cards {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .dispute-section-header h2 {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .dispute-prompt-cards {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dispute-prompt-cards {
+            grid-template-columns: 1fr;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 1rem;
+        }
+
+        .dispute-section-header h2 {
+            font-size: 2rem;
+        }
+
+        .dispute-modal-content {
+            padding: 8px;
+        }
+
+        .dispute-close-modal {
+            right: 10px;
+            top: 10px;
+        }
+    }
+
+    /* Modal Styles */
+    .dispute-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+    }
+
+    .dispute-modal-content {
+        background-color: white;
+        width: 90%;
+        max-width: 800px;
+        border-radius: 12px;
+        padding: 20px;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .dispute-close-modal {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.2s;
+        z-index: 10;
+    }
+
+    .dispute-close-modal:hover {
+        color: #000;
+    }
+
+    /* Add this new style for immediate hiding */
+    .dispute-card-inner.flipping .dispute-flip-btn {
+        opacity: 0;
+        transition: opacity 0.1s;
+    }
+
+    .dispute-jam-button {
+        background-color: #09ccfc;
+        color: #FFFFFF;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        border: none;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-block;
+        text-align: center;
+        min-width: 200px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .dispute-jam-button:hover {
+        background-color: #08b6e2;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(9, 204, 252, 0.3);
+    }
+</style>
+
+<section class="dispute-letters-section">
+    <div class="dispute-container">
+        <div class="dispute-section-header">
+            <h2>AI Dispute Letter Generator</h2>
+            <p class="dispute-subheading">Use these AI generated letters to create personalized dispute letters for
+                common credit
+                issues. Copy any prompt and paste it into ChatGPT for a custom letter.</p>
+            <p class="dispute-ai-tip">Pro Tip: Add your specific account details for more personalized results.</p>
+        </div>
+
+        <div class="dispute-prompt-cards">
+            <!-- Card 1 -->
+            <div class="dispute-prompt-card">
+                <div class="dispute-card-inner">
+                    <!-- Front of card -->
+                    <div class="dispute-card-front">
+                        <div class="dispute-card-header">
+                            <span class="dispute-ai-icon">🤖</span>
+                            <h3>Late Payment Removal</h3>
+                        </div>
+                        <p class="dispute-card-description">Use this prompt to request removal of a one-time late
+                            payment due to
+                            hardship.</p>
+                        <button class="dispute-flip-btn">View Prompt →</button>
+                    </div>
+                    <!-- Back of card -->
+                    <div class="dispute-card-back">
+                        <div class="dispute-prompt-content">
+                            <h4>Late Payment Removal Prompt</h4>
+                            <pre><code>[Your Full Name] [Your Address] [City State ZIP Code] [Email Address] [Phone Number] Date: [Insert Date]
+                            To Whom It May Concern
+                            I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit
+                            report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
+                            That moment was not a reflection of how I manage my responsibilities. I was going through a challenging time, and
+                            unfortunately the payment slipped through the cracks. As soon as I recognized the mistake I got back on track and
+                            brought the account current. Since then I've kept everything in good standing.
+                            I'm not making excuses. I'm simply asking that you take into consideration my overall payment history and the effort
+                            I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or
+                            goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
+                            Thank you for your time and for considering my request. I genuinely appreciate it.
+                            Sincerely [Your Full Name]</code></pre>
+                            <div class="dispute-button-container">
+                                <button class="dispute-copy-btn" data-prompt="[Your Full Name] [Your Address] [City State ZIP Code] [Email Address] [Phone Number] Date: [Insert Date]
+                            To Whom It May Concern
+                            I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit
+                            report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
+                            That moment was not a reflection of how I manage my responsibilities. I was going through a challenging time, and
+                            unfortunately the payment slipped through the cracks. As soon as I recognized the mistake I got back on track and
+                            brought the account current. Since then I've kept everything in good standing.
+                            I'm not making excuses. I'm simply asking that you take into consideration my overall payment history and the effort
+                            I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or
+                            goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
+                            Thank you for your time and for considering my request. I genuinely appreciate it.
+                            Sincerely [Your Full Name]">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="dispute-prompt-card">
+                <div class="dispute-card-inner">
+                    <div class="dispute-card-front">
+                        <div class="dispute-card-header">
+                            <span class="dispute-ai-icon">🤖</span>
+                            <h3>Collection Account Dispute</h3>
+                        </div>
+                        <p class="dispute-card-description">Challenge a collection account that you believe is
+                            inaccurate or
+                            unverifiable.</p>
+                        <button class="dispute-flip-btn">View Prompt →</button>
+                    </div>
+                    <div class="dispute-card-back">
+                        <div class="dispute-prompt-content">
+                            <h4>Collection Account Dispute Prompt</h4>
+                            <pre><code>Write a dispute letter for a collection account from ABC Collections in the amount of $500. Request debt validation and state that this debt is not recognized. Include a request for original account documentation and verification of their right to collect.</code></pre>
+                            <div class="dispute-button-container">
+                                <button class="dispute-copy-btn"
+                                    data-prompt="Write a dispute letter for a collection account from ABC Collections in the amount of $500. Request debt validation and state that this debt is not recognized. Include a request for original account documentation and verification of their right to collect.">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Hard Inquiry Removal -->
+            <div class="dispute-prompt-card">
+                <div class="dispute-card-inner">
+                    <div class="dispute-card-front">
+                        <div class="dispute-card-header">
+                            <span class="dispute-ai-icon">🤖</span>
+                            <h3>Hard Inquiry Removal</h3>
+                        </div>
+                        <p class="dispute-card-description">Request removal of unauthorized or outdated hard inquiries
+                            from your
+                            credit report.</p>
+                        <button class="dispute-flip-btn">View Prompt →</button>
+                    </div>
+                    <div class="dispute-card-back">
+                        <div class="dispute-prompt-content">
+                            <h4>Hard Inquiry Removal Prompt</h4>
+                            <pre><code>Write a dispute letter to Experian requesting removal of a hard inquiry from Chase Bank dated January 15, 2023. Explain that I never authorized this inquiry, I have no record of applying for credit with this company, and request verification or complete removal from my credit report.</code></pre>
+                            <div class="dispute-button-container">
+                                <button class="dispute-copy-btn"
+                                    data-prompt="Write a dispute letter to Experian requesting removal of a hard inquiry from Chase Bank dated January 15, 2023. Explain that I never authorized this inquiry, I have no record of applying for credit with this company, and request verification or complete removal from my credit report.">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Duplicate Account Dispute -->
+            <div class="dispute-prompt-card">
+                <div class="dispute-card-inner">
+                    <div class="dispute-card-front">
+                        <div class="dispute-card-header">
+                            <span class="dispute-ai-icon">🤖</span>
+                            <h3>Duplicate Account Dispute</h3>
+                        </div>
+                        <p class="dispute-card-description">Challenge duplicate accounts appearing on your credit report
+                            that
+                            are inflating your debt profile.</p>
+                        <button class="dispute-flip-btn">View Prompt →</button>
+                    </div>
+                    <div class="dispute-card-back">
+                        <div class="dispute-prompt-content">
+                            <h4>Duplicate Account Dispute Prompt</h4>
+                            <pre><code>Write a dispute letter to TransUnion regarding a duplicate Wells Fargo account appearing on my credit report. The original account number ends in 4567, while the duplicate shows the same balance and history but ends in 7890. Explain that this duplicate is artificially inflating my debt-to-income ratio and request its removal.</code></pre>
+                            <div class="dispute-button-container">
+                                <button class="dispute-copy-btn"
+                                    data-prompt="Write a dispute letter to TransUnion regarding a duplicate Wells Fargo account appearing on my credit report. The original account number ends in 4567, while the duplicate shows the same balance and history but ends in 7890. Explain that this duplicate is artificially inflating my debt-to-income ratio and request its removal.">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Identity Theft Item Removal -->
+            <div class="dispute-prompt-card">
+                <div class="dispute-card-inner">
+                    <div class="dispute-card-front">
+                        <div class="dispute-card-header">
+                            <span class="dispute-ai-icon">🤖</span>
+                            <h3>Identity Theft Item Removal</h3>
+                        </div>
+                        <p class="dispute-card-description">Dispute fraudulent accounts or charges that appeared on your
+                            credit
+                            report due to identity theft.</p>
+                        <button class="dispute-flip-btn">View Prompt →</button>
+                    </div>
+                    <div class="dispute-card-back">
+                        <div class="dispute-prompt-content">
+                            <h4>Identity Theft Item Removal Prompt</h4>
+                            <pre><code>Write a dispute letter to Equifax regarding a fraudulent Discover credit card account opened in my name on November 10, 2023. Include that I've filed a police report (case #12345), placed a fraud alert on my credit file, and never authorized this account. Request complete removal and include a request for identity theft victim assistance.</code></pre>
+                            <div class="dispute-button-container">
+                                <button class="dispute-copy-btn"
+                                    data-prompt="Write a dispute letter to Equifax regarding a fraudulent Discover credit card account opened in my name on November 10, 2023. Include that I've filed a police report (case #12345), placed a fraud alert on my credit file, and never authorized this account. Request complete removal and include a request for identity theft victim assistance.">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: Goodwill Letter Request -->
+            <div class="dispute-prompt-card">
+                <div class="dispute-card-inner">
+                    <div class="dispute-card-front">
+                        <div class="dispute-card-header">
+                            <span class="dispute-ai-icon">🤖</span>
+                            <h3>Goodwill Letter Request</h3>
+                        </div>
+                        <p class="dispute-card-description">Request removal of negative items based on your positive
+                            payment
+                            history and relationship with the creditor.</p>
+                        <button class="dispute-flip-btn">View Prompt →</button>
+                    </div>
+                    <div class="dispute-card-back">
+                        <div class="dispute-prompt-content">
+                            <h4>Goodwill Letter Request Prompt</h4>
+                            <pre><code>Write a goodwill letter to American Express requesting removal of a 60-day late payment from August 2022. Explain that I've been a loyal customer for 5 years with an otherwise perfect payment history, the late payment was due to a medical emergency, and I've made all payments on time since then. Emphasize my commitment to financial responsibility and request this courtesy adjustment.</code></pre>
+                            <div class="dispute-button-container">
+                                <button class="dispute-copy-btn"
+                                    data-prompt="Write a goodwill letter to American Express requesting removal of a 60-day late payment from August 2022. Explain that I've been a loyal customer for 5 years with an otherwise perfect payment history, the late payment was due to a medical emergency, and I've made all payments on time since then. Emphasize my commitment to financial responsibility and request this courtesy adjustment.">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="dispute-cta-section">
+            <p>Need help with more dispute letters? Start Jam Engine to get our entire suite of dispute letters.</p>
+            <button class="dispute-jam-button" id="disputeJamEngineBtn">Start JAM Engine</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="dispute-toast" id="disputeCopyToast">Prompt copied to clipboard! 📋</div>
+</section>
+
+<!-- Scripts -->
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const copyButtons = document.querySelectorAll('.dispute-copy-btn');
+        const flipButtons = document.querySelectorAll('.dispute-flip-btn');
+        const toast = document.getElementById('disputeCopyToast');
+
+        // Updated card flipping with consistent timing
+        flipButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Get the card inner element
+                const cardInner = this.closest('.dispute-card-inner');
+
+                if (cardInner) {
+                    // Add flipping class to hide buttons immediately
+                    cardInner.classList.add('flipping');
+
+                    // Check current rotation and flip accordingly
+                    if (cardInner.style.transform === 'rotateY(180deg)') {
+                        cardInner.style.transform = 'rotateY(0deg)';
+                    } else {
+                        cardInner.style.transform = 'rotateY(180deg)';
+                    }
+
+                    // Remove the flipping class after animation completes
+                    setTimeout(() => {
+                        cardInner.classList.remove('flipping');
+                    }, 500); // Match the transition duration (0.5s)
+                }
+            });
+        });
+
+        // Existing copy functionality
+        copyButtons.forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const prompt = button.dataset.prompt;
+
+                try {
+                    await navigator.clipboard.writeText(prompt);
+                    toast.classList.add('show');
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+            });
+        });
+
+        // Get the JAM Engine button
+        const jamEngineBtn = document.getElementById('disputeJamEngineBtn');
+        
+        // Add click event listener
+        if (jamEngineBtn) {
+            jamEngineBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Call the openQuizModal function from NavGetStarted.html
+                if (typeof window.openQuizModal === 'function') {
+                    window.openQuizModal();
+                } else {
+                    // Fallback if the function isn't available yet
+                    const navQuizModal = document.getElementById('nav-quizModal');
+                    if (navQuizModal) {
+                        navQuizModal.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                        
+                        // Reset to first step if possible
+                        if (typeof showStep === 'function') {
+                            showStep(1);
+                        }
+                    } else {
+                        console.error("nav-quizModal element not found!");
+                    }
+                }
+                
+                // Track button click if analytics is available
+                if (typeof analytics !== 'undefined') {
+                    analytics.track('JamEngineStarted', {
+                        location: 'Dispute Tool',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            });
+        }
+        
+        // Remove the booking modal since we're not using it anymore
+        const bookingModal = document.getElementById('disputeToolBookingModal');
+        if (bookingModal && bookingModal.parentNode) {
+            bookingModal.parentNode.removeChild(bookingModal);
+        }
+    });
+</script>

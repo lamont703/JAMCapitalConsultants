@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dispute Cards Data Module</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Modern, Clean Styling with enhanced mobile responsiveness */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: rgba(240, 242, 245, 0.85);
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* CSS for dispute cards with improved height handling */
+        .dispute-prompt-card {
+            perspective: 1000px;
+            margin: 15px;
+            width: 320px;
+            height: 450px;
+        }
+
+        .dispute-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dispute-card-front {
+            background-color: #ffffff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dispute-card-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+
+        .dispute-ai-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            color: #4a6cf7;
+            margin-top: 3px;
+        }
+
+        .dispute-card-front h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+            flex: 1;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .dispute-card-description {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+            max-height: 280px;
+            padding-right: 5px;
+            padding: 5px 5px 5px 0;
+        }
+
+        .dispute-card-description::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .dispute-card-description::-webkit-scrollbar-thumb {
+            background-color: #ddd;
+            border-radius: 4px;
+        }
+
+        .dispute-flip-btn {
+            align-self: flex-end;
+            background-color: transparent;
+            border: none;
+            color: #4a6cf7;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 10px 0;
+            transition: color 0.3s;
+            margin-top: 10px;
+        }
+
+        .dispute-flip-btn:hover {
+            color: #3451b2;
+        }
+
+        .dispute-card-back {
+            background-color: #f8f9fa;
+            color: #333;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dispute-prompt-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .dispute-prompt-content h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .dispute-prompt-content pre {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f1f3f5;
+            padding: 12px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0 0 15px 0;
+            white-space: pre-wrap;
+            max-height: 300px;
+            word-break: break-word;
+        }
+
+        .dispute-button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .dispute-copy-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .dispute-copy-btn:hover {
+            background-color: #3451b2;
+        }
+
+        .dispute-copy-icon {
+            margin-right: 5px;
+        }
+
+        /* Flipped state */
+        .flipped .dispute-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Card grid layout improvements */
+        .dispute-card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 25px;
+        }
+
+        /* Toast notification */
+        .dispute-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #002742;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transition: transform 0.3s ease-out;
+            border-left: 4px solid #09ccfc;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+
+        .dispute-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .dispute-prompt-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .dispute-section-header h2 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Add ellipsis for very long titles */
+        .dispute-card-front h3.long-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Toast Notification -->
+    <div class="dispute-toast" id="disputeCopyToast">Prompt copied to clipboard! 📋</div>
+
+    <script>
+        // Create a module for the Dispute Cards functionality
+        const DisputeCardsModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let letters = [];
+
+            // Initialize the module
+            function init() {
+                // Check if already initialized to prevent duplicate initialization
+                if (isInitialized) {
+                    console.log('DisputeCardsModule already initialized');
+                    return true;
+                }
+
+                console.log('Initializing DisputeCardsModule');
+
+                // Load default letters
+                loadDefaultLetters();
+
+                // Set initialization flag
+                isInitialized = true;
+
+                // Add a custom event to notify when the module is ready
+                if (window.dispatchEvent) {
+                    window.dispatchEvent(new CustomEvent('disputeCardsReady', {
+                        detail: { letterCount: getAllLetters().length }
+                    }));
+                }
+
+                return true;
+            }
+
+            // Load default letters
+            function loadDefaultLetters() {
+                letters = [
+                    {
+                        id: 1,
+                        title: "Late Payment Removal (Goodwill Request)",
+                        description: "Request removal of a late payment based on your otherwise good payment history and relationship with the creditor.",
+                        category: "Late Payments",
+                        icon: "fa-hand-holding-heart",
+                        promptText: "Write a goodwill letter to Capital One requesting the removal of a 30-day late payment from April 2023. Explain that I experienced a temporary hardship, have paid on time since, and value our long-standing relationship.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 2,
+                        title: "Collection Account Dispute",
+                        description: "Challenge a collection account that appears on your credit report that you believe is inaccurate or doesn't belong to you.",
+                        category: "Collections",
+                        icon: "fa-exclamation-circle",
+                        promptText: "Write a dispute letter to Experian to challenge a collection from ABC Collections that does not belong to me. Ask them to investigate and remove the account if it cannot be verified under the FCRA.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 3,
+                        title: "Charged-Off Account Dispute",
+                        description: "Dispute a charged-off account with incorrect information or balance on your credit report.",
+                        category: "General",
+                        icon: "fa-times-circle",
+                        promptText: "Write a letter disputing a charged-off account from Synchrony Bank that shows an incorrect balance. Request verification and correction under Section 611 of the Fair Credit Reporting Act.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 4,
+                        title: "Hard Inquiry Removal",
+                        description: "Request removal of unauthorized hard inquiries that may be negatively affecting your credit score.",
+                        category: "Inquiries",
+                        icon: "fa-search",
+                        promptText: "Write a dispute letter to TransUnion requesting the removal of a hard inquiry from XYZ Auto that I did not authorize on June 2023.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 5,
+                        title: "Duplicate Account Dispute",
+                        description: "Challenge duplicate accounts appearing on your credit report that are artificially lowering your credit score.",
+                        category: "General",
+                        icon: "fa-copy",
+                        promptText: "Write a dispute letter to Equifax requesting the deletion of a duplicate account listed twice from Credit One Bank. Request that only the accurate, original account be maintained.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 6,
+                        title: "Medical Debt Collection Dispute",
+                        description: "Challenge medical collections on your credit report, especially those with billing errors or HIPAA violations.",
+                        category: "Collections",
+                        icon: "fa-hospital",
+                        promptText: "Write a letter to challenge a medical collection on my credit report from Health Recovery Group. Ask them to verify billing accuracy and confirm that HIPAA compliance was followed.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 7,
+                        title: "Identity Theft Account Dispute",
+                        description: "Dispute accounts that appeared on your credit report due to identity theft with proper documentation.",
+                        category: "Identity Theft",
+                        icon: "fa-shield-alt",
+                        promptText: "Write a dispute letter to all three credit bureaus stating that a Capital One credit card opened in my name was the result of identity theft. Request removal and note that I have submitted a police report and FTC Identity Theft Affidavit.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 8,
+                        title: "Outdated Account Removal",
+                        description: "Request removal of negative accounts that have exceeded the 7-year reporting period under the FCRA.",
+                        category: "General",
+                        icon: "fa-calendar-times",
+                        promptText: "Write a letter to TransUnion requesting the removal of a closed Verizon Wireless account that was charged off over 7.5 years ago, in compliance with the 7-year reporting limit under the FCRA.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 9,
+                        title: "Wrong Account Status Dispute",
+                        description: "Correct inaccurate account statuses on your credit report, such as open accounts that were closed.",
+                        category: "General",
+                        icon: "fa-exclamation-triangle",
+                        promptText: "Write a letter to Equifax disputing a credit card account from Chase that is marked \"open\" but was closed in 2021. Request correction of the account status to \"closed by consumer.\"",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 10,
+                        title: "Debt Validation Letter to Collector",
+                        description: "Request proper validation of a debt from a collection agency before they continue collection activities.",
+                        category: "Collections",
+                        icon: "fa-file-contract",
+                        promptText: "Write a debt validation request to Midland Credit Management for an alleged debt. Ask them to verify the original creditor, amount owed, and provide proper documentation before any reporting or collection activity continues.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 11,
+                        title: "Goodwill Letter for Student Loan Late",
+                        description: "Request removal of a late student loan payment based on your otherwise good payment history.",
+                        category: "Late Payments",
+                        icon: "fa-graduation-cap",
+                        promptText: "Write a goodwill letter to Nelnet asking for the removal of a 60-day late student loan payment from February 2022. I've been current ever since and would appreciate the courtesy of a one-time adjustment.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 12,
+                        title: "Re-aged Account Dispute",
+                        description: "Challenge accounts that have been improperly re-aged to extend the reporting period beyond the legal limit.",
+                        category: "General",
+                        icon: "fa-hourglass-half",
+                        promptText: "Write a dispute letter to TransUnion regarding a re-aged debt from Portfolio Recovery that restarted the reporting date. Request investigation and correction per the FCRA's 7-year rule.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 13,
+                        title: "Inaccurate Payment History Dispute",
+                        description: "Correct payment history errors that show late payments when you actually paid on time.",
+                        category: "Late Payments",
+                        icon: "fa-history",
+                        promptText: "Write a dispute letter to Experian asking for correction of inaccurate late payments listed for my Discover card. I've made all payments on time since 2021.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 14,
+                        title: "Fraudulent Inquiry from Identity Theft",
+                        description: "Dispute unauthorized credit inquiries resulting from identity theft.",
+                        category: "Identity Theft",
+                        icon: "fa-user-shield",
+                        promptText: "Write a dispute letter to Equifax requesting the removal of a fraudulent inquiry by XYZ Credit on July 2023. I did not authorize this pull and suspect identity theft.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 15,
+                        title: "Settled Account Showing Balance",
+                        description: "Correct accounts that show an outstanding balance despite being settled in full.",
+                        category: "General",
+                        icon: "fa-check-circle",
+                        promptText: "Write a letter to Experian requesting an update on a Capital One account that was settled in full, but still reports an outstanding balance.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 16,
+                        title: "Public Record (Bankruptcy) Reporting Error",
+                        description: "Dispute bankruptcy information that is incorrectly reported on your credit file.",
+                        category: "Bankruptcy",
+                        icon: "fa-gavel",
+                        promptText: "Write a dispute letter to all three credit bureaus to challenge a Chapter 13 bankruptcy filed in error under my name. Request verification with the court and immediate deletion if inaccurate.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 17,
+                        title: "Repossession With Inaccurate Balance",
+                        description: "Challenge repossession accounts that show incorrect deficiency balances.",
+                        category: "General",
+                        icon: "fa-car",
+                        promptText: "Write a dispute letter to TransUnion requesting correction of a repossessed vehicle loan that reports the wrong deficiency balance.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 18,
+                        title: "Mixed File Dispute (Wrong Person's Data)",
+                        description: "Correct credit reports that contain information belonging to someone else with a similar name.",
+                        category: "Identity Theft",
+                        icon: "fa-random",
+                        promptText: "Write a dispute letter to Equifax notifying them of mixed file data. My report includes accounts and personal information that belong to someone else with a similar name.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 19,
+                        title: "Account Showing as Open After Closure",
+                        description: "Request correction of accounts that still show as open despite being closed by you.",
+                        category: "General",
+                        icon: "fa-door-closed",
+                        promptText: "Write a letter to Experian requesting a correction to a Capital One account that was closed by me in 2022 but still reports as open.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 20,
+                        title: "Inaccurate Personal Information Dispute",
+                        description: "Remove outdated addresses and incorrect name variations from your credit report.",
+                        category: "General",
+                        icon: "fa-id-card",
+                        promptText: "Write a dispute letter requesting the removal of outdated addresses and incorrect variations of my name from all three credit bureaus.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 21,
+                        title: "Student Loan Showing Incorrect Forbearance Status",
+                        description: "Correct student loans that show as delinquent during valid forbearance periods.",
+                        category: "Late Payments",
+                        icon: "fa-graduation-cap",
+                        promptText: "Write a dispute letter to Equifax about a student loan account from Navient that incorrectly shows as delinquent during a valid forbearance period.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 22,
+                        title: "Charge-Off Reporting Past Statute of Limitations",
+                        description: "Request removal of charge-offs that have exceeded the legal reporting period.",
+                        category: "General",
+                        icon: "fa-stopwatch",
+                        promptText: "Write a dispute letter to TransUnion requesting removal of a charge-off account from Wells Fargo that's past the 7-year reporting limit under the FCRA.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 23,
+                        title: "Collection Listed After Pay-for-Delete",
+                        description: "Request removal of collection accounts that should have been deleted after payment per agreement.",
+                        category: "Collections",
+                        icon: "fa-handshake",
+                        promptText: "Write a dispute letter to Experian requesting the removal of a collection account from ABC Collections that I paid under a pay-for-delete agreement.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 24,
+                        title: "Credit Card Limit Not Updated",
+                        description: "Request correction of credit limits that are reported lower than your actual limit.",
+                        category: "General",
+                        icon: "fa-credit-card",
+                        promptText: "Write a dispute letter to Experian requesting an update to the credit limit for my American Express account, which now reports $10,000 instead of the current $15,000 limit.",
+                        date: new Date().toLocaleDateString()
+                    },
+                    {
+                        id: 25,
+                        title: "Authorized User Account With Negative History",
+                        description: "Request removal from accounts where you were only an authorized user but are being affected by negative history.",
+                        category: "General",
+                        icon: "fa-user-minus",
+                        promptText: "Write a dispute letter requesting the removal of an authorized user account from my credit report. I am not financially responsible for the account and it's negatively impacting my score.",
+                        date: new Date().toLocaleDateString()
+                    }
+                ];
+            }
+
+            // Reset the module state
+            function reset() {
+                console.log('Resetting DisputeCardsModule');
+                isInitialized = false;
+                return true;
+            }
+
+            // Get all letters
+            function getAllLetters() {
+                return [...letters];
+            }
+
+            // Get a letter by ID
+            function getLetterById(id) {
+                return letters.find(letter => letter.id === id);
+            }
+
+            // Get letters by category
+            function getLettersByCategory(category) {
+                if (category === 'all') {
+                    return getAllLetters();
+                }
+                return letters.filter(letter => letter.category === category);
+            }
+
+            // Search letters by term
+            function searchLetters(term) {
+                if (!term) return getAllLetters();
+
+                const searchTerm = term.toLowerCase();
+                return letters.filter(letter =>
+                    letter.title.toLowerCase().includes(searchTerm) ||
+                    letter.description.toLowerCase().includes(searchTerm) ||
+                    letter.fullDescription.toLowerCase().includes(searchTerm) ||
+                    letter.category.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Filter letters by category and search term
+            function filterLetters(category = 'all', searchTerm = '') {
+                let result = getLettersByCategory(category);
+
+                if (searchTerm) {
+                    result = result.filter(letter =>
+                        letter.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        letter.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        letter.fullDescription.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                return result;
+            }
+
+            // Add a new letter
+            function addLetter(letter) {
+                // Generate a new ID
+                const newId = letters.length > 0 ? Math.max(...letters.map(l => l.id)) + 1 : 1;
+                const newLetter = { ...letter, id: newId, date: new Date().toISOString().split('T')[0] };
+                letters.push(newLetter);
+                return newLetter;
+            }
+
+            // Update an existing letter
+            function updateLetter(id, updatedData) {
+                const index = letters.findIndex(letter => letter.id === id);
+                if (index === -1) return false;
+
+                letters[index] = { ...letters[index], ...updatedData };
+                return letters[index];
+            }
+
+            // Delete a letter
+            function deleteLetter(id) {
+                const index = letters.findIndex(letter => letter.id === id);
+                if (index === -1) return false;
+
+                letters.splice(index, 1);
+                return true;
+            }
+
+            // Reset to default letters
+            function resetToDefault() {
+                loadDefaultLetters();
+                return true;
+            }
+
+            // Flip a card
+            function flipCard(id) {
+                const cardInner = document.querySelector(`.dispute-card-inner[data-id="${id}"]`);
+                if (!cardInner) return false;
+
+                if (cardInner.style.transform === 'rotateY(180deg)') {
+                    cardInner.style.transform = 'rotateY(0deg)';
+                } else {
+                    cardInner.style.transform = 'rotateY(180deg)';
+                }
+
+                return true;
+            }
+
+            // Copy prompt to clipboard
+            function copyPromptToClipboard(id) {
+                const letter = getLetterById(id);
+                if (!letter) return false;
+
+                const promptText = letter.promptText || letter.content || 'No content available';
+
+                try {
+                    navigator.clipboard.writeText(promptText).then(
+                        function () {
+                            alert('Prompt copied to clipboard!');
+                        },
+                        function () {
+                            alert('Failed to copy prompt. Please try again or copy manually.');
+                        }
+                    );
+                } catch (e) {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = promptText;
+                    textarea.style.position = 'fixed';
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            alert('Prompt copied to clipboard!');
+                        } else {
+                            alert('Failed to copy prompt. Please try again or copy manually.');
+                        }
+                    } catch (err) {
+                        alert('Failed to copy prompt. Please try again or copy manually.');
+                    }
+
+                    document.body.removeChild(textarea);
+                }
+
+                return true;
+            }
+
+            // Render card HTML with improved content handling
+            function renderCardHTML(letter) {
+                // Check if title is long and needs special handling
+                const titleClass = letter.title.length > 40 ? 'long-title' : '';
+
+                return `
+                <div class="dispute-prompt-card">
+                    <div class="dispute-card-inner" data-id="${letter.id}">
+                        <div class="dispute-card-front">
+                            <div class="dispute-card-header">
+                                <i class="dispute-ai-icon fas ${letter.icon}"></i>
+                                <h3 class="${titleClass}">${letter.title}</h3>
+                            </div>
+                            <p class="dispute-card-description">${letter.description || 'No description available.'}</p>
+                            <button class="dispute-flip-btn">View Details →</button>
+                        </div>
+                        <div class="dispute-card-back">
+                            <div class="dispute-prompt-content">
+                                <h4>${letter.promptTitle || letter.title}</h4>
+                                <pre><code>${letter.promptText || letter.content || 'No content available.'}</code></pre>
+                                <div class="dispute-button-container">
+                                    <button class="dispute-copy-btn">
+                                        <span class="dispute-copy-icon">📋</span> Copy Text
+                                    </button>
+                                    <button class="dispute-flip-btn">← Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }
+
+            // Render cards into a container
+            function renderCardsIntoContainer(containerId, category = 'all', searchTerm = '') {
+                const container = document.getElementById(containerId);
+                if (!container) return false;
+
+                const filteredLetters = filterLetters(category, searchTerm);
+
+                if (filteredLetters.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No letters found</h3>
+                            <p>Try adjusting your search or filter criteria.</p>
+                        </div>
+                    `;
+                    return true;
+                }
+
+                container.innerHTML = filteredLetters.map(letter => renderCardHTML(letter)).join('');
+
+                // Set up event listeners for the newly rendered cards
+                setupCardEventListeners();
+
+                return true;
+            }
+
+            // Set up event listeners for cards
+            function setupCardEventListeners() {
+                // Set up flip buttons
+                document.querySelectorAll('.dispute-flip-btn').forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Get the card inner element
+                        const cardInner = this.closest('.dispute-card-inner');
+                        const cardId = cardInner.getAttribute('data-id');
+
+                        if (cardInner) {
+                            flipCard(parseInt(cardId));
+                        }
+                    });
+                });
+
+                // Set up copy buttons
+                document.querySelectorAll('.dispute-copy-btn').forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const cardId = this.closest('.dispute-card-inner').getAttribute('data-id');
+                        copyPromptToClipboard(parseInt(cardId));
+                    });
+                });
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                getAllLetters: getAllLetters,
+                getLetterById: getLetterById,
+                getLettersByCategory: getLettersByCategory,
+                searchLetters: searchLetters,
+                filterLetters: filterLetters,
+                getFilteredLetters: filterLetters,
+                addLetter: addLetter,
+                updateLetter: updateLetter,
+                deleteLetter: deleteLetter,
+                resetToDefault: resetToDefault,
+                copyPromptToClipboard: copyPromptToClipboard,
+                flipCard: flipCard,
+                renderCardHTML: renderCardHTML,
+                renderCardsIntoContainer: renderCardsIntoContainer
+            };
+        })();
+
+        // Expose the module globally
+        window.jamDisputeCards = DisputeCardsModule;
+
+        // Initialize the module
+        DisputeCardsModule.init();
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('disputeCardsLoaded'));
+        }
+    </script>
+</body>
+
+</html>

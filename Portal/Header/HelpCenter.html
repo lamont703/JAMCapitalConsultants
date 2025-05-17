@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center Module</title>
+    <style>
+        /* Help Center Module Styles */
+        .help-container {
+            font-family: 'Roboto', sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            color: #333;
+        }
+
+        .help-header {
+            margin-bottom: 20px;
+        }
+
+        .help-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #1a2b3c;
+        }
+
+        .help-subtitle {
+            color: #6c7a89;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .help-search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .help-search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        .help-search-input:focus {
+            border-color: #09ccfc;
+            box-shadow: 0 0 0 2px rgba(9, 204, 252, 0.2);
+            outline: none;
+        }
+
+        .help-search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+
+        .help-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .help-category {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border-top: 3px solid #09ccfc;
+        }
+
+        .help-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-category-icon {
+            font-size: 24px;
+            color: #09ccfc;
+            margin-bottom: 15px;
+        }
+
+        .help-category-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #1a2b3c;
+        }
+
+        .help-category-description {
+            color: #6c7a89;
+            font-size: 14px;
+        }
+
+        .help-faq-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .help-faq-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #1a2b3c;
+            border-left: 4px solid #09ccfc;
+            padding-left: 10px;
+        }
+
+        .help-faq-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .help-faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .help-faq-question {
+            font-weight: 500;
+            color: #1a2b3c;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .help-faq-question:hover {
+            color: #09ccfc;
+        }
+
+        .help-faq-question i {
+            transition: transform 0.3s;
+            color: #09ccfc;
+        }
+
+        .help-faq-question.active i {
+            transform: rotate(180deg);
+        }
+
+        .help-faq-answer {
+            padding: 0 0 10px;
+            color: #6c7a89;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .help-faq-answer.active {
+            display: block;
+        }
+
+        .help-contact-section {
+            background: linear-gradient(135deg, #e6f9ff 0%, #ffffff 100%);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .help-contact-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #1a2b3c;
+        }
+
+        .help-contact-description {
+            color: #6c7a89;
+            margin-bottom: 20px;
+        }
+
+        .help-contact-button {
+            display: inline-block;
+            background-color: #09ccfc;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .help-contact-button:hover {
+            background-color: #07a3ca;
+        }
+
+        .help-search-results {
+            display: none;
+            background: #fff;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .help-search-results.active {
+            display: block;
+        }
+
+        .help-search-results-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #1a2b3c;
+        }
+
+        .help-search-results-list {
+            margin-bottom: 20px;
+        }
+
+        .help-search-result {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .help-search-result:hover {
+            background-color: #f9f9f9;
+        }
+
+        .help-search-result:last-child {
+            border-bottom: none;
+        }
+
+        .help-search-result-title {
+            font-weight: 500;
+            color: #1a2b3c;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .help-search-result-title i {
+            color: #09ccfc;
+            margin-right: 10px;
+        }
+
+        .help-search-result-preview {
+            color: #6c7a89;
+            font-size: 14px;
+        }
+
+        .help-search-back {
+            color: #09ccfc;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .help-search-back i {
+            margin-right: 5px;
+        }
+
+        .help-no-results {
+            text-align: center;
+            padding: 30px 0;
+            color: #6c7a89;
+        }
+
+        .help-no-results i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .help-article-container {
+            display: none;
+            background: #fff;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .help-article-container.active {
+            display: block;
+        }
+
+        .help-article-back {
+            color: #09ccfc;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .help-article-back i {
+            margin-right: 5px;
+        }
+
+        .help-article-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1a2b3c;
+        }
+
+        .help-article-content {
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .help-article-content h3 {
+            margin: 25px 0 15px;
+            color: #1a2b3c;
+        }
+
+        .help-article-content p {
+            margin-bottom: 15px;
+        }
+
+        .help-article-content ul,
+        .help-article-content ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+
+        .help-article-content li {
+            margin-bottom: 8px;
+        }
+
+        .help-article-content a {
+            color: #09ccfc;
+            text-decoration: none;
+        }
+
+        .help-article-content a:hover {
+            text-decoration: underline;
+        }
+
+        .help-article-helpful {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .help-article-helpful-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #1a2b3c;
+        }
+
+        .help-article-helpful-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .help-article-helpful-button {
+            background: #f5f5f5;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .help-article-helpful-button i {
+            margin-right: 5px;
+        }
+
+        .help-article-helpful-button:hover {
+            background: #e9e9e9;
+        }
+
+        .help-article-helpful-button.active {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .help-article-thank-you {
+            margin-top: 15px;
+            color: #09ccfc;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Help Center Module
+        const HelpCenterModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let activeArticleId = null;
+            let searchQuery = '';
+
+            // Sample help articles data
+            const helpArticles = [
+                {
+                    id: 'getting-started',
+                    title: 'Getting Started with JAM Engine',
+                    category: 'Getting Started',
+                    content: `
+                        <h3>Welcome to JAM Engine</h3>
+                        <p>JAM Engine is your all-in-one platform for credit repair and financial management. This guide will help you get started with the basic features and navigation.</p>
+                        
+                        <h3>Setting Up Your Account</h3>
+                        <p>When you first log in, you'll be prompted to complete your profile and provide some basic information about your credit situation. This helps us personalize your experience.</p>
+                        
+                        <h3>Dashboard Overview</h3>
+                        <p>Your dashboard is the central hub for all JAM Engine activities. Here you can see:</p>
+                        <ul>
+                            <li>Your credit score and history</li>
+                            <li>Active disputes and their status</li>
+                            <li>Document uploads</li>
+                            <li>Messages from your credit specialist</li>
+                            <li>Next steps recommended for your situation</li>
+                        </ul>
+                        
+                        <h3>Navigation</h3>
+                        <p>Use the sidebar menu to navigate between different sections of the platform. Each section is designed to help you with specific aspects of your credit repair journey.</p>
+                    `
+                },
+                {
+                    id: 'credit-report',
+                    title: 'Understanding Your Credit Report',
+                    category: 'Credit Reports',
+                    content: `
+                        <h3>Credit Report Basics</h3>
+                        <p>Your credit report contains information about your credit history, including your payment history, credit utilization, and any negative items that may be affecting your score.</p>
+                        
+                        <h3>Reading Your JAM Engine Credit Report</h3>
+                        <p>In the Credit Report section, you'll see a breakdown of your report from all three major bureaus: Experian, Equifax, and TransUnion. Each entry includes:</p>
+                        <ul>
+                            <li>Account name and type</li>
+                            <li>Current status (open/closed)</li>
+                            <li>Payment history</li>
+                            <li>Balance and credit limit</li>
+                            <li>Any negative marks or disputes</li>
+                        </ul>
+                        
+                        <h3>Identifying Errors</h3>
+                        <p>Look for any inaccuracies such as accounts you don't recognize, incorrect payment statuses, or outdated negative information. These are potential items for dispute.</p>
+                        
+                        <h3>Credit Score Factors</h3>
+                        <p>The system will highlight the key factors affecting your credit score, helping you understand what areas to focus on for improvement.</p>
+                    `
+                },
+                {
+                    id: 'dispute-process',
+                    title: 'How to Create and Track Disputes',
+                    category: 'Disputes',
+                    content: `
+                        <h3>Starting a Dispute</h3>
+                        <p>To dispute an item on your credit report:</p>
+                        <ol>
+                            <li>Navigate to the Disputes section</li>
+                            <li>Click "Create New Dispute"</li>
+                            <li>Select the credit bureau(s) to dispute with</li>
+                            <li>Choose the account or item you want to dispute</li>
+                            <li>Select a reason for the dispute</li>
+                            <li>Add any supporting documentation</li>
+                            <li>Submit your dispute</li>
+                        </ol>
+                        
+                        <h3>Dispute Library</h3>
+                        <p>The Dispute Library contains templates and strategies for different types of disputes. You can use these as a starting point for your own disputes.</p>
+                        
+                        <h3>Tracking Progress</h3>
+                        <p>Once submitted, you can track the status of your disputes in the Disputes Dashboard. Each dispute will show its current status, important dates, and any responses received.</p>
+                        
+                        <h3>Understanding Outcomes</h3>
+                        <p>Disputes can result in items being removed, updated, or verified. The system will explain what each outcome means and recommend next steps based on the result.</p>
+                    `
+                },
+                {
+                    id: 'document-upload',
+                    title: 'Uploading and Managing Documents',
+                    category: 'Documents',
+                    content: `
+                        <h3>Document Types</h3>
+                        <p>JAM Engine allows you to upload several types of documents:</p>
+                        <ul>
+                            <li>Identity verification (ID, passport)</li>
+                            <li>Credit reports</li>
+                            <li>Correspondence from creditors</li>
+                            <li>Proof of payment</li>
+                            <li>Supporting documentation for disputes</li>
+                        </ul>
+                        
+                        <h3>How to Upload Documents</h3>
+                        <p>To upload a document:</p>
+                        <ol>
+                            <li>Go to the Documents section</li>
+                            <li>Select the appropriate document category</li>
+                            <li>Click "Upload" or drag and drop your file</li>
+                            <li>Add any relevant notes or descriptions</li>
+                            <li>Submit the upload</li>
+                        </ol>
+                        
+                        <h3>Document Security</h3>
+                        <p>All documents are encrypted and stored securely. Only you and your assigned credit specialist can access them.</p>
+                        
+                        <h3>Managing Your Documents</h3>
+                        <p>You can view, download, or delete your documents at any time from the Documents section. You can also see which documents have been reviewed by your specialist.</p>
+                    `
+                },
+                {
+                    id: 'messaging',
+                    title: 'Communicating with Your Credit Specialist',
+                    category: 'Support',
+                    content: `
+                        <h3>Messaging System</h3>
+                        <p>JAM Engine includes a built-in messaging system that allows you to communicate directly with your assigned credit repair specialist.</p>
+                        
+                        <h3>Sending Messages</h3>
+                        <p>To send a message:</p>
+                        <ol>
+                            <li>Go to the Messages section</li>
+                            <li>Click "New Message"</li>
+                            <li>Type your message</li>
+                            <li>Attach any relevant documents if needed</li>
+                            <li>Send your message</li>
+                        </ol>
+                        
+                        <h3>Response Times</h3>
+                        <p>Our specialists typically respond within 24-48 business hours. You'll receive a notification when you get a new message.</p>
+                        
+                        <h3>Message History</h3>
+                        <p>All your communication history is saved and easily accessible, allowing you to reference previous conversations and advice.</p>
+                    `
+                },
+                {
+                    id: 'account-settings',
+                    title: 'Managing Your Account Settings',
+                    category: 'Account',
+                    content: `
+                        <h3>Accessing Settings</h3>
+                        <p>To access your account settings, click on the Settings tab in the main navigation menu.</p>
+                        
+                        <h3>Profile Information</h3>
+                        <p>Keep your personal information up to date, including:</p>
+                        <ul>
+                            <li>Contact details</li>
+                            <li>Address information</li>
+                            <li>Communication preferences</li>
+                        </ul>
+                        
+                        <h3>Security Settings</h3>
+                        <p>Manage your account security:</p>
+                        <ul>
+                            <li>Change your password</li>
+                            <li>Enable two-factor authentication</li>
+                            <li>Manage session timeout settings</li>
+                        </ul>
+                        
+                        <h3>Notification Preferences</h3>
+                        <p>Control how and when you receive notifications about your account, disputes, and messages.</p>
+                        
+                        <h3>Subscription Management</h3>
+                        <p>View your current subscription plan, billing history, and manage payment methods.</p>
+                    `
+                }
+            ];
+
+            // FAQ data
+            const faqData = [
+                {
+                    question: "How long does the credit repair process take?",
+                    answer: "The credit repair process varies for each individual. Simple disputes might be resolved in 30-45 days, while more complex situations can take 3-6 months or longer. Your dashboard will show estimated timelines based on your specific situation."
+                },
+                {
+                    question: "How do I know which items to dispute on my credit report?",
+                    answer: "JAM Engine analyzes your credit report and highlights potential errors or discrepancies. Items that are inaccurate, outdated, unverifiable, or improperly reported are good candidates for disputes. Your credit specialist can also provide personalized recommendations."
+                },
+                {
+                    question: "Can I upload my existing credit reports?",
+                    answer: "Yes! You can upload existing credit reports in the Documents section. This helps us analyze your credit history and identify potential dispute opportunities more quickly."
+                },
+                {
+                    question: "How often should I check my credit report?",
+                    answer: "We recommend checking your credit report at least once every 3 months during the active repair process. JAM Engine will automatically track changes and notify you of important updates."
+                },
+                {
+                    question: "What happens after I submit a dispute?",
+                    answer: "After submission, the credit bureau has 30 days to investigate (45 days in some cases). They'll contact the creditor to verify the information. You can track the status of each dispute in your Disputes Dashboard."
+                },
+                {
+                    question: "Is my personal information secure?",
+                    answer: "Yes, JAM Engine uses bank-level encryption to protect your data. All documents and personal information are stored securely, and we never share your information with unauthorized third parties."
+                },
+                {
+                    question: "Can I cancel my subscription at any time?",
+                    answer: "Yes, you can cancel your subscription at any time from the Settings > Subscription section. Your access will continue until the end of your current billing period."
+                },
+                {
+                    question: "How do I know if my credit score is improving?",
+                    answer: "JAM Engine tracks your credit score over time and displays this information in graph form on your dashboard. You'll also receive notifications when significant changes occur."
+                }
+            ];
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return false;
+
+                console.log(`Initializing Help Center Module in container: ${containerId}`);
+
+                // Insert the widget HTML
+                container.innerHTML = `
+                    <div class="help-container">
+                        <div class="help-header">
+                            <h2 class="help-title">JAM Engine Help Center</h2>
+                            <p class="help-subtitle">Find answers to common questions and learn how to get the most out of JAM Engine</p>
+                        </div>
+                        
+                        <div class="help-search-container">
+                            <input type="text" class="help-search-input" placeholder="Search for help topics..." id="help-search-input">
+                            <i class="fas fa-search help-search-icon"></i>
+                        </div>
+                        
+                        <div class="help-main-content">
+                            <!-- Categories Section -->
+                            <div class="help-categories">
+                                <div class="help-category" data-article="getting-started">
+                                    <div class="help-category-icon"><i class="fas fa-rocket"></i></div>
+                                    <h3 class="help-category-title">Getting Started</h3>
+                                    <p class="help-category-description">Learn the basics of JAM Engine and how to set up your account</p>
+                                </div>
+                                
+                                <div class="help-category" data-article="credit-report">
+                                    <div class="help-category-icon"><i class="fas fa-file-alt"></i></div>
+                                    <h3 class="help-category-title">Credit Reports</h3>
+                                    <p class="help-category-description">Understanding your credit report and score</p>
+                                </div>
+                                
+                                <div class="help-category" data-article="dispute-process">
+                                    <div class="help-category-icon"><i class="fas fa-gavel"></i></div>
+                                    <h3 class="help-category-title">Disputes</h3>
+                                    <p class="help-category-description">How to create and manage credit disputes</p>
+                                </div>
+                                
+                                <div class="help-category" data-article="document-upload">
+                                    <div class="help-category-icon"><i class="fas fa-upload"></i></div>
+                                    <h3 class="help-category-title">Documents</h3>
+                                    <p class="help-category-description">Uploading and managing your documents</p>
+                                </div>
+                            </div>
+                            
+                            <!-- FAQ Section -->
+                            <div class="help-faq-section">
+                                <h3 class="help-faq-title">Frequently Asked Questions</h3>
+                                <div class="help-faq-list">
+                                    ${faqData.map((faq, index) => `
+                                        <div class="help-faq-item">
+                                            <div class="help-faq-question" data-faq="${index}">
+                                                ${faq.question}
+                                                <i class="fas fa-chevron-down"></i>
+                                            </div>
+                                            <div class="help-faq-answer" id="help-faq-answer-${index}">
+                                                ${faq.answer}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Section -->
+                            <div class="help-contact-section">
+                                <h3 class="help-contact-title">Need More Help?</h3>
+                                <p class="help-contact-description">Our support team is available to assist you with any questions or issues you may have.</p>
+                                
+                                <div class="help-contact-options">
+                                    <div class="help-contact-option">
+                                        <div class="help-contact-icon"><i class="fas fa-envelope"></i></div>
+                                        <div class="help-contact-label">Email Support</div>
+                                        <div class="help-contact-value">support@jamengine.com</div>
+                                        <a href="mailto:support@jamengine.com" class="help-button">Send Email</a>
+                                    </div>
+                                    
+                                    <div class="help-contact-option">
+                                        <div class="help-contact-icon"><i class="fas fa-phone"></i></div>
+                                        <div class="help-contact-label">Phone Support</div>
+                                        <div class="help-contact-value">1-800-JAM-HELP</div>
+                                        <a href="tel:1-800-526-4357" class="help-button">Call Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Article View (Hidden by default) -->
+                        <div class="help-article-container">
+                            <div class="help-article-header">
+                                <button class="help-back-button">
+                                    <i class="fas fa-arrow-left"></i> Back to Help Center
+                                </button>
+                                <h2 class="help-article-title"></h2>
+                            </div>
+                            
+                            <div class="help-article-content"></div>
+                            
+                            <div class="help-article-helpful">
+                                <div class="help-article-helpful-title">Was this article helpful?</div>
+                                <div class="help-article-helpful-buttons">
+                                    <button class="help-article-helpful-button" data-value="yes">
+                                        <i class="fas fa-thumbs-up"></i> Yes
+                                    </button>
+                                    <button class="help-article-helpful-button" data-value="no">
+                                        <i class="fas fa-thumbs-down"></i> No
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Results (Hidden by default) -->
+                        <div class="help-search-results">
+                            <h3 class="help-search-results-title">Search Results</h3>
+                            <div class="help-search-results-list"></div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                isInitialized = true;
+                return true;
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // Category click
+                const categories = container.querySelectorAll('.help-category');
+                categories.forEach(category => {
+                    category.addEventListener('click', function () {
+                        const articleId = this.getAttribute('data-article');
+                        showArticle(articleId, container);
+                    });
+                });
+
+                // FAQ click
+                const faqQuestions = container.querySelectorAll('.help-faq-question');
+                faqQuestions.forEach(question => {
+                    question.addEventListener('click', function () {
+                        const faqIndex = this.getAttribute('data-faq');
+                        toggleFAQ(faqIndex, container);
+                    });
+                });
+
+                // Back button
+                const backButton = container.querySelector('.help-back-button');
+                if (backButton) {
+                    backButton.addEventListener('click', function () {
+                        hideArticle(container);
+                    });
+                }
+
+                // Search
+                const searchInput = container.querySelector('#help-search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('input', function () {
+                        searchQuery = this.value.trim();
+                        if (searchQuery.length >= 3) {
+                            performSearch(searchQuery, container);
+                        } else if (searchQuery.length === 0) {
+                            hideSearchResults(container);
+                        }
+                    });
+
+                    searchInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter' && searchQuery.length >= 3) {
+                            performSearch(searchQuery, container);
+                        }
+                    });
+                }
+
+                // Helpful buttons
+                const helpfulButtons = container.querySelectorAll('.help-article-helpful-button');
+                helpfulButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const value = this.getAttribute('data-value');
+                        submitFeedback(activeArticleId, value, container);
+                    });
+                });
+            }
+
+            // Show article
+            function showArticle(articleId, container) {
+                const article = helpArticles.find(a => a.id === articleId);
+                if (!article) return;
+
+                activeArticleId = articleId;
+
+                // Update article content
+                container.querySelector('.help-article-title').textContent = article.title;
+                container.querySelector('.help-article-content').innerHTML = article.content;
+
+                // Show article container, hide main content and search results
+                container.querySelector('.help-main-content').style.display = 'none';
+                container.querySelector('.help-search-results').classList.remove('active');
+                container.querySelector('.help-article-container').classList.add('active');
+
+                // Reset helpful buttons
+                const helpfulButtons = container.querySelectorAll('.help-article-helpful-button');
+                helpfulButtons.forEach(button => button.classList.remove('active'));
+            }
+
+            // Hide article
+            function hideArticle(container) {
+                activeArticleId = null;
+
+                // Hide article container, show main content
+                container.querySelector('.help-main-content').style.display = 'block';
+                container.querySelector('.help-article-container').classList.remove('active');
+            }
+
+            // Toggle FAQ
+            function toggleFAQ(faqIndex, container) {
+                const faqQuestion = container.querySelector(`.help-faq-question[data-faq="${faqIndex}"]`);
+                const faqAnswer = container.querySelector(`.help-faq-answer[data-faq="${faqIndex}"]`);
+
+                if (!faqQuestion || !faqAnswer) return;
+
+                const isActive = faqQuestion.classList.contains('active');
+
+                // Close all FAQs
+                container.querySelectorAll('.help-faq-question').forEach(q => q.classList.remove('active'));
+                container.querySelectorAll('.help-faq-answer').forEach(a => a.style.display = 'none');
+
+                // Toggle current FAQ
+                if (!isActive) {
+                    faqQuestion.classList.add('active');
+                    faqAnswer.style.display = 'block';
+                }
+            }
+
+            // Perform search
+            function performSearch(query, container) {
+                if (!query) return;
+
+                // Search in articles and FAQs
+                const results = [];
+
+                // Search in articles
+                helpArticles.forEach(article => {
+                    if (article.title.toLowerCase().includes(query.toLowerCase()) ||
+                        article.content.toLowerCase().includes(query.toLowerCase())) {
+                        results.push({
+                            type: 'article',
+                            id: article.id,
+                            title: article.title,
+                            preview: article.content.substring(0, 150) + '...'
+                        });
+                    }
+                });
+
+                // Search in FAQs
+                faqData.forEach(faq => {
+                    if (faq.question.toLowerCase().includes(query.toLowerCase()) ||
+                        faq.answer.toLowerCase().includes(query.toLowerCase())) {
+                        results.push({
+                            type: 'faq',
+                            id: faq.id,
+                            title: faq.question,
+                            preview: faq.answer.substring(0, 150) + '...'
+                        });
+                    }
+                });
+
+                // Display results
+                displaySearchResults(results, query, container);
+            }
+
+            // Display search results
+            function displaySearchResults(results, query, container) {
+                const resultsContainer = container.querySelector('.help-search-results');
+                const resultsList = container.querySelector('.help-search-results-list');
+
+                // Update title
+                container.querySelector('.help-search-results-title').textContent =
+                    `Search Results for "${query}" (${results.length} results)`;
+
+                // Generate results HTML
+                if (results.length === 0) {
+                    resultsList.innerHTML = `
+                        <div class="help-no-results">
+                            <i class="fas fa-search"></i>
+                            <p>No results found for "${query}"</p>
+                            <p>Try different keywords or browse our help categories.</p>
+                        </div>
+                    `;
+                } else {
+                    resultsList.innerHTML = results.map(result => `
+                        <div class="help-search-result" data-type="${result.type}" data-id="${result.id}">
+                            <div class="help-search-result-title">
+                                <i class="fas ${result.type === 'article' ? 'fa-file-alt' : 'fa-question-circle'}"></i>
+                                ${result.title}
+                            </div>
+                            <div class="help-search-result-preview">${result.preview}</div>
+                        </div>
+                    `).join('');
+
+                    // Add click event to results
+                    container.querySelectorAll('.help-search-result').forEach(resultItem => {
+                        resultItem.addEventListener('click', function () {
+                            const type = this.getAttribute('data-type');
+                            const id = this.getAttribute('data-id');
+
+                            if (type === 'article') {
+                                showArticle(id, container);
+                            } else if (type === 'faq') {
+                                hideSearchResults(container);
+                                const faqElement = container.querySelector(`.help-faq-question[data-faq="${id}"]`);
+                                if (faqElement) {
+                                    faqElement.scrollIntoView({ behavior: 'smooth' });
+                                    setTimeout(() => toggleFAQ(id, container), 500);
+                                }
+                            }
+                        });
+                    });
+                }
+
+                // Show results container, hide main content
+                container.querySelector('.help-main-content').style.display = 'none';
+                resultsContainer.classList.add('active');
+                container.querySelector('.help-article-container').classList.remove('active');
+            }
+
+            // Hide search results
+            function hideSearchResults(container) {
+                container.querySelector('.help-search-results').classList.remove('active');
+                container.querySelector('.help-main-content').style.display = 'block';
+            }
+
+            // Submit feedback
+            function submitFeedback(articleId, value, container) {
+                if (!articleId) return;
+
+                // In a real app, you would send this feedback to your server
+                console.log(`Feedback for article ${articleId}: ${value}`);
+
+                // Update UI
+                const helpfulButtons = container.querySelectorAll('.help-article-helpful-button');
+                helpfulButtons.forEach(button => button.classList.remove('active'));
+
+                const clickedButton = container.querySelector(`.help-article-helpful-button[data-value="${value}"]`);
+                if (clickedButton) {
+                    clickedButton.classList.add('active');
+                }
+
+                // Show thank you message
+                const helpfulSection = container.querySelector('.help-article-helpful');
+                const thankYouMessage = document.createElement('div');
+                thankYouMessage.className = 'help-article-thank-you';
+                thankYouMessage.textContent = 'Thank you for your feedback!';
+
+                // Remove existing thank you message if any
+                const existingMessage = container.querySelector('.help-article-thank-you');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+
+                helpfulSection.appendChild(thankYouMessage);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    thankYouMessage.remove();
+                }, 3000);
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        // Expose the module globally
+        window.jamHelpCenter = HelpCenterModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('helpCenterModuleLoaded'));
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Credit JAMS Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+        }
+
+        /* Hero Section */
+        .blog-hero {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 100px 0 80px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .blog-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/credit-pattern.png');
+            background-size: cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .blog-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .blog-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .blog-hero h1 span {
+            color: var(--warning);
+        }
+
+        .blog-hero p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .blog-hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .blog-stat {
+            text-align: center;
+        }
+
+        .blog-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--warning);
+            margin-bottom: 5px;
+        }
+
+        .blog-stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .blog-search {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .blog-search input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-search button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .blog-search button:hover {
+            background: var(--primary-dark);
+        }
+
+        .blog-categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .blog-category {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .blog-category:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .blog-cta {
+            margin-top: 20px;
+        }
+
+        .blog-cta-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .blog-cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .blog-hero-shape {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            z-index: 3;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .blog-hero {
+                padding: 80px 0 60px;
+            }
+
+            .blog-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .blog-hero p {
+                font-size: 1.1rem;
+            }
+
+            .blog-hero-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .blog-stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="blog-hero">
+        <div class="blog-hero-content">
+            <h1>Credit <span>JAMS</span> Blog</h1>
+            <p>Discover expert insights, practical tips, and success stories to help you navigate your credit repair
+                journey with confidence.</p>
+
+            <div class="blog-hero-stats">
+                <div class="blog-stat">
+                    <div class="blog-stat-number">200+</div>
+                    <div class="blog-stat-label">Articles</div>
+                </div>
+                <div class="blog-stat">
+                    <div class="blog-stat-number">50,000+</div>
+                    <div class="blog-stat-label">Monthly Readers</div>
+                </div>
+                <div class="blog-stat">
+                    <div class="blog-stat-number">15+</div>
+                    <div class="blog-stat-label">Credit Experts</div>
+                </div>
+            </div>
+
+            <div class="blog-search">
+                <input type="text" placeholder="Search for credit tips, strategies, and more...">
+                <button type="submit">Search</button>
+            </div>
+
+            <div class="blog-categories">
+                <div class="blog-category">Credit Repair</div>
+                <div class="blog-category">Credit Scores</div>
+                <div class="blog-category">Debt Management</div>
+                <div class="blog-category">Success Stories</div>
+                <div class="blog-category">Legal Rights</div>
+                <div class="blog-category">Credit Building</div>
+            </div>
+
+            <div class="blog-cta">
+                <a href="#blog-content" class="blog-cta-btn">Explore Articles</a>
+            </div>
+        </div>
+
+        <!-- Wave shape at bottom of hero -->
+        <svg class="blog-hero-shape" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100">
+            <path fill="#f8f9fa" fill-opacity="1"
+                d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z">
+            </path>
+        </svg>
+    </section>
+
+    <!-- Blog content would be listed below this hero section -->
+    <div id="blog-content">
+        <!-- Your existing blog content would go here -->
+    </div>
+
+    <script>
+        // Simple animation for category hover effect
+        document.querySelectorAll('.blog-category').forEach(category => {
+            category.addEventListener('click', function () {
+                // This would typically filter the blog posts
+                console.log('Category clicked:', this.textContent);
+
+                // For now, just add a visual feedback
+                this.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                setTimeout(() => {
+                    this.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                }, 300);
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.blog-search button').addEventListener('click', function () {
+            const searchTerm = document.querySelector('.blog-search input').value;
+            if (searchTerm.trim()) {
+                console.log('Searching for:', searchTerm);
+                // This would typically trigger a search
+                alert('Search functionality would filter blog posts for: ' + searchTerm);
+            }
+        });
+
+        // Allow Enter key to trigger search
+        document.querySelector('.blog-search input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.blog-search button').click();
+            }
+        });
+    </script>
+</body>
+
+</html>

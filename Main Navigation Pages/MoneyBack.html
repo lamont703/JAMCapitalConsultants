@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Money-Back Guarantee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--gray-600);
+        }
+
+        /* Main Content */
+        .guarantee-section {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .guarantee-icon {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .guarantee-icon i {
+            font-size: 4rem;
+            color: var(--success);
+        }
+
+        .guarantee-details p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .guarantee-steps {
+            margin: 30px 0;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        .step-number {
+            background-color: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            margin-bottom: 5px;
+            color: var(--primary-dark);
+        }
+
+        /* Requirements List */
+        .requirements-list {
+            background-color: var(--primary-light);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .requirements-list h3 {
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .requirements-list ul {
+            list-style-type: none;
+        }
+
+        .requirements-list li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .requirements-list li:before {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+        }
+
+        /* Exclusions */
+        .exclusions {
+            background-color: var(--gray-100);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .exclusions h3 {
+            margin-bottom: 15px;
+            color: var(--gray-800);
+        }
+
+        .exclusions ul {
+            list-style-type: none;
+        }
+
+        .exclusions li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .exclusions li:before {
+            content: '\f071';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: var(--warning);
+            position: absolute;
+            left: 0;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .faq-question {
+            padding: 15px 0;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-question.active {
+            color: var(--primary);
+        }
+
+        .faq-answer {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 40px;
+            background-color: var(--primary-light);
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: var(--gray-600);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+        }
+
+        .cta-btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .cta-btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .cta-btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .guarantee-section,
+            .faq-section {
+                padding: 30px 20px;
+            }
+
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+
+            .cta-btn {
+                display: block;
+                margin: 10px auto;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Our 100% Money-Back Guarantee</h1>
+            <p>We're so confident in our credit repair services that we back them with a risk-free guarantee.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Guarantee Section -->
+        <section class="guarantee-section">
+            <div class="guarantee-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h2 class="section-title">Our Commitment to Your Satisfaction</h2>
+            <div class="guarantee-details">
+                <p>At JAM Credit Solutions, we stand behind our services with a 100% money-back guarantee. If you don't
+                    see results after following our program for at least 6 months, we'll refund your service fees.</p>
+
+                <p>We understand that credit repair is a process that requires time and consistent effort. Our guarantee
+                    reflects our confidence in our methods and our commitment to your success.</p>
+
+                <div class="requirements-list">
+                    <h3>Guarantee Eligibility Requirements</h3>
+                    <ul>
+                        <li><strong>Minimum service period:</strong> You must be an active client for at least 6
+                            consecutive months.</li>
+                        <li><strong>Account in good standing:</strong> Your account must be current with all payments
+                            made on time.</li>
+                        <li><strong>Active participation:</strong> You must have followed all recommendations from our
+                            credit advisors.</li>
+                        <li><strong>Documentation:</strong> You must provide before and after credit reports showing no
+                            improvement.</li>
+                        <li><strong>Timely request:</strong> Refund requests must be submitted within 30 days after the
+                            6-month service period.</li>
+                    </ul>
+                </div>
+
+                <h3>How to Request Your Money-Back Guarantee</h3>
+                <div class="guarantee-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Contact Support</h3>
+                            <p>Reach out to our customer service team at support@jamcredit.com or call (800) 555-1234 to
+                                initiate your refund request.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Submit Documentation</h3>
+                            <p>Provide copies of your credit reports from before you started our service and your
+                                current
+                                reports showing no improvements.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Complete Form</h3>
+                            <p>Fill out our guarantee claim form explaining why you believe you're eligible for a refund
+                                under our guarantee policy.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Account Evaluation</h3>
+                            <p>Our team will review your account activity, dispute history, and credit reports to verify
+                                your eligibility for the guarantee.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Refund Processing</h3>
+                            <p>If all requirements are met and no improvements have been made, we'll process your refund
+                                within 30 business days.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exclusions">
+                    <h3>What's Not Covered</h3>
+                    <ul>
+                        <li><strong>Setup fees:</strong> Any one-time setup fees for the Full-Service plan are
+                            non-refundable.</li>
+                        <li><strong>Third-party costs:</strong> Fees paid to third parties (credit bureaus, creditors,
+                            etc.) are not refundable.</li>
+                        <li><strong>Accounts with new negative items:</strong> If new negative items appear on your
+                            credit report during the service period.</li>
+                        <li><strong>Inactive accounts:</strong> Accounts that have been inactive or have not followed
+                            the recommended dispute strategies.</li>
+                        <li><strong>Unrealistic expectations:</strong> Claims based on unrealistic expectations (e.g.,
+                            expecting a perfect credit score in 6 months).</li>
+                    </ul>
+                </div>
+
+                <p>Our guarantee is designed to ensure that you have the best possible chance of success with our credit
+                    repair services. We're committed to helping you improve your credit, and we stand behind our methods
+                    with this risk-free guarantee.</p>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <div class="faq-question">
+                    What exactly is covered by the money-back guarantee?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Our money-back guarantee covers the monthly service fees you've paid for our credit repair services.
+                    If you meet all the eligibility requirements and don't see any improvements in your credit report
+                    after 6 months, we'll refund the service fees you've paid during that period. Setup fees and
+                    third-party costs are not included in the refund.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    How do you define "improvement" in my credit report?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Improvement is defined as any positive change in your credit report, such as the removal of
+                    inaccurate negative items, corrections to errors, or an increase in your credit score. Even the
+                    removal of a single inaccurate item is considered an improvement, as it contributes to the overall
+                    health of your credit profile.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    What if I've only been using the service for 3 months?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Our money-back guarantee requires a minimum commitment of 6 consecutive months. Credit repair is a
+                    process that takes time, and meaningful results typically begin to appear after several rounds of
+                    disputes. If you cancel before the 6-month period, you won't be eligible for the guarantee.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    How do I request a refund under the guarantee?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    To request a refund, contact our customer service team at support@jamcredit.com or call (800)
+                    555-1234. You'll need to provide documentation showing your active participation in the program,
+                    including dispute records and before/after credit reports. Our team will review your account and
+                    respond to your request within 10 business days.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    Can I get a partial refund if I've seen some improvement but not as much as expected?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Our guarantee is based on whether there has been any improvement, not the degree of improvement. If
+                    any positive changes have occurred in your credit report, regardless of how small, the guarantee
+                    conditions have been met. Credit repair results vary based on individual circumstances, and we
+                    cannot guarantee specific outcomes or point increases.
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Ready to Start Your Credit Repair Journey?</h2>
+            <p>Choose a plan that works for you and take the first step toward better credit today, backed by our 100%
+                money-back guarantee.</p>
+            <div class="cta-buttons">
+                <a href="LandingPagePricing.html" class="cta-btn cta-btn-primary">View Pricing Plans</a>
+                <a href="HelpSupport.html" class="cta-btn cta-btn-secondary">Contact Support</a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Toggle FAQ answers
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isOpen = answer.style.maxHeight;
+
+                // Close all other answers
+                document.querySelectorAll('.faq-answer').forEach(item => {
+                    item.style.maxHeight = null;
+                });
+
+                document.querySelectorAll('.faq-question').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Toggle current answer
+                if (!isOpen) {
+                    question.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

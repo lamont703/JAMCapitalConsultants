@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM Credit Solutions - DIY Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* DIY Plan Card Styles */
+        .diy-plan-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .diy-plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .diy-plan-header {
+            background-color: #e6f9ff;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .diy-plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .diy-plan-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 0.25rem;
+        }
+
+        .diy-plan-price-period {
+            font-size: 1rem;
+            font-weight: normal;
+            color: #6c757d;
+        }
+
+        .diy-plan-target {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .diy-plan-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .diy-plan-description {
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .diy-plan-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .diy-plan-feature {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .diy-plan-feature i {
+            color: #09ccfc;
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .diy-plan-cta {
+            margin-top: auto;
+        }
+
+        .diy-select-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .diy-select-btn:hover {
+            background-color: #08b5e0;
+        }
+
+        /* DIY Plan Modal Styles */
+        .diy-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .diy-modal-content {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .diy-modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #e6f9ff;
+        }
+
+        .diy-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin: 0;
+        }
+
+        .diy-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .diy-modal-close:hover {
+            color: #343a40;
+        }
+
+        .diy-modal-body {
+            padding: 1.5rem;
+        }
+
+        .diy-plan-details {
+            margin-bottom: 2rem;
+        }
+
+        .diy-plan-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 1rem;
+        }
+
+        .diy-plan-description {
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .diy-plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .diy-plan-features li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .diy-plan-features i {
+            color: #28a745;
+            margin-right: 0.5rem;
+            margin-top: 0.3rem;
+        }
+
+        .diy-payment-options {
+            margin-bottom: 1.5rem;
+        }
+
+        .diy-payment-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .diy-payment-plans {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .diy-payment-plan {
+            flex: 1 0 200px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .diy-payment-plan:hover {
+            border-color: #09ccfc;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+        }
+
+        .diy-payment-plan.selected {
+            border-color: #09ccfc;
+            background-color: #e6f9ff;
+        }
+
+        .diy-payment-plan-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .diy-payment-plan-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .diy-payment-plan-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .diy-checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .diy-checkout-btn:hover {
+            background-color: #08b6e2;
+        }
+
+        .diy-guarantee {
+            display: flex;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .diy-guarantee i {
+            font-size: 2rem;
+            color: #28a745;
+            margin-right: 1rem;
+        }
+
+        .diy-guarantee-text {
+            font-size: 0.9rem;
+        }
+
+        .diy-guarantee-text strong {
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Self-executing function to create the module
+        const DIYPlanModule = (function () {
+            let initialized = false;
+            let selectedPlan = 'monthly'; // Default to monthly plan
+
+            // Payment links for different plans
+            const PAYMENT_LINKS = {
+                monthly: 'https://checkout.jamcreditrepair.com/diy-monthly',
+                quarterly: 'https://checkout.jamcreditrepair.com/diy-quarterly',
+                annual: 'https://checkout.jamcreditrepair.com/diy-annual'
+            };
+
+            // Try to restore state immediately when module is defined
+            try {
+                const savedState = sessionStorage.getItem('jamDIYPlanState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    console.log('Restored DIY Plan state during module definition', parsedState);
+
+                    if (parsedState.selectedPlan) {
+                        selectedPlan = parsedState.selectedPlan;
+                    }
+                    if (parsedState.initialized) {
+                        initialized = parsedState.initialized;
+                    }
+                }
+            } catch (e) {
+                console.error('Error restoring DIY Plan state during definition:', e);
+            }
+
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                console.log('Initializing DIY Plan Module, initialized:', initialized, 'selectedPlan:', selectedPlan);
+
+                // Create the modal structure
+                container.innerHTML = `
+                    <div class="diy-plan-card">
+                        <div class="diy-plan-header">
+                            <h3 class="diy-plan-name">DIY Plan</h3>
+                            <div class="diy-plan-price">$49-$79<span class="diy-plan-price-period">/month</span></div>
+                            <div class="diy-plan-target">Perfect for self-starters</div>
+                        </div>
+                        <div class="diy-plan-body">
+                            <div class="diy-plan-description">
+                                Take control of your credit repair journey with our powerful self-service tools.
+                            </div>
+                            <ul class="diy-plan-features">
+                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Full access to JAM Dispute Bot</li>
+                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Generate custom dispute letters</li>
+                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Track dispute progress</li>
+                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Credit score monitoring</li>
+                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Self-guided credit repair</li>
+                            </ul>
+                            <div class="diy-plan-cta">
+                                <button class="diy-select-btn" id="diy-select-btn">Start JAM Engine</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="diy-modal" class="diy-modal">
+                        <div class="diy-modal-content">
+                            <div class="diy-modal-header">
+                                <h3 class="diy-modal-title">DIY Plan - Take Control of Your Credit</h3>
+                                <button class="diy-modal-close">&times;</button>
+                            </div>
+                            <div class="diy-modal-body">
+                                <div class="diy-plan-details">
+                                    <div class="diy-plan-price">$49-$79<span style="font-size: 1rem; font-weight: normal; color: #6c757d;">/month</span></div>
+                                    <div class="diy-plan-description">
+                                        Take control of your credit repair journey with our powerful self-service tools.
+                                    </div>
+                                    <ul class="diy-plan-features">
+                                        <li><i class="fas fa-check-circle"></i> Full access to JAM Dispute Bot</li>
+                                        <li><i class="fas fa-check-circle"></i> Generate custom dispute letters</li>
+                                        <li><i class="fas fa-check-circle"></i> Track dispute progress</li>
+                                        <li><i class="fas fa-check-circle"></i> Credit score monitoring</li>
+                                        <li><i class="fas fa-check-circle"></i> Self-guided credit repair</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="diy-payment-options">
+                                    <h4 class="diy-payment-title">Choose Your Payment Plan</h4>
+                                    <div class="diy-payment-plans">
+                                        <div class="diy-payment-plan ${selectedPlan === 'monthly' ? 'selected' : ''}" data-plan="monthly">
+                                            <div class="diy-payment-plan-name">Monthly</div>
+                                            <div class="diy-payment-plan-price">$79/month</div>
+                                            <div class="diy-payment-plan-details">Pay month-to-month</div>
+                                        </div>
+                                        <div class="diy-payment-plan ${selectedPlan === 'quarterly' ? 'selected' : ''}" data-plan="quarterly">
+                                            <div class="diy-payment-plan-name">Quarterly</div>
+                                            <div class="diy-payment-plan-price">$59/month</div>
+                                            <div class="diy-payment-plan-details">$177 billed every 3 months</div>
+                                        </div>
+                                        <div class="diy-payment-plan ${selectedPlan === 'annual' ? 'selected' : ''}" data-plan="annual">
+                                            <div class="diy-payment-plan-name">Annual</div>
+                                            <div class="diy-payment-plan-price">$49/month</div>
+                                            <div class="diy-payment-plan-details">$588 billed annually (Save $360)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button id="diy-checkout-btn" class="diy-checkout-btn">Complete Purchase</button>
+                                
+                                <div class="diy-guarantee">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div class="diy-guarantee-text">
+                                        <strong>100% Money-Back Guarantee</strong>
+                                        If you're not satisfied with our service within the first 30 days, we'll refund your payment in full.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                initialized = true;
+
+                // Save state
+                saveState();
+
+                return true;
+            }
+
+            // Set up event listeners for the modal
+            function setupEventListeners(container) {
+                // Select button
+                const selectBtn = container.querySelector('#diy-select-btn');
+                if (selectBtn) {
+                    selectBtn.addEventListener('click', openModal);
+                }
+
+                // Close button
+                const closeBtn = container.querySelector('.diy-modal-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
+
+                // Close when clicking outside the modal content
+                const modal = container.querySelector('#diy-modal');
+                if (modal) {
+                    modal.addEventListener('click', function (e) {
+                        if (e.target === modal) {
+                            closeModal();
+                        }
+                    });
+                }
+
+                // Payment plan selection
+                const paymentPlans = container.querySelectorAll('.diy-payment-plan');
+                paymentPlans.forEach(plan => {
+                    plan.addEventListener('click', function () {
+                        // Remove selected class from all plans
+                        paymentPlans.forEach(p => p.classList.remove('selected'));
+
+                        // Add selected class to clicked plan
+                        this.classList.add('selected');
+
+                        // Update selected plan
+                        selectedPlan = this.dataset.plan;
+
+                        // Save state after selection
+                        saveState();
+                    });
+                });
+
+                // Checkout button
+                const checkoutBtn = container.querySelector('#diy-checkout-btn');
+                if (checkoutBtn) {
+                    checkoutBtn.addEventListener('click', function () {
+                        // Redirect to payment link based on selected plan
+                        const paymentLink = PAYMENT_LINKS[selectedPlan];
+                        if (paymentLink) {
+                            window.open(paymentLink, '_blank');
+                        } else {
+                            console.error('Payment link not found for plan:', selectedPlan);
+                        }
+                    });
+                }
+            }
+
+            // Open the modal
+            function openModal() {
+                const modal = document.getElementById('diy-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
+            }
+
+            // Close the modal
+            function closeModal() {
+                const modal = document.getElementById('diy-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // Add this function to save state to sessionStorage
+            function saveState() {
+                try {
+                    const state = {
+                        selectedPlan: selectedPlan,
+                        initialized: initialized
+                    };
+                    sessionStorage.setItem('jamDIYPlanState', JSON.stringify(state));
+                    console.log('Saved DIY Plan state to session storage', state);
+                } catch (e) {
+                    console.error('Error saving DIY Plan state:', e);
+                }
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                initialized = false;
+                try {
+                    sessionStorage.removeItem('jamDIYPlanState');
+                } catch (e) {
+                    console.error('Error clearing DIY Plan state:', e);
+                }
+                return true;
+            }
+
+            // Get the selected plan
+            function getSelectedPlan() {
+                return selectedPlan;
+            }
+
+            // Public API
+            return {
+                init: init,
+                openModal: openModal,
+                closeModal: closeModal,
+                reset: reset,
+                getSelectedPlan: getSelectedPlan
+            };
+        })();
+
+        // Expose the module globally - FIXED
+        window.jamDIYPlan = DIYPlanModule;
+
+        // Add a more robust reload mechanism
+        window.addEventListener('pageshow', function (event) {
+            // pageshow fires when the page is shown, including from bfcache
+            if (event.persisted) {
+                console.log('Page was restored from bfcache, reinitializing DIY Plan module');
+                const container = document.getElementById('diy-plan-container');
+                if (container && window.jamDIYPlan) {
+                    window.jamDIYPlan.init('diy-plan-container');
+                }
+            }
+        });
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM content loaded, checking for DIY plan container');
+            const container = document.getElementById('diy-plan-container');
+            if (container && window.jamDIYPlan) {
+                console.log('Found DIY plan container, initializing');
+                window.jamDIYPlan.init('diy-plan-container');
+            }
+        });
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamDIYPlanLoaded'));
+        }
+    </script>
+</body>
+
+</html>

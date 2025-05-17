@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Interface - JAM Credit Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #008080;
+            --primary-dark: #006666;
+            --primary-light: #e6f7f7;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --blue-dark: #002742;
+            --blue-accent: #09ccfc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .interface-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header placeholder - will be replaced with dashboardHeader.html */
+        .interface-header-placeholder {
+            height: 70px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main content area */
+        .interface-content {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar navigation */
+        .interface-sidebar {
+            width: 250px;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            height: calc(100vh - 70px);
+            position: sticky;
+            top: 70px;
+            overflow-y: auto;
+        }
+
+        .interface-sidebar-nav {
+            list-style: none;
+        }
+
+        .interface-sidebar-nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .interface-sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--gray-800);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .interface-sidebar-nav-link:hover {
+            background-color: var(--gray-100);
+            border-left-color: var(--primary-light);
+        }
+
+        .interface-sidebar-nav-link.active {
+            background-color: var(--primary-light);
+            border-left-color: var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .interface-sidebar-nav-icon {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main tab content */
+        .interface-main {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-x: hidden;
+        }
+
+        .interface-tab {
+            display: none;
+        }
+
+        .interface-tab.active {
+            display: block;
+        }
+
+        /* Widget styles */
+        .interface-widget {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .interface-widget-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .interface-widget-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .interface-widget-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .interface-widget-body {
+            padding: 1.5rem;
+        }
+
+        .interface-widget-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Loading indicators */
+        .interface-widget-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--gray-600);
+        }
+
+        .interface-loading-spinner {
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error messages */
+        .interface-error-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: var(--danger);
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 8px;
+        }
+
+        .interface-error-message i {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .interface-content {
+                flex-direction: column;
+            }
+
+            .interface-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                padding: 0.5rem 0;
+            }
+
+            .interface-sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+                padding: 0.5rem;
+            }
+
+            .interface-sidebar-nav-item {
+                margin-bottom: 0;
+                margin-right: 0.5rem;
+            }
+
+            .interface-sidebar-nav-link {
+                padding: 0.5rem 1rem;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+
+            .interface-sidebar-nav-link:hover,
+            .interface-sidebar-nav-link.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--primary);
+            }
+
+            .interface-main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="interface-container">
+        <!-- Header will be loaded dynamically -->
+        <div id="dashboardHeader"></div>
+
+        <!-- Main content area with sidebar and tabs -->
+        <div class="interface-content">
+            <!-- Sidebar navigation -->
+            <div class="interface-sidebar">
+                <ul class="interface-sidebar-nav">
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-dashboard" class="interface-sidebar-nav-link active"
+                            data-tab="interface-dashboard">
+                            <i class="fas fa-home interface-sidebar-nav-icon"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-dispute-library" class="interface-sidebar-nav-link"
+                            data-tab="interface-dispute-library">
+                            <i class="fas fa-file-lines interface-sidebar-nav-icon"></i> Dispute Library
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-dispute-bot" class="interface-sidebar-nav-link"
+                            data-tab="interface-dispute-bot">
+                            <i class="fas fa-robot"></i>
+                            <span>JAM Dispute Bot</span>
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-credit-report" class="interface-sidebar-nav-link"
+                            data-tab="interface-credit-report">
+                            <i class="fas fa-chart-line interface-sidebar-nav-icon"></i> Credit Report
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-disputes" class="interface-sidebar-nav-link" data-tab="interface-disputes">
+                            <i class="fas fa-tasks interface-sidebar-nav-icon"></i> Dispute Progress
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-documents" class="interface-sidebar-nav-link"
+                            data-tab="interface-documents">
+                            <i class="fas fa-file-alt interface-sidebar-nav-icon"></i> Documents
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-messages" class="interface-sidebar-nav-link" data-tab="interface-messages">
+                            <i class="fas fa-envelope interface-sidebar-nav-icon"></i> Messages
+                        </a>
+                    </li>
+                    <li class="interface-sidebar-nav-item">
+                        <a href="#interface-pricing" class="interface-sidebar-nav-link" data-tab="interface-pricing">
+                            <i class="fas fa-tags interface-sidebar-nav-icon"></i> Pricing Plans
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main tab content -->
+            <div class="interface-main">
+                <!-- Dashboard Tab -->
+                <div id="interface-dashboard" class="interface-tab active">
+                    <h1>Welcome to Your JAM Engine Dashboard</h1>
+                    <p>Track your credit repair progress and next steps.</p>
+
+                    <!-- Next Steps Widget -->
+                    <div id="interface-next-steps-widget" class="interface-widget">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+
+                    <!-- Credit Report Widget -->
+                    <div id="interface-credit-report-widget" class="interface-widget">
+                        <!-- Credit Report content will be loaded here -->
+                    </div>
+
+                    <!-- Document Upload Widget -->
+                    <div id="interface-document-upload-widget" class="interface-widget">
+                        <!-- Document Upload content will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Dispute Library Tab -->
+                <div id="interface-dispute-library" class="interface-tab">
+
+                    <!-- Dispute Library Widget -->
+                    <div id="interface-dispute-library-widget" class="interface-widget">
+                        <!-- Dispute Library content will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Dispute Bot Tab -->
+                <div id="interface-dispute-bot" class="interface-tab">
+                    <div class="interface-tab-header">
+                    </div>
+
+                    <div class="interface-widget">
+                        <div class="interface-widget-content" id="interface-dispute-bot-widget">
+                            <!-- The JamTipBot module will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credit Report Tab -->
+                <div id="interface-credit-report" class="interface-tab">
+
+                    <!-- Credit Report Widget -->
+                    <div id="interface-credit-report-full-widget" class="interface-widget">
+                        <!-- Credit Report content will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Add this tab content div after the Credit Report tab -->
+                <div id="interface-pricing" class="interface-tab">
+                    <div class="interface-tab-header">
+                    </div>
+
+                    <div class="interface-widget">
+                        <div class="interface-widget-content" id="interface-pricing-widget">
+                            <!-- The PricingTiersModule will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disputes Tab -->
+                <div id="interface-disputes" class="interface-tab">
+                    <div class="interface-tab-header">
+                    </div>
+
+                    <div id="interface-disputes-widget" class="interface-widget-container">
+                        <!-- DisputeProgressModule will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Documents Tab -->
+                <div id="interface-documents" class="interface-tab">
+                    <div class="interface-tab-header">
+                    </div>
+
+                    <div id="interface-documents-document-upload-widget" class="interface-widget-container">
+                        <!-- DocumentUploadModule will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Messages Tab -->
+                <div id="interface-messages" class="interface-tab">
+                    <div class="interface-tab-header">
+                    </div>
+
+                    <div id="interface-messages-content" class="interface-widget-container">
+                        <!-- MessagesModule will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="interface-settings" class="interface-tab">
+
+                    <!-- Settings content will be loaded here -->
+                    <div id="interface-settings-content">
+
+                    </div>
+                </div>
+
+                <!-- Help Center Tab -->
+                <div id="interface-help-center" class="interface-tab">
+                    <!-- Help Center content will be loaded here -->
+                    <div id="interface-help-center-content">
+                        <!-- Help Center content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to load the header component
+        function loadHeaderComponent() {
+            // Show loading indicator
+            const headerContainer = document.getElementById('dashboardHeader');
+            headerContainer.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading dashboard header...</span>
+                </div>
+            `;
+
+            // Check if the DashboardHeader module is already available
+            if (window.jamDashboardHeader) {
+                // Initialize the header directly
+                const success = window.jamDashboardHeader.init('dashboardHeader');
+                if (!success) {
+                    headerContainer.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize header component
+                        </div>
+                    `;
+                }
+            } else {
+                // If not available, wait for it to load
+                window.addEventListener('dashboardHeaderLoaded', function () {
+                    const success = window.jamDashboardHeader.init('dashboardHeader');
+                    if (!success) {
+                        headerContainer.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize header component
+                            </div>
+                        `;
+                    }
+                });
+
+                // Set a timeout in case the module never loads
+                setTimeout(() => {
+                    if (!window.jamDashboardHeader) {
+                        headerContainer.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Header module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 5000);
+            }
+        }
+
+        // Function to initialize sidebar navigation
+        function initializeSidebar() {
+            const sidebarLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // Prevent default anchor behavior
+                    e.preventDefault();
+
+                    // Get the href attribute
+                    const targetId = this.getAttribute('href').substring(1);
+
+                    // Handle tab switching
+                    const targetTab = document.getElementById(targetId);
+                    if (targetTab) {
+                        // Remove active class from all tabs
+                        document.querySelectorAll('.interface-tab').forEach(tab => {
+                            tab.classList.remove('active');
+                        });
+
+                        // Add active class to target tab
+                        targetTab.classList.add('active');
+
+                        // Update active state in sidebar
+                        document.querySelectorAll('.interface-sidebar-nav-link').forEach(navLink => {
+                            navLink.classList.remove('active');
+                        });
+                        this.classList.add('active');
+
+                        // Scroll to top of the page
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+
+                        // Load widgets for the selected tab
+                        loadWidgetsForTab(targetId);
+                    }
+                });
+            });
+        }
+
+        // Function to find the active tab
+        function getActiveTab() {
+            return document.querySelector('.interface-tab.active');
+        }
+
+        // Function to load widgets for the active tab
+        function loadWidgetsForActiveTab() {
+            const activeTab = getActiveTab();
+            if (activeTab) {
+                loadWidgetsForTab(activeTab.id);
+            }
+        }
+
+        // Function to load widgets for a specific tab
+        function loadWidgetsForTab(tabId) {
+            console.log(`Loading widgets for tab: ${tabId}`);
+
+            // Make sure the tab exists before loading widgets
+            const tabElement = document.getElementById(tabId);
+            if (!tabElement) {
+                console.error(`Tab element with ID ${tabId} not found`);
+                return;
+            }
+
+            // Load different widgets based on the active tab
+            switch (tabId) {
+                case 'interface-dashboard':
+                    // Load next steps widget
+                    loadComponent('interface-next-steps-widget', 'dashboardNextSteps.html');
+
+                    // Always reload the Credit Report and Document Upload modules
+                    console.log('Loading Credit Report module into interface-credit-report-widget');
+                    loadCreditReportModule('interface-credit-report-widget', true); // Force reload
+
+                    console.log('Loading Document Upload module into interface-document-upload-widget');
+                    loadDocumentUploadModule('interface-document-upload-widget', true); // Force reload
+
+                    break;
+
+                case 'interface-dispute-library':
+                    loadDisputeLibraryModule('interface-dispute-library-widget');
+                    break;
+
+                case 'interface-dispute-bot':
+                    loadDisputeBotModule('interface-dispute-bot-widget');
+                    break;
+
+                case 'interface-disputes':
+                    loadDisputeProgressModule('interface-disputes-widget', true); // Force reload
+                    break;
+
+                case 'interface-messages':
+                    loadMessagesModule('interface-messages-content', true); // Force reload
+                    break;
+
+                case 'interface-credit-report':
+                    loadCreditReportModule('interface-credit-report-full-widget', true); // Force reload
+                    break;
+
+                case 'interface-documents':
+                    loadDocumentUploadModule('interface-documents-document-upload-widget', true); // Force reload
+                    break;
+
+                case 'interface-settings':
+                    loadSettingsModule('interface-settings-content', true); // Force reload
+                    break;
+
+                case 'interface-help-center':
+                    loadHelpCenterModule('interface-help-center-content', true); // Force reload
+                    break;
+
+                case 'interface-pricing':
+                    // Always force reload the Pricing Tiers module
+                    loadPricingTiersModule('interface-pricing-widget', true); // Force reload
+                    break;
+
+                default:
+                    console.log(`No widgets defined for tab: ${tabId}`);
+            }
+        }
+
+        // Function to load external components
+        function loadComponent(containerId, componentUrl) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading component...</span>
+                </div>
+            `;
+
+            // Check if it's the Next Steps module
+            if (componentUrl === 'dashboardNextSteps.html') {
+                // Use the existing NextStepsModule
+                if (window.jamDashboardNextSteps) {
+                    const success = window.jamDashboardNextSteps.init(containerId);
+                    if (!success) {
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Failed to initialize Next Steps component
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Wait for the module to load
+                    window.addEventListener('dashboardNextStepsLoaded', function () {
+                        const success = window.jamDashboardNextSteps.init(containerId);
+                        if (!success) {
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Next Steps component
+                                </div>
+                            `;
+                        }
+                    });
+
+                    // Set a timeout in case the module never loads
+                    setTimeout(() => {
+                        if (!window.jamDashboardNextSteps) {
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Next Steps module not found after timeout
+                                </div>
+                            `;
+                        }
+                    }, 5000);
+                }
+                return;
+            }
+
+            // For other components, fetch the HTML
+            fetch(componentUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    // Extract the body content
+                    const bodyMatch = html.match(/<body>([\s\S]*?)<\/body>/);
+                    if (bodyMatch && bodyMatch[1]) {
+                        container.innerHTML = bodyMatch[1];
+                    } else {
+                        container.innerHTML = html;
+                    }
+
+                    // Execute any scripts in the component
+                    const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/i);
+                    if (scriptMatch && scriptMatch[1]) {
+                        const script = document.createElement('script');
+                        script.textContent = scriptMatch[1];
+                        document.body.appendChild(script);
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error loading component ${componentUrl}:`, error);
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to load component: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+
+        // Handle "View All" links
+        document.addEventListener('DOMContentLoaded', function () {
+            const viewAllLinks = document.querySelectorAll('.interface-view-all');
+
+            viewAllLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+
+                    // Find and click the corresponding nav link
+                    const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                    if (navLink) {
+                        navLink.click();
+                    }
+                });
+            });
+
+            // Check URL hash on page load
+            if (window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                if (navLink) {
+                    navLink.click();
+                }
+            }
+
+            // Handle iframe height adjustments
+            window.addEventListener('message', function (e) {
+                // Check if message is from our iframe
+                if (e.data && e.data.type === 'iframe-height') {
+                    const iframe = document.getElementById(e.data.frameId);
+                    if (iframe) {
+                        iframe.style.height = `${e.data.height}px`;
+                    }
+                }
+            });
+
+            // Initialize components
+            loadHeaderComponent();
+            initializeSidebar();
+            loadWidgetsForActiveTab();
+        });
+
+        // Function to load the CreditReportModule with option to force reload
+        function loadCreditReportModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Credit Report module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading credit report module...</span>
+                </div>
+            `;
+
+            // Check if CreditReportModule is available
+            if (window.jamCreditReport) {
+                console.log('Credit Report module already loaded, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamCreditReport.reset === 'function') {
+                    console.log('Resetting Credit Report module initialization state');
+                    window.jamCreditReport.reset();
+                }
+
+                const success = window.jamCreditReport.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Credit Report module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Credit Report component
+                        </div>
+                    `;
+                } else {
+                    console.log('Credit Report module initialized successfully');
+                }
+            } else {
+                console.log('Credit Report module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = 'dashboardCreditReport.html';
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('Credit Report module loaded event received');
+                    if (window.jamCreditReport) {
+                        const success = window.jamCreditReport.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize Credit Report module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Credit Report component
+                                </div>
+                            `;
+                        } else {
+                            console.log('Credit Report module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('creditReportLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('creditReportLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamCreditReport) {
+                        console.error('Credit Report module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Credit Report module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 5000);
+            }
+        }
+
+        // Function to load the DocumentUploadModule
+        function loadDocumentUploadModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Document Upload module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading document upload...</span>
+                </div>
+            `;
+
+            // Check if DocumentUploadModule is available
+            if (window.jamDocumentUpload) {
+                console.log('Document Upload module already loaded, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamDocumentUpload.reset === 'function') {
+                    console.log('Resetting Document Upload module initialization state');
+                    window.jamDocumentUpload.reset();
+                }
+
+                const success = window.jamDocumentUpload.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Document Upload module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Document Upload component
+                        </div>
+                    `;
+                } else {
+                    console.log('Document Upload module initialized successfully');
+                }
+            } else {
+                console.log('Document Upload module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = 'dashboardDocumentUpload.html';
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('Document Upload module loaded event received');
+                    if (window.jamDocumentUpload) {
+                        const success = window.jamDocumentUpload.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize Document Upload module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Document Upload component
+                                </div>
+                            `;
+                        } else {
+                            console.log('Document Upload module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('documentUploadLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('documentUploadLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamDocumentUpload) {
+                        console.error('Document Upload module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Document Upload module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 10000);
+            }
+        }
+
+        // Listen for when the DocumentUploadModule is loaded
+        window.addEventListener('documentUploadLoaded', function () {
+            console.log('DocumentUploadModule loaded event received');
+
+            // If we're currently on the dashboard tab, initialize the dashboard widget
+            if (document.querySelector('.interface-tab.active')?.id === 'interface-dashboard') {
+                loadDocumentUploadModule('interface-document-upload-widget', true);
+            }
+
+            // If we're currently on the documents tab, initialize the documents widget
+            if (document.querySelector('.interface-tab.active')?.id === 'interface-documents') {
+                loadDocumentUploadModule('interface-documents-document-upload-widget', true);
+            }
+        });
+
+        // Function to load the DisputeLibraryModule
+        function loadDisputeLibraryModule(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading dispute library module...</span>
+                </div>
+            `;
+
+            // Check if DisputeLibraryModule is available
+            if (window.jamDisputeLibrary) {
+                const success = window.jamDisputeLibrary.init(containerId);
+                if (!success) {
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Dispute Library component
+                        </div>
+                    `;
+                }
+            } else {
+                // Wait for the module to load
+                window.addEventListener('disputeLibraryLoaded', function () {
+                    const success = window.jamDisputeLibrary.init(containerId);
+                    if (!success) {
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Failed to initialize Dispute Library component
+                            </div>
+                        `;
+                    }
+                }, { once: true });
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamDisputeLibrary) {
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Dispute Library module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 5000);
+            }
+        }
+
+        // Function to load the DisputeBotModule
+        function loadDisputeBotModule(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Dispute Bot module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading JAM Dispute Bot...</span>
+                </div>
+            `;
+
+            // Check if JamTipBotModule is available
+            if (window.jamTipBot) {
+                console.log('JAM Tip Bot module already loaded, initializing');
+
+                // Force reset if the module has a reset function
+                if (typeof window.jamTipBot.reset === 'function') {
+                    console.log('Resetting JAM Tip Bot module initialization state');
+                    window.jamTipBot.reset();
+                }
+
+                const success = window.jamTipBot.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize JAM Tip Bot module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize JAM Dispute Bot
+                        </div>
+                    `;
+                } else {
+                    console.log('JAM Tip Bot module initialized successfully');
+                }
+            } else {
+                console.log('JAM Tip Bot module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = 'JamTipBot.html';
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('JAM Tip Bot module loaded event received');
+                    if (window.jamTipBot) {
+                        const success = window.jamTipBot.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize JAM Tip Bot module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize JAM Dispute Bot
+                                </div>
+                            `;
+                        } else {
+                            console.log('JAM Tip Bot module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('jamTipBotLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('jamTipBotLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamTipBot) {
+                        console.error('JAM Tip Bot module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                JAM Dispute Bot module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 10000);
+            }
+        }
+
+        // Function to load the PricingTiersModule
+        function loadPricingTiersModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Pricing Tiers module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading pricing plans...</span>
+                </div>
+            `;
+
+            // Check if PricingTiersModule is already loaded
+            if (window.jamPricingTiers) {
+                console.log('Pricing Tiers module already loaded, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamPricingTiers.reset === 'function') {
+                    console.log('Resetting Pricing Tiers module initialization state');
+                    window.jamPricingTiers.reset();
+                }
+
+                const success = window.jamPricingTiers.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Pricing Tiers module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Pricing Plans
+                        </div>
+                    `;
+                } else {
+                    console.log('Pricing Tiers module initialized successfully');
+                }
+            } else {
+                console.log('Pricing Tiers module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = '../modules/PricingTiers.js'; // Adjust path as needed
+                document.body.appendChild(script);
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('Pricing Tiers module loaded event received');
+                    if (window.jamPricingTiers) {
+                        const success = window.jamPricingTiers.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize Pricing Tiers module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Pricing Plans
+                                </div>
+                            `;
+                        } else {
+                            console.log('Pricing Tiers module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('jamPricingTiersLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('jamPricingTiersLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamPricingTiers) {
+                        console.error('Pricing Tiers module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Pricing Plans module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 10000);
+            }
+        }
+
+        // First, make sure we have the correct nav item with an event listener
+        document.getElementById('nav-pricing').addEventListener('click', function () {
+            // Hide all tabs
+            document.querySelectorAll('.interface-tab').forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // Show the pricing tab
+            document.getElementById('interface-pricing').style.display = 'block';
+
+            // Update active nav item
+            document.querySelectorAll('.interface-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            // Load the pricing module if not already loaded
+            loadPricingTiersModule('interface-pricing-widget');
+        });
+
+        // Function to handle tab switching
+        function setupTabNavigation() {
+            const navLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Get the target tab ID
+                    const tabId = this.getAttribute('data-tab');
+                    if (!tabId) return;
+
+                    // Update active state for nav links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Load the tab content
+                    switchToTab(tabId);
+
+                    // Save active tab to localStorage
+                    localStorage.setItem('activeTab', tabId);
+                });
+            });
+
+            // Set initial active tab from localStorage or default to dashboard
+            const savedTab = localStorage.getItem('activeTab') || 'interface-dashboard';
+            const defaultTab = document.querySelector(`.interface-sidebar-nav-link[data-tab="${savedTab}"]`) ||
+                document.querySelector('.interface-sidebar-nav-link');
+
+            if (defaultTab) {
+                defaultTab.click();
+            }
+        }
+
+        // Function to switch to a specific tab
+        function switchToTab(tabId) {
+            console.log(`Switching to tab: ${tabId}`);
+
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.interface-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show the selected tab
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+
+                // Load widgets for the tab
+                loadWidgetsForTab(tabId);
+            }
+        }
+
+        // Function to update the content area based on active tab
+        function updateContentArea(tabId) {
+            console.log(`Updating content area for tab: ${tabId}`);
+
+            // Hide all content sections
+            const contentSections = document.querySelectorAll('.interface-content-section');
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show the active content section
+            const activeSection = document.getElementById(tabId + '-content');
+            if (activeSection) {
+                activeSection.style.display = 'block';
+            }
+
+            // Handle dashboard tab specifically
+            if (tabId === 'interface-dashboard') {
+                console.log('Returning to dashboard tab, checking module status');
+
+                // Check if modules need to be reloaded
+                const creditReportWidget = document.getElementById('interface-credit-report-widget');
+                const documentUploadWidget = document.getElementById('interface-document-upload-widget');
+
+                // Check if widgets are in loading state or empty
+                const creditReportNeedsReload = creditReportWidget &&
+                    (creditReportWidget.querySelector('.interface-widget-loading') ||
+                        creditReportWidget.innerHTML.trim() === '');
+
+                const documentUploadNeedsReload = documentUploadWidget &&
+                    (documentUploadWidget.querySelector('.interface-widget-loading') ||
+                        documentUploadWidget.innerHTML.trim() === '');
+
+                console.log(`Credit report widget needs reload: ${creditReportNeedsReload}`);
+                console.log(`Document upload widget needs reload: ${documentUploadNeedsReload}`);
+
+                // Only reload if needed
+                if (creditReportNeedsReload) {
+                    console.log('Reloading Credit Report module');
+                    loadCreditReportModule('interface-credit-report-widget');
+                }
+
+                if (documentUploadNeedsReload) {
+                    console.log('Reloading Document Upload module');
+                    loadDocumentUploadModule('interface-document-upload-widget');
+                }
+            }
+        }
+
+        // Function to load the DisputeProgressModule
+        function loadDisputeProgressModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Dispute Progress module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading dispute progress...</span>
+                </div>
+            `;
+
+            // Check if DisputeProgressModule is available
+            if (window.jamDisputeProgress) {
+                console.log('Dispute Progress module already loaded, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamDisputeProgress.reset === 'function') {
+                    console.log('Resetting Dispute Progress module initialization state');
+                    window.jamDisputeProgress.reset();
+                }
+
+                const success = window.jamDisputeProgress.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Dispute Progress module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Dispute Progress component
+                        </div>
+                    `;
+                } else {
+                    console.log('Dispute Progress module initialized successfully');
+                }
+            } else {
+                console.log('Dispute Progress module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = 'DisputeProgress.html';
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('Dispute Progress module loaded event received');
+                    if (window.jamDisputeProgress) {
+                        const success = window.jamDisputeProgress.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize Dispute Progress module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Dispute Progress component
+                                </div>
+                            `;
+                        } else {
+                            console.log('Dispute Progress module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('disputeProgressLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('disputeProgressLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamDisputeProgress) {
+                        console.error('Dispute Progress module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Dispute Progress module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 10000);
+            }
+        }
+
+        // Function to load the MessagesModule
+        function loadMessagesModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Messages module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading messages...</span>
+                </div>
+            `;
+
+            // Check if MessagesModule is available
+            if (window.jamMessages) {
+                console.log('Messages module found, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamMessages.reset === 'function') {
+                    console.log('Resetting Messages module initialization state');
+                    window.jamMessages.reset();
+                }
+
+                const success = window.jamMessages.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Messages module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Messages component
+                        </div>
+                    `;
+                } else {
+                    console.log('Messages module initialized successfully');
+                }
+            } else {
+                console.log('Messages module not found, attempting to initialize from existing script');
+
+                // Try to find the MessagesModule in all scripts on the page
+                let foundMessagesModule = false;
+
+                // Check all inline scripts
+                document.querySelectorAll('script:not([src])').forEach(script => {
+                    if (script.textContent.includes('MessagesModule')) {
+                        foundMessagesModule = true;
+                        try {
+                            // This is a fallback approach - ideally the script should be properly loaded
+                            eval('window.jamMessages = MessagesModule;');
+
+                            if (window.jamMessages) {
+                                const success = window.jamMessages.init(containerId);
+                                if (!success) {
+                                    console.error('Failed to initialize Messages module after manual initialization');
+                                    container.innerHTML = `
+                                        <div class="interface-error-message">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Failed to initialize Messages component
+                                        </div>
+                                    `;
+                                } else {
+                                    console.log('Messages module initialized successfully after manual initialization');
+                                }
+                            } else {
+                                throw new Error('MessagesModule not found after evaluation');
+                            }
+                        } catch (error) {
+                            console.error('Error initializing Messages module:', error);
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Error initializing Messages module: ${error.message}
+                                </div>
+                            `;
+                        }
+                    }
+                });
+
+                if (!foundMessagesModule) {
+                    // If we didn't find it in inline scripts, try loading it from a file
+                    console.log('Messages module not found in inline scripts, attempting to load from file');
+
+                    const script = document.createElement('script');
+                    script.src = 'Messages.html';
+
+                    const handler = function () {
+                        console.log('Messages module loaded event received');
+                        if (window.jamMessages) {
+                            const success = window.jamMessages.init(containerId);
+                            if (!success) {
+                                console.error('Failed to initialize Messages module after load');
+                                container.innerHTML = `
+                                    <div class="interface-error-message">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Failed to initialize Messages component
+                                    </div>
+                                `;
+                            } else {
+                                console.log('Messages module initialized successfully after load');
+                            }
+                        }
+                        window.removeEventListener('messagesModuleLoaded', handler);
+                    };
+
+                    window.addEventListener('messagesModuleLoaded', handler);
+                    document.body.appendChild(script);
+
+                    setTimeout(() => {
+                        if (!window.jamMessages) {
+                            console.error('Messages module not found after timeout');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Messages module not found after timeout
+                                </div>
+                            `;
+                        }
+                    }, 10000);
+                }
+            }
+        }
+
+        // Listen for when the MessagesModule is loaded
+        window.addEventListener('messagesModuleLoaded', function () {
+            console.log('MessagesModule loaded event received');
+            // If we're currently on the messages tab, initialize it
+            if (document.querySelector('.interface-tab.active')?.id === 'interface-messages') {
+                loadMessagesModule('interface-messages-content', true);
+            }
+        });
+
+        // Function to load the SettingsModule
+        function loadSettingsModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Settings module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading settings...</span>
+                </div>
+            `;
+
+            // Check if SettingsModule is available
+            if (window.jamSettings) {
+                console.log('Settings module already loaded, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamSettings.reset === 'function') {
+                    console.log('Resetting Settings module initialization state');
+                    window.jamSettings.reset();
+                }
+
+                const success = window.jamSettings.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Settings module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Settings component
+                        </div>
+                    `;
+                } else {
+                    console.log('Settings module initialized successfully');
+                }
+            } else {
+                console.log('Settings module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = 'Settings.html';
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('Settings module loaded event received');
+                    if (window.jamSettings) {
+                        const success = window.jamSettings.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize Settings module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Settings component
+                                </div>
+                            `;
+                        } else {
+                            console.log('Settings module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('settingsModuleLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('settingsModuleLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamSettings) {
+                        console.error('Settings module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Settings module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 10000);
+            }
+        }
+
+        // Listen for when the SettingsModule is loaded
+        window.addEventListener('settingsModuleLoaded', function () {
+            console.log('SettingsModule loaded event received');
+            // If we're currently on the settings tab, initialize it
+            if (document.querySelector('.interface-tab.active')?.id === 'interface-settings') {
+                loadSettingsModule('interface-settings-content', true);
+            }
+        });
+
+        // Function to load the HelpCenterModule
+        function loadHelpCenterModule(containerId, forceReload = false) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return;
+            }
+
+            console.log(`Loading Help Center module into ${containerId}`);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading help center...</span>
+                </div>
+            `;
+
+            // Check if HelpCenterModule is available
+            if (window.jamHelpCenter) {
+                console.log('Help Center module already loaded, initializing');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamHelpCenter.reset === 'function') {
+                    console.log('Resetting Help Center module initialization state');
+                    window.jamHelpCenter.reset();
+                }
+
+                const success = window.jamHelpCenter.init(containerId);
+                if (!success) {
+                    console.error('Failed to initialize Help Center module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Help Center component
+                        </div>
+                    `;
+                } else {
+                    console.log('Help Center module initialized successfully');
+                }
+            } else {
+                console.log('Help Center module not loaded, loading script');
+                // Load the script
+                const script = document.createElement('script');
+                script.src = 'HelpCenter.html';
+
+                // Create a one-time event handler
+                const handler = function () {
+                    console.log('Help Center module loaded event received');
+                    if (window.jamHelpCenter) {
+                        const success = window.jamHelpCenter.init(containerId);
+                        if (!success) {
+                            console.error('Failed to initialize Help Center module after load');
+                            container.innerHTML = `
+                                <div class="interface-error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Failed to initialize Help Center component
+                                </div>
+                            `;
+                        } else {
+                            console.log('Help Center module initialized successfully after load');
+                        }
+                    }
+                    // Remove the event listener to prevent duplicate handlers
+                    window.removeEventListener('helpCenterModuleLoaded', handler);
+                };
+
+                // Add the event listener
+                window.addEventListener('helpCenterModuleLoaded', handler);
+
+                // Append the script to load it
+                document.body.appendChild(script);
+
+                // Set a timeout in case the module doesn't load
+                setTimeout(() => {
+                    if (!window.jamHelpCenter) {
+                        console.error('Help Center module not found after timeout');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Help Center module not found after timeout
+                            </div>
+                        `;
+                    }
+                }, 10000);
+            }
+        }
+
+        // Listen for when the HelpCenterModule is loaded
+        window.addEventListener('helpCenterModuleLoaded', function () {
+            console.log('HelpCenterModule loaded event received');
+            // If we're currently on the help center tab, initialize it
+            if (document.querySelector('.interface-tab.active')?.id === 'interface-help-center') {
+                loadHelpCenterModule('interface-help-center-content', true);
+            }
+        });
+
+        // Initialize the dashboard when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load header component
+            loadHeaderComponent();
+
+            // Setup sidebar navigation
+            setupSidebarNavigation();
+
+            // Setup tab navigation
+            setupTabNavigation();
+
+            // No need to call loadWidgetsForActiveTab() here as setupTabNavigation will handle it
+        });
+
+        // Add this near the top of your dashboardInterface.html file, before any code that uses MessagesModule
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if MessagesModule exists but isn't exposed globally
+            if (typeof MessagesModule !== 'undefined' && !window.jamMessages) {
+                console.log('Found MessagesModule, exposing globally');
+                window.jamMessages = MessagesModule;
+
+                // Dispatch the loaded event
+                window.dispatchEvent(new CustomEvent('messagesModuleLoaded'));
+            }
+        });
+
+        // Update your existing message event listener to handle Settings tab
+        window.addEventListener('message', function (e) {
+            console.log('Message received in dashboardInterface:', e.data);
+
+            if (e.data && e.data.type === 'loadTab') {
+                console.log(`Request to load tab: ${e.data.tabId}`);
+
+                // Activate the requested tab
+                const tab = document.getElementById(e.data.tabId);
+                if (tab) {
+                    console.log(`Tab ${e.data.tabId} found, activating`);
+
+                    // Hide all tabs
+                    document.querySelectorAll('.interface-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+
+                    // Show requested tab
+                    tab.classList.add('active');
+
+                    // Load the appropriate module based on tab ID
+                    if (e.data.tabId === 'interface-help-center') {
+                        loadHelpCenterModule('interface-help-center-content', true);
+                    } else if (e.data.tabId === 'interface-settings') {
+                        loadSettingsModule('interface-settings-content', true);
+                    }
+                } else {
+                    console.error(`Tab ${e.data.tabId} not found`);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

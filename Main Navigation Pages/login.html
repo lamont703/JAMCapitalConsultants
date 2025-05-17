@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Portal Login - JAM Credit Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .login-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 0 1rem;
+            box-sizing: border-box;
+            margin-top: -5vh;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transform: translateY(-5vh);
+        }
+
+        .login-logo {
+            margin-bottom: 2rem;
+            max-width: 200px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        .login-title {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .login-subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #09ccfc;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #09ccfc;
+        }
+
+        .login-button {
+            background-color: #09ccfc;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .login-button:hover {
+            background-color: #09ccfc;
+        }
+
+        .forgot-password {
+            color: #09ccfc;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #09ccfc;
+        }
+
+        .login-divider {
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #666;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .login-divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .support-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+
+        .support-link {
+            color: #09ccfc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .support-link:hover {
+            color: #09ccfc;
+        }
+
+        .home-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #09ccfc;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .home-link:hover {
+            color: #09ccfc;
+        }
+
+        .home-link i {
+            margin-right: 0.5rem;
+        }
+
+        .nav-header {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            color: #09ccfc;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-to-home:hover {
+            background-color: rgba(0, 128, 128, 0.1);
+        }
+
+        .back-to-home i {
+            margin-right: 0.5rem;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #09ccfc;
+            border-bottom: 2px solid #09ccfc;
+        }
+
+        .tab:hover:not(.active) {
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .register-button {
+            background-color: #09ccfc;
+            color: white;
+        }
+
+        .register-button:hover {
+            background-color: #08b6e2;
+        }
+
+        @media (max-width: 480px) {
+            .login-section {
+                padding: 0 1rem;
+                min-height: 100vh;
+                margin-top: -3vh;
+            }
+
+            .login-container {
+                transform: translateY(-3vh);
+                padding: 2rem;
+                border-radius: 12px;
+            }
+
+            .login-title {
+                font-size: 1.5rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .login-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .login-logo {
+                margin-bottom: 1.5rem;
+                max-width: 150px;
+            }
+
+            .input-group {
+                margin-bottom: 0.75rem;
+            }
+
+            .login-input {
+                padding: 0.75rem 1rem 0.75rem 2.5rem;
+            }
+
+            .forgot-password {
+                font-size: 0.875rem;
+                padding: 0.5rem;
+                display: inline-block;
+            }
+
+            .support-text {
+                font-size: 0.875rem;
+                margin-top: 1rem;
+            }
+
+            .nav-header {
+                top: 0.5rem;
+                left: 0.5rem;
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            .login-section {
+                min-height: -webkit-fill-available;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation header -->
+    <div class="nav-header">
+        <a href="https://www.jamcapitalconsultants.com" class="back-to-home">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+    <section class="login-section">
+        <div class="login-container">
+            <a href="https://www.jamcapitalconsultants.com">
+                <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/681bce267fc2d260912232f3.png"
+                    alt="JAM Credit Solutions Logo" class="login-logo">
+            </a>
+
+            <!-- Tabs for Login/Register -->
+            <div class="tab-container">
+                <div class="tab active" id="loginTab">Login</div>
+                <div class="tab" id="registerTab">Register</div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="form-container active" id="loginForm">
+                <h1 class="login-title">Welcome Back</h1>
+                <p class="login-subtitle">Log in to access your credit repair dashboard</p>
+
+                <form class="login-form" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" class="login-input" id="login-email" placeholder="Email Address" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="login-input" id="login-password" placeholder="Password" required>
+                    </div>
+
+                    <button type="submit" class="login-button">Log In to Dashboard</button>
+                    <a href="#forgot-password" class="forgot-password">Forgot your password?</a>
+                </form>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="form-container" id="registerForm">
+                <h1 class="login-title">Create Account</h1>
+                <p class="login-subtitle">Sign up to start your credit repair journey</p>
+
+                <form class="login-form" onsubmit="handleRegistration(event)">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" class="login-input" id="register-name" placeholder="Full Name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" class="login-input" id="register-email" placeholder="Email Address"
+                            required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" class="login-input" id="register-phone" placeholder="Phone Number" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="login-input" id="register-password" placeholder="Create Password"
+                            required>
+                    </div>
+
+                    <button type="submit" class="login-button register-button">Create Account</button>
+                </form>
+            </div>
+
+            <div class="login-divider">
+                <span>Need Help?</span>
+            </div>
+
+            <p class="support-text">
+                Contact our support team at <a href="mailto:support@jamcreditsolutions.com"
+                    class="support-link">support@jamcreditsolutions.com</a>
+            </p>
+
+            <a href="https://www.jamcapitalconsultants.com" class="home-link">
+                <i class="fas fa-home"></i> Return to Homepage
+            </a>
+        </div>
+    </section>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+
+            loginTab.addEventListener('click', function () {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+            });
+
+            registerTab.addEventListener('click', function () {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerForm.classList.add('active');
+                loginForm.classList.remove('active');
+            });
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            // Get input values
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            // Check if fields aren't empty
+            if (email && password) {
+                // Show feedback that login is processing
+                const button = event.target.querySelector('button');
+                button.innerHTML = 'Logging in...';
+                button.disabled = true;
+
+                // Track login attempt if analytics is available
+                if (typeof analytics !== 'undefined') {
+                    analytics.track('LoginAttempt', {
+                        email: email,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+
+                // Simulate a brief delay then redirect
+                setTimeout(() => {
+                    window.location.href = 'https://jamcapitalconsultants.com/dashboard';
+                }, 1000);
+            } else {
+                // Basic validation to ensure fields aren't empty
+                alert('Please fill in all fields');
+            }
+        }
+
+        function handleRegistration(event) {
+            event.preventDefault();
+
+            // Get input values
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const phone = document.getElementById('register-phone').value;
+            const password = document.getElementById('register-password').value;
+
+            // Check if fields aren't empty
+            if (name && email && phone && password) {
+                // Show feedback that registration is processing
+                const button = event.target.querySelector('button');
+                button.innerHTML = 'Creating Account...';
+                button.disabled = true;
+
+                // Track registration if analytics is available
+                if (typeof analytics !== 'undefined') {
+                    analytics.track('Registration', {
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+
+                // Simulate a brief delay then redirect
+                setTimeout(() => {
+                    window.location.href = 'https://jamcapitalconsultants.com/dashboard';
+                }, 1000);
+            } else {
+                // Basic validation to ensure fields aren't empty
+                alert('Please fill in all fields');
+            }
+        }
+    </script>
+</body>
+
+</html>

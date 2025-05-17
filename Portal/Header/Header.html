@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Header - JAM Credit Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header-dashboard {
+            background-color: white;
+            border-bottom: 1px solid var(--gray-300);
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+            height: 70px;
+        }
+
+        /* Brand logo styling */
+        .header-brand-logo {
+            height: 38px;
+            margin-right: 12px;
+            transition: var(--transition);
+        }
+
+        .header-brand-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            flex: 0 0 auto;
+        }
+
+        .header-brand-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary) 0%, #07a3ca 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-left: auto;
+        }
+
+        .header-notification-icon {
+            position: relative;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .header-notification-icon:hover {
+            background-color: var(--gray-100);
+        }
+
+        .header-notification-icon i {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+        }
+
+        .header-notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        .header-user-menu-container {
+            position: relative;
+        }
+
+        .header-user-menu-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .header-user-menu-trigger:hover {
+            background-color: var(--gray-100);
+        }
+
+        .header-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid var(--primary);
+        }
+
+        .header-user-info {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .header-user-info {
+                display: block;
+            }
+        }
+
+        .header-user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+        }
+
+        .header-user-role {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .header-user-menu-caret {
+            color: var(--gray-600);
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .header-user-menu-trigger.active .header-user-menu-caret {
+            transform: rotate(180deg);
+        }
+
+        .header-user-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-md);
+            width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .header-user-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .header-user-menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .header-user-menu-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-user-menu-email {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            word-break: break-all;
+        }
+
+        .header-user-menu-items {
+            padding: 0.5rem 0;
+        }
+
+        .header-user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray-800);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .header-user-menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .header-user-menu-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .header-user-menu-divider {
+            height: 1px;
+            background-color: var(--gray-200);
+            margin: 0.5rem 0;
+        }
+
+        .header-user-menu-logout {
+            color: var(--danger);
+        }
+
+        .header-user-menu-logout:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        /* Mobile menu button */
+        .header-mobile-menu-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .header-mobile-menu-button:hover {
+            background-color: var(--gray-100);
+        }
+
+        .header-mobile-menu-button i {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+        }
+
+        @media (min-width: 992px) {
+            .header-mobile-menu-button {
+                display: none;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .header-dashboard {
+                padding: 0.75rem 1rem;
+            }
+
+            .header-brand-name {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- No HTML content needed here as it's generated by the script -->
+    <script>
+        // Create a module for the header functionality
+        const DashboardHeader = (function () {
+            // User data - would normally come from a server/API
+            const userData = {
+                name: "John Smith",
+                email: "john.smith@example.com",
+                initials: "JS",
+                status: "Active Client",
+                notifications: 3
+            };
+
+            // Update header with user data
+            function updateHeaderWithUserData() {
+                document.getElementById('header-userName').textContent = userData.name;
+                document.getElementById('header-userMenuName').textContent = userData.name;
+                document.getElementById('header-userMenuEmail').textContent = userData.email;
+                document.getElementById('header-userAvatar').textContent = userData.initials;
+                document.getElementById('header-clientStatus').textContent = userData.status;
+
+                const notificationBadge = document.getElementById('header-notificationBadge');
+                if (userData.notifications > 0) {
+                    notificationBadge.textContent = userData.notifications;
+                    notificationBadge.style.display = 'flex';
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+            }
+
+            // Toggle user menu
+            function setupUserMenu() {
+                const userMenuTrigger = document.getElementById('header-userMenuTrigger');
+                const userMenu = document.getElementById('header-userMenu');
+
+                if (userMenuTrigger && userMenu) {
+                    userMenuTrigger.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        userMenu.classList.toggle('active');
+                    });
+
+                    // Close menu when clicking outside
+                    document.addEventListener('click', function () {
+                        userMenu.classList.remove('active');
+                    });
+
+                    // Prevent menu from closing when clicking inside it
+                    userMenu.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                    });
+                }
+            }
+
+            // Setup logout functionality
+            function setupLogout() {
+                const logoutButton = document.getElementById('header-logoutButton');
+                if (logoutButton) {
+                    logoutButton.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        handleLogout();
+                    });
+                }
+            }
+
+            function handleLogout() {
+                // In a real app, this would clear session data and redirect
+                window.location.href = 'https://jamcapitalconsultants.com/login';
+            }
+
+            // Initialize header
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return false;
+
+                // Insert the header HTML with JAM Engine branding
+                container.innerHTML = `
+                    <div class="header-dashboard">
+                        <div class="header-brand">
+                            <img src="https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/gaOp7QAouTuwykUssx6C/media/68197e67ef825fea67348f8a.png" alt="JAM Engine Logo" class="header-brand-logo">
+                            <h1 class="header-brand-name">JAM Engine Dashboard</h1>
+                        </div>
+                        <div class="header-actions">
+                            <div class="header-notification-icon">
+                                <i class="fas fa-bell"></i>
+                                <span class="header-notification-badge" id="header-notificationBadge">3</span>
+                            </div>
+                            <div class="header-user-menu-container">
+                                <div class="header-user-menu-trigger" id="header-userMenuTrigger">
+                                    <div class="header-user-avatar" id="header-userAvatar">JS</div>
+                                    <div class="header-user-info">
+                                        <span class="header-user-name" id="header-userName">John Smith</span>
+                                        <span class="header-user-status" id="header-clientStatus">Active Client</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="header-user-menu" id="header-userMenu">
+                                    <div class="header-user-menu-header">
+                                        <div class="header-user-menu-name" id="header-userMenuName">John Smith</div>
+                                        <div class="header-user-menu-email" id="header-userMenuEmail">john.smith@example.com</div>
+                                    </div>
+                                    <a href="#settings" class="header-user-menu-item">
+                                        <i class="fas fa-cog"></i> Account Settings
+                                    </a>
+                                    <a href="#help" class="header-user-menu-item">
+                                        <i class="fas fa-question-circle"></i> Help Center
+                                    </a>
+                                    <a href="#" class="header-user-menu-item header-logout-item" id="header-logoutButton">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Update header with user data
+                updateHeaderWithUserData();
+                setupUserMenu();
+                setupLogout();
+
+                // Signal that initialization is complete
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                updateUserData: function (newData) {
+                    Object.assign(userData, newData);
+                    updateHeaderWithUserData();
+                },
+                setNotifications: function (count) {
+                    userData.notifications = count;
+                    updateHeaderWithUserData();
+                }
+            };
+        })();
+
+        // Expose the module globally
+        window.jamDashboardHeader = DashboardHeader;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('dashboardHeaderLoaded'));
+        }
+
+        // Add this to the setupEventListeners function in dashboardHeader.html
+        function setupEventListeners() {
+            console.log('Setting up event listeners in dashboardHeader.html');
+
+            // Your existing event listeners...
+
+            // Help Center button click handler (as a backup)
+            const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
+            if (helpCenterButton) {
+                console.log('Help Center button found in setupEventListeners');
+
+                helpCenterButton.addEventListener('click', function (e) {
+                    console.log('Help Center button clicked from setupEventListeners!');
+                    e.preventDefault();
+
+                    // Send message to parent window
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-help-center'
+                        }, '*');
+                    }
+                });
+            }
+        }
+
+        // Make sure this code is executed when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DashboardHeader DOM loaded, setting up Help Center button');
+
+            // Direct approach - find the button and attach the listener
+            const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
+
+            if (helpCenterButton) {
+                console.log('Help Center button found by selector:', helpCenterButton);
+
+                helpCenterButton.addEventListener('click', function (e) {
+                    console.log('Help Center button clicked!');
+                    e.preventDefault();
+
+                    // Try to communicate with parent window
+                    if (window.parent && window.parent !== window) {
+                        console.log('Sending message to parent window to load Help Center tab');
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-help-center'
+                        }, '*');
+                    } else {
+                        console.log('No parent window detected, trying direct tab activation');
+
+                        // Direct tab activation if not in iframe
+                        const helpCenterTab = document.getElementById('interface-help-center');
+                        if (helpCenterTab) {
+                            // Hide all tabs
+                            document.querySelectorAll('.interface-tab').forEach(tab => {
+                                tab.classList.remove('active');
+                            });
+
+                            // Show help center tab
+                            helpCenterTab.classList.add('active');
+
+                            // Try to load the module
+                            if (typeof loadHelpCenterModule === 'function') {
+                                loadHelpCenterModule('interface-help-center-content', true);
+                            }
+                        }
+                    }
+                });
+            } else {
+                // If the selector didn't work, try a more general approach
+                console.log('Help Center button not found by specific selector, trying alternative approach');
+
+                // Try to find by text content
+                const allMenuItems = document.querySelectorAll('.header-user-menu-item');
+                console.log('Found menu items:', allMenuItems.length);
+
+                allMenuItems.forEach(item => {
+                    if (item.textContent.includes('Help Center')) {
+                        console.log('Found Help Center button by text content:', item);
+
+                        item.addEventListener('click', function (e) {
+                            console.log('Help Center button clicked (found by text)!');
+                            e.preventDefault();
+
+                            // Send message to parent window
+                            if (window.parent && window.parent !== window) {
+                                window.parent.postMessage({
+                                    type: 'loadTab',
+                                    tabId: 'interface-help-center'
+                                }, '*');
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Account Settings button click handler
+            const accountSettingsButton = document.querySelector('.header-user-menu-item[href="#settings"]');
+
+            if (accountSettingsButton) {
+                console.log('Account Settings button found by selector:', accountSettingsButton);
+
+                accountSettingsButton.addEventListener('click', function (e) {
+                    console.log('Account Settings button clicked!');
+                    e.preventDefault();
+
+                    // Try to communicate with parent window
+                    if (window.parent && window.parent !== window) {
+                        console.log('Sending message to parent window to load Settings tab');
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-settings'
+                        }, '*');
+                    } else {
+                        console.log('No parent window detected, trying direct tab activation');
+
+                        // Direct tab activation if not in iframe
+                        const settingsTab = document.getElementById('interface-settings');
+                        if (settingsTab) {
+                            // Hide all tabs
+                            document.querySelectorAll('.interface-tab').forEach(tab => {
+                                tab.classList.remove('active');
+                            });
+
+                            // Show settings tab
+                            settingsTab.classList.add('active');
+
+                            // Try to load the module
+                            if (typeof loadSettingsModule === 'function') {
+                                loadSettingsModule('interface-settings-content', true);
+                            }
+                        }
+                    }
+
+                    // Close the user menu if it's open
+                    const userMenu = document.querySelector('.header-user-menu');
+                    if (userMenu) {
+                        userMenu.classList.remove('active');
+                    }
+                });
+            } else {
+                // If the selector didn't work, try a more general approach
+                console.log('Account Settings button not found by specific selector, trying alternative approach');
+
+                // Try to find by text content
+                const allMenuItems = document.querySelectorAll('.header-user-menu-item');
+
+                allMenuItems.forEach(item => {
+                    if (item.textContent.includes('Account Settings')) {
+                        console.log('Found Account Settings button by text content:', item);
+
+                        item.addEventListener('click', function (e) {
+                            console.log('Account Settings button clicked (found by text)!');
+                            e.preventDefault();
+
+                            // Send message to parent window
+                            if (window.parent && window.parent !== window) {
+                                window.parent.postMessage({
+                                    type: 'loadTab',
+                                    tabId: 'interface-settings'
+                                }, '*');
+                            }
+
+                            // Close the user menu if it's open
+                            const userMenu = document.querySelector('.header-user-menu');
+                            if (userMenu) {
+                                userMenu.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // Also make sure the setupEventListeners function is called
+        function setupEventListeners() {
+            console.log('Setting up event listeners in dashboardHeader.html');
+
+            // Your existing event listeners...
+
+            // Help Center button click handler (as a backup)
+            const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
+            if (helpCenterButton) {
+                console.log('Help Center button found in setupEventListeners');
+
+                helpCenterButton.addEventListener('click', function (e) {
+                    console.log('Help Center button clicked from setupEventListeners!');
+                    e.preventDefault();
+
+                    // Send message to parent window
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-help-center'
+                        }, '*');
+                    }
+                });
+            }
+        }
+
+        // Make sure setupEventListeners is called
+        if (typeof HeaderModule !== 'undefined' && HeaderModule.init) {
+            console.log('HeaderModule found, making sure setupEventListeners is called');
+            const originalInit = HeaderModule.init;
+            HeaderModule.init = function (containerId) {
+                const result = originalInit(containerId);
+                setupEventListeners();
+                return result;
+            };
+        }
+    </script>
+</body>
+
+</html>

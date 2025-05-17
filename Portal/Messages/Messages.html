@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages Module</title>
+    <style>
+        /* Messages Module Styles */
+        .messages-container {
+            font-family: 'Roboto', sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .messages-search {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 5px 15px;
+            width: 250px;
+        }
+
+        .messages-search input {
+            border: none;
+            background: transparent;
+            padding: 8px;
+            width: 100%;
+            outline: none;
+        }
+
+        .messages-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .messages-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .message-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .message-item.unread {
+            background-color: #e6f9ff;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #09ccfc;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .message-sender {
+            font-weight: bold;
+        }
+
+        .message-time {
+            color: #888;
+            font-size: 0.8em;
+        }
+
+        .message-subject {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .message-preview {
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 500px;
+        }
+
+        .message-detail {
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message-detail.active {
+            display: block;
+        }
+
+        .message-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .message-detail-info {
+            flex: 1;
+        }
+
+        .message-detail-subject {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .message-detail-meta {
+            display: flex;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .message-detail-sender {
+            margin-right: 15px;
+            font-weight: 500;
+        }
+
+        .message-detail-time {
+            color: #888;
+        }
+
+        .message-detail-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-detail-action {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .message-detail-action:hover {
+            background: #e0e0e0;
+        }
+
+        .message-detail-action.primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .message-detail-action.primary:hover {
+            background: #07a3ca;
+        }
+
+        .message-detail-action.danger {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .message-detail-action.danger:hover {
+            background: #ffcdd2;
+        }
+
+        .message-detail-body {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-line;
+        }
+
+        .message-compose {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .message-compose-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .message-compose-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #07a3ca;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .messages-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .messages-search {
+                width: 100%;
+            }
+
+            .message-detail-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .message-detail-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Messages Module
+        const MessagesModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let messages = [];
+            let currentFilter = 'all';
+            let activeMessageId = null;
+
+            // Sample message data
+            const sampleMessages = [
+                {
+                    id: 1,
+                    sender: 'JAM Support',
+                    avatar: 'JS',
+                    subject: 'Welcome to JAM Capital Consultants',
+                    body: 'Thank you for choosing JAM Capital Consultants for your credit repair needs. We\'re excited to help you improve your credit score and achieve your financial goals.\n\nOur team of experts will work closely with you to develop a personalized plan to address your specific credit issues. Please feel free to reach out if you have any questions or concerns.\n\nBest regards,\nThe JAM Support Team',
+                    time: '2023-06-15T10:30:00',
+                    read: true
+                },
+                {
+                    id: 2,
+                    sender: 'Credit Specialist',
+                    avatar: 'CS',
+                    subject: 'Your Credit Report Analysis',
+                    body: 'We\'ve completed the initial analysis of your credit report. There are several items we\'ve identified that we can potentially dispute to help improve your score.\n\nI\'d like to schedule a call to discuss our findings and next steps. Please let me know what times work best for you this week.\n\nRegards,\nYour Credit Specialist',
+                    time: '2023-06-18T14:45:00',
+                    read: false
+                },
+                {
+                    id: 3,
+                    sender: 'Billing Department',
+                    avatar: 'BD',
+                    subject: 'Monthly Statement Available',
+                    body: 'Your monthly statement is now available in your account. Please review it at your earliest convenience.\n\nIf you have any questions about your billing or would like to update your payment method, please don\'t hesitate to contact us.\n\nThank you,\nBilling Department',
+                    time: '2023-06-20T09:15:00',
+                    read: true
+                },
+                {
+                    id: 4,
+                    sender: 'JAM Updates',
+                    avatar: 'JU',
+                    subject: 'New Features Available',
+                    body: 'We\'ve added some exciting new features to your dashboard!\n\n- Improved credit score tracking\n- Enhanced dispute management tools\n- New educational resources\n\nLog in to check them out, and let us know what you think.\n\nThe JAM Team',
+                    time: '2023-06-22T16:30:00',
+                    read: false
+                },
+                {
+                    id: 5,
+                    sender: 'Credit Specialist',
+                    avatar: 'CS',
+                    subject: 'Dispute Update',
+                    body: 'Good news! We\'ve received responses for some of the disputes we filed on your behalf. Two items have been removed from your credit report, which should positively impact your score.\n\nWe\'re still waiting on responses for the remaining items and will update you as soon as we hear back.\n\nBest regards,\nYour Credit Specialist',
+                    time: '2023-06-25T11:20:00',
+                    read: false
+                }
+            ];
+
+            // Format date for display
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else if (diffDays < 7) {
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    return days[date.getDay()];
+                } else {
+                    return date.toLocaleDateString();
+                }
+            }
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                // Only initialize once unless reset
+                if (isInitialized) {
+                    console.log('Messages Module already initialized');
+                    return true;
+                }
+
+                console.log('Initializing Messages Module');
+
+                // Load messages (in a real app, this would be an API call)
+                messages = [...sampleMessages];
+
+                // Render the initial UI
+                renderMessagesUI(container);
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Render the messages UI
+            function renderMessagesUI(container) {
+                // Create the messages container
+                const messagesContainer = document.createElement('div');
+                messagesContainer.className = 'messages-container';
+
+                // Create the header with search and filters
+                const header = document.createElement('div');
+                header.className = 'messages-header';
+
+                // Search box
+                const searchBox = document.createElement('div');
+                searchBox.className = 'messages-search';
+                searchBox.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search messages..." id="message-search">
+                `;
+
+                // Filters
+                const filters = document.createElement('div');
+                filters.className = 'messages-filters';
+                filters.innerHTML = `
+                    <button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>
+                    <button class="filter-btn ${currentFilter === 'unread' ? 'active' : ''}" data-filter="unread">Unread</button>
+                `;
+
+                header.appendChild(searchBox);
+                header.appendChild(filters);
+
+                // Message detail view (initially hidden)
+                const messageDetail = document.createElement('div');
+                messageDetail.className = 'message-detail';
+                messageDetail.id = 'message-detail';
+
+                // Messages list
+                const messagesList = document.createElement('ul');
+                messagesList.className = 'messages-list';
+                messagesList.id = 'messages-list';
+
+                // Filter messages based on current filter
+                const filteredMessages = currentFilter === 'all'
+                    ? messages
+                    : messages.filter(msg => !msg.read);
+
+                if (filteredMessages.length === 0) {
+                    messagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No messages found</p>
+                        </div>
+                    `;
+                } else {
+                    messagesList.innerHTML = filteredMessages.map(message => `
+                        <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
+                            <div class="message-avatar">${message.avatar}</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${message.sender}</span>
+                                    <span class="message-time">${formatDate(message.time)}</span>
+                                </div>
+                                <div class="message-subject">${message.subject}</div>
+                                <div class="message-preview">${message.body.substring(0, 100)}${message.body.length > 100 ? '...' : ''}</div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+
+                // Append all elements to the container
+                messagesContainer.appendChild(header);
+                messagesContainer.appendChild(messageDetail);
+                messagesContainer.appendChild(messagesList);
+
+                // Clear the container and append the messages UI
+                container.innerHTML = '';
+                container.appendChild(messagesContainer);
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // Message item click
+                container.addEventListener('click', function (e) {
+                    const messageItem = e.target.closest('.message-item');
+                    if (messageItem) {
+                        const messageId = parseInt(messageItem.dataset.id);
+                        openMessage(messageId, container);
+                    }
+                });
+
+                // Filter buttons click
+                container.addEventListener('click', function (e) {
+                    const filterBtn = e.target.closest('.filter-btn');
+                    if (filterBtn) {
+                        const filter = filterBtn.dataset.filter;
+                        setFilter(filter, container);
+                    }
+                });
+
+                // Search input
+                const searchInput = container.querySelector('#message-search');
+                if (searchInput) {
+                    searchInput.addEventListener('input', function (e) {
+                        searchMessages(e.target.value, container);
+                    });
+                }
+
+                // Message detail action buttons
+                container.addEventListener('click', function (e) {
+                    const actionBtn = e.target.closest('.message-detail-action');
+                    if (actionBtn) {
+                        const action = actionBtn.dataset.action;
+
+                        if (action === 'back') {
+                            closeMessageDetail(container);
+                        } else if (action === 'mark-read' || action === 'mark-unread') {
+                            toggleReadStatus(activeMessageId, container);
+                        } else if (action === 'delete') {
+                            deleteMessage(activeMessageId, container);
+                        }
+                    }
+                });
+            }
+
+            // Open a message
+            function openMessage(messageId, container) {
+                const message = messages.find(msg => msg.id === messageId);
+                if (!message) return;
+
+                // Mark as read
+                if (!message.read) {
+                    message.read = true;
+                    // In a real app, you would send an API request to mark as read
+                }
+
+                // Store active message ID
+                activeMessageId = messageId;
+
+                // Update the message detail view
+                const messageDetail = container.querySelector('#message-detail');
+                if (messageDetail) {
+                    messageDetail.innerHTML = `
+                        <div class="message-detail-header">
+                            <div class="message-detail-subject">${message.subject}</div>
+                            <div class="message-detail-actions">
+                                <button class="message-detail-action" data-action="back">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button class="message-detail-action" data-action="${message.read ? 'mark-unread' : 'mark-read'}">
+                                    <i class="fas ${message.read ? 'fa-envelope' : 'fa-envelope-open'}"></i> 
+                                    ${message.read ? 'Mark as unread' : 'Mark as read'}
+                                </button>
+                                <button class="message-detail-action" data-action="delete">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        <div class="message-detail-info">
+                            <div class="message-detail-avatar">${message.avatar}</div>
+                            <div>
+                                <div class="message-detail-sender">${message.sender}</div>
+                                <div class="message-detail-time">${new Date(message.time).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="message-detail-body">
+                            ${message.body.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    messageDetail.classList.add('active');
+                }
+
+                // Hide the messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    messagesList.style.display = 'none';
+                }
+
+                // Update the message item in the list to reflect read status
+                const messageItem = container.querySelector(`.message-item[data-id="${messageId}"]`);
+                if (messageItem) {
+                    messageItem.classList.remove('unread');
+                }
+            }
+
+            // Close message detail view
+            function closeMessageDetail(container) {
+                // Hide message detail
+                const messageDetail = container.querySelector('#message-detail');
+                if (messageDetail) {
+                    messageDetail.classList.remove('active');
+                }
+
+                // Show messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    messagesList.style.display = 'block';
+                }
+
+                // Clear active message
+                activeMessageId = null;
+            }
+
+            // Toggle read status
+            function toggleReadStatus(messageId, container) {
+                const message = messages.find(msg => msg.id === messageId);
+                if (!message) return;
+
+                // Toggle read status
+                message.read = !message.read;
+
+                // Update UI
+                if (activeMessageId === messageId) {
+                    // If we're in detail view, update the button
+                    const actionBtn = container.querySelector(`.message-detail-action[data-action="${message.read ? 'mark-read' : 'mark-unread'}"]`);
+                    if (actionBtn) {
+                        actionBtn.dataset.action = message.read ? 'mark-unread' : 'mark-read';
+                        actionBtn.innerHTML = `
+                            <i class="fas ${message.read ? 'fa-envelope' : 'fa-envelope-open'}"></i> 
+                            ${message.read ? 'Mark as unread' : 'Mark as read'}
+                        `;
+                    }
+                }
+
+                // Update list item
+                const messageItem = container.querySelector(`.message-item[data-id="${messageId}"]`);
+                if (messageItem) {
+                    if (message.read) {
+                        messageItem.classList.remove('unread');
+                    } else {
+                        messageItem.classList.add('unread');
+                    }
+                }
+
+                // In a real app, you would send an API request to update read status
+            }
+
+            // Delete a message
+            function deleteMessage(messageId, container) {
+                // Remove from messages array
+                messages = messages.filter(msg => msg.id !== messageId);
+
+                // Close detail view if open
+                closeMessageDetail(container);
+
+                // Re-render messages list
+                renderMessagesUI(container);
+
+                // In a real app, you would send an API request to delete the message
+            }
+
+            // Search messages
+            function searchMessages(query, container) {
+                if (!query) {
+                    // If query is empty, reset to current filter
+                    renderMessagesUI(container);
+                    return;
+                }
+
+                // Filter messages based on search query
+                const filteredMessages = messages.filter(msg => {
+                    const searchText = query.toLowerCase();
+                    return (
+                        msg.subject.toLowerCase().includes(searchText) ||
+                        msg.body.toLowerCase().includes(searchText) ||
+                        msg.sender.toLowerCase().includes(searchText)
+                    );
+                });
+
+                // Update messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    if (filteredMessages.length === 0) {
+                        messagesList.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <p>No messages found matching "${query}"</p>
+                            </div>
+                        `;
+                    } else {
+                        messagesList.innerHTML = filteredMessages.map(message => `
+                            <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
+                                <div class="message-avatar">${message.avatar}</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">${message.sender}</span>
+                                        <span class="message-time">${formatDate(message.time)}</span>
+                                    </div>
+                                    <div class="message-subject">${message.subject}</div>
+                                    <div class="message-preview">${message.body.substring(0, 100)}${message.body.length > 100 ? '...' : ''}</div>
+                                </div>
+                            </li>
+                        `).join('');
+                    }
+                }
+            }
+
+            // Set filter
+            function setFilter(filter, container) {
+                if (filter === currentFilter) return;
+
+                currentFilter = filter;
+
+                // Update filter buttons
+                const filterBtns = container.querySelectorAll('.filter-btn');
+                filterBtns.forEach(btn => {
+                    if (btn.dataset.filter === filter) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                // Re-render messages list
+                renderMessagesUI(container);
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                activeMessageId = null;
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                openMessage: openMessage,
+                closeMessageDetail: closeMessageDetail,
+                toggleReadStatus: toggleReadStatus,
+                deleteMessage: deleteMessage,
+                searchMessages: searchMessages,
+                setFilter: setFilter
+            };
+        })();
+
+        // Expose the module globally
+        window.jamMessages = MessagesModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('messagesModuleLoaded'));
+        }
+    </script>
+</body>
+
+</html>

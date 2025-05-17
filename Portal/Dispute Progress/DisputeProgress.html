@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Dispute Progress</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dispute-progress-container {
+            font-family: 'Montserrat', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .dispute-progress-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .dispute-progress-title {
+            font-size: 1.8rem;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .dispute-progress-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+
+        .dispute-score-section {
+            background: linear-gradient(135deg, #002742, #004080);
+            color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .dispute-score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-score-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .dispute-score-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .dispute-score-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #09ccfc;
+        }
+
+        .dispute-score-change {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+
+        .dispute-score-up {
+            color: #28a745;
+        }
+
+        .dispute-score-down {
+            color: #dc3545;
+        }
+
+        .dispute-score-meter {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .dispute-score-progress {
+            height: 100%;
+            background-color: #09ccfc;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        .dispute-score-range {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .dispute-rounds-section {
+            margin-bottom: 2rem;
+        }
+
+        .dispute-round-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .dispute-round-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .dispute-round-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #09ccfc;
+        }
+
+        .dispute-round-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .dispute-round-content {
+            padding: 1.5rem;
+        }
+
+        .dispute-round-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dispute-stat {
+            flex: 1;
+            min-width: 120px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .dispute-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .dispute-stat-removed {
+            color: #28a745;
+        }
+
+        .dispute-stat-pending {
+            color: #ffc107;
+        }
+
+        .dispute-stat-verified {
+            color: #dc3545;
+        }
+
+        .dispute-stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .dispute-items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-items-title {
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .dispute-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dispute-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.8rem;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+
+        .dispute-item-status {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            padding-top: 0.2rem;
+        }
+
+        .dispute-status-removed {
+            color: #28a745;
+        }
+
+        .dispute-status-pending {
+            color: #ffc107;
+        }
+
+        .dispute-status-verified {
+            color: #dc3545;
+        }
+
+        .dispute-item-details {
+            flex: 1;
+        }
+
+        .dispute-item-creditor {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .dispute-item-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.3rem;
+        }
+
+        .dispute-item-bureau {
+            font-size: 0.8rem;
+            background-color: #e9ecef;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .dispute-round-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .dispute-action-button {
+            display: flex;
+            align-items: center;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .dispute-action-primary {
+            background-color: #09ccfc;
+            color: white;
+        }
+
+        .dispute-action-primary:hover {
+            background-color: #07a3ca;
+        }
+
+        .dispute-action-secondary {
+            background-color: #e9ecef;
+            color: #343a40;
+        }
+
+        .dispute-action-secondary:hover {
+            background-color: #dee2e6;
+        }
+
+        .dispute-action-button i {
+            margin-right: 0.5rem;
+        }
+
+        .dispute-empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dispute-empty-icon {
+            font-size: 3rem;
+            color: #e9ecef;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-empty-title {
+            font-size: 1.5rem;
+            color: #343a40;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-empty-message {
+            color: #6c757d;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dispute-round-stats {
+                flex-direction: column;
+            }
+
+            .dispute-stat {
+                min-width: 100%;
+            }
+
+            .dispute-round-actions {
+                flex-direction: column;
+            }
+
+            .dispute-action-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Dispute Progress Module
+        const DisputeProgressModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let disputeData = null;
+
+            // Sample data - would be replaced with API calls in production
+            const sampleDisputeData = {
+                creditScore: {
+                    current: 680,
+                    previous: 650,
+                    change: 30,
+                    date: "June 15, 2023",
+                    percentile: 68 // 680 out of 850 = ~80%
+                },
+                rounds: [
+                    {
+                        id: "round-3",
+                        number: 3,
+                        status: "in-progress",
+                        date: "Started June 1, 2023",
+                        summary: "Your third round of disputes is currently in progress. We've submitted 5 new disputes to the credit bureaus.",
+                        stats: {
+                            total: 5,
+                            pending: 5,
+                            removed: 0,
+                            verified: 0
+                        },
+                        items: [
+                            {
+                                id: "item-301",
+                                creditor: "Capital One",
+                                description: "Late payment - 30 days",
+                                status: "pending",
+                                bureau: "Experian, TransUnion"
+                            },
+                            {
+                                id: "item-302",
+                                creditor: "Chase Bank",
+                                description: "Collection account",
+                                status: "pending",
+                                bureau: "All bureaus"
+                            },
+                            {
+                                id: "item-303",
+                                creditor: "Discover",
+                                description: "Late payment - 60 days",
+                                status: "pending",
+                                bureau: "Equifax, TransUnion"
+                            }
+                        ],
+                        reportUrl: "#"
+                    },
+                    {
+                        id: "round-2",
+                        number: 2,
+                        status: "completed",
+                        date: "Completed May 15, 2023",
+                        summary: "Your second round of disputes has been completed. We successfully removed 2 items from your credit report, resulting in a 15 point increase in your credit score.",
+                        stats: {
+                            total: 4,
+                            pending: 0,
+                            removed: 2,
+                            verified: 2
+                        },
+                        items: [
+                            {
+                                id: "item-201",
+                                creditor: "Bank of America",
+                                description: "Late payment - 90 days",
+                                status: "removed",
+                                bureau: "All bureaus"
+                            },
+                            {
+                                id: "item-202",
+                                creditor: "Citibank",
+                                description: "Collection account",
+                                status: "removed",
+                                bureau: "Experian, Equifax"
+                            },
+                            {
+                                id: "item-203",
+                                creditor: "Wells Fargo",
+                                description: "Late payment - 30 days",
+                                status: "verified",
+                                bureau: "TransUnion"
+                            },
+                            {
+                                id: "item-204",
+                                creditor: "American Express",
+                                description: "High balance",
+                                status: "verified",
+                                bureau: "All bureaus"
+                            }
+                        ],
+                        reportUrl: "reports/dispute-round-2.pdf"
+                    },
+                    {
+                        id: "round-1",
+                        number: 1,
+                        status: "completed",
+                        date: "Completed April 10, 2023",
+                        summary: "Your first round of disputes has been completed. We successfully removed 3 items from your credit report, resulting in a 20 point increase in your credit score.",
+                        stats: {
+                            total: 5,
+                            pending: 0,
+                            removed: 3,
+                            verified: 2
+                        },
+                        items: [
+                            {
+                                id: "item-101",
+                                creditor: "Synchrony Bank",
+                                description: "Late payment - 60 days",
+                                status: "removed",
+                                bureau: "All bureaus"
+                            },
+                            {
+                                id: "item-102",
+                                creditor: "Midland Credit",
+                                description: "Collection account",
+                                status: "removed",
+                                bureau: "Experian, TransUnion"
+                            },
+                            {
+                                id: "item-103",
+                                creditor: "Capital One",
+                                description: "Late payment - 30 days",
+                                status: "removed",
+                                bureau: "Equifax"
+                            },
+                            {
+                                id: "item-104",
+                                creditor: "Chase Bank",
+                                description: "High utilization",
+                                status: "verified",
+                                bureau: "All bureaus"
+                            },
+                            {
+                                id: "item-105",
+                                creditor: "Discover",
+                                description: "Late payment - 90 days",
+                                status: "verified",
+                                bureau: "Experian"
+                            }
+                        ],
+                        reportUrl: "reports/dispute-round-1.pdf"
+                    }
+                ]
+            };
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                // Only initialize once unless reset
+                if (isInitialized) {
+                    console.log('Dispute Progress Module already initialized');
+                    return true;
+                }
+
+                console.log('Initializing Dispute Progress Module');
+
+                // In a real app, we would fetch data from an API
+                // For now, use the sample data
+                disputeData = sampleDisputeData;
+
+                // Render the module
+                renderModule(container);
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Render the module
+            function renderModule(container) {
+                // Check if we have dispute data
+                if (!disputeData || !disputeData.rounds || disputeData.rounds.length === 0) {
+                    renderEmptyState(container);
+                    return;
+                }
+
+                // Create the main container
+                container.innerHTML = `
+                    <div class="dispute-progress-container">
+                        <div class="dispute-progress-header">
+                            <h2 class="dispute-progress-title">Your Dispute Progress</h2>
+                            <p class="dispute-progress-subtitle">Track the status of your credit dispute rounds and see your progress</p>
+                        </div>
+                        
+                        ${renderCreditScoreSection()}
+                        
+                        <div class="dispute-rounds-section">
+                            ${disputeData.rounds.map(round => renderDisputeRound(round)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render the credit score section
+            function renderCreditScoreSection() {
+                const { current, previous, change, date, percentile } = disputeData.creditScore;
+                const isImproved = change > 0;
+
+                return `
+                    <div class="dispute-score-section">
+                        <div class="dispute-score-header">
+                            <div class="dispute-score-title">Your Credit Score</div>
+                            <div class="dispute-score-date">Last updated: ${date}</div>
+                        </div>
+                        <div class="dispute-score-display">
+                            <div class="dispute-score-value">${current}</div>
+                            <div class="dispute-score-change">
+                                <i class="fas ${isImproved ? 'fa-arrow-up dispute-score-up' : 'fa-arrow-down dispute-score-down'}"></i>
+                                <span>${Math.abs(change)} points ${isImproved ? 'increase' : 'decrease'}</span>
+                            </div>
+                        </div>
+                        <div class="dispute-score-meter">
+                            <div class="dispute-score-progress" style="width: ${percentile}%"></div>
+                        </div>
+                        <div class="dispute-score-range">
+                            <span>Poor</span>
+                            <span>Fair</span>
+                            <span>Good</span>
+                            <span>Very Good</span>
+                            <span>Excellent</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render a dispute round card
+            function renderDisputeRound(round) {
+                const { id, number, status, date, summary, stats, items, reportUrl } = round;
+                const isInProgress = status === 'in-progress';
+
+                return `
+                    <div class="dispute-round-card" id="${id}">
+                        <div class="dispute-round-header">
+                            <div class="dispute-round-title">
+                                <i class="fas ${isInProgress ? 'fa-clock' : 'fa-check-circle'}"></i>
+                                Round ${number} ${isInProgress ? '(In Progress)' : ''}
+                            </div>
+                            <div class="dispute-round-date">${date}</div>
+                        </div>
+                        <div class="dispute-round-content">
+                            <div class="dispute-round-summary">
+                                ${summary}
+                            </div>
+                            
+                            <div class="dispute-round-stats">
+                                <div class="dispute-stat">
+                                    <div class="dispute-stat-value">${stats.total}</div>
+                                    <div class="dispute-stat-label">Total Items</div>
+                                </div>
+                                <div class="dispute-stat">
+                                    <div class="dispute-stat-value">${stats.removed}</div>
+                                    <div class="dispute-stat-label">Removed</div>
+                                </div>
+                                <div class="dispute-stat">
+                                    <div class="dispute-stat-value">${stats.pending}</div>
+                                    <div class="dispute-stat-label">Pending</div>
+                                </div>
+                                <div class="dispute-stat">
+                                    <div class="dispute-stat-value">${stats.verified}</div>
+                                    <div class="dispute-stat-label">Verified</div>
+                                </div>
+                            </div>
+                            
+                            <div class="dispute-items-list">
+                                ${items.map(item => renderDisputeItem(item)).join('')}
+                            </div>
+                            
+                            <div class="dispute-round-actions">
+                                ${isInProgress ? `
+                                    <button class="dispute-action-button dispute-action-secondary" onclick="window.jamDisputeProgress.viewDetails('${id}')">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                ` : `
+                                    <button class="dispute-action-button dispute-action-secondary" onclick="window.jamDisputeProgress.viewDetails('${id}')">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                    <button class="dispute-action-button dispute-action-primary" onclick="window.jamDisputeProgress.downloadReport('${id}', '${reportUrl}')">
+                                        <i class="fas fa-download"></i> Download Report
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render a dispute item
+            function renderDisputeItem(item) {
+                const { id, creditor, description, status, bureau } = item;
+
+                let statusIcon, statusClass;
+                switch (status) {
+                    case 'removed':
+                        statusIcon = 'fa-check-circle';
+                        statusClass = 'dispute-status-removed';
+                        break;
+                    case 'pending':
+                        statusIcon = 'fa-clock';
+                        statusClass = 'dispute-status-pending';
+                        break;
+                    case 'verified':
+                        statusIcon = 'fa-times-circle';
+                        statusClass = 'dispute-status-verified';
+                        break;
+                    default:
+                        statusIcon = 'fa-question-circle';
+                        statusClass = '';
+                }
+
+                return `
+                    <div class="dispute-item" id="${id}">
+                        <div class="dispute-item-status ${statusClass}">
+                            <i class="fas ${statusIcon}"></i>
+                        </div>
+                        <div class="dispute-item-details">
+                            <div class="dispute-item-creditor">${creditor}</div>
+                            <div class="dispute-item-description">${description}</div>
+                            <div class="dispute-item-bureau">${bureau}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render empty state when no disputes are available
+            function renderEmptyState(container) {
+                container.innerHTML = `
+                    <div class="dispute-progress-container">
+                        <div class="dispute-empty-state">
+                            <div class="dispute-empty-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3 class="dispute-empty-title">No Disputes Yet</h3>
+                            <p class="dispute-empty-message">
+                                You haven't started any dispute rounds yet. 
+                                Once you begin the dispute process, you'll see your progress here.
+                            </p>
+                            <button class="dispute-action-button dispute-action-primary" onclick="window.jamDisputeProgress.startDispute()">
+                                <i class="fas fa-play"></i> Start Dispute Process
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // Event listeners are set up using inline onclick handlers
+                // This is just a placeholder for any additional event setup
+            }
+
+            // View dispute details
+            function viewDetails(roundId) {
+                console.log(`Viewing details for round: ${roundId}`);
+                // In a real app, this might open a modal with more details
+                alert(`Viewing details for dispute round ${roundId}`);
+            }
+
+            // Download dispute report
+            function downloadReport(roundId, reportUrl) {
+                console.log(`Downloading report for round: ${roundId}, URL: ${reportUrl}`);
+
+                // In a real app, this would trigger a file download
+                if (reportUrl && reportUrl !== '#') {
+                    // Simulate download by opening in a new tab
+                    window.open(reportUrl, '_blank');
+                } else {
+                    alert(`The report for dispute round ${roundId} is not available for download.`);
+                }
+            }
+
+            // Start dispute process
+            function startDispute() {
+                console.log('Starting dispute process');
+                // In a real app, this would redirect to the dispute creation flow
+                alert('This would redirect you to start the dispute process.');
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                viewDetails: viewDetails,
+                downloadReport: downloadReport,
+                startDispute: startDispute
+            };
+        })();
+
+        // Expose the module globally
+        window.jamDisputeProgress = DisputeProgressModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('disputeProgressLoaded'));
+        }
+    </script>
+</body>
+
+</html>

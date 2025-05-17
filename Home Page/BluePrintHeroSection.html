@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM Hero Section</title>
+
+    <!-- Import headline font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .hero-section {
+            position: relative;
+            width: 100%;
+            max-width: 1600px;
+            margin: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 20px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            transform: translateY(-10px);
+            transition: all 0.5s ease;
+        }
+
+        .hero-section:hover {
+            box-shadow: 0 40px 70px rgba(0, 0, 0, 0.35), 0 25px 40px rgba(0, 0, 0, 0.25);
+            transform: translateY(-15px);
+        }
+
+        .hero-image {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .hero-section:hover .hero-image {
+            transform: scale(1.02);
+        }
+
+        .hero-text-overlay {
+            position: absolute;
+            top: 55%;
+            left: -50px;
+            transform: translateY(-50%);
+            max-width: 650px;
+            text-align: left;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-text-overlay h1 {
+            font-size: 5rem;
+            margin-bottom: 0px;
+            line-height: 1.1;
+            display: inline-block;
+            text-align: center;
+            width: auto;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .jam-engine-container {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .jam-engine-logo {
+            height: 30rem;
+            width: 40rem;
+            vertical-align: bottom;
+            margin-top: -12.5rem;
+            margin-bottom: 1rem;
+            margin-right: 4rem;
+        }
+
+        .highlight-engine {
+            color: #09ccfc;
+            font-weight: 700;
+        }
+
+        /* Quiz Button Styles */
+        .quiz-button-container {
+            position: absolute;
+            bottom: 20%;
+            left: 10%;
+            top: 63%;
+            width: auto;
+            text-align: left;
+            z-index: 10;
+        }
+
+        .credit-quiz-btn {
+            background-color: #09ccfc;
+            color: #FFFFFF;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-width: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .credit-quiz-btn:hover {
+            background-color: #08b6e2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(9, 204, 252, 0.3);
+        }
+
+        .credit-quiz-btn .subtext {
+            font-size: 0.875rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .animated-bg-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .jam-engine-logo {
+                height: 2.5rem;
+            }
+
+            .hero-text-overlay {
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 85%;
+                max-width: none;
+                text-align: center;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 2.5rem;
+                display: block;
+                width: 100%;
+            }
+
+            .quiz-button-container {
+                top: auto;
+                bottom: 15%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80%;
+                max-width: 300px;
+                text-align: center;
+                margin-top: 0;
+            }
+
+            .credit-quiz-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero-section">
+        <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/6819aa74ef825fa41b34dd79.png"
+            alt="Credit Blueprint Hero" class="hero-image" />
+
+        <div class="hero-text-overlay">
+            <h1>Boost <br>Your Credit <br>With <br><span class="jam-engine-container">
+                    <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/681bce267fc2d260912232f3.png"
+                        alt="JAM ENGINE" class="jam-engine-logo">
+                </span></h1>
+        </div>
+
+        <div class="quiz-button-container">
+            <button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
+                Start JAM Engine
+                <span class="subtext">Get Results In Weeks - Not Guesses</span>
+            </button>
+        </div>
+
+        <div class="animated-bg-elements">
+            <!-- Elements will be added via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Create animated background elements
+            const bgContainer = document.querySelector('.animated-bg-elements');
+            const numElements = 5;
+
+            for (let i = 0; i < numElements; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+
+                // Random size between 50px and 150px
+                const size = Math.random() * 100 + 50;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+
+                // Random position
+                element.style.top = `${Math.random() * 100}%`;
+                element.style.left = `${Math.random() * 100}%`;
+
+                // Random animation delay and duration
+                element.style.animationDelay = `${Math.random() * 5}s`;
+                element.style.animationDuration = `${15 + Math.random() * 10}s`;
+
+                bgContainer.appendChild(element);
+            }
+
+            // Get the button element
+            const jamEngineButton = document.querySelector('#creditQuizButton');
+
+            // Update the click event to trigger the nav-quizModal
+            if (jamEngineButton) {
+                // Remove old event listeners by cloning the node
+                const newButton = jamEngineButton.cloneNode(true);
+                jamEngineButton.parentNode.replaceChild(newButton, jamEngineButton);
+
+                // Add new event listener that opens the nav-quizModal
+                newButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Call the openQuizModal function from NavGetStarted.html
+                    if (typeof window.openQuizModal === 'function') {
+                        window.openQuizModal();
+                    } else {
+                        // Fallback if the function isn't available yet
+                        const navQuizModal = document.getElementById('nav-quizModal');
+                        if (navQuizModal) {
+                            navQuizModal.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
+
+                            // Reset to first step if possible
+                            if (typeof showStep === 'function') {
+                                showStep(1);
+                            }
+                        } else {
+                            console.error("nav-quizModal element not found!");
+                        }
+                    }
+
+                    // Track quiz start if analytics is available
+                    if (typeof analytics !== 'undefined') {
+                        analytics.track('CreditQuizStarted', {
+                            location: 'Hero Section',
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

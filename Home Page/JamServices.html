@@ -1,0 +1,398 @@
+<!-- Add viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Font and Icon Links -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Montserrat:wght@400;500&display=swap"
+    rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    .benefits-section {
+        padding: 5rem 0;
+        background-color: #fff;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .section-title {
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 3rem;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .benefit-card {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background-color: #09ccfc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .icon-wrapper i {
+        color: #fff;
+        font-size: 1.5rem;
+    }
+
+    .benefit-card h3 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.25rem;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .benefit-card p {
+        font-family: 'Montserrat', sans-serif;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .cta-container {
+        text-align: center;
+        margin-top: 4rem;
+    }
+
+    .cta-container h3 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-button {
+        display: inline-block;
+        background-color: #09ccfc;
+        color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+        background-color: #09ccfc;
+    }
+
+    @media (max-width: 1024px) {
+        .benefits-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .benefits-section {
+            padding: 3rem 0;
+        }
+
+        .container {
+            padding: 0 1rem;
+        }
+
+        .benefits-grid {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .benefit-card {
+            padding: 1.5rem;
+        }
+
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        .icon-wrapper i {
+            font-size: 1.25rem;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .benefit-card p {
+            font-size: 0.95rem;
+        }
+
+        .cta-container {
+            margin-top: 2.5rem;
+        }
+
+        .cta-container h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+
+        .cta-button {
+            padding: 0.875rem 1.75rem;
+            font-size: 0.95rem;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .benefits-section {
+            padding: 2.5rem 0;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            padding: 0 0.5rem;
+        }
+
+        .benefit-card {
+            padding: 1.25rem;
+        }
+
+        .benefit-card:hover {
+            transform: none;
+        }
+    }
+
+    /* Modal Styles */
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 0;
+        padding: 15px;
+        width: 92%;
+        max-width: 750px;
+        border-radius: 8px;
+        position: relative;
+        height: 92vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .close-modal {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        font-size: 24px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 5px 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .close-modal:hover {
+        color: #333;
+    }
+
+    /* Update iframe styles */
+    #aI0peBKAcSgXeFySGo0P_1746244862558 {
+        flex: 1;
+        width: 100% !important;
+        height: 150vh !important;
+        border: none;
+        margin: 0;
+        padding: 0;
+        transform: scale(0.98);
+        transform-origin: center center;
+    }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 100%;
+            height: 100vh;
+            border-radius: 0;
+            padding: 12px;
+            margin: 0;
+            overflow-y: auto;
+        }
+
+        #aI0peBKAcSgXeFySGo0P_1746244862558 {
+            transform: scale(0.96);
+            height: 200vh !important;
+            min-height: 1200px;
+        }
+    }
+
+    /* Add styles for smaller devices */
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 8px;
+        }
+
+        .close-modal {
+            right: 10px;
+            top: 10px;
+        }
+
+        #aI0peBKAcSgXeFySGo0P_1746244862558 {
+            transform: scale(0.94);
+        }
+    }
+</style>
+
+<!-- HTML Content -->
+<section class="benefits-section">
+    <div class="container">
+        <h2 class="section-title">What's Included in Your Personalized Credit Plan</h2>
+
+        <div class="benefits-grid">
+            <!-- Credit Report Review -->
+            <div class="benefit-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>Credit Report Review & Strategy Call</h3>
+                <p>Start with a one-on-one call to review your current credit report, uncover key issues, and build a
+                    personalized game plan.</p>
+            </div>
+
+            <!-- Monthly Dispute Letters -->
+            <div class="benefit-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>Monthly Dispute Letter Service</h3>
+                <p>We handle the creation and delivery of dispute letters to challenge inaccurate, outdated, or
+                    unverifiable items on your credit reports.</p>
+            </div>
+
+            <!-- AI Progress Tracking -->
+            <div class="benefit-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>AI-Powered Progress Tracking</h3>
+                <p>Track your score improvements and dispute rounds with our automated updates — you'll always know
+                    what's happening behind the scenes.</p>
+            </div>
+
+            <!-- Secure Portal -->
+            <div class="benefit-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Secure Client Portal Access</h3>
+                <p>Upload documents, view your credit roadmap, and stay connected to your case anytime with our
+                    easy-to-use online portal.</p>
+            </div>
+
+            <!-- Support -->
+            <div class="benefit-card">
+                <div class="icon-wrapper">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Dedicated Support & Guidance</h3>
+                <p>Our team is here to answer questions and offer support every step of the way — from onboarding to
+                    final results.</p>
+            </div>
+        </div>
+
+        <div class="cta-container">
+            <h3>Want to see how we'd approach your credit journey?</h3>
+            <a href="#book-call" class="cta-button" id="servicesBookingBtn">Book My Free Strategy Call</a>
+        </div>
+    </div>
+</section>
+
+<!-- Modal HTML -->
+<div id="servicesBookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <iframe src="https://api.leadconnectorhq.com/widget/booking/aI0peBKAcSgXeFySGo0P"
+            id="aI0peBKAcSgXeFySGo0P_1746244862558" style="width: 100%; border: none;" allow="scrolling"
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script>
+    // Get modal elements with updated ID
+    const modal = document.getElementById('servicesBookingModal');
+    const closeBtn = document.querySelector('.close-modal');
+    const ctaButton = document.getElementById('servicesBookingBtn');
+
+    // Open modal when CTA button is clicked
+    ctaButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close modal when X is clicked
+    closeBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Handle escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+</script>

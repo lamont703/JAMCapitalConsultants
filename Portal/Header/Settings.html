@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Module</title>
+    <style>
+        /* Settings Module Styles */
+        .settings-container {
+            font-family: 'Roboto', sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            color: #333;
+        }
+
+        .settings-header {
+            margin-bottom: 30px;
+        }
+
+        .settings-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .settings-subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .settings-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-section-title i {
+            margin-right: 10px;
+            color: #09ccfc;
+        }
+
+        .settings-form-group {
+            margin-bottom: 20px;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .settings-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .settings-input:focus {
+            border-color: #09ccfc;
+            outline: none;
+        }
+
+        .settings-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        .settings-checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .settings-checkbox {
+            margin-right: 10px;
+        }
+
+        .settings-button {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .settings-button:hover {
+            background-color: #07a3ca;
+        }
+
+        .settings-button-secondary {
+            background-color: #95a5a6;
+        }
+
+        .settings-button-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .settings-button-danger {
+            background-color: #e74c3c;
+        }
+
+        .settings-button-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .settings-buttons-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .settings-success-message {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-success-message i {
+            margin-right: 10px;
+        }
+
+        .settings-error-message {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-error-message i {
+            margin-right: 10px;
+        }
+
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .settings-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .settings-tab:hover {
+            color: #09ccfc;
+        }
+
+        .settings-tab.active {
+            color: #09ccfc;
+            border-bottom-color: #09ccfc;
+        }
+
+        .settings-tab-content {
+            display: none;
+        }
+
+        .settings-tab-content.active {
+            display: block;
+        }
+
+        .settings-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .settings-avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .settings-upload-btn {
+            margin-top: 10px;
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .settings-upload-btn:hover {
+            background-color: #07a3ca;
+        }
+
+        .settings-notification-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .settings-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .settings-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .settings-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .settings-toggle input:checked+.settings-toggle-slider {
+            background-color: #3498db;
+        }
+
+        .settings-toggle input:checked+.settings-toggle-slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Settings Module
+        const SettingsModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let activeTab = 'profile';
+            let userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                phone: '(555) 123-4567',
+                address: '123 Main St',
+                city: 'Anytown',
+                state: 'CA',
+                zipCode: '12345',
+                timezone: 'America/Los_Angeles',
+                language: 'en',
+                notifications: {
+                    email: true,
+                    sms: true,
+                    disputes: true,
+                    creditReport: true,
+                    promotions: false
+                },
+                security: {
+                    twoFactorAuth: false,
+                    sessionTimeout: 30
+                }
+            };
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                console.log(`Initializing Settings Module in container: ${containerId}`);
+
+                // Render the settings UI
+                renderSettingsUI(container);
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                isInitialized = true;
+                return true;
+            }
+
+            // Render the settings UI
+            function renderSettingsUI(container) {
+                container.innerHTML = `
+                    <div class="settings-container">
+                        <div class="settings-header">
+                            <h2 class="settings-title">Account Settings</h2>
+                            <p class="settings-subtitle">Manage your account preferences and personal information</p>
+                        </div>
+
+                        <div class="settings-tabs">
+                            <div class="settings-tab ${activeTab === 'profile' ? 'active' : ''}" data-tab="profile">
+                                <i class="fas fa-user"></i> Profile
+                            </div>
+                            <div class="settings-tab ${activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
+                                <i class="fas fa-bell"></i> Notifications
+                            </div>
+                            <div class="settings-tab ${activeTab === 'security' ? 'active' : ''}" data-tab="security">
+                                <i class="fas fa-lock"></i> Security
+                            </div>
+                            <div class="settings-tab ${activeTab === 'preferences' ? 'active' : ''}" data-tab="preferences">
+                                <i class="fas fa-cog"></i> Preferences
+                            </div>
+                        </div>
+
+                        <!-- Profile Tab Content -->
+                        <div id="settings-profile-tab" class="settings-tab-content ${activeTab === 'profile' ? 'active' : ''}">
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-user-circle"></i> Personal Information</h3>
+                                
+                                <div class="settings-avatar-container">
+                                    <div class="settings-avatar">${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}</div>
+                                    <div class="settings-upload-btn" id="settings-upload-avatar">Upload Photo</div>
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-first-name">First Name</label>
+                                    <input type="text" id="settings-first-name" class="settings-input" value="${userData.firstName}">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-last-name">Last Name</label>
+                                    <input type="text" id="settings-last-name" class="settings-input" value="${userData.lastName}">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-email">Email Address</label>
+                                    <input type="email" id="settings-email" class="settings-input" value="${userData.email}">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-phone">Phone Number</label>
+                                    <input type="tel" id="settings-phone" class="settings-input" value="${userData.phone}">
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-home"></i> Address Information</h3>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-address">Street Address</label>
+                                    <input type="text" id="settings-address" class="settings-input" value="${userData.address}">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-city">City</label>
+                                    <input type="text" id="settings-city" class="settings-input" value="${userData.city}">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-state">State</label>
+                                    <input type="text" id="settings-state" class="settings-input" value="${userData.state}">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-zip">ZIP Code</label>
+                                    <input type="text" id="settings-zip" class="settings-input" value="${userData.zipCode}">
+                                </div>
+                                
+                                <div class="settings-buttons-row">
+                                    <button class="settings-button" id="settings-save-profile">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications Tab Content -->
+                        <div id="settings-notifications-tab" class="settings-tab-content ${activeTab === 'notifications' ? 'active' : ''}">
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-bell"></i> Notification Preferences</h3>
+                                
+                                <div class="settings-notification-item">
+                                    <div>
+                                        <strong>Email Notifications</strong>
+                                        <p>Receive updates via email</p>
+                                    </div>
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settings-email-notifications" ${userData.notifications.email ? 'checked' : ''}>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="settings-notification-item">
+                                    <div>
+                                        <strong>SMS Notifications</strong>
+                                        <p>Receive updates via text message</p>
+                                    </div>
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settings-sms-notifications" ${userData.notifications.sms ? 'checked' : ''}>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="settings-notification-item">
+                                    <div>
+                                        <strong>Dispute Updates</strong>
+                                        <p>Get notified about dispute status changes</p>
+                                    </div>
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settings-dispute-notifications" ${userData.notifications.disputes ? 'checked' : ''}>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="settings-notification-item">
+                                    <div>
+                                        <strong>Credit Report Updates</strong>
+                                        <p>Get notified about changes to your credit report</p>
+                                    </div>
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settings-credit-notifications" ${userData.notifications.creditReport ? 'checked' : ''}>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="settings-notification-item">
+                                    <div>
+                                        <strong>Promotional Emails</strong>
+                                        <p>Receive special offers and promotions</p>
+                                    </div>
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settings-promo-notifications" ${userData.notifications.promotions ? 'checked' : ''}>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="settings-buttons-row">
+                                    <button class="settings-button" id="settings-save-notifications">Save Preferences</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Tab Content -->
+                        <div id="settings-security-tab" class="settings-tab-content ${activeTab === 'security' ? 'active' : ''}">
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-lock"></i> Password</h3>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-current-password">Current Password</label>
+                                    <input type="password" id="settings-current-password" class="settings-input">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-new-password">New Password</label>
+                                    <input type="password" id="settings-new-password" class="settings-input">
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-confirm-password">Confirm New Password</label>
+                                    <input type="password" id="settings-confirm-password" class="settings-input">
+                                </div>
+                                
+                                <div class="settings-buttons-row">
+                                    <button class="settings-button" id="settings-change-password">Update Password</button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-shield-alt"></i> Security Settings</h3>
+                                
+                                <div class="settings-notification-item">
+                                    <div>
+                                        <strong>Two-Factor Authentication</strong>
+                                        <p>Add an extra layer of security to your account</p>
+                                    </div>
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settings-two-factor" ${userData.security.twoFactorAuth ? 'checked' : ''}>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-session-timeout">Session Timeout (minutes)</label>
+                                    <select id="settings-session-timeout" class="settings-select">
+                                        <option value="15" ${userData.security.sessionTimeout === 15 ? 'selected' : ''}>15 minutes</option>
+                                        <option value="30" ${userData.security.sessionTimeout === 30 ? 'selected' : ''}>30 minutes</option>
+                                        <option value="60" ${userData.security.sessionTimeout === 60 ? 'selected' : ''}>1 hour</option>
+                                        <option value="120" ${userData.security.sessionTimeout === 120 ? 'selected' : ''}>2 hours</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="settings-buttons-row">
+                                    <button class="settings-button" id="settings-save-security">Save Security Settings</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preferences Tab Content -->
+                        <div id="settings-preferences-tab" class="settings-tab-content ${activeTab === 'preferences' ? 'active' : ''}">
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-globe"></i> Regional Settings</h3>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-language">Language</label>
+                                    <select id="settings-language" class="settings-select">
+                                        <option value="en" ${userData.language === 'en' ? 'selected' : ''}>English</option>
+                                        <option value="es" ${userData.language === 'es' ? 'selected' : ''}>Spanish</option>
+                                        <option value="fr" ${userData.language === 'fr' ? 'selected' : ''}>French</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="settings-form-group">
+                                    <label class="settings-label" for="settings-timezone">Time Zone</label>
+                                    <select id="settings-timezone" class="settings-select">
+                                        <option value="America/New_York" ${userData.timezone === 'America/New_York' ? 'selected' : ''}>Eastern Time (ET)</option>
+                                        <option value="America/Chicago" ${userData.timezone === 'America/Chicago' ? 'selected' : ''}>Central Time (CT)</option>
+                                        <option value="America/Denver" ${userData.timezone === 'America/Denver' ? 'selected' : ''}>Mountain Time (MT)</option>
+                                        <option value="America/Los_Angeles" ${userData.timezone === 'America/Los_Angeles' ? 'selected' : ''}>Pacific Time (PT)</option>
+                                        <option value="America/Anchorage" ${userData.timezone === 'America/Anchorage' ? 'selected' : ''}>Alaska Time (AKT)</option>
+                                        <option value="Pacific/Honolulu" ${userData.timezone === 'Pacific/Honolulu' ? 'selected' : ''}>Hawaii Time (HT)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="settings-buttons-row">
+                                    <button class="settings-button" id="settings-save-preferences">Save Preferences</button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section">
+                                <h3 class="settings-section-title"><i class="fas fa-trash-alt"></i> Account Management</h3>
+                                <p>Permanently delete your account and all associated data.</p>
+                                <div class="settings-buttons-row">
+                                    <button class="settings-button settings-button-danger" id="settings-delete-account">Delete Account</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // Tab switching
+                const tabs = container.querySelectorAll('.settings-tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabName = tab.dataset.tab;
+                        switchTab(tabName, container);
+                    });
+                });
+
+                // Save profile button
+                const saveProfileBtn = container.querySelector('#settings-save-profile');
+                if (saveProfileBtn) {
+                    saveProfileBtn.addEventListener('click', () => {
+                        saveProfileData(container);
+                    });
+                }
+
+                // Save notifications button
+                const saveNotificationsBtn = container.querySelector('#settings-save-notifications');
+                if (saveNotificationsBtn) {
+                    saveNotificationsBtn.addEventListener('click', () => {
+                        saveNotificationSettings(container);
+                    });
+                }
+
+                // Change password button
+                const changePasswordBtn = container.querySelector('#settings-change-password');
+                if (changePasswordBtn) {
+                    changePasswordBtn.addEventListener('click', () => {
+                        changePassword(container);
+                    });
+                }
+
+                // Save security settings button
+                const saveSecurityBtn = container.querySelector('#settings-save-security');
+                if (saveSecurityBtn) {
+                    saveSecurityBtn.addEventListener('click', () => {
+                        saveSecuritySettings(container);
+                    });
+                }
+
+                // Save preferences button
+                const savePreferencesBtn = container.querySelector('#settings-save-preferences');
+                if (savePreferencesBtn) {
+                    savePreferencesBtn.addEventListener('click', () => {
+                        savePreferences(container);
+                    });
+                }
+
+                // Delete account button
+                const deleteAccountBtn = container.querySelector('#settings-delete-account');
+                if (deleteAccountBtn) {
+                    deleteAccountBtn.addEventListener('click', () => {
+                        confirmDeleteAccount(container);
+                    });
+                }
+
+                // Upload avatar button
+                const uploadAvatarBtn = container.querySelector('#settings-upload-avatar');
+                if (uploadAvatarBtn) {
+                    uploadAvatarBtn.addEventListener('click', () => {
+                        // In a real implementation, this would open a file picker
+                        alert('This would open a file picker in a real implementation.');
+                    });
+                }
+            }
+
+            // Switch between tabs
+            function switchTab(tabName, container) {
+                activeTab = tabName;
+
+                // Update tab buttons
+                const tabs = container.querySelectorAll('.settings-tab');
+                tabs.forEach(tab => {
+                    if (tab.dataset.tab === tabName) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+
+                // Update tab content
+                const tabContents = container.querySelectorAll('.settings-tab-content');
+                tabContents.forEach(content => {
+                    if (content.id === `settings-${tabName}-tab`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            }
+
+            // Save profile data
+            function saveProfileData(container) {
+                // Get form values
+                const firstName = container.querySelector('#settings-first-name').value;
+                const lastName = container.querySelector('#settings-last-name').value;
+                const email = container.querySelector('#settings-email').value;
+                const phone = container.querySelector('#settings-phone').value;
+                const address = container.querySelector('#settings-address').value;
+                const city = container.querySelector('#settings-city').value;
+                const state = container.querySelector('#settings-state').value;
+                const zipCode = container.querySelector('#settings-zip').value;
+
+                // Update user data
+                userData.firstName = firstName;
+                userData.lastName = lastName;
+                userData.email = email;
+                userData.phone = phone;
+                userData.address = address;
+                userData.city = city;
+                userData.state = state;
+                userData.zipCode = zipCode;
+
+                // In a real app, you would send this data to the server
+
+                // Show success message
+                showSuccessMessage(container, 'Profile updated successfully!');
+            }
+
+            // Save notification settings
+            function saveNotificationSettings(container) {
+                // Get toggle values
+                const emailNotifications = container.querySelector('#settings-email-notifications').checked;
+                const smsNotifications = container.querySelector('#settings-sms-notifications').checked;
+                const disputeNotifications = container.querySelector('#settings-dispute-notifications').checked;
+                const creditNotifications = container.querySelector('#settings-credit-notifications').checked;
+                const promoNotifications = container.querySelector('#settings-promo-notifications').checked;
+
+                // Update user data
+                userData.notifications.email = emailNotifications;
+                userData.notifications.sms = smsNotifications;
+                userData.notifications.disputes = disputeNotifications;
+                userData.notifications.creditReport = creditNotifications;
+                userData.notifications.promotions = promoNotifications;
+
+                // In a real app, you would send this data to the server
+
+                // Show success message
+                showSuccessMessage(container, 'Notification preferences updated successfully!');
+            }
+
+            // Change password
+            function changePassword(container) {
+                // Get password values
+                const currentPassword = container.querySelector('#settings-current-password').value;
+                const newPassword = container.querySelector('#settings-new-password').value;
+                const confirmPassword = container.querySelector('#settings-confirm-password').value;
+
+                // Validate passwords
+                if (!currentPassword) {
+                    showErrorMessage(container, 'Please enter your current password.');
+                    return;
+                }
+
+                if (!newPassword) {
+                    showErrorMessage(container, 'Please enter a new password.');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    showErrorMessage(container, 'New passwords do not match.');
+                    return;
+                }
+
+                // In a real app, you would validate the current password and update the password on the server
+
+                // Clear password fields
+                container.querySelector('#settings-current-password').value = '';
+                container.querySelector('#settings-new-password').value = '';
+                container.querySelector('#settings-confirm-password').value = '';
+
+                // Show success message
+                showSuccessMessage(container, 'Password updated successfully!');
+            }
+
+            // Save security settings
+            function saveSecuritySettings(container) {
+                // Get security settings
+                const twoFactorAuth = container.querySelector('#settings-two-factor').checked;
+                const sessionTimeout = parseInt(container.querySelector('#settings-session-timeout').value);
+
+                // Update user data
+                userData.security.twoFactorAuth = twoFactorAuth;
+                userData.security.sessionTimeout = sessionTimeout;
+
+                // In a real app, you would send this data to the server
+
+                // Show success message
+                showSuccessMessage(container, 'Security settings updated successfully!');
+            }
+
+            // Save preferences
+            function savePreferences(container) {
+                // Get preference values
+                const language = container.querySelector('#settings-language').value;
+                const timezone = container.querySelector('#settings-timezone').value;
+
+                // Update user data
+                userData.language = language;
+                userData.timezone = timezone;
+
+                // In a real app, you would send this data to the server
+
+                // Show success message
+                showSuccessMessage(container, 'Preferences updated successfully!');
+            }
+
+            // Confirm account deletion
+            function confirmDeleteAccount(container) {
+                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                    // In a real app, you would send a request to delete the account
+                    alert('Account deletion request submitted. You will receive a confirmation email.');
+                }
+            }
+
+            // Show success message
+            function showSuccessMessage(container, message) {
+                // Remove any existing messages
+                removeMessages(container);
+
+                // Create success message element
+                const successMessage = document.createElement('div');
+                successMessage.className = 'settings-success-message';
+                successMessage.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>${message}</span>
+                `;
+
+                // Insert at the top of the active tab content
+                const activeTabContent = container.querySelector('.settings-tab-content.active');
+                if (activeTabContent) {
+                    activeTabContent.insertBefore(successMessage, activeTabContent.firstChild);
+
+                    // Auto-hide after 5 seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 5000);
+                }
+            }
+
+            // Show error message
+            function showErrorMessage(container, message) {
+                // Remove any existing messages
+                removeMessages(container);
+
+                // Create error message element
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'settings-error-message';
+                errorMessage.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${message}</span>
+                `;
+
+                // Insert at the top of the active tab content
+                const activeTabContent = container.querySelector('.settings-tab-content.active');
+                if (activeTabContent) {
+                    activeTabContent.insertBefore(errorMessage, activeTabContent.firstChild);
+
+                    // Auto-hide after 5 seconds
+                    setTimeout(() => {
+                        errorMessage.remove();
+                    }, 5000);
+                }
+            }
+
+            // Remove all message notifications
+            function removeMessages(container) {
+                const messages = container.querySelectorAll('.settings-success-message, .settings-error-message');
+                messages.forEach(message => message.remove());
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        // Expose the module globally
+        window.jamSettings = SettingsModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('settingsModuleLoaded'));
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Plan FAQ</title>
+    <style>
+        .plan-faq-container {
+            font-family: 'Montserrat', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .plan-faq-title {
+            color: #09ccfc;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .plan-faq-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .plan-faq-question {
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .plan-faq-answer {
+            display: none;
+            padding: 10px 0;
+        }
+
+        .plan-faq-answer.active {
+            display: block;
+        }
+    </style>
+    <script>
+        // Plan FAQ Module
+        const PlanFaqModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let expandedQuestions = [];
+
+            console.log('PlanFaqModule definition started');
+
+            // Try to restore state immediately when module is defined
+            try {
+                console.log('Attempting to restore PlanFaq state from sessionStorage');
+                const savedState = sessionStorage.getItem('jamPlanFaqState');
+                console.log('Retrieved savedState:', savedState);
+
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    console.log('Restored Plan FAQ state during module definition', parsedState);
+
+                    if (parsedState.isInitialized) {
+                        isInitialized = parsedState.isInitialized;
+                        console.log('Restored isInitialized:', isInitialized);
+                    }
+
+                    if (parsedState.expandedQuestions) {
+                        expandedQuestions = parsedState.expandedQuestions;
+                        console.log('Restored expandedQuestions:', expandedQuestions);
+                    }
+                } else {
+                    console.log('No saved state found for PlanFaq');
+                }
+            } catch (e) {
+                console.error('Error restoring Plan FAQ state during definition:', e);
+            }
+
+            // Initialize the module
+            function init(containerId) {
+                console.log('PlanFaq init called with container:', containerId);
+                console.log('Current isInitialized state:', isInitialized);
+
+                // Debug DOM structure
+                console.log('Current DOM structure:', document.body.innerHTML.substring(0, 500) + '...');
+
+                const container = document.getElementById(containerId);
+                console.log('Container found:', !!container);
+
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    console.log('Available containers:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
+                    return false;
+                }
+
+                // Check container visibility
+                const containerStyle = window.getComputedStyle(container);
+                console.log('Container visibility:', {
+                    display: containerStyle.display,
+                    visibility: containerStyle.visibility,
+                    height: containerStyle.height,
+                    width: containerStyle.width,
+                    position: containerStyle.position
+                });
+
+                // Only initialize once unless reset
+                if (isInitialized) {
+                    console.log('PlanFaq Module already initialized, skipping initialization');
+
+                    // Debug: Check if content is already there
+                    console.log('Current container content:', container.innerHTML.substring(0, 200) + '...');
+
+                    // Force re-render if container is empty or contains loading spinner
+                    if (!container.innerHTML.trim() ||
+                        container.innerHTML.includes('pricing-loading') ||
+                        container.innerHTML.includes('Loading FAQs')) {
+                        console.log('Container has loading spinner or is empty despite module being initialized, forcing re-render');
+                        isInitialized = false;
+                    } else {
+                        return true;
+                    }
+                }
+
+                console.log('Initializing PlanFaq module with content');
+
+                // Enhanced FAQ content with more questions
+                container.innerHTML = `
+                    <div class="plan-faq-container">
+                        <h2 class="plan-faq-title">Frequently Asked Questions</h2>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                How long does credit repair take?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                Most clients see initial results within 30-45 days, with significant improvements 
+                                typically occurring within 3-6 months. Some complex cases may take longer. Your dashboard 
+                                will show estimated timelines based on your specific situation.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                What's included in each plan?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                The DIY plan provides you with all the tools and resources to repair your credit yourself.
+                                The Guided plan adds expert support and strategy sessions to help you along the way. 
+                                The Full-Service plan is our white-glove service where we handle everything for you - from
+                                writing and sending dispute letters to following up with creditors and credit bureaus.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                Can I cancel my subscription at any time?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                Yes, all our paid plans can be canceled at any time with no cancellation fees. You'll continue
+                                to have access to your plan features until the end of your current billing cycle. The Free plan
+                                never expires and requires no payment information.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                Is there a guarantee for credit score improvement?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                While we cannot legally guarantee specific point increases (no credit repair company can),
+                                our methods have helped thousands of clients improve their credit scores. Results vary based on
+                                your unique credit situation and how actively you participate in the recommended actions
+                                during the repair process.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                What do I need to provide to get started?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                Just two things: a credit monitoring account (we'll give you 3 trusted options to choose from) 
+                                and ID verification (license + utility bill). We'll walk you through it all during the onboarding process.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                How do I know which items to dispute on my credit report?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                JAM Engine analyzes your credit report and highlights potential errors or discrepancies. 
+                                Items that are inaccurate, outdated, unverifiable, or improperly reported are good candidates 
+                                for disputes. Your credit specialist can also provide personalized recommendations.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                Do you offer a money-back guarantee?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                Yes, we offer a money-back guarantee that requires a minimum commitment of 6 consecutive months.
+                                Credit repair is a process that takes time, and meaningful results typically begin to appear 
+                                after several rounds of disputes. To qualify, you must actively participate in the program and 
+                                follow our recommendations.
+                            </div>
+                        </div>
+                        <div class="plan-faq-item">
+                            <div class="plan-faq-question">
+                                Is my information safe with your service?
+                                <span>+</span>
+                            </div>
+                            <div class="plan-faq-answer">
+                                Yes, we use bank-level encryption and security measures to protect your personal information.
+                                We also include identity theft protection features as part of our service, giving you additional
+                                peace of mind while working on your credit repair.
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                console.log('Content added to container, setting up event listeners');
+
+                // Add click handlers with state persistence
+                const questions = container.querySelectorAll('.plan-faq-question');
+                console.log('Found questions:', questions.length);
+
+                questions.forEach((question, index) => {
+                    question.addEventListener('click', function () {
+                        console.log('Question clicked:', index);
+                        const answer = this.nextElementSibling;
+                        answer.classList.toggle('active');
+                        this.querySelector('span').textContent =
+                            answer.classList.contains('active') ? '-' : '+';
+
+                        // Update expanded questions array
+                        const isExpanded = answer.classList.contains('active');
+                        const questionIndex = expandedQuestions.indexOf(index);
+
+                        if (isExpanded && questionIndex === -1) {
+                            expandedQuestions.push(index);
+                        } else if (!isExpanded && questionIndex !== -1) {
+                            expandedQuestions.splice(questionIndex, 1);
+                        }
+
+                        console.log('Updated expandedQuestions:', expandedQuestions);
+
+                        // Save state
+                        saveState();
+                    });
+
+                    // Restore expanded state
+                    if (expandedQuestions.includes(index)) {
+                        console.log('Restoring expanded state for question:', index);
+                        const answer = question.nextElementSibling;
+                        answer.classList.add('active');
+                        question.querySelector('span').textContent = '-';
+                    }
+                });
+
+                isInitialized = true;
+                saveState();
+                console.log('PlanFaq module initialized successfully');
+                return true;
+            }
+
+            // Add this function to save state to sessionStorage
+            function saveState() {
+                try {
+                    const state = {
+                        isInitialized: isInitialized,
+                        expandedQuestions: expandedQuestions
+                    };
+                    sessionStorage.setItem('jamPlanFaqState', JSON.stringify(state));
+                    console.log('Saved Plan FAQ state to session storage', state);
+                } catch (e) {
+                    console.error('Error saving Plan FAQ state:', e);
+                }
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                console.log('PlanFaq reset called');
+                isInitialized = false;
+                expandedQuestions = [];
+                try {
+                    sessionStorage.removeItem('jamPlanFaqState');
+                    console.log('Cleared PlanFaq state from sessionStorage');
+                } catch (e) {
+                    console.error('Error clearing Plan FAQ state:', e);
+                }
+                console.log('PlanFaq module reset');
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        console.log('PlanFaqModule defined, exposing globally');
+
+        // Expose the module globally - IMPORTANT: This needs to match what PricingTiers expects
+        window.jamPlanFaq = PlanFaqModule;
+        console.log('Exposed as window.jamPlanFaq:', !!window.jamPlanFaq);
+
+        // Also expose as PricingFAQ to handle the mismatch in the PricingTiers module
+        window.jamPricingFAQ = PlanFaqModule;
+        console.log('Exposed as window.jamPricingFAQ:', !!window.jamPricingFAQ);
+
+        // Add a more robust reload mechanism
+        window.addEventListener('pageshow', function (event) {
+            // pageshow fires when the page is shown, including from bfcache
+            if (event.persisted) {
+                console.log('Page was restored from bfcache, reinitializing Plan FAQ module');
+                const container = document.getElementById('plan-faq-container');
+                if (container && window.jamPlanFaq) {
+                    window.jamPlanFaq.init('plan-faq-container');
+                }
+            }
+        });
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM content loaded, checking for Plan FAQ container');
+            const container = document.getElementById('plan-faq-container');
+            if (container && window.jamPlanFaq) {
+                console.log('Found Plan FAQ container, initializing');
+                window.jamPlanFaq.init('plan-faq-container');
+            }
+        });
+
+        // Signal that the module is loaded - with both event names to handle the mismatch
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamPlanFaqLoaded'));
+            window.dispatchEvent(new CustomEvent('jamPricingFAQLoaded'));
+        }
+    </script>
+</head>
+
+</html>

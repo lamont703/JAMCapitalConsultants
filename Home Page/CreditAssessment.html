@@ -1,0 +1,1530 @@
+<!-- Add viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Styles -->
+<style>
+    /* Quiz Button Styles */
+    .quiz-button-container {
+        margin: 1rem auto;
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    .credit-quiz-btn {
+        background-color: #09ccfc;
+        color: #FFFFFF;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        border: none;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    .credit-quiz-btn:hover {
+        background-color: #08b6e2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(9, 204, 252, 0.2);
+    }
+
+    .credit-quiz-btn .subtext {
+        font-size: 0.875rem;
+        font-weight: 400;
+        opacity: 0.9;
+    }
+
+    .quiz-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(9, 204, 252, 0.4) 100%);
+        z-index: 1000;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        background: linear-gradient(to bottom, #ffffff, #f8fdff);
+        padding: 1.5rem;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+        width: 92%;
+        max-width: 800px;
+        height: 92vh;
+        border-radius: 12px;
+        margin: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 1px rgba(9, 204, 252, 0.5);
+        animation: modalFadeIn 0.4s ease;
+        border: 1px solid rgba(9, 204, 252, 0.1);
+    }
+
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .close-button {
+        position: fixed;
+        top: max(env(safe-area-inset-top), 0.75rem);
+        right: 0.75rem;
+        padding: 0.75rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        transition: all 0.3s ease;
+        z-index: 1001;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .close-button:hover {
+        color: #000;
+        background-color: #fff;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 639px) {
+        .quiz-button-container {
+            margin: 0.5rem auto;
+            padding: 0 0.75rem;
+        }
+
+        .credit-quiz-btn {
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+        }
+
+        .credit-quiz-btn .subtext {
+            font-size: 0.813rem;
+        }
+
+        .modal-content {
+            padding: 1rem;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        .quiz-container {
+            padding: 0;
+        }
+
+        .options-grid {
+            padding: 0;
+        }
+
+        .question-title {
+            padding: 0;
+        }
+
+        .quiz-navigation {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 -1rem;
+        }
+
+        .nav-btn {
+            min-height: 44px;
+            flex: 1;
+            font-size: 0.938rem;
+        }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        .modal-content {
+            height: -webkit-fill-available;
+        }
+
+        .quiz-navigation {
+            padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+        }
+    }
+
+    /* Enhanced Quiz Container Styling */
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        box-sizing: border-box;
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(145deg, #ffffff, #f8fdff);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(9, 204, 252, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Add decorative accent elements */
+    .quiz-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #09ccfc, #08b6e2);
+    }
+
+    /* Add subtle background pattern */
+    .quiz-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background-image: radial-gradient(circle, rgba(9, 204, 252, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        z-index: 0;
+        opacity: 0.5;
+    }
+
+    /* Enhanced question title with decorative underline */
+    .question-title {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        padding: 0 1rem;
+        color: #2c3e50;
+        position: relative;
+    }
+
+    .question-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #09ccfc, #08b6e2);
+        border-radius: 3px;
+    }
+
+    .options-grid {
+        display: grid;
+        gap: 1rem;
+        padding: 0;
+        margin-bottom: 2rem;
+        box-sizing: border-box;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Add subtle glow effect to selected options */
+    .option-btn.selected {
+        border-color: #09ccfc;
+        background: linear-gradient(145deg, #e6f7fa, #d9f4fa);
+        position: relative;
+        box-shadow: 0 3px 10px rgba(9, 204, 252, 0.2);
+    }
+
+    .option-btn.selected::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 12px;
+        padding: 1px;
+        background: linear-gradient(45deg, #09ccfc, #08b6e2, #09ccfc);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.8;
+    }
+
+    /* Add subtle color to option icons */
+    .option-icon {
+        font-size: 1.75rem;
+        min-width: 2.5rem;
+        text-align: center;
+        background: linear-gradient(135deg, #09ccfc, #08b6e2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+    }
+
+    /* Add animated progress bar */
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: var(--progress, 0%);
+        background: linear-gradient(90deg, #09ccfc, #08b6e2);
+        transition: width 0.5s ease;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(9, 204, 252, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(9, 204, 252, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 5px rgba(9, 204, 252, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(9, 204, 252, 0);
+        }
+    }
+
+    /* Add subtle color to form inputs */
+    .form-input {
+        width: 100%;
+        padding: 1.125rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #09ccfc;
+        box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.15);
+        background-color: #fff;
+    }
+
+    /* Add subtle gradient to quiz steps */
+    .quiz-step {
+        position: relative;
+        z-index: 1;
+        background: linear-gradient(145deg, #ffffff, #fafeff);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    /* Add subtle color to success message */
+    .success-message h2 {
+        background: linear-gradient(90deg, #008080, #09ccfc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+    }
+
+    /* Add subtle animation to CTA buttons */
+    .cta-button {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-button::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%) rotate(45deg);
+        }
+
+        100% {
+            transform: translateX(100%) rotate(45deg);
+        }
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 639px) {
+        .quiz-container::before {
+            height: 3px;
+        }
+
+        .quiz-container::after {
+            width: 100px;
+            height: 100px;
+            opacity: 0.3;
+        }
+
+        .question-title::after {
+            width: 40px;
+            height: 2px;
+        }
+    }
+
+    .progress-container {
+        margin: 1.5rem 0 2.5rem;
+        padding: 0 1.5rem;
+    }
+
+    .progress-bar {
+        height: 10px;
+        background: linear-gradient(to right, #f0f0f0, #e6f7fa);
+        border-radius: 6px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-text {
+        display: block;
+        text-align: center;
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .option-btn {
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .option-btn:hover {
+        border-color: #09ccfc;
+        background: linear-gradient(145deg, #f7fafa, #e6f7fa);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(9, 204, 252, 0.15);
+    }
+
+    .option-text {
+        font-size: 1.1rem;
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .nav-btn {
+        padding: 0.875rem 1.75rem;
+        border-radius: 30px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        flex: 0 0 auto;
+    }
+
+    #prevBtn {
+        margin-right: auto;
+        background-color: #f5f5f5;
+        color: #555;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    #prevBtn:hover {
+        background-color: #e8e8e8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #nextBtn {
+        margin-left: auto;
+        background: linear-gradient(to right, #09ccfc, #08b6e2);
+        color: white;
+        box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
+    }
+
+    #nextBtn:hover {
+        background: linear-gradient(to right, #08b6e2, #07a3ca);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(9, 204, 252, 0.4);
+    }
+
+    #nextBtn:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Form Styles */
+    .contact-form {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+
+    .form-input::placeholder {
+        color: #aaa;
+    }
+
+    /* Success Message */
+    .success-message {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(145deg, #ffffff, #f8fdff);
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .success-message h2 {
+        color: #008080;
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive Breakpoints */
+    @media (min-width: 640px) {
+        .options-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .question-title {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 639px) {
+        .modal-content {
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            border-radius: 0;
+            padding: 1rem;
+        }
+
+        .question-title {
+            font-size: 1.25rem;
+        }
+
+        .option-btn {
+            padding: 0.875rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    .primary-button {
+        background-color: #09ccfc;
+        color: white;
+    }
+
+    .primary-button:hover {
+        background-color: #08b6e2;
+    }
+
+    .secondary-button {
+        background-color: #fff;
+        color: #09ccfc;
+        border: 2px solid #09ccfc;
+    }
+
+    .secondary-button:hover {
+        background-color: #f0f7f7;
+    }
+
+    /* Add gradient to CTA options */
+    .cta-option {
+        background: linear-gradient(145deg, #ffffff, #f8f8f8);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .cta-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(145deg, #ffffff, #f0f7f7);
+    }
+
+    .cta-option.primary {
+        border-left: 4px solid #09ccfc;
+    }
+
+    .cta-option.secondary {
+        border-left: 4px solid #08b6e2;
+    }
+
+    /* Enhanced styling for the bottom image container */
+    .quiz-bottom-image-container {
+        width: 100%;
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(9, 204, 252, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .quiz-bottom-image {
+        max-width: 500px;
+        width: 80%;
+        height: auto;
+        opacity: 0.9;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        transition: all 0.3s ease;
+    }
+
+    .quiz-bottom-image:hover {
+        transform: translateY(-5px);
+        filter: drop-shadow(0 6px 10px rgba(9, 204, 252, 0.2));
+    }
+
+    .quiz-bottom-text {
+        font-size: 1rem;
+        color: #666;
+        margin-top: 0.75rem;
+        font-style: italic;
+    }
+
+    /* Improved quiz navigation layout */
+    .quiz-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(248, 253, 255, 0.95));
+        border-top: 1px solid rgba(9, 204, 252, 0.1);
+        margin-top: 1.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .nav-btn {
+        padding: 0.875rem 1.75rem;
+        border-radius: 30px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        flex: 0 0 auto;
+    }
+
+    #prevBtn {
+        margin-right: auto;
+        background-color: #f5f5f5;
+        color: #555;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    #nextBtn {
+        margin-left: auto;
+        background: linear-gradient(to right, #09ccfc, #08b6e2);
+        color: white;
+        box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 639px) {
+        .quiz-bottom-image-container {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-bottom-image {
+            max-width: 280px;
+            width: 90%;
+        }
+
+        .quiz-bottom-text {
+            font-size: 0.85rem;
+        }
+
+        .quiz-navigation {
+            padding: 1rem;
+            margin: 0 -1rem;
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1rem;
+            min-width: 100px;
+            font-size: 0.938rem;
+        }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        .quiz-navigation {
+            padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+        }
+    }
+</style>
+
+<!-- HTML Content -->
+<div class="quiz-button-container">
+    <!-- Main Button -->
+    <button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
+        Start My AI Credit Assessment
+        <span class="subtext">Find out exactly what's holding your credit score back.</span>
+    </button>
+</div>
+
+<!-- Modal with Quiz Content -->
+<div id="nav-quizModal" class="quiz-modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <!-- Quiz Content Structure -->
+        <div id="quizContent" class="quiz-container">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="quizProgress"></div>
+                <span class="progress-text">Progress: <span id="progressPercentage">0%</span></span>
+            </div>
+
+            <!-- Quiz Steps Container -->
+            <div class="quiz-steps" id="quizSteps">
+                <!-- Step 1 -->
+                <div class="quiz-step" data-step="1">
+                    <h2 class="question-title">Which best describes your current credit situation?</h2>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="no_credit">
+                            <span class="option-icon">📊</span>
+                            <span class="option-text">I have no credit history</span>
+                        </button>
+                        <button class="option-btn" data-value="below_580">
+                            <span class="option-icon">📉</span>
+                            <span class="option-text">My score is below 580</span>
+                        </button>
+                        <button class="option-btn" data-value="580_669">
+                            <span class="option-icon">📈</span>
+                            <span class="option-text">My score is between 580-669</span>
+                        </button>
+                        <button class="option-btn" data-value="670_739">
+                            <span class="option-icon">📊</span>
+                            <span class="option-text">My score is between 670-739</span>
+                        </button>
+                        <button class="option-btn" data-value="above_740">
+                            <span class="option-icon">🌟</span>
+                            <span class="option-text">My score is above 740</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="quiz-step" data-step="2" style="display: none;">
+                    <h2 class="question-title">What's your main credit goal right now?</h2>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="buy_home">
+                            <span class="option-icon">🏠</span>
+                            <span class="option-text">Buy a home</span>
+                        </button>
+                        <button class="option-btn" data-value="new_car">
+                            <span class="option-icon">🚗</span>
+                            <span class="option-text">Get a new car</span>
+                        </button>
+                        <button class="option-btn" data-value="credit_card">
+                            <span class="option-icon">💳</span>
+                            <span class="option-text">Get a credit card or loan</span>
+                        </button>
+                        <button class="option-btn" data-value="improve_score">
+                            <span class="option-icon">📈</span>
+                            <span class="option-text">Improve my credit score overall</span>
+                        </button>
+                        <button class="option-btn" data-value="remove_negative">
+                            <span class="option-icon">🎯</span>
+                            <span class="option-text">Remove negative items from my report</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="quiz-step" data-step="3" style="display: none;">
+                    <h2 class="question-title">How many active credit cards or loans do you currently have?</h2>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="none">
+                            <span class="option-icon">0️⃣</span>
+                            <span class="option-text">None</span>
+                        </button>
+                        <button class="option-btn" data-value="1-2">
+                            <span class="option-icon">1️⃣</span>
+                            <span class="option-text">1–2</span>
+                        </button>
+                        <button class="option-btn" data-value="3-5">
+                            <span class="option-icon">3️⃣</span>
+                            <span class="option-text">3–5</span>
+                        </button>
+                        <button class="option-btn" data-value="6+">
+                            <span class="option-icon">6️⃣</span>
+                            <span class="option-text">6 or more</span>
+                        </button>
+                        <button class="option-btn" data-value="not_sure">
+                            <span class="option-icon">❓</span>
+                            <span class="option-text">Not sure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="quiz-step" data-step="4" style="display: none;">
+                    <h2 class="question-title">Have you checked your credit report in the last 6 months?</h2>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="yes">
+                            <span class="option-icon">✅</span>
+                            <span class="option-text">Yes</span>
+                        </button>
+                        <button class="option-btn" data-value="no">
+                            <span class="option-icon">❌</span>
+                            <span class="option-text">No</span>
+                        </button>
+                        <button class="option-btn" data-value="not_sure">
+                            <span class="option-icon">❓</span>
+                            <span class="option-text">I'm not sure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="quiz-step" data-step="5" style="display: none;">
+                    <h2 class="question-title">Which of these credit issues applies to you?</h2>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="late_payments">
+                            <span class="option-icon">⏰</span>
+                            <span class="option-text">Late payments</span>
+                        </button>
+                        <button class="option-btn" data-value="collections">
+                            <span class="option-icon">📑</span>
+                            <span class="option-text">Collections accounts</span>
+                        </button>
+                        <button class="option-btn" data-value="high_balances">
+                            <span class="option-icon">💰</span>
+                            <span class="option-text">High credit card balances</span>
+                        </button>
+                        <button class="option-btn" data-value="bankruptcy">
+                            <span class="option-icon">⚖️</span>
+                            <span class="option-text">Bankruptcy</span>
+                        </button>
+                        <button class="option-btn" data-value="no_issues">
+                            <span class="option-icon">✨</span>
+                            <span class="option-text">No major issues — just want to improve</span>
+                        </button>
+                        <button class="option-btn" data-value="not_sure">
+                            <span class="option-icon">❓</span>
+                            <span class="option-text">Not sure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="quiz-step" data-step="6" style="display: none;">
+                    <h2 class="question-title">Would you be interested in expert help to fix your credit faster?</h2>
+                    <div class="options-grid">
+                        <button class="option-btn" data-value="very_interested">
+                            <span class="option-icon">🎯</span>
+                            <span class="option-text">Yes, I'm very interested</span>
+                        </button>
+                        <button class="option-btn" data-value="maybe">
+                            <span class="option-icon">🤔</span>
+                            <span class="option-text">Maybe, tell me more</span>
+                        </button>
+                        <button class="option-btn" data-value="not_now">
+                            <span class="option-icon">📚</span>
+                            <span class="option-text">Not right now, just exploring</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 7 (Final) -->
+                <div class="quiz-step" data-step="7" style="display: none;">
+                    <h2 class="question-title">Where should we send your personalized guide?</h2>
+                    <div class="contact-form">
+                        <div class="form-group">
+                            <input type="text" id="name" class="form-input" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" class="form-input" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" class="form-input" placeholder="Phone Number (Optional)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="quiz-navigation">
+                <button id="prevBtn" class="nav-btn" style="display: none;">Previous</button>
+                <button id="nextBtn" class="nav-btn">Next</button>
+            </div>
+
+            <!-- Add this right before the quiz navigation div -->
+            <div class="quiz-bottom-image-container">
+                <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/681c0f1ae17a08c0aa28f040.png"
+                    alt="JAM ENGINE" class="quiz-bottom-image">
+                <p class="quiz-bottom-text">Powered by JAM ENGINE</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all quiz buttons instead of just one
+        const quizButtons = document.querySelectorAll('.credit-quiz-btn');
+        const quizModal = document.querySelector('#nav-quizModal');
+        const closeButton = document.querySelector('.close-button');
+
+        let currentStep = 1;
+        const totalSteps = 7;
+        // Make quizData global so it can be accessed by submitQuiz
+        window.quizData = {};
+
+        // Modal Functions
+        function handleQuizStart(e) {
+            e.preventDefault();
+            try {
+                if (typeof analytics !== 'undefined') {
+                    analytics.track('CreditQuizStarted', {
+                        location: 'Hero Section',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+
+                if (quizModal) {
+                    quizModal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    // Prevent bounce scroll on iOS
+                    document.body.style.position = 'fixed';
+                    document.body.style.width = '100%';
+                    showStep(1);
+                }
+            } catch (error) {
+                console.error('Error handling quiz start:', error);
+            }
+        }
+
+        // Make closeQuizModal accessible globally
+        window.closeQuizModal = function () {
+            if (quizModal) {
+                quizModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                document.body.style.position = '';
+                document.body.style.width = '';
+            }
+        };
+
+        // Quiz Functions
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
+            document.querySelector('.progress-bar').style.setProperty('--progress', `${progress}%`);
+        }
+
+        function handleOptionSelect(e) {
+            const button = e.target.closest('.option-btn');
+            if (!button) return;
+
+            // Get the current step element and clear other selections
+            const currentStepEl = button.closest('.quiz-step');
+            currentStepEl.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Add selected class and store the selection
+            button.classList.add('selected');
+            document.getElementById('nextBtn').disabled = false;
+
+            // Store the selection in quizData
+            const stepNumber = currentStepEl.dataset.step;
+            window.quizData[`question_${stepNumber}`] = button.dataset.value;
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.quiz-step').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            const stepEl = document.querySelector(`[data-step="${step}"]`);
+            if (stepEl) {
+                stepEl.style.display = 'block';
+
+                // Only check for selected option if not on the final form step
+                if (step < totalSteps) {
+                    const selectedOption = stepEl.querySelector('.option-btn.selected');
+                    document.getElementById('nextBtn').disabled = !selectedOption;
+                } else {
+                    // Enable the submit button on the final step
+                    document.getElementById('nextBtn').disabled = false;
+                }
+            }
+
+            document.getElementById('prevBtn').style.display = step > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').textContent = step === totalSteps ? 'Submit' : 'Next';
+
+            updateProgress();
+        }
+
+        // Add form input validation
+        document.addEventListener('input', function (e) {
+            if (e.target.matches('#name, #email')) {
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const nextBtn = document.getElementById('nextBtn');
+
+                // Enable submit button only if both name and email are filled
+                if (currentStep === totalSteps) {
+                    nextBtn.disabled = !(name && email);
+                }
+            }
+        });
+
+        // Event Listeners
+        // Add event listener to all quiz buttons instead of just one
+        quizButtons.forEach(button => {
+            button.addEventListener('click', handleQuizStart);
+        });
+
+        closeButton.addEventListener('click', window.closeQuizModal);
+
+        document.getElementById('quizSteps').addEventListener('click', function (e) {
+            const button = e.target.closest('.option-btn');
+            if (button) {
+                handleOptionSelect(e);
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                submitQuiz();
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function (event) {
+            if (event.target === quizModal) {
+                window.closeQuizModal();
+            }
+        });
+    });
+
+    function showCalendarEmbed() {
+        const quizContent = document.getElementById('quizContent');
+        quizContent.innerHTML = `
+        <div class="calendar-container">
+            <button class="back-button" onclick="showSuccessMessage()">← Back</button>
+            <iframe 
+                src="https://api.leadconnectorhq.com/widget/booking/aI0peBKAcSgXeFySGo0P" 
+                style="width: 100%; border:none; overflow: hidden;" 
+                scrolling="no" 
+                id="aI0peBKAcSgXeFySGo0P_1745962492010">
+            </iframe>
+        </div>
+    `;
+
+        // Add the required script
+        const script = document.createElement('script');
+        script.src = "https://api.leadconnectorhq.com/js/form_embed.js";
+        script.type = "text/javascript";
+        document.body.appendChild(script);
+
+        // Add styles for the calendar view
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+        .calendar-container {
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: #e0e0e0;
+        }
+
+        iframe {
+            min-height: 700px;
+            margin-top: 3rem;
+        }
+    `;
+        document.head.appendChild(styleElement);
+    }
+
+    // Add this new function to show the blueprint steps
+    function showBlueprintSteps() {
+        const quizContent = document.getElementById('quizContent');
+        quizContent.innerHTML = `
+        <div class="blueprint-container">
+            <button class="back-button" onclick="showSuccessMessage()">← Back</button>
+            
+            <div class="blueprint-content">
+                <h2>How Our AI-Backed Credit Repair Blueprint Works</h2>
+                
+                <div class="step-viewer">
+                    <!-- Step 1 -->
+                    <div class="blueprint-step active" data-blueprint-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Take Your Free AI Credit Quiz</h3>
+                            <p>Discover what's holding your score back and get your personalized game plan.</p>
+                            <div class="step-status">✓ Completed</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="blueprint-step" data-blueprint-step="2" style="display: none;">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Book Your Free Strategy Call</h3>
+                            <p>Talk with a Credit Expert to review your quiz results and build your action plan.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="blueprint-step" data-blueprint-step="3" style="display: none;">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Choose Your Credit Monitoring Service</h3>
+                            <p>Pick one of our recommended platforms (Smart Credit, IdentityIQ, or MyScoreIQ) to track your real-time credit updates.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="blueprint-step" data-blueprint-step="4" style="display: none;">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Submit Your Verification Documents</h3>
+                            <p>Upload your driver's license and a utility bill for ID verification (quick and secure).</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="blueprint-step" data-blueprint-step="5" style="display: none;">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Watch the Magic Happen</h3>
+                            <p>We handle the disputes. You monitor your credit improvements every month — powered by our expert team and AI-guided systems.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="blueprint-navigation">
+                    <div class="step-progress">Step <span id="currentBlueprintStep">1</span> of 5</div>
+                    <button id="nextBlueprintStep" class="cta-button primary-button">
+                        See Next Step
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+        // Add styles for the blueprint view
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+        .blueprint-container {
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .blueprint-content {
+            padding-top: 3rem;
+        }
+
+        .blueprint-content h2 {
+            color: #008080;
+            font-size: 1.75rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .step-viewer {
+            margin: 2rem 0;
+            min-height: 200px;
+        }
+
+        .blueprint-step {
+            display: flex;
+            gap: 1rem;
+            padding: 2rem;
+            background: #f8f8f8;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .blueprint-step.active {
+            background: #e6f3f3;
+        }
+
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            background: #008080;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            color: #008080;
+            margin: 0 0 1rem 0;
+            font-size: 1.3rem;
+        }
+
+        .step-content p {
+            margin: 0;
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .step-status {
+            color: #008080;
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .blueprint-navigation {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .step-progress {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 639px) {
+            .blueprint-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .blueprint-step {
+                padding: 1.5rem;
+            }
+
+            .step-content h3 {
+                font-size: 1.1rem;
+            }
+
+            .step-content p {
+                font-size: 1rem;
+            }
+
+            .step-number {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1rem;
+            }
+        }
+    `;
+        document.head.appendChild(styleElement);
+
+        // Add navigation functionality
+        let currentStep = 1;
+        const totalSteps = 5;
+        const nextButton = document.getElementById('nextBlueprintStep');
+
+        nextButton.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                // Hide current step
+                document.querySelector(`[data-blueprint-step="${currentStep}"]`).style.display = 'none';
+
+                // Show next step
+                currentStep++;
+                const nextStepEl = document.querySelector(`[data-blueprint-step="${currentStep}"]`);
+                nextStepEl.style.display = 'flex';
+
+                // Update progress
+                document.getElementById('currentBlueprintStep').textContent = currentStep;
+
+                // Update button on last step
+                if (currentStep === totalSteps) {
+                    const navigationDiv = document.querySelector('.blueprint-navigation');
+                    navigationDiv.innerHTML = `
+                    <div class="step-progress">Step <span id="currentBlueprintStep">5</span> of 5</div>
+                    <h3 class="ready-text">Ready to Start?</h3>
+                    <button id="nextBlueprintStep" class="cta-button primary-button" onclick="showCalendarEmbed()">
+                        Book My Free Strategy Call Now
+                    </button>
+                `;
+                }
+            }
+        });
+
+        // Add this CSS to the styleElement.textContent string
+        styleElement.textContent += `
+        .ready-text {
+            color: #008080;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+
+        @media (max-width: 639px) {
+            .ready-text {
+                font-size: 1.1rem;
+            }
+        }
+    `;
+    }
+
+    // Update the successMessageHTML to use the new showBlueprintSteps function
+    const successMessageHTML = `
+    <div class="success-message">
+        <h2>You're One Step Closer to Your 800 Credit Score!</h2>
+        <p class="success-subheadline">Your Personalized Guide is on its way to your inbox — but why stop there? Let's get you real results even faster. Choose your next step below:</p>
+        
+        <div class="cta-container">
+            <!-- Primary CTA -->
+            <div class="cta-option primary">
+                <button class="cta-button primary-button" onclick="showCalendarEmbed()">
+                    Book My Free Strategy Call
+                </button>
+                <p class="cta-description">Talk one-on-one with a Credit Consultant who can review your quiz results and map out your personalized game plan.</p>
+            </div>
+
+            <!-- Secondary CTA -->
+            <div class="cta-option secondary">
+                <button class="cta-button secondary-button" onclick="showBlueprintSteps()">
+                    See How Our Blueprint Works
+                </button>
+                <p class="cta-description">Want to skip the guesswork? See how JAM Capital Consultants uses AI and expert strategies to help clients boost their scores faster than ever.</p>
+            </div>
+        </div>
+
+        <p class="soft-message">Not ready yet? No problem! Your free guide is on the way — check your inbox within a few minutes.</p>
+    </div>
+  `;
+
+    // Function to show the success message
+    function showSuccessMessage() {
+        const quizContent = document.getElementById('quizContent');
+        quizContent.innerHTML = successMessageHTML;
+    }
+
+    function submitQuiz() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+
+        if (!name || !email) {
+            alert('Please fill in your name and email to receive your personalized guide.');
+            return;
+        }
+
+        // Combine form data with quiz answers
+        const finalData = {
+            ...window.quizData,
+            name,
+            email,
+            phone,
+            timestamp: new Date().toISOString()
+        };
+
+        // Track completion
+        if (typeof analytics !== 'undefined') {
+            analytics.track('CreditQuizCompleted', finalData);
+        }
+
+        // Show the success message
+        showSuccessMessage();
+
+        // Add the existing success message styles
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+      .success-message {
+        text-align: center;
+        padding: 2rem 1rem;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .success-message h2 {
+        color: #008080;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+      }
+
+      .success-subheadline {
+        font-size: 1.1rem;
+        line-height: 1.5;
+        color: #333;
+        margin-bottom: 2rem;
+      }
+
+      .cta-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .cta-option {
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: #f8f8f8;
+        transition: transform 0.2s ease;
+      }
+
+      .cta-option:hover {
+        transform: translateY(-2px);
+      }
+
+      .cta-button {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 1rem;
+      }
+
+      .primary-button {
+        background-color: #09ccfc;
+        color: white;
+      }
+
+      .primary-button:hover {
+        background-color: #08b6e2;
+      }
+
+      .secondary-button {
+        background-color: #fff;
+        color: #09ccfc;
+        border: 2px solid #09ccfc;
+      }
+
+      .secondary-button:hover {
+        background-color: #f0f7f7;
+      }
+
+      .cta-description {
+        font-size: 0.95rem;
+        color: #666;
+        line-height: 1.4;
+        margin: 0;
+      }
+
+      .soft-message {
+        color: #888;
+        font-size: 0.9rem;
+        margin-top: 2rem;
+      }
+
+      @media (max-width: 639px) {
+        .success-message h2 {
+          font-size: 1.5rem;
+        }
+
+        .success-subheadline {
+          font-size: 1rem;
+        }
+
+        .cta-container {
+          gap: 1rem;
+        }
+
+        .cta-option {
+          padding: 1rem;
+        }
+      }
+    `;
+        document.head.appendChild(styleElement);
+    }
+</script>

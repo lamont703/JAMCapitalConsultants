@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM Credit Solutions - Pricing Plans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Pricing Container Styles */
+        .pricing-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .pricing-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Pricing Plans Grid - UPDATED FOR ONE PLAN PER ROW */
+        .pricing-plans {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Plan container styling - UPDATED */
+        .pricing-plan-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pricing-plan-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading indicator */
+        .pricing-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .pricing-loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #09ccfc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error message */
+        .pricing-error-message {
+            background-color: #fff3f3;
+            border-left: 4px solid #dc3545;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #dc3545;
+            border-radius: 4px;
+        }
+
+        .pricing-error-message i {
+            margin-right: 0.5rem;
+        }
+
+        /* Modal styles */
+        .pricing-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pricing-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .pricing-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .pricing-modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #09ccfc;
+            text-align: center;
+        }
+
+        .pricing-modal-features {
+            list-style-type: none;
+            margin: 1.5rem 0;
+        }
+
+        .pricing-modal-features li {
+            margin-bottom: 0.8rem;
+            display: flex;
+        }
+
+        .pricing-modal-features li i {
+            color: #28a745;
+            margin-right: 0.5rem;
+            margin-top: 0.3rem;
+        }
+
+        .pricing-modal-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .pricing-modal-actions {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .pricing-select-btn {
+            display: inline-block;
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .pricing-select-btn:hover {
+            background-color: #08b6e2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(9, 204, 252, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- No HTML content needed here as it's generated by the script -->
+    <script>
+        // Pricing Tiers Module
+        const PricingTiersModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let selectedPlan = null;
+            let loadedModules = {};
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                // Only initialize once unless reset
+                if (isInitialized) {
+                    console.log('Pricing Tiers Module already initialized');
+                    return true;
+                }
+
+                console.log('Initializing Pricing Tiers Module');
+
+                // Try to restore state
+                restoreModuleState();
+
+                container.innerHTML = `
+                    <div class="pricing-container">
+                        <div class="pricing-header">
+                            <h2 class="pricing-title">Choose Your Credit Repair Plan</h2>
+                            <p class="pricing-subtitle">Select the plan that best fits your needs and budget. All plans include our dispute technology and expert support.</p>
+                        </div>
+                        
+                        <div class="pricing-content">
+                            <!-- Plans Tab Content -->
+                            <div class="pricing-tab-content pricing-tab-content-active" id="pricing-plans-content">
+                                <div class="pricing-plans-container">
+                                    <!-- Plan containers for modules -->
+                                    <div class="pricing-plans">
+                                        
+                                        <div id="free-plan-container" class="pricing-plan-container">
+                                            <div class="pricing-loading">
+                                                <div class="pricing-spinner"></div>
+                                                <p>Loading Free Plan...</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="diy-plan-container" class="pricing-plan-container">
+                                            <div class="pricing-loading">
+                                                <div class="pricing-spinner"></div>
+                                                <p>Loading DIY Plan...</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="fullservice-plan-container" class="pricing-plan-container">
+                                            <div class="pricing-loading">
+                                                <div class="pricing-spinner"></div>
+                                                <p>Loading Full-Service Plan...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Comparison Tab Content -->
+                            <div class="pricing-tab-content" id="pricing-comparison-content">
+                                <div id="plan-comparison-container">
+                                    <div class="pricing-loading">
+                                        <div class="pricing-spinner"></div>
+                                        <p>Loading Plan Comparison...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- FAQ Tab Content -->
+                            <div class="pricing-tab-content" id="pricing-faq-content">
+                                <div id="plan-faq-container">
+                                    <div class="pricing-loading">
+                                        <div class="pricing-spinner"></div>
+                                        <p>Loading FAQs...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Modal for plan selection (hidden by default) -->
+                        <div class="pricing-modal" id="pricing-modal">
+                            <div class="pricing-modal-content">
+                                <span class="pricing-modal-close">&times;</span>
+                                <h3 class="pricing-modal-title">Complete Your Purchase</h3>
+                                <div id="pricing-modal-content">
+                                    <!-- Content will be dynamically inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+
+                // Load plan modules
+                loadPlanModules();
+
+                // Store module state in sessionStorage to persist between page visits
+                storeModuleState();
+
+                return true;
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                // Close modal when clicking the X
+                const closeBtn = container.querySelector('.pricing-modal-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
+
+                // Close modal when clicking outside the modal content
+                const modal = container.querySelector('.pricing-modal');
+                if (modal) {
+                    modal.addEventListener('click', function (e) {
+                        if (e.target === modal) {
+                            closeModal();
+                        }
+                    });
+                }
+
+                // Add visibility change listener to handle tab/window focus changes
+                document.addEventListener('visibilitychange', function () {
+                    if (document.visibilityState === 'visible') {
+                        console.log('Page is now visible, checking module states');
+                        checkAndReloadModules();
+                    }
+                });
+
+                // Add page load and beforeunload events
+                window.addEventListener('load', function () {
+                    console.log('Page loaded, checking stored module states');
+                    restoreModuleState();
+                });
+
+                window.addEventListener('beforeunload', function () {
+                    console.log('Page about to unload, storing module states');
+                    storeModuleState();
+                });
+            }
+
+            // Store module state in sessionStorage
+            function storeModuleState() {
+                try {
+                    sessionStorage.setItem('jamPricingModuleState', JSON.stringify({
+                        isInitialized: isInitialized,
+                        selectedPlan: selectedPlan,
+                        loadedModules: loadedModules
+                    }));
+                    console.log('Module state stored in sessionStorage');
+                } catch (e) {
+                    console.error('Failed to store module state:', e);
+                }
+            }
+
+            // Restore module state from sessionStorage
+            function restoreModuleState() {
+                try {
+                    const state = JSON.parse(sessionStorage.getItem('jamPricingModuleState'));
+                    if (state) {
+                        console.log('Restoring module state from sessionStorage');
+                        isInitialized = state.isInitialized;
+                        selectedPlan = state.selectedPlan;
+                        loadedModules = state.loadedModules || {};
+
+                        // If we were initialized before, make sure modules are still loaded
+                        if (isInitialized) {
+                            checkAndReloadModules();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to restore module state:', e);
+                }
+            }
+
+            // Check and reload modules if needed
+            function checkAndReloadModules() {
+                // Remove GuidedPlanModule from loadedModules if it exists
+                if (loadedModules.GuidedPlanModule) {
+                    console.log('Removing GuidedPlanModule from loaded modules');
+                    delete loadedModules.GuidedPlanModule;
+                    storeModuleState(); // Update the stored state
+                }
+
+                // Prioritize loading the Free Plan first
+                if (loadedModules.FreePlanModule) {
+                    console.log('Free Plan was previously loaded, checking if still available');
+                    if (!window.jamFreePlan) {
+                        console.log('Free Plan module no longer available, reloading');
+                        loadModule('FreePlanModule', 'free-plan-container', true);
+                    } else {
+                        console.log('Free Plan module still available');
+                    }
+                }
+
+                // Then check other modules
+                for (const moduleName in loadedModules) {
+                    if (moduleName !== 'FreePlanModule' && moduleName !== 'GuidedPlanModule') {
+                        const globalName = 'jam' + moduleName.replace('Module', '');
+                        if (!window[globalName]) {
+                            console.log(`${moduleName} no longer available, reloading`);
+                            loadModule(moduleName, loadedModules[moduleName], true);
+                        }
+                    }
+                }
+            }
+
+            // Load plan modules
+            function loadPlanModules() {
+                console.log('Loading plan modules');
+
+                // Load Free Plan Module first with priority
+                loadModule('FreePlanModule', 'free-plan-container');
+
+                // Then load other modules
+                loadModule('DIYPlanModule', 'diy-plan-container');
+                loadModule('FullServicePlanModule', 'fullservice-plan-container');
+                loadModule('PlanComparisonModule', 'plan-comparison-container');
+                loadModule('PlanFaqModule', 'plan-faq-container');
+            }
+
+            // Helper function to load a module
+            function loadModule(moduleName, containerId, forceReload = false) {
+                console.log(`Loading module: ${moduleName} into container: ${containerId}, forceReload: ${forceReload}`);
+
+                // Create container if it doesn't exist
+                let container = document.getElementById(containerId);
+                if (!container) {
+                    // Check if the parent container exists
+                    let parentContainer = document.getElementById('pricing-modules-container');
+
+                    // If parent container doesn't exist, create it
+                    if (!parentContainer) {
+                        parentContainer = document.createElement('div');
+                        parentContainer.id = 'pricing-modules-container';
+
+                        // Find a suitable place to append it - main container or body
+                        const mainContainer = document.querySelector('.pricing-container') || document.body;
+                        mainContainer.appendChild(parentContainer);
+                        console.log('Created missing pricing-modules-container');
+                    }
+
+                    // Now create the module container
+                    container = document.createElement('div');
+                    container.id = containerId;
+                    parentContainer.appendChild(container);
+                }
+
+                // Record that we've loaded this module
+                loadedModules[moduleName] = containerId;
+
+                // Store module state
+                storeModuleState();
+
+                // Get the global module name
+                const globalModuleName = 'jam' + moduleName.replace('Module', '');
+                console.log(`Global module name: ${globalModuleName}`);
+
+                // Check if the module is already loaded
+                if (window[globalModuleName]) {
+                    console.log(`${moduleName} already loaded, initializing`);
+                    window[globalModuleName].init(containerId);
+                    return;
+                }
+
+                // If the module is not available, show an error
+                console.error(`${moduleName} not available`);
+                container.innerHTML = `
+                    <div class="pricing-error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Failed to load ${moduleName}. Please refresh the page.
+                    </div>
+                `;
+            }
+
+            // Close the modal
+            function closeModal() {
+                const modal = document.getElementById('pricing-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                // Don't reset loadedModules to maintain state between resets
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                getSelectedPlan: function () {
+                    return selectedPlan;
+                },
+                reloadModule: function (moduleName, containerId) {
+                    loadModule(moduleName, containerId, true);
+                }
+            };
+        })();
+
+        // Expose the module globally
+        window.jamPricingTiers = PricingTiersModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamPricingTiersLoaded'));
+        }
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.querySelector('.pricing-container');
+            if (container && container.id) {
+                PricingTiersModule.init(container.id);
+            } else if (container) {
+                // If container doesn't have an ID, give it one
+                container.id = 'pricing-tiers-container';
+                PricingTiersModule.init('pricing-tiers-container');
+            }
+        });
+    </script>
+</body>
+
+</html>

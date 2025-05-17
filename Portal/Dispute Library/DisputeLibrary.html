@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dispute Letter Library - JAM Credit Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #008080;
+            --primary-dark: #006666;
+            --primary-light: #e6f7f7;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --blue-dark: #002742;
+            --blue-accent: #09ccfc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .dispute-library {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .library-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .library-title {
+            font-size: 2rem;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .library-description {
+            color: var(--gray-600);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-container {
+            display: flex;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px 0 0 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .search-button {
+            background-color: var(--blue-dark);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .search-button:hover {
+            background-color: #001f36;
+        }
+
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .filter-button {
+            background-color: var(--gray-200);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .filter-button:hover {
+            background-color: var(--gray-300);
+        }
+
+        .filter-button.active {
+            background-color: var(--blue-dark);
+            color: white;
+        }
+
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .letter-card {
+            perspective: 1000px;
+            height: auto;
+            min-height: 280px;
+            width: 100%;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .letter-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+            transform-origin: center center;
+        }
+
+        .letter-card-front,
+        .letter-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background-color: var(--blue-dark);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            color: white;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .letter-card-front {
+            border-left: 4px solid var(--blue-accent);
+        }
+
+        .letter-card-back {
+            border-left: 4px solid var(--blue-accent);
+            transform: rotateY(180deg);
+            overflow-y: auto;
+        }
+
+        .letter-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid rgba(9, 204, 252, 0.3);
+        }
+
+        .letter-icon {
+            font-size: 1.6rem;
+            margin-right: 0.8rem;
+            color: var(--blue-accent);
+        }
+
+        .letter-card-header h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .letter-description {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0.6rem 0 1.2rem;
+            flex-grow: 1;
+        }
+
+        .letter-flip-btn {
+            background: rgba(9, 204, 252, 0.2);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .letter-flip-btn:hover {
+            background: rgba(9, 204, 252, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .letter-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .letter-action-btn {
+            background: rgba(9, 204, 252, 0.2);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            flex: 1;
+            margin: 0 0.3rem;
+        }
+
+        .letter-action-btn:hover {
+            background: rgba(9, 204, 252, 0.4);
+        }
+
+        .letter-action-btn.preview {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .letter-action-btn.preview:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .letter-action-btn.download {
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .letter-action-btn.download:hover {
+            background: rgba(40, 167, 69, 0.3);
+        }
+
+        .letter-back-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter-back-btn:hover {
+            color: var(--blue-accent);
+        }
+
+        .letter-back-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .letter-category {
+            display: inline-block;
+            background-color: rgba(9, 204, 252, 0.2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .letter-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1rem;
+        }
+
+        .letter-content {
+            text-align: left;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--gray-100);
+            border-radius: 8px;
+            border: 1px dashed var(--gray-300);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--gray-600);
+        }
+
+        /* Loading state */
+        .loading-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 39, 66, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--blue-dark);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .letter-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .letter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .search-input {
+                border-radius: 4px;
+                margin-bottom: 0.5rem;
+            }
+
+            .search-button {
+                border-radius: 4px;
+                width: 100%;
+            }
+        }
+
+        /* Dispute Card Styles */
+        .dispute-prompt-card {
+            perspective: 1000px;
+            margin: 15px;
+            width: 320px;
+            height: 450px;
+        }
+
+        .dispute-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dispute-card-front {
+            background-color: #ffffff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dispute-card-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+
+        .dispute-ai-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            color: #4a6cf7;
+            margin-top: 3px;
+        }
+
+        .dispute-card-front h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+            flex: 1;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .dispute-card-front h3.long-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dispute-card-description {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+            max-height: 280px;
+            padding: 5px 5px 5px 0;
+        }
+
+        .dispute-card-description::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .dispute-card-description::-webkit-scrollbar-thumb {
+            background-color: #ddd;
+            border-radius: 4px;
+        }
+
+        .dispute-flip-btn {
+            align-self: flex-end;
+            background-color: transparent;
+            border: none;
+            color: #4a6cf7;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 10px 0;
+            transition: color 0.3s;
+            margin-top: 10px;
+        }
+
+        .dispute-flip-btn:hover {
+            color: #3451b2;
+        }
+
+        .dispute-card-back {
+            background-color: #f8f9fa;
+            color: #333;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dispute-prompt-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .dispute-prompt-content h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .dispute-prompt-content pre {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f1f3f5;
+            padding: 12px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0 0 15px 0;
+            white-space: pre-wrap;
+            max-height: 300px;
+            word-break: break-word;
+        }
+
+        .dispute-button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .dispute-copy-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .dispute-copy-btn:hover {
+            background-color: #3451b2;
+        }
+
+        .dispute-copy-icon {
+            margin-right: 5px;
+        }
+
+        /* Flipped state */
+        .flipped .dispute-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Card grid layout improvements */
+        #letterGrid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- No HTML content needed here as it's generated by the script -->
+    <script>
+        // Create a module for the Dispute Library functionality
+        const DisputeLibraryModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let isDisputeCardsLoading = false;
+            let currentFilter = 'all';
+            let searchTerm = '';
+
+            // Debug logging function with timestamp
+            function debugLog(message, data) {
+                const timestamp = new Date().toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+                console.log(`[DisputeLibrary ${timestamp}] ${message}`);
+                if (data !== undefined) {
+                    console.log(`[DisputeLibrary ${timestamp}] Data:`, data);
+                }
+            }
+
+            // Error logging function with timestamp
+            function errorLog(message, error) {
+                const timestamp = new Date().toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+                console.error(`[DisputeLibrary ${timestamp}] ERROR: ${message}`);
+                if (error) {
+                    console.error(`[DisputeLibrary ${timestamp}] Error details:`, error);
+                }
+            }
+
+            // Check if we have a saved state
+            function getSavedState() {
+                try {
+                    debugLog('Checking for saved state');
+                    const savedState = localStorage.getItem('jamDisputeLibraryState');
+                    if (savedState) {
+                        const parsedState = JSON.parse(savedState);
+                        debugLog('Found saved state', parsedState);
+                        return parsedState;
+                    }
+                    debugLog('No saved state found');
+                } catch (e) {
+                    errorLog('Failed to retrieve saved state', e);
+                }
+                return null;
+            }
+
+            // Save current state
+            function saveState() {
+                try {
+                    const state = {
+                        currentFilter: currentFilter,
+                        searchTerm: searchTerm,
+                        lastVisit: new Date().toISOString()
+                    };
+                    debugLog('Saving state', state);
+                    localStorage.setItem('jamDisputeLibraryState', JSON.stringify(state));
+                    debugLog('State saved successfully');
+                } catch (e) {
+                    errorLog('Failed to save state', e);
+                }
+            }
+
+            // Initialize the module
+            function init(containerId) {
+                debugLog(`Initializing with container: ${containerId}`);
+                debugLog(`Current initialization state: ${isInitialized}`);
+
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    errorLog(`Container not found: ${containerId}`);
+                    return false;
+                }
+
+                debugLog('Container found, continuing initialization');
+
+                // Restore saved state if available
+                const savedState = getSavedState();
+                if (savedState) {
+                    currentFilter = savedState.currentFilter || 'all';
+                    searchTerm = savedState.searchTerm || '';
+                    debugLog('Restored state values');
+                    debugLog('Data:', { currentFilter, searchTerm });
+                }
+
+                // If already initialized, check if we need to rebuild the HTML structure
+                if (isInitialized) {
+                    debugLog('Already initialized, refreshing content');
+
+                    // Check if the letter grid exists
+                    const letterGrid = document.getElementById('letterGrid');
+                    if (!letterGrid) {
+                        debugLog('Letter grid not found, rebuilding HTML structure');
+                        // Insert the library HTML since it's missing
+                        container.innerHTML = `
+                            <div class="dispute-library">
+                                <div class="library-header">
+                                    <h1 class="library-title">Dispute Letter Library</h1>
+                                    <p class="library-description">Browse our collection of professionally crafted dispute letters for various credit reporting issues.</p>
+                                </div>
+                                
+                                <div class="search-container">
+                                    <input type="text" class="search-input" placeholder="Search for dispute letters..." value="${searchTerm}">
+                                    <button class="search-button"><i class="fas fa-search"></i> Search</button>
+                                </div>
+                                
+                                <div class="filter-container">
+                                    <button class="filter-button ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All Letters</button>
+                                    <button class="filter-button ${currentFilter === 'General' ? 'active' : ''}" data-filter="General">General</button>
+                                    <button class="filter-button ${currentFilter === 'Late Payments' ? 'active' : ''}" data-filter="Late Payments">Late Payments</button>
+                                    <button class="filter-button ${currentFilter === 'Collections' ? 'active' : ''}" data-filter="Collections">Collections</button>
+                                    <button class="filter-button ${currentFilter === 'Inquiries' ? 'active' : ''}" data-filter="Inquiries">Inquiries</button>
+                                    <button class="filter-button ${currentFilter === 'Identity Theft' ? 'active' : ''}" data-filter="Identity Theft">Identity Theft</button>
+                                    <button class="filter-button ${currentFilter === 'Bankruptcy' ? 'active' : ''}" data-filter="Bankruptcy">Bankruptcy</button>
+                                </div>
+                                
+                                <div class="library-content">
+                                    <div class="letter-grid" id="letterGrid">
+                                        <div class="loading-state">
+                                            <div class="loading-spinner"></div>
+                                            <h3>Loading dispute letters...</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Set up event listeners for search and filters
+                        setupEventListeners();
+                    }
+
+                    // Check if the module is still functional
+                    if (window.jamDisputeCards) {
+                        try {
+                            // Try to call a method to verify the module is working
+                            const testLetters = window.jamDisputeCards.getAllLetters();
+                            if (Array.isArray(testLetters)) {
+                                debugLog('DisputeCards module is functional, re-rendering');
+                                renderLetters();
+                                return true;
+                            } else {
+                                debugLog('DisputeCards module exists but returned invalid data');
+                            }
+                        } catch (e) {
+                            errorLog('Error testing DisputeCards module functionality', e);
+                        }
+                    }
+
+                    // If we get here, the module isn't functional despite being initialized
+                    debugLog('Module not functional, resetting initialization state');
+                    isInitialized = false;
+                    // Continue with initialization below
+                }
+
+                // Insert the library HTML (for first initialization)
+                debugLog('Inserting library HTML');
+                container.innerHTML = `
+                    <div class="dispute-library">
+                        <div class="library-header">
+                            <h1 class="library-title">Dispute Letter Library</h1>
+                            <p class="library-description">Browse our collection of professionally crafted dispute letters for various credit reporting issues.</p>
+                        </div>
+                        
+                        <div class="search-container">
+                            <input type="text" class="search-input" placeholder="Search for dispute letters..." value="${searchTerm}">
+                            <button class="search-button"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                        
+                        <div class="filter-container">
+                            <button class="filter-button ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All Letters</button>
+                            <button class="filter-button ${currentFilter === 'General' ? 'active' : ''}" data-filter="General">General</button>
+                            <button class="filter-button ${currentFilter === 'Late Payments' ? 'active' : ''}" data-filter="Late Payments">Late Payments</button>
+                            <button class="filter-button ${currentFilter === 'Collections' ? 'active' : ''}" data-filter="Collections">Collections</button>
+                            <button class="filter-button ${currentFilter === 'Inquiries' ? 'active' : ''}" data-filter="Inquiries">Inquiries</button>
+                            <button class="filter-button ${currentFilter === 'Identity Theft' ? 'active' : ''}" data-filter="Identity Theft">Identity Theft</button>
+                            <button class="filter-button ${currentFilter === 'Bankruptcy' ? 'active' : ''}" data-filter="Bankruptcy">Bankruptcy</button>
+                        </div>
+                        
+                        <div class="library-content">
+                            <div class="letter-grid" id="letterGrid">
+                                <div class="loading-state">
+                                    <div class="loading-spinner"></div>
+                                    <h3>Loading dispute letters...</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners for search and filters
+                setupEventListeners();
+
+                // Load the DisputeCards module and render letters
+                loadDisputeCardsAndRender();
+
+                // Set up visibility change listener to handle tab switching
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+
+                // Set up beforeunload to save state when leaving
+                window.addEventListener('beforeunload', saveState);
+
+                isInitialized = true;
+                return true;
+            }
+
+            // Handle visibility change (tab switching)
+            function handleVisibilityChange() {
+                debugLog(`Visibility changed to: ${document.visibilityState}`);
+
+                if (document.visibilityState === 'visible') {
+                    debugLog('Tab became visible, checking for DisputeCards module');
+
+                    // Always re-render when coming back to the tab
+                    if (isInitialized && window.jamDisputeCards) {
+                        try {
+                            // Try to call a method to verify the module is working
+                            const testLetters = window.jamDisputeCards.getAllLetters();
+                            if (Array.isArray(testLetters)) {
+                                debugLog('DisputeCards module is functional, re-rendering');
+                                renderLetters();
+                                return;
+                            }
+                        } catch (e) {
+                            errorLog('Error testing DisputeCards module functionality', e);
+                        }
+                    }
+
+                    // If we get here, either not initialized or module not functional
+                    debugLog('Module needs to be reinitialized');
+                    isInitialized = false;
+                    isDisputeCardsLoading = false;
+
+                    // Re-initialize the entire module
+                    init('interface-dispute-library-widget');
+                } else {
+                    // Tab is hidden, save the current state
+                    debugLog('Tab became hidden, saving state');
+                    saveState();
+                }
+            }
+
+            // Function to load the DisputeCards module and render letters
+            function loadDisputeCardsAndRender() {
+                debugLog('loadDisputeCardsAndRender called');
+                debugLog(`jamDisputeCards exists: ${!!window.jamDisputeCards}`);
+                debugLog(`isDisputeCardsLoading: ${isDisputeCardsLoading}`);
+
+                if (window.jamDisputeCards) {
+                    debugLog('DisputeCards module already loaded, rendering letters');
+                    // Make sure the module is initialized
+                    try {
+                        window.jamDisputeCards.init();
+                        debugLog('DisputeCards module initialized');
+                        renderLetters();
+                    } catch (e) {
+                        errorLog('Error initializing DisputeCards module', e);
+                        reloadDisputeCardsModule();
+                    }
+                    return;
+                }
+
+                if (isDisputeCardsLoading) {
+                    debugLog('DisputeCards module is already loading, waiting...');
+                    return;
+                }
+
+                debugLog('Loading DisputeCards module');
+                isDisputeCardsLoading = true;
+
+                // Load the DisputeCards module
+                loadDisputeCardsModule()
+                    .then(() => {
+                        debugLog('DisputeCards module loaded successfully');
+                        isDisputeCardsLoading = false;
+                        renderLetters();
+                    })
+                    .catch(error => {
+                        errorLog('Failed to load DisputeCards module', error);
+                        isDisputeCardsLoading = false;
+
+                        const letterGrid = document.getElementById('letterGrid');
+                        if (letterGrid) {
+                            letterGrid.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <h3>Error loading dispute letters</h3>
+                                    <p>Please try refreshing the page or contact support if the problem persists.</p>
+                                    <button class="letter-flip-btn" style="margin-top: 1rem;" onclick="window.jamDisputeLibrary.retryLoadingCards()">
+                                        <i class="fas fa-sync-alt"></i> Retry
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    });
+            }
+
+            // Function to force reload the DisputeCards module
+            function reloadDisputeCardsModule() {
+                debugLog('Forcing reload of DisputeCards module');
+
+                // Remove any existing script elements
+                const existingScripts = document.querySelectorAll('script[src="Dispute Library/DisputeCards.html"]');
+                existingScripts.forEach(script => script.remove());
+
+                // Reset the module if it exists
+                if (window.jamDisputeCards && typeof window.jamDisputeCards.reset === 'function') {
+                    window.jamDisputeCards.reset();
+                }
+
+                // Clear from window
+                window.jamDisputeCards = null;
+
+                // Clear loading flag
+                isDisputeCardsLoading = false;
+
+                // Load the module again
+                return loadDisputeCardsAndRender();
+            }
+
+            // Function to retry loading the DisputeCards module
+            function retryLoadingCards() {
+                debugLog('Retry loading cards requested by user');
+                const letterGrid = document.getElementById('letterGrid');
+                if (letterGrid) {
+                    letterGrid.innerHTML = `
+                        <div class="loading-state">
+                            <div class="loading-spinner"></div>
+                            <h3>Loading dispute letters...</h3>
+                        </div>
+                    `;
+                }
+
+                // Force a complete reload
+                window.jamDisputeCards = undefined;
+                isDisputeCardsLoading = false;
+
+                try {
+                    sessionStorage.removeItem('jamDisputeCardsScript');
+                    debugLog('Cleared cached DisputeCards script for retry');
+                } catch (e) {
+                    errorLog('Error clearing cached script during retry', e);
+                }
+
+                loadDisputeCardsAndRender();
+            }
+
+            // Function to load the DisputeCards module
+            function loadDisputeCardsModule() {
+                debugLog('loadDisputeCardsModule called');
+
+                return new Promise((resolve, reject) => {
+                    // Check if the module is already loaded and functional
+                    if (window.jamDisputeCards) {
+                        try {
+                            // Test if the module is functional
+                            const testLetters = window.jamDisputeCards.getAllLetters();
+                            if (Array.isArray(testLetters)) {
+                                debugLog('DisputeCards module already exists and is functional');
+                                resolve();
+                                return;
+                            } else {
+                                debugLog('DisputeCards module exists but is not functional, reloading');
+                                // Reset the module
+                                if (typeof window.jamDisputeCards.reset === 'function') {
+                                    window.jamDisputeCards.reset();
+                                }
+                                window.jamDisputeCards = null;
+                            }
+                        } catch (e) {
+                            errorLog('Error testing existing DisputeCards module', e);
+                            window.jamDisputeCards = null;
+                        }
+                    }
+
+                    // Since we're using inline scripts, we'll create the DisputeCards module directly
+                    debugLog('Creating DisputeCards module inline');
+
+                    try {
+                        // Insert the DisputeCards module code directly
+                        const script = document.createElement('script');
+                        script.textContent = `
+                            // Create a module for the Dispute Cards functionality
+                            const DisputeCardsModule = (function () {
+                                // Private variables
+                                let isInitialized = false;
+                                let letters = [];
+                            
+                                // Initialize the module
+                                function init() {
+                                    // Check if already initialized to prevent duplicate initialization
+                                    if (isInitialized) {
+                                        console.log('DisputeCardsModule already initialized');
+                                        return true;
+                                    }
+                                    
+                                    console.log('Initializing DisputeCardsModule');
+                                    
+                                    // Load default letters
+                                    loadDefaultLetters();
+                                    
+                                    // Set initialization flag
+                                    isInitialized = true;
+                                    
+                                    return true;
+                                }
+                            
+                                // Load default letters
+                                function loadDefaultLetters() {
+                                    letters = [
+                                        {
+                                            id: 1,
+                                            title: "General Dispute Letter",
+                                            category: "General",
+                                            description: "A comprehensive letter for disputing multiple types of inaccurate information on your credit report.",
+                                            fullDescription: "This general-purpose dispute letter addresses multiple inaccuracies on your credit report. It cites relevant sections of the Fair Credit Reporting Act (FCRA) and requests a thorough investigation.",
+                                            date: "2023-01-15",
+                                            icon: "fa-file-alt",
+                                            content: "Sample letter content for general disputes..."
+                                        },
+                                        {
+                                            id: 2,
+                                            title: "Late Payment Dispute",
+                                            category: "Late Payments",
+                                            description: "Dispute incorrectly reported late payments with this targeted letter.",
+                                            fullDescription: "This letter specifically addresses late payments that were incorrectly reported to the credit bureaus. It includes language about payment history documentation and requests removal of the inaccurate late payment marks.",
+                                            date: "2023-02-10",
+                                            icon: "fa-calendar-times",
+                                            content: "Sample letter content for late payment disputes..."
+                                        },
+                                        {
+                                            id: 3,
+                                            title: "Collection Account Dispute",
+                                            category: "Collections",
+                                            description: "Challenge collection accounts that are inaccurate, outdated, or not yours.",
+                                            fullDescription: "Use this letter to dispute collection accounts appearing on your credit report. It addresses issues like debt validation, time-barred debts, and accounts that don't belong to you.",
+                                            date: "2023-03-05",
+                                            icon: "fa-hand-holding-usd",
+                                            content: "Sample letter content for collection disputes..."
+                                        },
+                                        {
+                                            id: 4,
+                                            title: "Hard Inquiry Dispute",
+                                            category: "Inquiries",
+                                            description: "Remove unauthorized hard inquiries from your credit report with this letter.",
+                                            fullDescription: "This letter helps you dispute unauthorized hard inquiries on your credit report. It cites the FCRA requirement that credit pulls must have your permission and requests removal of inquiries made without your consent.",
+                                            date: "2023-04-20",
+                                            icon: "fa-search",
+                                            content: "Sample letter content for inquiry disputes..."
+                                        },
+                                        {
+                                            id: 5,
+                                            title: "Identity Theft Dispute",
+                                            category: "Identity Theft",
+                                            description: "Comprehensive letter for disputing accounts opened fraudulently due to identity theft.",
+                                            fullDescription: "This specialized letter addresses accounts and information on your credit report resulting from identity theft. It references the FTC Identity Theft Report process and requests immediate removal of fraudulent items.",
+                                            date: "2023-05-12",
+                                            icon: "fa-user-shield",
+                                            content: "Sample letter content for identity theft disputes..."
+                                        },
+                                        {
+                                            id: 6,
+                                            title: "Bankruptcy Error Dispute",
+                                            category: "Bankruptcy",
+                                            description: "Correct errors in how bankruptcy information is reported on your credit file.",
+                                            fullDescription: "This letter addresses errors in how bankruptcy information appears on your credit report. It helps correct discharge dates, included/excluded accounts, and other bankruptcy-related reporting errors.",
+                                            date: "2023-06-30",
+                                            icon: "fa-balance-scale",
+                                            content: "Sample letter content for bankruptcy reporting disputes..."
+                                        }
+                                    ];
+                                }
+                            
+                                // Reset the module state
+                                function reset() {
+                                    console.log('Resetting DisputeCardsModule');
+                                    isInitialized = false;
+                                    return true;
+                                }
+                            
+                                // Get all letters
+                                function getAllLetters() {
+                                    return [...letters];
+                                }
+                            
+                                // Get a letter by ID
+                                function getLetterById(id) {
+                                    return letters.find(letter => letter.id === id);
+                                }
+                            
+                                // Get letters by category
+                                function getLettersByCategory(category) {
+                                    if (category === 'all') {
+                                        return getAllLetters();
+                                    }
+                                    return letters.filter(letter => letter.category === category);
+                                }
+                            
+                                // Search letters by term
+                                function searchLetters(term) {
+                                    if (!term) return getAllLetters();
+                                    
+                                    const searchTerm = term.toLowerCase();
+                                    return letters.filter(letter => 
+                                        letter.title.toLowerCase().includes(searchTerm) || 
+                                        letter.description.toLowerCase().includes(searchTerm) ||
+                                        letter.fullDescription.toLowerCase().includes(searchTerm) ||
+                                        letter.category.toLowerCase().includes(searchTerm)
+                                    );
+                                }
+                            
+                                // Filter letters by category and search term
+                                function filterLetters(category = 'all', searchTerm = '') {
+                                    let result = getLettersByCategory(category);
+                                    
+                                    if (searchTerm) {
+                                        result = result.filter(letter => 
+                                            letter.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                            letter.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            letter.fullDescription.toLowerCase().includes(searchTerm.toLowerCase())
+                                        );
+                                    }
+                                    
+                                    return result;
+                                }
+                            
+                                // Add a new letter
+                                function addLetter(letter) {
+                                    // Generate a new ID
+                                    const newId = letters.length > 0 ? Math.max(...letters.map(l => l.id)) + 1 : 1;
+                                    const newLetter = { ...letter, id: newId, date: new Date().toISOString().split('T')[0] };
+                                    letters.push(newLetter);
+                                    return newLetter;
+                                }
+                            
+                                // Update an existing letter
+                                function updateLetter(id, updatedData) {
+                                    const index = letters.findIndex(letter => letter.id === id);
+                                    if (index === -1) return false;
+                                    
+                                    letters[index] = { ...letters[index], ...updatedData };
+                                    return letters[index];
+                                }
+                            
+                                // Delete a letter
+                                function deleteLetter(id) {
+                                    const index = letters.findIndex(letter => letter.id === id);
+                                    if (index === -1) return false;
+                                    
+                                    letters.splice(index, 1);
+                                    return true;
+                                }
+                            
+                                // Reset to default letters
+                                function resetToDefault() {
+                                    loadDefaultLetters();
+                                    return true;
+                                }
+                            
+                                // Flip a card
+                                function flipCard(id) {
+                                    const cardInner = document.querySelector(\`.dispute-card-inner[data-id="\${id}"]\`);
+                                    if (!cardInner) return false;
+                                    
+                                    if (cardInner.style.transform === 'rotateY(180deg)') {
+                                        cardInner.style.transform = 'rotateY(0deg)';
+                                    } else {
+                                        cardInner.style.transform = 'rotateY(180deg)';
+                                    }
+                                    
+                                    return true;
+                                }
+                            
+                                // Copy prompt to clipboard
+                                function copyPromptToClipboard(id) {
+                                    const letter = getLetterById(id);
+                                    if (!letter) return false;
+                                    
+                                    const promptText = letter.promptText || letter.content || 'No content available';
+                                    
+                                    try {
+                                        navigator.clipboard.writeText(promptText).then(
+                                            function() {
+                                                alert('Prompt copied to clipboard!');
+                                            },
+                                            function() {
+                                                alert('Failed to copy prompt. Please try again or copy manually.');
+                                            }
+                                        );
+                                    } catch (e) {
+                                        // Fallback for older browsers
+                                        const textarea = document.createElement('textarea');
+                                        textarea.value = promptText;
+                                        textarea.style.position = 'fixed';
+                                        document.body.appendChild(textarea);
+                                        textarea.focus();
+                                        textarea.select();
+                                        
+                                        try {
+                                            const successful = document.execCommand('copy');
+                                            if (successful) {
+                                                alert('Prompt copied to clipboard!');
+                                            } else {
+                                                alert('Failed to copy prompt. Please try again or copy manually.');
+                                            }
+                                        } catch (err) {
+                                            alert('Failed to copy prompt. Please try again or copy manually.');
+                                        }
+                                        
+                                        document.body.removeChild(textarea);
+                                    }
+                                    
+                                    return true;
+                                }
+                            
+                                // Public API
+                                return {
+                                    init: init,
+                                    reset: reset,
+                                    getAllLetters: getAllLetters,
+                                    getLetterById: getLetterById,
+                                    getLettersByCategory: getLettersByCategory,
+                                    searchLetters: searchLetters,
+                                    filterLetters: filterLetters,
+                                    addLetter: addLetter,
+                                    updateLetter: updateLetter,
+                                    deleteLetter: deleteLetter,
+                                    resetToDefault: resetToDefault,
+                                    copyPromptToClipboard: copyPromptToClipboard,
+                                    flipCard: flipCard
+                                };
+                            })();
+                            
+                            // Expose the module globally
+                            window.jamDisputeCards = DisputeCardsModule;
+                            
+                            // Initialize the module
+                            DisputeCardsModule.init();
+                            
+                            // Signal that the module is loaded
+                            if (window.dispatchEvent) {
+                                window.dispatchEvent(new CustomEvent('disputeCardsLoaded'));
+                            }
+                        `;
+
+                        document.body.appendChild(script);
+
+                        // Wait for the module to be loaded
+                        const checkInterval = setInterval(() => {
+                            if (window.jamDisputeCards) {
+                                debugLog('DisputeCards module loaded inline');
+                                clearInterval(checkInterval);
+                                resolve();
+                            }
+                        }, 100);
+
+                        // Set a timeout in case it doesn't load
+                        setTimeout(() => {
+                            if (!window.jamDisputeCards) {
+                                clearInterval(checkInterval);
+                                errorLog('Timeout waiting for DisputeCards module');
+                                reject(new Error('Timeout waiting for module'));
+                            }
+                        }, 2000);
+                    } catch (e) {
+                        errorLog('Error creating inline DisputeCards module', e);
+                        reject(new Error('Failed to create inline module'));
+                    }
+                });
+            }
+
+            // Set up event listeners for search and filters
+            function setupEventListeners() {
+                debugLog('Setting up event listeners');
+                const searchButton = document.getElementById('searchButton');
+                const searchInput = document.getElementById('letterSearch');
+                const filterButtons = document.querySelectorAll('.filter-button');
+
+                if (searchButton && searchInput) {
+                    debugLog('Setting up search button listener');
+                    searchButton.addEventListener('click', function () {
+                        searchTerm = searchInput.value.toLowerCase();
+                        debugLog(`Search button clicked, term: "${searchTerm}"`);
+                        saveState();
+                        renderLetters();
+                    });
+                }
+
+                if (searchInput) {
+                    debugLog('Setting up search input listener');
+                    searchInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            searchTerm = searchInput.value.toLowerCase();
+                            debugLog(`Search input enter pressed, term: "${searchTerm}"`);
+                            saveState();
+                            renderLetters();
+                        }
+                    });
+                }
+
+                if (filterButtons.length > 0) {
+                    debugLog(`Setting up ${filterButtons.length} filter button listeners`);
+                    filterButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            filterButtons.forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            currentFilter = this.getAttribute('data-filter');
+                            debugLog(`Filter button clicked: ${currentFilter}`);
+                            saveState();
+                            renderLetters();
+                        });
+                    });
+                }
+            }
+
+            // Render the letters based on current filter and search term
+            function renderLetters() {
+                debugLog('renderLetters called');
+
+                // Find the letter grid element
+                let letterGrid = document.getElementById('letterGrid');
+
+                // If letter grid doesn't exist, try to find the library content and create it
+                if (!letterGrid) {
+                    debugLog('Letter grid not found, looking for library content');
+                    const libraryContent = document.querySelector('.library-content');
+
+                    if (libraryContent) {
+                        debugLog('Library content found, creating letter grid');
+                        letterGrid = document.createElement('div');
+                        letterGrid.id = 'letterGrid';
+                        letterGrid.className = 'letter-grid';
+
+                        // Add loading state
+                        letterGrid.innerHTML = `
+                            <div class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <h3>Loading dispute letters...</h3>
+                            </div>
+                        `;
+
+                        libraryContent.innerHTML = ''; // Clear existing content
+                        libraryContent.appendChild(letterGrid);
+                    } else {
+                        // If library content doesn't exist, we need to rebuild the entire structure
+                        debugLog('Library content not found, rebuilding entire structure');
+                        const container = document.getElementById('interface-dispute-library-widget');
+
+                        if (!container) {
+                            errorLog('Container not found, cannot render letters');
+                            return;
+                        }
+
+                        // Rebuild the HTML structure
+                        container.innerHTML = `
+                            <div class="dispute-library">
+                                <div class="library-header">
+                                    <h1 class="library-title">Dispute Letter Library</h1>
+                                    <p class="library-description">Browse our collection of professionally crafted dispute letters for various credit reporting issues.</p>
+                                </div>
+                                
+                                <div class="search-container">
+                                    <input type="text" id="letterSearch" class="search-input" placeholder="Search for dispute letters..." value="${searchTerm}">
+                                    <button id="searchButton" class="search-button"><i class="fas fa-search"></i> Search</button>
+                                </div>
+                                
+                                <div class="filter-container">
+                                    <button class="filter-button ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All Letters</button>
+                                    <button class="filter-button ${currentFilter === 'General' ? 'active' : ''}" data-filter="General">General</button>
+                                    <button class="filter-button ${currentFilter === 'Late Payments' ? 'active' : ''}" data-filter="Late Payments">Late Payments</button>
+                                    <button class="filter-button ${currentFilter === 'Collections' ? 'active' : ''}" data-filter="Collections">Collections</button>
+                                    <button class="filter-button ${currentFilter === 'Inquiries' ? 'active' : ''}" data-filter="Inquiries">Inquiries</button>
+                                    <button class="filter-button ${currentFilter === 'Identity Theft' ? 'active' : ''}" data-filter="Identity Theft">Identity Theft</button>
+                                    <button class="filter-button ${currentFilter === 'Bankruptcy' ? 'active' : ''}" data-filter="Bankruptcy">Bankruptcy</button>
+                                </div>
+                                
+                                <div class="library-content">
+                                    <div class="letter-grid" id="letterGrid">
+                                        <div class="loading-state">
+                                            <div class="loading-spinner"></div>
+                                            <h3>Loading dispute letters...</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Set up event listeners for the rebuilt structure
+                        setupEventListeners();
+
+                        // Get the letter grid from the rebuilt structure
+                        letterGrid = document.getElementById('letterGrid');
+
+                        if (!letterGrid) {
+                            errorLog('Letter grid still not found after rebuilding, cannot render letters');
+                            return;
+                        }
+                    }
+                }
+
+                // Get filtered letters
+                debugLog(`Getting filtered letters with filter: ${currentFilter}, search: ${searchTerm}`);
+                const filteredLetters = window.jamDisputeCards.getFilteredLetters(currentFilter, searchTerm);
+                debugLog(`Found ${filteredLetters.length} letters after filtering`);
+
+                // Check if we have any letters
+                if (filteredLetters.length === 0) {
+                    letterGrid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No letters found</h3>
+                            <p>Try adjusting your search or filter criteria.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render the letters
+                debugLog(`Rendering ${filteredLetters.length} letters`);
+                letterGrid.innerHTML = filteredLetters.map(letter => `
+                    <div class="letter-card" data-id="${letter.id}">
+                        <div class="letter-card-inner">
+                            <div class="letter-card-front">
+                                <div class="letter-card-header">
+                                    <i class="fas ${letter.icon} letter-icon"></i>
+                                    <h3>${letter.title}</h3>
+                                </div>
+                                <span class="letter-category">${letter.category}</span>
+                                <p class="letter-description">${letter.description}</p>
+                                <button class="letter-flip-btn">View Prompt →</button>
+                                <div class="letter-date">Added: ${letter.date}</div>
+                            </div>
+                            <div class="letter-card-back">
+                                <h3>${letter.title}</h3>
+                                <div class="letter-details">
+                                    <p>${letter.fullDescription}</p>
+                                    <div class="letter-actions">
+                                        <button class="letter-action-btn preview">
+                                            <i class="fas fa-eye"></i> Copy Prompt
+                                        </button>
+                                    </div>
+                                </div>
+                                <button class="letter-back-btn">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                debugLog('Rendering complete, setting up event listeners');
+                setupCardEventListeners();
+            }
+
+            // Set up card event listeners
+            function setupCardEventListeners() {
+                debugLog('Setting up card flip listeners');
+
+                const flipButtons = document.querySelectorAll('.letter-card .letter-flip-btn');
+                const backButtons = document.querySelectorAll('.letter-card .letter-back-btn');
+                const previewButtons = document.querySelectorAll('.letter-action-btn.preview');
+                const downloadButtons = document.querySelectorAll('.letter-action-btn.download');
+
+                debugLog(`Found ${flipButtons.length} flip buttons, ${backButtons.length} back buttons`);
+                debugLog(`Found ${previewButtons.length} preview buttons, ${downloadButtons.length} download buttons`);
+
+                flipButtons.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const cardId = this.closest('.letter-card').getAttribute('data-id');
+                        debugLog(`Flip button clicked for card ${cardId}`);
+                        flipCard(parseInt(cardId));
+                    });
+                });
+
+                backButtons.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const cardId = this.closest('.letter-card').getAttribute('data-id');
+                        debugLog(`Back button clicked for card ${cardId}`);
+                        flipCard(parseInt(cardId));
+                    });
+                });
+
+                previewButtons.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const cardId = this.closest('.letter-card').getAttribute('data-id');
+                        debugLog(`Preview button clicked for card ${cardId}`);
+                        previewLetter(parseInt(cardId));
+                    });
+                });
+
+                downloadButtons.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const cardId = this.closest('.letter-card').getAttribute('data-id');
+                        debugLog(`Download button clicked for card ${cardId}`);
+                        downloadLetter(parseInt(cardId));
+                    });
+                });
+            }
+
+            function flipCard(id) {
+                debugLog(`flipCard called for id: ${id}`);
+                const card = document.querySelector(`.letter-card[data-id="${id}"] .letter-card-inner`);
+                if (card) {
+                    debugLog('Card found, flipping');
+                    // Add flipping class to hide buttons during animation
+                    card.classList.add('flipping');
+
+                    // Toggle the transform
+                    card.style.transform = card.style.transform === 'rotateY(180deg)' ? '' : 'rotateY(180deg)';
+                    debugLog(`Card transform set to: ${card.style.transform}`);
+
+                    // Remove the flipping class after animation completes
+                    setTimeout(() => {
+                        card.classList.remove('flipping');
+                        debugLog('Flipping animation complete');
+                    }, 500); // Match the transition duration
+                } else {
+                    errorLog(`Card with id ${id} not found`);
+                }
+            }
+
+            function previewLetter(id) {
+                debugLog(`previewLetter called for id: ${id}`);
+                if (!window.jamDisputeCards) {
+                    errorLog('DisputeCards module not loaded');
+                    return;
+                }
+
+                const letter = window.jamDisputeCards.getLetterById(id);
+                if (!letter) {
+                    errorLog(`Letter with id ${id} not found`);
+                    return;
+                }
+
+                debugLog(`Previewing letter: ${letter.title}`);
+                alert(`Preview functionality for "${letter.title}" would open a modal with the letter template.`);
+                // In a real implementation, this would open a modal with the letter preview
+            }
+
+            function downloadLetter(id) {
+                debugLog(`downloadLetter called for id: ${id}`);
+                if (!window.jamDisputeCards) {
+                    errorLog('DisputeCards module not loaded');
+                    return;
+                }
+
+                const letter = window.jamDisputeCards.getLetterById(id);
+                if (!letter) {
+                    errorLog(`Letter with id ${id} not found`);
+                    return;
+                }
+
+                debugLog(`Downloading letter: ${letter.title}`);
+                alert(`Download started for "${letter.title}". In a real implementation, this would download a Word or PDF file.`);
+                // In a real implementation, this would trigger a file download
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                debugLog('Reset called');
+                isInitialized = false;
+                isDisputeCardsLoading = false;
+
+                // Remove event listeners
+                debugLog('Removing event listeners');
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                window.removeEventListener('beforeunload', saveState);
+
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                flipCard: flipCard,
+                previewLetter: previewLetter,
+                downloadLetter: downloadLetter,
+                retryLoadingCards: retryLoadingCards
+            };
+        })();
+
+        // Expose the module globally
+        window.jamDisputeLibrary = DisputeLibraryModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            console.log('[DisputeLibrary] Dispatching disputeLibraryLoaded event');
+            window.dispatchEvent(new CustomEvent('disputeLibraryLoaded'));
+        }
+
+        // Add this to the init function after loading the DisputeCards module
+        window.addEventListener('disputeCardsReady', function (event) {
+            debugLog(`DisputeCards module ready with ${event.detail.letterCount} letters`);
+            renderLetters();
+        });
+    </script>
+</body>
+
+</html>

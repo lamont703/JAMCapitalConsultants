@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Credit Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #008080;
+            --primary-dark: #006666;
+            --primary-light: #e6f7f7;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+        }
+
+        .credit-report-container {
+            font-family: 'Montserrat', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .credit-report-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .credit-report-title {
+            color: #09ccfc;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .credit-report-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .smartcredit-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .smartcredit-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .smartcredit-logo {
+            max-width: 200px;
+            margin-right: 20px;
+        }
+
+        .smartcredit-title {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .smartcredit-description {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .smartcredit-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .smartcredit-feature {
+            background-color: #e6f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .smartcredit-feature i {
+            font-size: 2.5rem;
+            color: #09ccfc;
+            margin-bottom: 15px;
+        }
+
+        .smartcredit-feature h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #0099cc;
+        }
+
+        .smartcredit-feature p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .smartcredit-cta {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .smartcredit-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .smartcredit-btn:hover {
+            background-color: #0099cc;
+        }
+
+        .smartcredit-disclaimer {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .faq-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .faq-title {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 15px;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question i {
+            color: #09ccfc;
+            transition: transform 0.3s;
+        }
+
+        .faq-active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 0 0 15px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .faq-active .faq-answer {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .smartcredit-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Credit Report Module
+        const CreditReportModule = (function () {
+            // Private variables
+            let isInitialized = false;
+
+            // Initialize the module
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return false;
+
+                // Only initialize once
+                if (isInitialized) {
+                    console.log('Credit Report Module already initialized');
+                    return true;
+                }
+
+                // Insert the widget HTML
+                container.innerHTML = `
+                    <div class="credit-report-container">
+                        <div class="credit-report-header">
+                            <h2 class="credit-report-title">Monitor Your Credit</h2>
+                            <p class="credit-report-subtitle">Track your progress and stay informed about changes to your credit report</p>
+                        </div>
+                        
+                        <div class="smartcredit-section">
+                            <div class="smartcredit-header">
+                                <img src="../assets/images/smartcredit-logo.png" alt="SmartCredit Logo" class="smartcredit-logo">
+                                <div>
+                                    <h3 class="smartcredit-title">Our Recommended Credit Monitoring Service</h3>
+                                </div>
+                            </div>
+                            
+                            <p class="smartcredit-description">
+                                SmartCredit provides comprehensive credit monitoring with powerful tools to help you understand, 
+                                manage and improve your credit. As part of your credit repair journey with JAM Credit Solutions, 
+                                we recommend SmartCredit for its exceptional features and user-friendly interface.
+                            </p>
+                            
+                            <div class="smartcredit-features">
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-chart-line"></i>
+                                    <h4>3-Bureau Monitoring</h4>
+                                    <p>Track your credit reports and scores from all three major credit bureaus: Experian, Equifax, and TransUnion.</p>
+                                </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-bell"></i>
+                                    <h4>Real-Time Alerts</h4>
+                                    <p>Receive instant notifications about important changes to your credit report, helping you spot potential issues quickly.</p>
+                                </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-tools"></i>
+                                    <h4>Action Tools</h4>
+                                    <p>Access powerful tools to help you address negative items and improve your credit score directly from your dashboard.</p>
+                                </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <h4>Identity Protection</h4>
+                                    <p>Protect yourself from identity theft with advanced monitoring and $1M identity theft insurance.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="smartcredit-cta">
+                                <a href="https://smartcredit.com/partners/jamcredit" target="_blank" class="smartcredit-btn">
+                                    Sign Up for SmartCredit
+                                </a>
+                                <p class="smartcredit-disclaimer">
+                                    Special offer for JAM Credit Solutions clients: Get your first month for just $1
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-section">
+                            <h3 class="faq-title">Frequently Asked Questions</h3>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" data-faq="1">
+                                    Why do I need credit monitoring during credit repair?
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer" id="faq-1">
+                                    Credit monitoring is essential during the repair process as it allows you to track changes to your credit report in real-time. 
+                                    You'll be able to see when negative items are removed, when your score changes, and verify that the dispute process is working. 
+                                    It also helps you catch any new negative items quickly so they can be addressed.
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" data-faq="2">
+                                    Why do you recommend SmartCredit specifically?
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer" id="faq-2">
+                                    We've evaluated many credit monitoring services and found SmartCredit to offer the best combination of features, 
+                                    usability, and value for our clients. Their 3-bureau monitoring, action tools, and user-friendly interface make 
+                                    it ideal for tracking your credit repair progress. Additionally, they offer special pricing for our clients.
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" data-faq="3">
+                                    How often should I check my credit reports?
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer" id="faq-3">
+                                    During active credit repair, we recommend checking your credit reports at least once a week. 
+                                    SmartCredit makes this easy with their dashboard and alert system. This frequent monitoring helps 
+                                    you stay on top of changes and ensures you can quickly respond to any updates or issues.
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" data-faq="4">
+                                    Is my information safe with SmartCredit?
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer" id="faq-4">
+                                    Yes, SmartCredit uses bank-level encryption and security measures to protect your personal information. 
+                                    They also include identity theft protection and insurance as part of their service, giving you additional 
+                                    peace of mind while monitoring your credit.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners();
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Set up event listeners
+            function setupEventListeners() {
+                // FAQ toggles
+                document.querySelectorAll('.faq-question').forEach(question => {
+                    question.addEventListener('click', function () {
+                        const faqItem = this.parentElement;
+                        faqItem.classList.toggle('faq-active');
+                    });
+                });
+            }
+
+            // Reset initialization state
+            function reset() {
+                isInitialized = false;
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset
+            };
+        })();
+
+        // Expose the module globally
+        window.jamCreditReport = CreditReportModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('creditReportLoaded'));
+        }
+    </script>
+</body>
+
+</html>

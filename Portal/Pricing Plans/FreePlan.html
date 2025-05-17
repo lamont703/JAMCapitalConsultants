@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM Credit Solutions - Free Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Free Plan Container Styles */
+        .free-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .free-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .free-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .free-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Free Plan Card Styles */
+        .free-plan-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+        }
+
+        .free-plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .free-plan-header {
+            padding: 1.5rem;
+            background: #e6f9ff;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        .free-plan-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #09ccfc;
+        }
+
+        .free-plan-price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .free-plan-price-period {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: normal;
+        }
+
+        .free-plan-target {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .free-plan-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .free-plan-description {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+
+        .free-plan-features {
+            list-style-type: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .free-plan-feature {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+        }
+
+        .free-plan-feature i {
+            color: #09ccfc;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            margin-top: 0.2rem;
+        }
+
+        .free-plan-cta {
+            margin-top: auto;
+            text-align: center;
+        }
+
+        .free-select-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .free-select-btn:hover {
+            background-color: #08b7e4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        /* Modal Styles */
+        .free-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .free-modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .free-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .free-modal-header {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .free-modal-title {
+            font-size: 1.5rem;
+            color: #09ccfc;
+        }
+
+        .free-modal-body {
+            margin-bottom: 1rem;
+        }
+
+        .free-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .free-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .free-form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .free-modal-actions {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .free-error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .free-error-message i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .free-plan-card {
+                max-width: 100%;
+            }
+
+            .free-modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- No visible content here - everything is loaded via JavaScript -->
+
+    <script>
+        // Create the FreePlanModule
+        const FreePlanModule = (function () {
+            let isInitialized = false;
+            let selectedOption = null;
+
+            // Try to restore state immediately when module is defined
+            try {
+                const savedState = sessionStorage.getItem('jamFreePlanState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    console.log('Restored Free Plan state during module definition', parsedState);
+
+                    if (parsedState.selectedOption) {
+                        selectedOption = parsedState.selectedOption;
+                    }
+                    if (parsedState.isInitialized) {
+                        isInitialized = parsedState.isInitialized;
+                    }
+                }
+            } catch (e) {
+                console.error('Error restoring Free Plan state during definition:', e);
+            }
+
+            function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                console.log('Initializing Free Plan Module, isInitialized:', isInitialized, 'selectedOption:', selectedOption);
+
+                // Insert the widget HTML
+                container.innerHTML = `
+                    <div class="free-plan-card">
+                        <div class="free-plan-header">
+                            <h3 class="free-plan-name">Free Plan</h3>
+                            <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
+                            <div class="free-plan-target">Perfect for getting started</div>
+                        </div>
+                        <div class="free-plan-body">
+                            <div class="free-plan-description">
+                                Start your credit repair journey with our essential free tools and resources.
+                            </div>
+                            <ul class="free-plan-features">
+                                <li class="free-plan-feature"><i class="fas fa-check"></i> Dispute Letter Library</li>
+                                <li class="free-plan-feature"><i class="fas fa-check"></i> Credit Repair eBook</li>
+                                <li class="free-plan-feature"><i class="fas fa-check"></i> Email Support</li>
+                                <li class="free-plan-feature"><i class="fas fa-check"></i> Basic Credit Tools</li>
+                                <li class="free-plan-feature"><i class="fas fa-check"></i> Credit Repair Strategy Guide</li>
+                            </ul>
+                            <div class="free-plan-cta">
+                                <button id="free-select-btn" class="free-select-btn">Get Started Free</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="free-modal" class="free-modal">
+                        <div class="free-modal-content">
+                            <span class="free-modal-close">&times;</span>
+                            <div class="free-modal-header">
+                                <h3 class="free-modal-title">Create Your Free Account</h3>
+                            </div>
+                            <div class="free-modal-body">
+                                <div class="free-form-group">
+                                    <label for="free-email">Email Address</label>
+                                    <input type="email" id="free-email" placeholder="your@email.com" required>
+                                </div>
+                                <div class="free-form-group">
+                                    <label for="free-password">Create Password</label>
+                                    <input type="password" id="free-password" placeholder="Minimum 8 characters" required>
+                                </div>
+                                <div class="free-modal-actions">
+                                    <button class="free-select-btn">Create Free Account</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // If we already have a selected option, show the success state
+                if (selectedOption === 'free') {
+                    const freePlanCard = container.querySelector('.free-plan-card');
+                    if (freePlanCard) {
+                        freePlanCard.innerHTML = `
+                            <div class="free-plan-header">
+                                <h3 class="free-plan-name">Free Plan</h3>
+                                <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
+                            </div>
+                            <div class="free-plan-body" style="text-align: center;">
+                                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 15px;"></i>
+                                <h3 style="margin-bottom: 10px;">Account Created!</h3>
+                                <p>Thank you for signing up. Check your email for login instructions.</p>
+                                <div class="free-plan-cta" style="margin-top: 20px;">
+                                    <button class="free-select-btn" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+
+                // Save state
+                saveState();
+
+                return true;
+            }
+
+            function setupEventListeners(container) {
+                // Get Started button
+                const selectBtn = container.querySelector('#free-select-btn');
+                if (selectBtn) {
+                    selectBtn.addEventListener('click', function () {
+                        openModal(container);
+                    });
+                }
+
+                // Modal close button
+                const closeBtn = container.querySelector('.free-modal-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function () {
+                        closeModal(container);
+                    });
+                }
+
+                // Close modal when clicking outside
+                const modal = container.querySelector('.free-modal');
+                if (modal) {
+                    modal.addEventListener('click', function (event) {
+                        if (event.target === modal) {
+                            closeModal(container);
+                        }
+                    });
+                }
+
+                // Form submission
+                const submitBtn = container.querySelector('.free-modal-actions .free-select-btn');
+                if (submitBtn) {
+                    submitBtn.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        processSignup(container);
+                    });
+                }
+            }
+
+            function openModal(container) {
+                const modal = container.querySelector('.free-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
+            }
+
+            function closeModal(container) {
+                const modal = container.querySelector('.free-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            function processSignup(container) {
+                const email = container.querySelector('#free-email').value;
+                const password = container.querySelector('#free-password').value;
+                const modalBody = container.querySelector('.free-modal-body');
+
+                // Basic validation
+                if (!email || !password) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'free-error-message';
+                    errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all required fields.';
+
+                    // Remove any existing error messages
+                    const existingError = modalBody.querySelector('.free-error-message');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+
+                    // Insert error before the actions div
+                    const actionsDiv = modalBody.querySelector('.free-modal-actions');
+                    modalBody.insertBefore(errorMsg, actionsDiv);
+                    return;
+                }
+
+                console.log('Processing free signup for:', email);
+
+                // Show loading state
+                const submitBtn = container.querySelector('.free-modal-actions .free-select-btn');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Creating Account...';
+                submitBtn.disabled = true;
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Reset button
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+
+                    // Close modal
+                    closeModal(container);
+
+                    // Show success message
+                    const freePlanCard = container.querySelector('.free-plan-card');
+                    if (freePlanCard) {
+                        freePlanCard.innerHTML = `
+                            <div class="free-plan-header">
+                                <h3 class="free-plan-name">Free Plan</h3>
+                                <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
+                            </div>
+                            <div class="free-plan-body" style="text-align: center;">
+                                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 15px;"></i>
+                                <h3 style="margin-bottom: 10px;">Account Created!</h3>
+                                <p>Thank you for signing up. Check your email for login instructions.</p>
+                                <div class="free-plan-cta" style="margin-top: 20px;">
+                                    <button class="free-select-btn" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Store selected option
+                    selectedOption = 'free';
+
+                    // Trigger event for tracking
+                    if (typeof window.dispatchEvent === 'function') {
+                        window.dispatchEvent(new CustomEvent('freePlanSelected', {
+                            detail: { plan: 'free', email: email }
+                        }));
+                    }
+
+                    // Save the updated state
+                    saveState();
+                }, 1500);
+            }
+
+            // Add this function to save state to sessionStorage
+            function saveState() {
+                try {
+                    const state = {
+                        selectedOption: selectedOption,
+                        isInitialized: isInitialized
+                    };
+                    sessionStorage.setItem('jamFreePlanState', JSON.stringify(state));
+                    console.log('Saved Free Plan state to session storage', state);
+                } catch (e) {
+                    console.error('Error saving Free Plan state:', e);
+                }
+            }
+
+            // Update your reset function to clear session storage
+            function reset() {
+                isInitialized = false;
+                selectedOption = null;
+                try {
+                    sessionStorage.removeItem('jamFreePlanState');
+                } catch (e) {
+                    console.error('Error clearing Free Plan state:', e);
+                }
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                openModal: openModal,
+                closeModal: closeModal,
+                getSelectedOption: function () {
+                    return selectedOption;
+                }
+            };
+        })();
+
+        // Make sure the module is properly exposed globally
+        window.jamFreePlan = FreePlanModule;
+
+        // Add a more robust reload mechanism
+        window.addEventListener('pageshow', function (event) {
+            // pageshow fires when the page is shown, including from bfcache
+            if (event.persisted) {
+                console.log('Page was restored from bfcache, reinitializing FreePlan module');
+                const container = document.getElementById('free-plan-container');
+                if (container && window.jamFreePlan) {
+                    window.jamFreePlan.init('free-plan-container');
+                }
+            }
+        });
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM content loaded, checking for Free Plan container');
+            const container = document.getElementById('free-plan-container');
+            if (container && window.jamFreePlan) {
+                console.log('Found Free Plan container, initializing');
+                window.jamFreePlan.init('free-plan-container');
+            } else if (window.jamFreePlan) {
+                // If loaded directly, create a container
+                console.log('FreePlan.html loaded directly, creating container');
+                const newContainer = document.createElement('div');
+                newContainer.id = 'free-plan-container';
+                document.body.appendChild(newContainer);
+                window.jamFreePlan.init('free-plan-container');
+            }
+        });
+
+        // Signal that the module is loaded
+            if (window.dispatchEvent) {
+                window.dispatchEvent(new CustomEvent('jamFreePlanLoaded'));
+                console.log('FreePlan module loaded and event dispatched');
+            }
+
+    </script>
+</body>
+
+</html>
