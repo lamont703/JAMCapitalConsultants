@@ -172,74 +172,349 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #6c757d;
             margin: 0 10px;
-            flex-shrink: 0;
-        }
-
-        .Bot-user-message .Bot-message-avatar {
-            background: #09ccfc;
-            color: white;
         }
 
         .Bot-bot-message .Bot-message-avatar {
-            background: #07a3ca;
-            color: white;
-        }
-
-        .Bot-chat-input-container {
-            display: flex;
-            padding: 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .Bot-chat-input {
-            flex: 1;
-            border: 1px solid #dee2e6;
-            border-radius: 24px;
-            padding: 10px 15px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .Bot-chat-input:focus {
-            border-color: #09ccfc;
-        }
-
-        .Bot-chat-send {
             background: #09ccfc;
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            margin-left: 10px;
+        }
+
+        /* Quick Reply Options */
+        .Bot-quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .Bot-quick-reply {
+            background: white;
+            border: 1px solid #09ccfc;
+            color: #09ccfc;
+            padding: 10px 16px;
+            border-radius: 18px;
             cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
         }
 
-        .Bot-chat-send:hover {
-            background: #07a3ca;
+        .Bot-quick-reply:hover {
+            background: #e6f9ff;
+            transform: translateY(-2px);
         }
 
-        /* Upload Interface */
-        .Bot-upload-container {
+        .Bot-quick-reply-icon {
+            margin-right: 8px;
+            font-size: 0.85rem;
+        }
+
+        /* Option Cards for Guided Flow */
+        .Bot-option-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .Bot-option-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .Bot-option-card:hover {
+            border-color: #09ccfc;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(9, 204, 252, 0.1);
+        }
+
+        .Bot-option-card-icon {
+            font-size: 24px;
+            color: #09ccfc;
+            margin-bottom: 12px;
+        }
+
+        .Bot-option-card-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .Bot-option-card-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        /* Welcome Screen */
+        .Bot-welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
             height: 100%;
         }
 
-        .Bot-upload-area {
+        .Bot-welcome-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #09ccfc;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(9, 204, 252, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(9, 204, 252, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(9, 204, 252, 0);
+            }
+        }
+
+        .Bot-welcome-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+
+        .Bot-welcome-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        /* Progress Indicator */
+        .Bot-progress-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .Bot-progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .Bot-progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20%;
+        }
+
+        .Bot-progress-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #dee2e6;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .Bot-progress-dot.active {
+            background: #09ccfc;
+        }
+
+        .Bot-progress-dot.completed {
+            background: #28a745;
+        }
+
+        .Bot-progress-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .Bot-progress-bar {
+            height: 4px;
+            background: #dee2e6;
+            position: relative;
+            margin-top: -22px;
+            z-index: 1;
+        }
+
+        .Bot-progress-bar-fill {
+            height: 100%;
+            background: #09ccfc;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Form Elements */
+        .Bot-form-group {
+            margin-bottom: 20px;
+        }
+
+        .Bot-form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .Bot-form-input,
+        .Bot-form-select,
+        .Bot-form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .Bot-form-input:focus,
+        .Bot-form-select:focus,
+        .Bot-form-textarea:focus {
+            outline: none;
+            border-color: #09ccfc;
+            box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.1);
+        }
+
+        /* Buttons */
+        .Bot-btn {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .Bot-btn:hover {
+            background: #07a3ca;
+            transform: translateY(-2px);
+        }
+
+        .Bot-btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .Bot-btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .Bot-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* File Upload */
+        .Bot-file-upload {
             border: 2px dashed #dee2e6;
             border-radius: 8px;
             padding: 30px;
             text-align: center;
+            transition: all 0.2s ease;
             margin-bottom: 20px;
-            transition: all 0.2s;
+            position: relative;
+        }
+
+        .Bot-file-upload-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        #manualUploadBtn {
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .Bot-option-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .Bot-progress-label {
+                display: none;
+            }
+
+            .Bot-tab {
+                padding: 10px;
+            }
+
+            .Bot-tab-text {
+                display: none;
+            }
+
+            .Bot-tab-icon {
+                margin-right: 0;
+            }
+        }
+
+        /* Upload Tab Styles */
+        .Bot-upload-container {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .Bot-upload-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .Bot-upload-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .Bot-upload-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .Bot-upload-message {
+            margin-bottom: 20px;
+        }
+
+        .Bot-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
             cursor: pointer;
         }
 
@@ -249,703 +524,687 @@
         }
 
         .Bot-upload-icon {
-            font-size: 48px;
+            font-size: 3rem;
             color: #09ccfc;
             margin-bottom: 15px;
         }
 
-        .Bot-upload-title {
-            font-size: 18px;
+        .Bot-upload-area-title {
+            font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 10px;
         }
 
-        .Bot-upload-subtitle {
-            color: #6c757d;
+        .Bot-upload-area-subtitle {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .Bot-upload-area-formats {
+            color: #888;
+            font-size: 0.8rem;
             margin-bottom: 15px;
         }
 
-        .Bot-upload-button {
-            background: #09ccfc;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
+        .Bot-upload-btn {
+            margin-top: 10px;
         }
 
-        .Bot-upload-button:hover {
-            background: #07a3ca;
+        .Bot-upload-files {
+            margin-bottom: 20px;
         }
 
-        .Bot-uploaded-files {
-            margin-top: 20px;
-        }
-
-        .Bot-uploaded-file {
+        .Bot-upload-file {
             display: flex;
             align-items: center;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 15px;
             margin-bottom: 10px;
         }
 
-        .Bot-file-icon {
+        .Bot-upload-file-icon {
+            font-size: 1.5rem;
             color: #09ccfc;
-            font-size: 20px;
-            margin-right: 10px;
+            margin-right: 15px;
         }
 
-        .Bot-file-info {
+        .Bot-upload-file-info {
             flex: 1;
         }
 
-        .Bot-file-name {
+        .Bot-upload-file-name {
             font-weight: 500;
             margin-bottom: 3px;
         }
 
-        .Bot-file-size {
-            font-size: 12px;
+        .Bot-upload-file-size {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .Bot-upload-file-status {
+            font-size: 0.8rem;
+            color: #28a745;
+            display: flex;
+            align-items: center;
+        }
+
+        .Bot-upload-file-status i {
+            margin-right: 5px;
+        }
+
+        .Bot-upload-file-actions {
+            display: flex;
+        }
+
+        .Bot-upload-file-action {
+            background: none;
+            border: none;
             color: #6c757d;
-        }
-
-        .Bot-file-remove {
-            color: #dc3545;
             cursor: pointer;
+            font-size: 1rem;
             padding: 5px;
+            margin-left: 5px;
+            transition: color 0.2s;
         }
 
-        /* Guide Interface */
-        .Bot-guide-container {
-            height: 100%;
-            overflow-y: auto;
-        }
-
-        .Bot-guide-section {
-            margin-bottom: 30px;
-        }
-
-        .Bot-guide-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
+        .Bot-upload-file-action:hover {
             color: #09ccfc;
         }
 
-        .Bot-guide-content {
-            background: white;
-            border-radius: 8px;
+        .Bot-upload-tips {
+            background: #f8f9fa;
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        .Bot-guide-step {
-            display: flex;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f8f9fa;
-        }
-
-        .Bot-guide-step:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .Bot-step-number {
-            width: 30px;
-            height: 30px;
-            background: #09ccfc;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .Bot-upload-tips-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-right: 15px;
-            flex-shrink: 0;
+            margin-bottom: 15px;
+            color: #333;
         }
 
-        .Bot-step-content {
+        .Bot-upload-tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .Bot-upload-tip {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .Bot-upload-tip-icon {
+            color: #28a745;
+            font-size: 1.2rem;
+            margin-right: 10px;
+            margin-top: 2px;
+        }
+
+        .Bot-upload-tip-content {
             flex: 1;
         }
 
-        .Bot-step-title {
+        .Bot-upload-tip-content h4 {
+            font-size: 1rem;
             font-weight: 600;
             margin-bottom: 5px;
         }
 
-        /* Settings Interface */
-        .Bot-settings-container {
-            height: 100%;
-            overflow-y: auto;
+        .Bot-upload-tip-content p {
+            font-size: 0.9rem;
+            color: #666;
         }
 
-        .Bot-settings-section {
-            margin-bottom: 30px;
-        }
-
-        .Bot-settings-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
+        .Bot-upload-tip-content a {
             color: #09ccfc;
+            text-decoration: none;
         }
 
-        .Bot-settings-option {
-            display: flex;
-            align-items: center;
+        .Bot-upload-tip-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Continue Button Styles */
+        .Bot-upload-continue {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .Bot-upload-continue-text {
             margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f8f9fa;
-        }
-
-        .Bot-settings-option:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .Bot-settings-label {
-            flex: 1;
-        }
-
-        .Bot-settings-name {
             font-weight: 500;
-            margin-bottom: 3px;
-        }
-
-        .Bot-settings-description {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-
-        .Bot-toggle {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-
-        .Bot-toggle input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .Bot-toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #dee2e6;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .Bot-toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        .Bot-toggle input:checked+.Bot-toggle-slider {
-            background-color: #09ccfc;
-        }
-
-        .Bot-toggle input:checked+.Bot-toggle-slider:before {
-            transform: translateX(24px);
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .Bot-tab {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-            }
-
-            .Bot-tab-icon {
-                margin-right: 5px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .Bot-header {
-                padding: 12px 15px;
-            }
-
-            .Bot-title {
-                font-size: 1.1rem;
-            }
-
-            .Bot-tab {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-
-            .Bot-tab-content {
-                padding: 15px;
-            }
-
-            .Bot-message {
-                max-width: 95%;
-                padding: 10px 14px;
-            }
+            color: #495057;
         }
     </style>
 </head>
 
 <body>
-    <!-- No HTML content needed here as it's generated by the script -->
+    <div id="jamTipBotContainer"></div>
+
     <script>
         // JAM Tip Bot Module
         const JamTipBotModule = (function () {
             // Private variables
             let isInitialized = false;
-            let activeTab = 'chat';
-            let uploadedFiles = [];
-            let chatHistory = [];
+            let activeTab = 'workflow'; // Default tab is now workflow
+            let currentStep = 1;
+            let workflowState = {
+                disputeType: null,
+                selectedItems: [],
+                userInfo: {},
+                generatedLetters: [],
+                uploadedReports: []
+            };
             let isProcessingMessage = false;
 
-            // Sample credit tips for demonstration
-            const creditTips = [
-                "Keep your credit card utilization below 30% for the best impact on your score.",
-                "Paying off collection accounts may not immediately improve your score, but it prevents further damage.",
-                "Dispute inaccurate information on your credit report - it's your right under the FCRA.",
-                "Adding yourself as an authorized user on someone's well-maintained credit card can boost your score.",
-                "Avoid applying for multiple credit cards in a short period - each application creates a hard inquiry.",
-                "Set up automatic payments to avoid late payments, which can stay on your report for 7 years.",
-                "A secured credit card can help rebuild credit if you're starting from scratch.",
-                "Check your credit reports regularly for errors - you're entitled to free reports annually.",
-                "Keeping old accounts open (even if unused) helps maintain a longer credit history.",
-                "Diversifying your credit mix (cards, loans, etc.) can positively impact your score."
-            ];
+            // Function to save the current tab state
+            function saveTabState(tabId) {
+                activeTab = tabId;
+                // Save to localStorage for persistence across page reloads
+                localStorage.setItem('jamBotActiveTab', tabId);
+                localStorage.setItem('jamBotWorkflowStep', currentStep);
+                localStorage.setItem('jamBotWorkflowState', JSON.stringify(workflowState));
+            }
 
-            // Sample credit laws for the AI to reference
-            const creditLaws = [
-                {
-                    name: "Fair Credit Reporting Act (FCRA)",
-                    description: "Gives consumers the right to dispute inaccurate information on their credit reports."
-                },
-                {
-                    name: "Fair Debt Collection Practices Act (FDCPA)",
-                    description: "Prohibits debt collectors from using abusive, unfair, or deceptive practices."
-                },
-                {
-                    name: "Credit Card Accountability Responsibility and Disclosure Act (CARD Act)",
-                    description: "Provides protections regarding credit card rates, fees, and disclosures."
-                },
-                {
-                    name: "Equal Credit Opportunity Act (ECOA)",
-                    description: "Prohibits credit discrimination on the basis of race, color, religion, national origin, sex, marital status, age, or because you receive public assistance."
-                }
-            ];
+            // Function to restore the tab state
+            function restoreTabState() {
+                // Try to get saved tab from localStorage, default to 'workflow'
+                const savedTab = localStorage.getItem('jamBotActiveTab') || 'workflow';
+                const savedStep = parseInt(localStorage.getItem('jamBotWorkflowStep') || '1');
+                const savedState = JSON.parse(localStorage.getItem('jamBotWorkflowState') || '{}');
 
-            // Initialize the module
-            function init(containerId) {
-                const container = document.getElementById(containerId);
-                if (!container) return false;
-
-                // Only initialize once
-                if (isInitialized) {
-                    console.log('JAM Tip Bot Module already initialized');
-                    return true;
+                // Restore workflow state if available
+                if (savedState && Object.keys(savedState).length > 0) {
+                    workflowState = savedState;
                 }
 
-                // Insert the widget HTML
+                currentStep = savedStep;
+                switchTab(savedTab);
+                return savedTab;
+            }
+
+            // Function to set up event listeners for the widget
+            function setupEventListeners() {
+                // Tab switching
+                const tabs = document.querySelectorAll('.Bot-tab');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function () {
+                        const targetId = this.getAttribute('data-tab');
+                        console.log('Tab clicked:', targetId);
+                        switchTab(targetId);
+                    });
+                });
+
+                // Start workflow button in letters tab
+                const startWorkflowBtn = document.getElementById('startWorkflowBtn');
+                if (startWorkflowBtn) {
+                    startWorkflowBtn.addEventListener('click', function () {
+                        switchTab('workflow');
+                        resetWorkflow();
+                        updateWorkflowView();
+                    });
+                }
+
+                // Initialize chat input
+                initChatListeners();
+            }
+
+            // Function to initialize chat listeners
+            function initChatListeners() {
+                const chatInput = document.querySelector('.Bot-chat-input');
+                const sendButton = document.querySelector('.Bot-chat-send');
+
+                if (chatInput && sendButton) {
+                    // Send message on button click
+                    sendButton.addEventListener('click', handleSendMessage);
+
+                    // Send message on Enter key (but allow Shift+Enter for new lines)
+                    chatInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                        }
+                    });
+                }
+            }
+
+            // Function to switch tabs
+            function switchTab(tabId) {
+                console.log('Switching to tab:', tabId);
+
+                const tabs = document.querySelectorAll('.Bot-tab');
+                const tabContents = document.querySelectorAll('.Bot-tab-content');
+
+                // Update active tab
+                tabs.forEach(tab => {
+                    if (tab.getAttribute('data-tab') === tabId) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+
+                // Update active content
+                tabContents.forEach(content => {
+                    if (content.id === `Bot-tab-${tabId}`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+
+                // Save the current tab state
+                saveTabState(tabId);
+
+                // If switching to workflow tab, update the workflow view
+                if (tabId === 'workflow') {
+                    updateWorkflowView();
+                }
+            }
+
+            // Function to update the workflow view based on current step
+            function updateWorkflowView() {
+                const workflowContent = document.getElementById('Bot-tab-workflow');
+                if (!workflowContent) return;
+
+                // Update progress bar
+                updateProgressBar();
+
+                // Clear existing content
+                const workflowContainer = workflowContent.querySelector('.Bot-workflow-container');
+                workflowContainer.innerHTML = '';
+
+                // Generate content based on current step
+                switch (currentStep) {
+                    case 1:
+                        renderWelcomeStep(workflowContainer);
+                        break;
+                    case 2:
+                        renderDisputeTypeStep(workflowContainer);
+                        break;
+                    case 3:
+                        renderCreditReportUploadStep(workflowContainer);
+                        break;
+                    case 4:
+                        renderSelectItemsStep(workflowContainer);
+                        break;
+                    case 5:
+                        renderGenerateLetterStep(workflowContainer);
+                        break;
+                    default:
+                        renderWelcomeStep(workflowContainer);
+                }
+            }
+
+            // Function to update progress bar
+            function updateProgressBar() {
+                const progressDots = document.querySelectorAll('.Bot-progress-dot');
+                const progressBarFill = document.querySelector('.Bot-progress-bar-fill');
+
+                if (!progressDots || !progressBarFill) return;
+
+                // Update dots
+                progressDots.forEach((dot, index) => {
+                    const stepNumber = index + 1;
+
+                    if (stepNumber < currentStep) {
+                        dot.classList.add('completed');
+                        dot.classList.remove('active');
+                    } else if (stepNumber === currentStep) {
+                        dot.classList.add('active');
+                        dot.classList.remove('completed');
+                    } else {
+                        dot.classList.remove('active', 'completed');
+                    }
+                });
+
+                // Update progress bar fill
+                const progressPercentage = ((currentStep - 1) / (progressDots.length - 1)) * 100;
+                progressBarFill.style.width = `${progressPercentage}%`;
+            }
+
+            // Step 1: Welcome & Intake
+            function renderWelcomeStep(container) {
                 container.innerHTML = `
-                    <div class="Bot-container" id="Bot-container">
-                        <div class="Bot-header">
-                            <div class="Bot-logo">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div>
-                                <h2 class="Bot-title">JAM AI Credit Bot</h2>
-                                <div class="Bot-subtitle">Your AI-powered credit repair assistant</div>
-                            </div>
+                    <div class="Bot-welcome-screen">
+                        <div class="Bot-welcome-avatar">
+                            <i class="fas fa-robot"></i>
                         </div>
+                        <h2 class="Bot-welcome-title">Welcome to JAM Dispute Bot</h2>
+                        <p class="Bot-welcome-subtitle">Your AI-powered credit strategy expert</p>
                         
-                        <div class="Bot-tabs" id="Bot-tabs">
-                            <div class="Bot-tab active" data-tab="chat">
-                                <i class="Bot-tab-icon fas fa-comments"></i> Chat
-                            </div>
-                            <div class="Bot-tab" data-tab="upload">
-                                <i class="Bot-tab-icon fas fa-upload"></i> Upload Reports
-                            </div>
-                            <div class="Bot-tab" data-tab="guide">
-                                <i class="Bot-tab-icon fas fa-book"></i> Guide
-                            </div>
-                            <div class="Bot-tab" data-tab="settings">
-                                <i class="Bot-tab-icon fas fa-cog"></i> Settings
-                            </div>
-                        </div>
-                        
-                        <div class="Bot-content">
-                            <!-- Chat Tab -->
-                            <div class="Bot-tab-content active" id="Bot-tab-chat">
-                                <div class="Bot-chat-container">
-                                    <div class="Bot-chat-messages" id="Bot-chat-messages">
-                                        <!-- Messages will be added here -->
-                                    </div>
-                                    <div class="Bot-chat-input-container">
-                                        <textarea class="Bot-chat-input" id="Bot-chat-input" placeholder="Type your message here..." rows="1"></textarea>
-                                        <button class="Bot-chat-send" id="Bot-chat-send">
-                                            <i class="fas fa-paper-plane"></i>
-                                        </button>
-                                    </div>
+                        <div class="Bot-option-cards">
+                            <div class="Bot-option-card" data-option="collection">
+                                <div class="Bot-option-card-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
                                 </div>
+                                <h3 class="Bot-option-card-title">Remove a Collection</h3>
+                                <p class="Bot-option-card-desc">Dispute collection accounts on your credit report</p>
                             </div>
                             
-                            <!-- Upload Tab -->
-                            <div class="Bot-tab-content" id="Bot-tab-upload">
-                                <div class="Bot-upload-container">
-                                    <div class="Bot-upload-area" id="Bot-upload-area">
-                                        <div class="Bot-upload-icon">
-                                            <i class="fas fa-file-upload"></i>
-                                        </div>
-                                        <h3 class="Bot-upload-title">Upload Your Credit Reports</h3>
-                                        <p class="Bot-upload-subtitle">Drag and drop your files here or click to browse</p>
-                                        <input type="file" class="Bot-upload-input" id="Bot-upload-input" multiple accept=".pdf,.jpg,.jpeg,.png">
-                                        <button class="Bot-upload-button">
-                                            <i class="fas fa-folder-open"></i> Browse Files
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="Bot-file-list" id="Bot-file-list">
-                                        <!-- Uploaded files will appear here -->
-                                    </div>
-                                    
-                                    <button class="Bot-upload-button" id="Bot-analyze-button" style="display: none; width: 100%;">
-                                        <i class="fas fa-search"></i> Analyze My Credit Reports
-                                    </button>
+                            <div class="Bot-option-card" data-option="late_payment">
+                                <div class="Bot-option-card-icon">
+                                    <i class="fas fa-calendar-times"></i>
                                 </div>
+                                <h3 class="Bot-option-card-title">Fix Late Payment</h3>
+                                <p class="Bot-option-card-desc">Dispute incorrect late payment records</p>
                             </div>
                             
-                            <!-- Guide Tab -->
-                            <div class="Bot-tab-content" id="Bot-tab-guide">
-                                <div class="Bot-guide-container">
-                                    <div class="Bot-guide-step">
-                                        <div class="Bot-step-header">
-                                            <div class="Bot-step-number">1</div>
-                                            <h3 class="Bot-step-title">Upload Your Credit Reports</h3>
-                                        </div>
-                                        <div class="Bot-step-content">
-                                            <p>Start by uploading your credit reports from all three bureaus (Experian, Equifax, and TransUnion). The AI needs these to identify potential errors and negative items that can be disputed.</p>
-                                            <div class="Bot-step-tip">
-                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
-                                                <div>You can get free credit reports once a year from <a href="https://www.annualcreditreport.com" target="_blank">AnnualCreditReport.com</a></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="Bot-guide-step">
-                                        <div class="Bot-step-header">
-                                            <div class="Bot-step-number">2</div>
-                                            <h3 class="Bot-step-title">Review AI Analysis</h3>
-                                        </div>
-                                        <div class="Bot-step-content">
-                                            <p>After uploading, our AI will analyze your reports to identify potential errors, negative items, and opportunities for improvement. The analysis will highlight items that can be disputed under FCRA guidelines.</p>
-                                            <div class="Bot-step-tip">
-                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
-                                                <div>Common disputable items include incorrect personal information, accounts that aren't yours, late payments reported in error, and outdated negative information.</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="Bot-guide-step">
-                                        <div class="Bot-step-header">
-                                            <div class="Bot-step-number">3</div>
-                                            <h3 class="Bot-step-title">Generate Dispute Letters</h3>
-                                        </div>
-                                        <div class="Bot-step-content">
-                                            <p>Use the chat interface to ask the AI to generate customized dispute letters for specific items. The AI will create legally-sound letters based on relevant credit laws and your specific situation.</p>
-                                            <div class="Bot-step-tip">
-                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
-                                                <div>Be specific when requesting letters. For example: "Generate a dispute letter for the late payment on my Capital One account from March 2022."</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="Bot-guide-step">
-                                        <div class="Bot-step-header">
-                                            <div class="Bot-step-number">4</div>
-                                            <h3 class="Bot-step-title">Send Disputes & Track Progress</h3>
-                                        </div>
-                                        <div class="Bot-step-content">
-                                            <p>Download and send the generated dispute letters to the appropriate credit bureaus. Return to the AI chat to ask questions about next steps, follow-up strategies, and to track your progress.</p>
-                                            <div class="Bot-step-tip">
-                                                <div class="Bot-tip-icon"><i class="fas fa-lightbulb"></i></div>
-                                                <div>Credit bureaus typically respond within 30 days. Keep all correspondence and check your credit reports regularly to monitor changes.</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="Bot-option-card" data-option="not_mine">
+                                <div class="Bot-option-card-icon">
+                                    <i class="fas fa-user-times"></i>
                                 </div>
+                                <h3 class="Bot-option-card-title">Not My Account</h3>
+                                <p class="Bot-option-card-desc">Remove accounts that don't belong to you</p>
                             </div>
                             
-                            <!-- Settings Tab -->
-                            <div class="Bot-tab-content" id="Bot-tab-settings">
-                                <div class="Bot-settings-container">
-                                    <div class="Bot-settings-section">
-                                        <h3 class="Bot-settings-title">
-                                            <i class="fas fa-bell"></i> Notifications
-                                        </h3>
-                                        <div class="Bot-settings-option">
-                                            <div class="Bot-settings-label">
-                                                <div class="Bot-settings-name">Email Notifications</div>
-                                                <div class="Bot-settings-description">Receive email updates about your disputes and credit changes</div>
-                                            </div>
-                                            <label class="Bot-toggle">
-                                                <input type="checkbox" checked id="Bot-setting-email">
-                                                <span class="Bot-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                        <div class="Bot-settings-option">
-                                            <div class="Bot-settings-label">
-                                                <div class="Bot-settings-name">Credit Score Alerts</div>
-                                                <div class="Bot-settings-description">Get notified when your credit score changes</div>
-                                            </div>
-                                            <label class="Bot-toggle">
-                                                <input type="checkbox" checked id="Bot-setting-score-alerts">
-                                                <span class="Bot-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="Bot-settings-section">
-                                        <h3 class="Bot-settings-title">
-                                            <i class="fas fa-robot"></i> AI Assistant
-                                        </h3>
-                                        <div class="Bot-settings-option">
-                                            <div class="Bot-settings-label">
-                                                <div class="Bot-settings-name">AI Suggestions</div>
-                                                <div class="Bot-settings-description">Allow AI to proactively suggest credit improvement strategies</div>
-                                            </div>
-                                            <label class="Bot-toggle">
-                                                <input type="checkbox" checked id="Bot-setting-ai-suggestions">
-                                                <span class="Bot-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                        <div class="Bot-settings-option">
-                                            <div class="Bot-settings-label">
-                                                <div class="Bot-settings-name">Save Chat History</div>
-                                                <div class="Bot-settings-description">Store your conversations with the AI for future reference</div>
-                                            </div>
-                                            <label class="Bot-toggle">
-                                                <input type="checkbox" checked id="Bot-setting-save-chat">
-                                                <span class="Bot-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="Bot-settings-section">
-                                        <h3 class="Bot-settings-title">
-                                            <i class="fas fa-shield-alt"></i> Privacy
-                                        </h3>
-                                        <div class="Bot-settings-option">
-                                            <div class="Bot-settings-label">
-                                                <div class="Bot-settings-name">Data Encryption</div>
-                                                <div class="Bot-settings-description">Encrypt all your credit data and communications</div>
-                                            </div>
-                                            <label class="Bot-toggle">
-                                                <input type="checkbox" checked id="Bot-setting-encryption" disabled>
-                                                <span class="Bot-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                        <div class="Bot-settings-option">
-                                            <div class="Bot-settings-label">
-                                                <div class="Bot-settings-name">Anonymous Analytics</div>
-                                                <div class="Bot-settings-description">Share anonymous usage data to improve our service</div>
-                                            </div>
-                                            <label class="Bot-toggle">
-                                                <input type="checkbox" checked id="Bot-setting-analytics">
-                                                <span class="Bot-toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                            <div class="Bot-option-card" data-option="show_common">
+                                <div class="Bot-option-card-icon">
+                                    <i class="fas fa-question-circle"></i>
                                 </div>
+                                <h3 class="Bot-option-card-title">I'm Not Sure</h3>
+                                <p class="Bot-option-card-desc">Show me common credit report issues</p>
                             </div>
                         </div>
                     </div>
                 `;
 
-                // Set up event listeners
-                setupEventListeners();
-
-                // Add welcome message
-                addBotMessage("👋 Hello! I'm your AI Credit Assistant. I can help you analyze your credit reports, identify disputable items, and generate dispute letters based on credit laws. Upload your credit reports or ask me questions about credit repair!");
-
-                // Mark as initialized
-                isInitialized = true;
-
-                return true;
+                // Add event listeners to option cards
+                const optionCards = container.querySelectorAll('.Bot-option-card');
+                optionCards.forEach(card => {
+                    card.addEventListener('click', function () {
+                        const option = this.getAttribute('data-option');
+                        workflowState.disputeType = option;
+                        goToNextStep();
+                    });
+                });
             }
 
-            // Reset initialization state for reloading
-            function reset() {
-                isInitialized = false;
-                return true;
-            }
+            // Step 2: Dispute Type Selection
+            function renderDisputeTypeStep(container) {
+                let title, description, options;
 
-            // Set up event listeners for the widget
-            function setupEventListeners() {
-                // Tab switching
-                const tabs = document.querySelectorAll('.Bot-tab');
-                const tabContents = document.querySelectorAll('.Bot-tab-content');
+                // Customize content based on previous selection
+                switch (workflowState.disputeType) {
+                    case 'collection':
+                        title = "Collection Account Dispute";
+                        description = "Let's gather some information about the collection account you want to dispute.";
+                        options = [
+                            { id: 'paid_collection', text: 'Collection was paid but still showing', icon: 'fa-check-circle' },
+                            { id: 'old_collection', text: 'Collection is too old (over 7 years)', icon: 'fa-hourglass-end' },
+                            { id: 'wrong_amount', text: 'Collection amount is wrong', icon: 'fa-dollar-sign' },
+                            { id: 'not_notified', text: 'I was never notified about this debt', icon: 'fa-envelope' }
+                        ];
+                        break;
+                    case 'late_payment':
+                        title = "Late Payment Dispute";
+                        description = "Tell us more about the late payment issue on your credit report.";
+                        options = [
+                            { id: 'never_late', text: 'I was never late on this payment', icon: 'fa-calendar-check' },
+                            { id: 'wrong_date', text: 'The late payment date is incorrect', icon: 'fa-calendar-times' },
+                            { id: 'wrong_severity', text: 'The lateness severity is wrong (30/60/90 days)', icon: 'fa-exclamation-triangle' },
+                            { id: 'goodwill', text: 'I want to request goodwill removal', icon: 'fa-hands-helping' }
+                        ];
+                        break;
+                    case 'not_mine':
+                        title = "Account Not Mine";
+                        description = "Let's gather details about the account that doesn't belong to you.";
+                        options = [
+                            { id: 'never_opened', text: 'I never opened this account', icon: 'fa-times-circle' },
+                            { id: 'identity_theft', text: 'This may be identity theft', icon: 'fa-user-shield' },
+                            { id: 'mixed_file', text: 'This belongs to someone with a similar name', icon: 'fa-users' },
+                            { id: 'authorized_user', text: 'I was only an authorized user', icon: 'fa-user-check' }
+                        ];
+                        break;
+                    case 'show_common':
+                    default:
+                        title = "Common Credit Report Issues";
+                        description = "Here are common issues people dispute on their credit reports. Select what applies to you:";
+                        options = [
+                            { id: 'incorrect_personal', text: 'Incorrect personal information', icon: 'fa-address-card' },
+                            { id: 'duplicate_accounts', text: 'Duplicate accounts', icon: 'fa-copy' },
+                            { id: 'hard_inquiries', text: 'Unauthorized hard inquiries', icon: 'fa-search' },
+                            { id: 'bankruptcy_issues', text: 'Bankruptcy reporting issues', icon: 'fa-balance-scale' }
+                        ];
+                        break;
+                }
 
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const targetId = tab.getAttribute('data-tab');
+                container.innerHTML = `
+                    <div class="Bot-step-container">
+                        <h2 class="Bot-step-title">${title}</h2>
+                        <p class="Bot-step-description">${description}</p>
+                        
+                        <div class="Bot-option-cards">
+                            ${options.map(option => `
+                                <div class="Bot-option-card" data-option="${option.id}">
+                                    <div class="Bot-option-card-icon">
+                                        <i class="fas ${option.icon}"></i>
+                                    </div>
+                                    <h3 class="Bot-option-card-title">${option.text}</h3>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="Bot-btn-group">
+                            <button class="Bot-btn Bot-btn-secondary" id="backButton">Back</button>
+                        </div>
+                    </div>
+                `;
 
-                        // Update active tab
-                        tabs.forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-
-                        // Update active content
-                        tabContents.forEach(content => {
-                            content.classList.remove('active');
-                            if (content.id === targetId) {
-                                content.classList.add('active');
-                            }
-                        });
+                // Add event listeners to option cards
+                const optionCards = container.querySelectorAll('.Bot-option-card');
+                optionCards.forEach(card => {
+                    card.addEventListener('click', function () {
+                        const option = this.getAttribute('data-option');
+                        workflowState.disputeSubtype = option;
+                        goToNextStep();
                     });
                 });
 
-                // Chat form submission
-                const chatForm = document.getElementById('Bot-chat-form');
-                const chatInput = document.getElementById('Bot-chat-input');
-
-                if (chatForm) {
-                    chatForm.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        const message = chatInput.value.trim();
-                        if (message) {
-                            // Add user message to chat
-                            addUserMessage(message);
-
-                            // Clear input
-                            chatInput.value = '';
-
-                            // Process the message and get AI response
-                            processUserMessage(message);
-                        }
-                    });
+                // Back button listener
+                const backButton = container.querySelector('#backButton');
+                if (backButton) {
+                    backButton.addEventListener('click', goToPreviousStep);
                 }
+            }
 
-                // File upload handling
-                const fileUploadInput = document.getElementById('Bot-file-upload');
-                const uploadButton = document.getElementById('Bot-upload-button');
+            // Step 3: Credit Report Upload
+            function renderCreditReportUploadStep(container) {
+                container.innerHTML = `
+                    <div class="Bot-step-container">
+                        <h2 class="Bot-step-title">Upload Your Credit Report</h2>
+                        <p class="Bot-step-description">Upload your credit report so we can identify the items to dispute.</p>
+                        
+                        <div class="Bot-file-upload" id="fileUploadArea">
+                            <div class="Bot-file-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p class="Bot-file-upload-text">Drag & drop your credit report file here</p>
+                            <button type="button" class="Bot-btn Bot-btn-primary" id="manualUploadBtn">
+                                <i class="fas fa-upload"></i> Browse Files
+                            </button>
+                            <input type="file" class="Bot-file-upload-input" id="creditReportFile" accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                        
+                        <div class="Bot-form-group" style="margin-top: 20px;">
+                            <label class="Bot-form-label">Or select your credit bureau:</label>
+                            <select class="Bot-form-select" id="creditBureauSelect">
+                                <option value="">Select a credit bureau</option>
+                                <option value="experian">Experian</option>
+                                <option value="equifax">Equifax</option>
+                                <option value="transunion">TransUnion</option>
+                            </select>
+                        </div>
+                        
+                        <div class="Bot-btn-group">
+                            <button class="Bot-btn Bot-btn-secondary" id="backButton">Back</button>
+                            <button class="Bot-btn" id="continueButton">Continue Without Upload</button>
+                        </div>
+                    </div>
+                `;
 
-                if (uploadButton && fileUploadInput) {
-                    uploadButton.addEventListener('click', () => {
-                        fileUploadInput.click();
-                    });
+                // Add specific styles for this step
+                const style = document.createElement('style');
+                style.textContent = `
+                    .Bot-file-upload {
+                        border: 2px dashed #dee2e6;
+                        border-radius: 8px;
+                        padding: 30px;
+                        text-align: center;
+                        transition: all 0.2s ease;
+                        margin-bottom: 20px;
+                        position: relative;
+                    }
+                    
+                    .Bot-file-upload-input {
+                        position: absolute;
+                        width: 1px;
+                        height: 1px;
+                        padding: 0;
+                        margin: -1px;
+                        overflow: hidden;
+                        clip: rect(0, 0, 0, 0);
+                        border: 0;
+                    }
+                    
+                    #manualUploadBtn {
+                        display: inline-block;
+                        margin-top: 15px;
+                    }
+                `;
+                document.head.appendChild(style);
 
-                    fileUploadInput.addEventListener('change', (e) => {
-                        const files = e.target.files;
-                        if (files.length > 0) {
-                            handleFileUpload(files);
-                        }
-                    });
-                }
+                // Get references to elements
+                const fileUploadArea = container.querySelector('#fileUploadArea');
+                const fileInput = container.querySelector('#creditReportFile');
+                const manualUploadBtn = container.querySelector('#manualUploadBtn');
 
-                // Drag and drop for file upload
-                const dropArea = document.getElementById('Bot-drop-area');
-
-                if (dropArea) {
-                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                        dropArea.addEventListener(eventName, preventDefaults, false);
-                    });
-
-                    function preventDefaults(e) {
+                // Manual upload button click handler
+                if (manualUploadBtn) {
+                    manualUploadBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                    }
-
-                    ['dragenter', 'dragover'].forEach(eventName => {
-                        dropArea.addEventListener(eventName, () => {
-                            dropArea.classList.add('Bot-highlight');
-                        }, false);
-                    });
-
-                    ['dragleave', 'drop'].forEach(eventName => {
-                        dropArea.addEventListener(eventName, () => {
-                            dropArea.classList.remove('Bot-highlight');
-                        }, false);
-                    });
-
-                    dropArea.addEventListener('drop', (e) => {
-                        const files = e.dataTransfer.files;
-                        if (files.length > 0) {
-                            handleFileUpload(files);
+                        console.log('Manual upload button clicked');
+                        if (fileInput) {
+                            fileInput.click();
+                        } else {
+                            console.error('File input element not found');
                         }
-                    }, false);
+                    });
+                } else {
+                    console.error('Manual upload button not found');
                 }
 
-                // Settings toggles
-                const settingToggles = document.querySelectorAll('.Bot-toggle input[type="checkbox"]');
-
-                settingToggles.forEach(toggle => {
-                    toggle.addEventListener('change', (e) => {
-                        const settingId = e.target.id;
-                        const isEnabled = e.target.checked;
-                        updateSetting(settingId, isEnabled);
-                    });
-                });
-
-                // Example buttons in the guide tab
-                const exampleButtons = document.querySelectorAll('.Bot-example-button');
-
-                exampleButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const exampleQuery = button.getAttribute('data-query');
-                        if (exampleQuery) {
-                            // Switch to chat tab
-                            document.querySelector('.Bot-tab[data-tab="Bot-tab-chat"]').click();
-
-                            // Set the query in the input
-                            chatInput.value = exampleQuery;
-
-                            // Focus the input
-                            chatInput.focus();
+                // File input change handler
+                if (fileInput) {
+                    fileInput.addEventListener('change', function () {
+                        console.log('File input changed');
+                        if (this.files && this.files.length > 0) {
+                            console.log('File selected:', this.files[0].name);
+                            handleFileUpload(this.files[0]);
                         }
                     });
-                });
+                } else {
+                    console.error('File input element not found');
+                }
+
+                // Drag and drop handlers
+                if (fileUploadArea) {
+                    fileUploadArea.addEventListener('dragover', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.style.borderColor = '#09ccfc';
+                        this.style.backgroundColor = '#f8f9fa';
+                    });
+
+                    fileUploadArea.addEventListener('dragleave', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.style.borderColor = '#dee2e6';
+                        this.style.backgroundColor = '';
+                    });
+
+                    fileUploadArea.addEventListener('drop', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.style.borderColor = '#dee2e6';
+                        this.style.backgroundColor = '';
+
+                        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                            console.log('File dropped:', e.dataTransfer.files[0].name);
+                            handleFileUpload(e.dataTransfer.files[0]);
+                        }
+                    });
+                } else {
+                    console.error('File upload area not found');
+                }
+
+                // Bureau select listener
+                const bureauSelect = container.querySelector('#creditBureauSelect');
+                if (bureauSelect) {
+                    bureauSelect.addEventListener('change', () => {
+                        workflowState.creditBureau = bureauSelect.value;
+                    });
+                }
+
+                // Button listeners
+                const backButton = container.querySelector('#backButton');
+                const continueButton = container.querySelector('#continueButton');
+
+                if (backButton) {
+                    backButton.addEventListener('click', goToPreviousStep);
+                }
+
+                if (continueButton) {
+                    continueButton.addEventListener('click', () => {
+                        goToNextStep();
+                    });
+                }
             }
 
             // Handle file upload
-            function handleFileUpload(files) {
-                const fileList = Array.from(files);
-                const validFiles = fileList.filter(file => {
-                    const fileType = file.type;
-                    return fileType === 'application/pdf' ||
-                        fileType.startsWith('image/') ||
-                        fileType === 'text/plain';
-                });
+            function handleFileUpload(file) {
+                // In a real implementation, you would upload the file to your server
+                // For demo purposes, we'll just store the file name
+                workflowState.uploadedFile = file.name;
 
-                if (validFiles.length === 0) {
-                    addBotMessage("⚠️ Please upload PDF, image, or text files only. These are the formats I can analyze for credit report information.");
-                    return;
+                // Show success message
+                const fileUploadArea = document.querySelector('#fileUploadArea');
+                if (fileUploadArea) {
+                    fileUploadArea.innerHTML = `
+                        <div class="Bot-file-upload-success">
+                            <div class="Bot-file-upload-success-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="Bot-file-upload-success-title">File Uploaded Successfully</h3>
+                            <p class="Bot-file-upload-success-name">${file.name}</p>
+                        </div>
+                    `;
                 }
 
-                // Show uploading message
-                addUserMessage(`Uploading ${validFiles.length} file(s): ${validFiles.map(f => f.name).join(', ')}`);
+                // Store the file in the workflow state for reports tab as well
+                workflowState.uploadedReports = workflowState.uploadedReports || [];
+                workflowState.uploadedReports.push({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    uploadedAt: new Date().toISOString()
+                });
 
-                // Simulate file processing (in a real app, you'd send these to your server)
-                addBotMessage("📤 I'm receiving your files now. Please wait while I process them...");
+                // Save the updated state
+                saveTabState(activeTab);
 
-                // Simulate processing delay
+                // Simulate file analysis
                 setTimeout(() => {
                     // Show success message
                     addBotMessage(`✅ I've analyzed your credit report files. I found several items that may be eligible for disputes:
@@ -957,183 +1216,974 @@
 
 Would you like me to help you create dispute letters for any of these items?`);
                 }, 3000);
+
+                // Update the reports tab if it exists
+                updateUploadedReportsList();
             }
 
-            // Process user message and generate AI response
-            function processUserMessage(message) {
-                // In a real implementation, this would call your AI API
-                // For demo purposes, we'll use some canned responses
+            // Function to update the uploaded reports list in the Upload Reports tab
+            function updateUploadedReportsList() {
+                const uploadedReportsList = document.getElementById('uploadedReportsList');
+                if (!uploadedReportsList) return;
 
-                // Simulate AI thinking
-                setTimeout(() => {
-                    // Simple pattern matching for demo purposes
-                    if (message.toLowerCase().includes('dispute letter') || message.toLowerCase().includes('generate letter')) {
-                        addBotMessage(`📝 Here's a dispute letter for your Capital One late payment:
+                // Clear the list
+                uploadedReportsList.innerHTML = '';
 
----
+                // Add each report to the list
+                if (workflowState.uploadedReports && workflowState.uploadedReports.length > 0) {
+                    workflowState.uploadedReports.forEach(report => {
+                        const fileElement = document.createElement('div');
+                        fileElement.className = 'Bot-upload-file';
+                        fileElement.innerHTML = `
+                            <div class="Bot-upload-file-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="Bot-upload-file-info">
+                                <div class="Bot-upload-file-name">${report.name}</div>
+                                <div class="Bot-upload-file-size">${formatFileSize(report.size || 0)}</div>
+                            </div>
+                            <div class="Bot-upload-file-status">
+                                <i class="fas fa-check-circle"></i> Uploaded
+                            </div>
+                            <div class="Bot-upload-file-actions">
+                                <button class="Bot-upload-file-action" title="View Report">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="Bot-upload-file-action" title="Delete Report" data-file="${report.name}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        `;
 
-**[Your Name]**
-**[Your Address]**
-**[City, State ZIP]**
+                        uploadedReportsList.appendChild(fileElement);
+                    });
 
-**[Date]**
+                    // Add remove button listeners
+                    const removeButtons = uploadedReportsList.querySelectorAll('.Bot-upload-file-action[title="Delete Report"]');
+                    removeButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const fileName = this.getAttribute('data-file');
 
-**Equifax Information Services LLC**
-**P.O. Box 740256**
-**Atlanta, GA 30374**
+                            // Remove from workflow state
+                            workflowState.uploadedReports = workflowState.uploadedReports.filter(
+                                report => report.name !== fileName
+                            );
 
-**Re: Dispute of Inaccurate Information**
+                            // Save the updated state
+                            saveTabState(activeTab);
+
+                            // Remove from DOM
+                            this.closest('.Bot-upload-file').remove();
+
+                            // Update continue button visibility
+                            updateContinueButtonVisibility();
+                        });
+                    });
+                }
+
+                // Update continue button visibility
+                updateContinueButtonVisibility();
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Step 4: Account Details
+            function renderAccountDetailsStep(container) {
+                container.innerHTML = `
+                    <div class="Bot-step-container">
+                        <h2 class="Bot-step-title">Account Details</h2>
+                        <p class="Bot-step-description">Please provide details about the account you want to dispute.</p>
+                        
+                        <div class="Bot-form">
+                            <div class="Bot-form-group">
+                                <label class="Bot-form-label">Creditor/Company Name:</label>
+                                <input type="text" class="Bot-form-input" id="creditorName" placeholder="e.g., Capital One, Experian">
+                            </div>
+                            
+                            <div class="Bot-form-group">
+                                <label class="Bot-form-label">Account Number (last 4 digits):</label>
+                                <input type="text" class="Bot-form-input" id="accountNumber" placeholder="e.g., 1234" maxlength="4">
+                            </div>
+                            
+                            <div class="Bot-form-group">
+                                <label class="Bot-form-label">Date of Issue:</label>
+                                <input type="date" class="Bot-form-input" id="issueDate">
+                            </div>
+                            
+                            <div class="Bot-form-group">
+                                <label class="Bot-form-label">Describe the issue in detail:</label>
+                                <textarea class="Bot-form-textarea" id="issueDescription" placeholder="Explain what's incorrect about this account..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="Bot-btn-group">
+                            <button class="Bot-btn Bot-btn-secondary" id="backButton">Back</button>
+                            <button class="Bot-btn" id="continueButton">Continue</button>
+                        </div>
+                    </div>
+                `;
+
+                // Button listeners
+                const backButton = container.querySelector('#backButton');
+                const continueButton = container.querySelector('#continueButton');
+
+                if (backButton) {
+                    backButton.addEventListener('click', goToPreviousStep);
+                }
+
+                if (continueButton) {
+                    continueButton.addEventListener('click', () => {
+                        // Gather form data
+                        const creditorName = document.getElementById('creditorName').value;
+                        const accountNumber = document.getElementById('accountNumber').value;
+                        const issueDate = document.getElementById('issueDate').value;
+                        const issueDescription = document.getElementById('issueDescription').value;
+
+                        // Store in workflow state
+                        workflowState.accountDetails = {
+                            creditorName,
+                            accountNumber,
+                            issueDate,
+                            issueDescription
+                        };
+
+                        goToNextStep();
+                    });
+                }
+            }
+
+            // Step 5: Evidence Collection
+            function renderEvidenceStep(container) {
+                container.innerHTML = `
+                    <div class="Bot-step-container">
+                        <h2 class="Bot-step-title">Supporting Evidence</h2>
+                        <p class="Bot-step-description">Upload any supporting documents that prove your dispute claim.</p>
+                        
+                        <div class="Bot-file-upload" id="evidenceUploadArea">
+                            <div class="Bot-file-upload-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <p class="Bot-file-upload-text">Drag & drop supporting documents here or click to browse</p>
+                            <input type="file" class="Bot-file-upload-input" id="evidenceFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple>
+                        </div>
+                        
+                        <div class="Bot-evidence-list" id="evidenceList">
+                            <!-- Uploaded evidence files will appear here -->
+                        </div>
+                        
+                        <div class="Bot-form-group">
+                            <label class="Bot-form-label">Evidence Type:</label>
+                            <select class="Bot-form-select" id="evidenceType">
+                                <option value="">Select evidence type</option>
+                                <option value="payment_proof">Payment Proof</option>
+                                <option value="correspondence">Correspondence with Creditor</option>
+                                <option value="identity_docs">Identity Documents</option>
+                                <option value="other">Other Supporting Documents</option>
+                            </select>
+                        </div>
+                        
+                        <div class="Bot-btn-group">
+                            <button class="Bot-btn Bot-btn-secondary" id="backButton">Back</button>
+                            <button class="Bot-btn" id="continueButton">Continue</button>
+                        </div>
+                    </div>
+                `;
+
+                // File upload area listener
+                const evidenceUploadArea = container.querySelector('#evidenceUploadArea');
+                const evidenceInput = container.querySelector('#evidenceFile');
+                const evidenceList = container.querySelector('#evidenceList');
+
+                if (evidenceUploadArea && evidenceInput) {
+                    evidenceUploadArea.addEventListener('click', () => {
+                        evidenceInput.click();
+                    });
+
+                    evidenceUploadArea.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        evidenceUploadArea.style.borderColor = '#09ccfc';
+                        evidenceUploadArea.style.background = '#f8f9fa';
+                    });
+
+                    evidenceUploadArea.addEventListener('dragleave', () => {
+                        evidenceUploadArea.style.borderColor = '#dee2e6';
+                        evidenceUploadArea.style.background = 'white';
+                    });
+
+                    evidenceUploadArea.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        evidenceUploadArea.style.borderColor = '#dee2e6';
+                        evidenceUploadArea.style.background = 'white';
+
+                        if (e.dataTransfer.files.length) {
+                            handleEvidenceUpload(e.dataTransfer.files);
+                        }
+                    });
+
+                    evidenceInput.addEventListener('change', () => {
+                        if (evidenceInput.files.length) {
+                            handleEvidenceUpload(evidenceInput.files);
+                        }
+                    });
+                }
+
+                // Button listeners
+                const backButton = container.querySelector('#backButton');
+                const continueButton = container.querySelector('#continueButton');
+
+                if (backButton) {
+                    backButton.addEventListener('click', goToPreviousStep);
+                }
+
+                if (continueButton) {
+                    continueButton.addEventListener('click', () => {
+                        const evidenceType = document.getElementById('evidenceType').value;
+                        workflowState.evidenceType = evidenceType;
+                        goToNextStep();
+                    });
+                }
+            }
+
+            // Handle evidence upload
+            function handleEvidenceUpload(files) {
+                const evidenceList = document.getElementById('evidenceList');
+                if (!evidenceList) return;
+
+                // Store files in workflow state
+                workflowState.evidenceFiles = workflowState.evidenceFiles || [];
+
+                // Process each file
+                Array.from(files).forEach(file => {
+                    workflowState.evidenceFiles.push(file.name);
+
+                    // Create file item in the list
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'Bot-evidence-item';
+                    fileItem.innerHTML = `
+                        <div class="Bot-evidence-item-icon">
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <div class="Bot-evidence-item-details">
+                            <p class="Bot-evidence-item-name">${file.name}</p>
+                            <p class="Bot-evidence-item-size">${formatFileSize(file.size)}</p>
+                        </div>
+                        <button class="Bot-evidence-item-remove" data-file="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+
+                    evidenceList.appendChild(fileItem);
+                });
+
+                // Add remove button listeners
+                const removeButtons = evidenceList.querySelectorAll('.Bot-evidence-item-remove');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const fileName = this.getAttribute('data-file');
+
+                        // Remove from workflow state
+                        workflowState.evidenceFiles = workflowState.evidenceFiles.filter(name => name !== fileName);
+
+                        // Remove from DOM
+                        this.closest('.Bot-evidence-item').remove();
+                    });
+                });
+            }
+
+            // Step 6: Generate Dispute Letter
+            function renderGenerateLetterStep(container) {
+                container.innerHTML = `
+                    <div class="Bot-step-container">
+                        <h2 class="Bot-step-title">Generate Dispute Letter</h2>
+                        <p class="Bot-step-description">Review your information and generate your dispute letter.</p>
+                        
+                        <div class="Bot-summary-container">
+                            <h3 class="Bot-summary-heading">Dispute Summary</h3>
+                            
+                            <div class="Bot-summary-section">
+                                <h4 class="Bot-summary-section-title">Dispute Type</h4>
+                                <p class="Bot-summary-text">${getDisputeTypeLabel(workflowState.disputeType)}</p>
+                            </div>
+                            
+                            <div class="Bot-summary-section">
+                                <h4 class="Bot-summary-section-title">Account Details</h4>
+                                <p class="Bot-summary-text">
+                                    <strong>Creditor:</strong> ${workflowState.accountDetails?.creditorName || 'Not provided'}<br>
+                                    <strong>Account #:</strong> XXXX-${workflowState.accountDetails?.accountNumber || 'XXXX'}<br>
+                                    <strong>Date of Issue:</strong> ${workflowState.accountDetails?.issueDate || 'Not provided'}
+                                </p>
+                            </div>
+                            
+                            <div class="Bot-summary-section">
+                                <h4 class="Bot-summary-section-title">Issue Description</h4>
+                                <p class="Bot-summary-text">${workflowState.accountDetails?.issueDescription || 'Not provided'}</p>
+                            </div>
+                            
+                            <div class="Bot-summary-section">
+                                <h4 class="Bot-summary-section-title">Supporting Evidence</h4>
+                                <p class="Bot-summary-text">
+                                    ${workflowState.evidenceFiles && workflowState.evidenceFiles.length > 0
+                        ? workflowState.evidenceFiles.map(file => `• ${file}`).join('<br>')
+                        : 'No evidence files uploaded'}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="Bot-btn-group">
+                            <button class="Bot-btn Bot-btn-secondary" id="backButton">Back</button>
+                            <button class="Bot-btn" id="generateButton">Generate Letter</button>
+                        </div>
+                    </div>
+                `;
+
+                // Button listeners
+                const backButton = container.querySelector('#backButton');
+                const generateButton = container.querySelector('#generateButton');
+
+                if (backButton) {
+                    backButton.addEventListener('click', goToPreviousStep);
+                }
+
+                if (generateButton) {
+                    generateButton.addEventListener('click', () => {
+                        // Show loading state
+                        generateButton.disabled = true;
+                        generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+                        // Simulate letter generation (would call API in real implementation)
+                        setTimeout(() => {
+                            // Generate a sample letter based on dispute type
+                            const letter = generateDisputeLetter();
+
+                            // Store in workflow state
+                            workflowState.generatedLetter = letter;
+
+                            // Move to next step
+                            goToNextStep();
+                        }, 2000);
+                    });
+                }
+            }
+
+            // Helper function to get dispute type label
+            function getDisputeTypeLabel(type) {
+                const types = {
+                    'late_payment': 'Late Payment Dispute',
+                    'collection': 'Collection Account Dispute',
+                    'incorrect_info': 'Incorrect Information Dispute',
+                    'identity_theft': 'Identity Theft Dispute',
+                    'hard_inquiry': 'Hard Inquiry Dispute'
+                };
+
+                return types[type] || 'General Dispute';
+            }
+
+            // Generate a dispute letter based on the workflow state
+            function generateDisputeLetter() {
+                const today = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                // Get bureau address based on selection
+                const bureauAddress = getBureauAddress(workflowState.creditBureau);
+
+                // Generate letter content based on dispute type
+                let letterContent = '';
+
+                switch (workflowState.disputeType) {
+                    case 'late_payment':
+                        letterContent = `I am disputing a late payment on my ${workflowState.accountDetails?.creditorName} account ending in ${workflowState.accountDetails?.accountNumber}. This payment was made on time and I have included evidence of this payment.`;
+                        break;
+                    case 'collection':
+                        letterContent = `I am disputing a collection account from ${workflowState.accountDetails?.creditorName} with account number ending in ${workflowState.accountDetails?.accountNumber}. This account ${workflowState.accountDetails?.issueDescription}.`;
+                        break;
+                    case 'incorrect_info':
+                        letterContent = `I am disputing incorrect information on my credit report. ${workflowState.accountDetails?.issueDescription}`;
+                        break;
+                    case 'identity_theft':
+                        letterContent = `I am a victim of identity theft and I am disputing the following account that was fraudulently opened in my name: ${workflowState.accountDetails?.creditorName} account ending in ${workflowState.accountDetails?.accountNumber}.`;
+                        break;
+                    default:
+                        letterContent = `I am writing to dispute the following information in my credit report: ${workflowState.accountDetails?.issueDescription}`;
+                }
+
+                // Construct the full letter
+                return `
+[Your Name]
+[Your Address]
+[City, State ZIP]
+
+${today}
+
+${bureauAddress}
+
+Re: Dispute of Inaccurate Information
 
 To Whom It May Concern:
 
-I am writing to dispute the following information that appears on my credit report:
+I am writing in accordance with my rights under the Fair Credit Reporting Act, 15 U.S.C. § 1681 et seq.
 
-**Account Information:**
-- Creditor: Capital One
-- Account Number: XXXX-XXXX-XXXX-4832
-- Reported Status: 30 days late payment in March 2022
+${letterContent}
 
-This information is inaccurate because I made this payment on time. I have attached a copy of my bank statement showing the payment was made on [date], which was before the due date.
+Please investigate this matter and remove the inaccurate information from my credit report. As required by law, please send me written confirmation when your investigation is complete and the item has been removed.
 
-Under the Fair Credit Reporting Act, Section 611(a), you are required to conduct a reasonable investigation into this matter and remove or correct any information that cannot be verified.
+Enclosed are copies of supporting documents that substantiate my position.
 
-Please investigate this matter and delete this incorrect information from my credit report as soon as possible.
+Thank you for your prompt attention to this matter.
 
 Sincerely,
 
 [Your Signature]
 [Your Printed Name]
-
----
-
-You can download this letter as a PDF, customize it with your specific details, and send it to all three credit bureaus. Would you like me to generate any other dispute letters?`);
-                    }
-                    else if (message.toLowerCase().includes('credit score') || message.toLowerCase().includes('improve')) {
-                        addBotMessage(`📈 Here are 5 effective strategies to improve your credit score:
-
-1. **Pay all bills on time** - Payment history is 35% of your FICO score
-2. **Reduce credit card balances** - Aim for less than 30% utilization
-3. **Don't close old accounts** - Length of credit history matters
-4. **Limit new credit applications** - Too many hard inquiries can hurt your score
-5. **Review your credit reports** - Dispute any errors you find
-
-Based on your credit report, focusing on reducing your credit card balances would likely have the biggest impact on your score. Would you like specific advice on any of these strategies?`);
-                    }
-                    else if (message.toLowerCase().includes('law') || message.toLowerCase().includes('fcra') || message.toLowerCase().includes('rights')) {
-                        addBotMessage(`⚖️ Here are key credit laws that protect your rights:
-
-**Fair Credit Reporting Act (FCRA)**
-- Gives you the right to dispute inaccurate information
-- Requires credit bureaus to investigate disputes within 30 days
-- Limits who can access your credit report
-- Entitles you to free credit reports annually
-
-**Fair Debt Collection Practices Act (FDCPA)**
-- Prohibits abusive debt collection practices
-- Restricts when and how collectors can contact you
-- Requires collectors to validate debts upon request
-- Gives you the right to request collectors stop contacting you
-
-**Equal Credit Opportunity Act (ECOA)**
-- Prohibits discrimination in lending based on race, color, religion, national origin, sex, marital status, age, or public assistance status
-
-Would you like more specific information about how any of these laws apply to your situation?`);
-                    }
-                    else {
-                        addBotMessage(`I'm here to help with your credit repair journey! You can ask me to:
-
-- Analyze your credit reports for errors
-- Generate customized dispute letters
-- Explain credit laws and your rights
-- Provide strategies to improve your credit score
-- Answer questions about the dispute process
-
-What would you like help with today?`);
-                    }
-                }, 1000);
+                `;
             }
 
-            // Add a user message to the chat
-            function addUserMessage(message) {
-                const chatMessages = document.querySelector('.Bot-chat-messages');
-                if (!chatMessages) return;
+            // Get bureau address based on selection
+            function getBureauAddress(bureau) {
+                const addresses = {
+                    'experian': `Experian
+P.O. Box 4500
+Allen, TX 75013`,
+                    'equifax': `Equifax Information Services LLC
+P.O. Box 740256
+Atlanta, GA 30374`,
+                    'transunion': `TransUnion Consumer Solutions
+P.O. Box 2000
+Chester, PA 19016`
+                };
 
-                const messageElement = document.createElement('div');
-                messageElement.className = 'Bot-message Bot-user-message';
-                messageElement.innerHTML = `
-                    <div class="Bot-message-content">
-                        <p>${formatMessage(message)}</p>
-                    </div>
-                    <div class="Bot-message-avatar">
-                        <i class="fas fa-user"></i>
+                return addresses[bureau] || addresses['equifax']; // Default to Equifax if not specified
+            }
+
+            // Step 7: Letter Preview
+            function renderLetterPreviewStep(container) {
+                container.innerHTML = `
+                    <div class="Bot-step-container">
+                        <h2 class="Bot-step-title">Your Dispute Letter</h2>
+                        <p class="Bot-step-description">Review your dispute letter and download it.</p>
+                        
+                        <div class="Bot-letter-preview">
+                            <pre class="Bot-letter-content">${workflowState.generatedLetter}</pre>
+                        </div>
+                        
+                        <div class="Bot-btn-group">
+                            <button class="Bot-btn Bot-btn-secondary" id="backButton">Back</button>
+                            <button class="Bot-btn Bot-btn-secondary" id="editButton">Edit Letter</button>
+                            <button class="Bot-btn" id="downloadButton">Download Letter</button>
+                        </div>
                     </div>
                 `;
 
-                chatMessages.appendChild(messageElement);
-                scrollToBottom();
-            }
+                // Button listeners
+                const backButton = container.querySelector('#backButton');
+                const editButton = container.querySelector('#editButton');
+                const downloadButton = container.querySelector('#downloadButton');
 
-            // Add a bot message to the chat
-            function addBotMessage(message) {
-                const chatMessages = document.querySelector('.Bot-chat-messages');
-                if (!chatMessages) return;
-
-                const messageElement = document.createElement('div');
-                messageElement.className = 'Bot-message Bot-bot-message';
-                messageElement.innerHTML = `
-                    <div class="Bot-message-avatar">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="Bot-message-content">
-                        <p>${formatMessage(message)}</p>
-                    </div>
-                `;
-
-                chatMessages.appendChild(messageElement);
-                scrollToBottom();
-            }
-
-            // Format message with markdown-like syntax
-            function formatMessage(message) {
-                // Convert line breaks to <br>
-                let formatted = message.replace(/\n/g, '<br>');
-
-                // Bold text between **
-                formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-                // Italic text between *
-                formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-                return formatted;
-            }
-
-            // Scroll chat to bottom
-            function scrollToBottom() {
-                const chatMessages = document.querySelector('.Bot-chat-messages');
-                if (chatMessages) {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (backButton) {
+                    backButton.addEventListener('click', goToPreviousStep);
                 }
-            }
 
-            // Update user settings
-            function updateSetting(settingId, isEnabled) {
-                console.log(`Setting ${settingId} changed to ${isEnabled}`);
-                // In a real app, you would save this to user preferences
+                if (editButton) {
+                    editButton.addEventListener('click', () => {
+                        // Make the letter content editable
+                        const letterContent = container.querySelector('.Bot-letter-content');
+                        letterContent.contentEditable = true;
+                        letterContent.focus();
+                        letterContent.style.border = '2px solid #09ccfc';
+                        letterContent.style.padding = '15px';
+
+                        // Change edit button to save button
+                        editButton.innerHTML = 'Save Changes';
+                        editButton.removeEventListener('click', arguments.callee);
+                        editButton.addEventListener('click', () => {
+                            // Save the edited content
+                            workflowState.generatedLetter = letterContent.textContent;
+
+                            // Make it non-editable again
+                            letterContent.contentEditable = false;
+                            letterContent.style.border = '1px solid #dee2e6';
+
+                            // Change back to edit button
+                            editButton.innerHTML = 'Edit Letter';
+                            editButton.removeEventListener('click', arguments.callee);
+                            editButton.addEventListener('click', arguments.callee);
+                        });
+                    });
+                }
+
+                if (downloadButton) {
+                    downloadButton.addEventListener('click', () => {
+                        // Create a blob with the letter content
+                        const blob = new Blob([workflowState.generatedLetter], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+
+                        // Create a download link and click it
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Dispute_Letter_${new Date().toISOString().split('T')[0]}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+
+                        // Clean up
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 100);
+                    });
+                }
             }
 
             // Public API
             return {
-                init: init,
-                reset: reset
+                init: function (containerId) {
+                    const container = document.getElementById(containerId);
+                    if (!container) return false;
+
+                    // Only initialize once
+                    if (isInitialized) {
+                        console.log('JAM Tip Bot Module already initialized');
+                        // Even if already initialized, restore the tab state
+                        restoreTabState();
+                        return true;
+                    }
+
+                    // Insert the widget HTML
+                    container.innerHTML = `
+                        <div class="Bot-container">
+                            <div class="Bot-header">
+                                <div class="Bot-logo">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="Bot-header-text">
+                                    <h1 class="Bot-title">JAM Dispute Bot</h1>
+                                    <p class="Bot-subtitle">Your AI-powered credit repair assistant</p>
+                                </div>
+                            </div>
+                            
+                            <div class="Bot-tabs">
+                                <div class="Bot-tab active" data-tab="workflow">
+                                    <i class="Bot-tab-icon fas fa-tasks"></i>
+                                    <span class="Bot-tab-text">Dispute Workflow</span>
+                                </div>
+                                <div class="Bot-tab" data-tab="upload">
+                                    <i class="Bot-tab-icon fas fa-file-upload"></i>
+                                    <span class="Bot-tab-text">Upload Reports</span>
+                                </div>
+                                <div class="Bot-tab" data-tab="chat">
+                                    <i class="Bot-tab-icon fas fa-comments"></i>
+                                    <span class="Bot-tab-text">Chat</span>
+                                </div>
+                                <div class="Bot-tab" data-tab="letters">
+                                    <i class="Bot-tab-icon fas fa-file-alt"></i>
+                                    <span class="Bot-tab-text">My Letters</span>
+                                </div>
+                            </div>
+                            
+                            <div class="Bot-content">
+                                <div id="Bot-tab-workflow" class="Bot-tab-content active">
+                                    <div class="Bot-workflow-header">
+                                        <div class="Bot-progress-container">
+                                            <div class="Bot-progress-bar">
+                                                <div class="Bot-progress-steps">
+                                                    <div class="Bot-progress-step active" data-step="1">
+                                                        <div class="Bot-progress-step-number">1</div>
+                                                        <div class="Bot-progress-label">Welcome</div>
+                                                    </div>
+                                                    <div class="Bot-progress-step" data-step="2">
+                                                        <div class="Bot-progress-step-number">2</div>
+                                                        <div class="Bot-progress-label">Type</div>
+                                                    </div>
+                                                    <div class="Bot-progress-step" data-step="3">
+                                                        <div class="Bot-progress-step-number">3</div>
+                                                        <div class="Bot-progress-label">Report</div>
+                                                    </div>
+                                                    <div class="Bot-progress-step" data-step="4">
+                                                        <div class="Bot-progress-step-number">4</div>
+                                                        <div class="Bot-progress-label">Details</div>
+                                                    </div>
+                                                    <div class="Bot-progress-step" data-step="5">
+                                                        <div class="Bot-progress-step-number">5</div>
+                                                        <div class="Bot-progress-label">Evidence</div>
+                                                    </div>
+                                                    <div class="Bot-progress-step" data-step="6">
+                                                        <div class="Bot-progress-step-number">6</div>
+                                                        <div class="Bot-progress-label">Generate</div>
+                                                    </div>
+                                                    <div class="Bot-progress-step" data-step="7">
+                                                        <div class="Bot-progress-step-number">7</div>
+                                                        <div class="Bot-progress-label">Download</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="Bot-workflow-container">
+                                        <!-- Initial welcome screen content -->
+                                        <div class="Bot-welcome-screen">
+                                            <div class="Bot-welcome-avatar">
+                                                <i class="fas fa-robot"></i>
+                                            </div>
+                                            <h2 class="Bot-welcome-title">Welcome to JAM Dispute Bot</h2>
+                                            <p class="Bot-welcome-subtitle">Your AI-powered credit strategy expert</p>
+                                            
+                                            <div class="Bot-option-cards">
+                                                <div class="Bot-option-card" data-option="collection">
+                                                    <div class="Bot-option-card-icon">
+                                                        <i class="fas fa-file-invoice-dollar"></i>
+                                                    </div>
+                                                    <h3 class="Bot-option-card-title">Remove a Collection</h3>
+                                                    <p class="Bot-option-card-desc">Dispute collection accounts on your credit report</p>
+                                                </div>
+                                                
+                                                <div class="Bot-option-card" data-option="late_payment">
+                                                    <div class="Bot-option-card-icon">
+                                                        <i class="fas fa-calendar-times"></i>
+                                                    </div>
+                                                    <h3 class="Bot-option-card-title">Fix Late Payment</h3>
+                                                    <p class="Bot-option-card-desc">Dispute incorrect late payment records</p>
+                                                </div>
+                                                
+                                                <div class="Bot-option-card" data-option="not_mine">
+                                                    <div class="Bot-option-card-icon">
+                                                        <i class="fas fa-user-times"></i>
+                                                    </div>
+                                                    <h3 class="Bot-option-card-title">Not My Account</h3>
+                                                    <p class="Bot-option-card-desc">Dispute accounts that don't belong to you</p>
+                                                </div>
+                                                
+                                                <div class="Bot-option-card" data-option="other_issues">
+                                                    <div class="Bot-option-card-icon">
+                                                        <i class="fas fa-question-circle"></i>
+                                                    </div>
+                                                    <h3 class="Bot-option-card-title">Other Issues</h3>
+                                                    <p class="Bot-option-card-desc">Address other credit report problems</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="Bot-tab-upload" class="Bot-tab-content">
+                                    <div class="Bot-upload-container">
+                                        <div class="Bot-upload-header">
+                                            <h2 class="Bot-upload-title">Upload Your Credit Reports</h2>
+                                            <p class="Bot-upload-subtitle">Upload your credit reports to get personalized dispute recommendations</p>
+                                        </div>
+                                        
+                                        <div class="Bot-upload-message">
+                                            <div class="Bot-message Bot-bot-message">
+                                                <div class="Bot-message-avatar">
+                                                    <i class="fas fa-robot"></i>
+                                                </div>
+                                                <div class="Bot-message-content">
+                                                    <p>To give you the most accurate support, I recommend you upload your credit report. This helps me find all related issues and build a full plan of action.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="Bot-upload-area" id="creditReportUploadArea">
+                                            <input type="file" id="creditReportFileInput" accept=".pdf" style="display: none;">
+                                            <div class="Bot-upload-icon">
+                                                <i class="fas fa-file-upload"></i>
+                                            </div>
+                                            <h3 class="Bot-upload-area-title">Upload Your Credit Report</h3>
+                                            <p class="Bot-upload-area-subtitle">Drag & drop your file here or click to browse</p>
+                                            <p class="Bot-upload-area-formats">Accepts PDF from SmartCredit, IdentityIQ, MyScoreIQ</p>
+                                            <button class="Bot-btn Bot-btn-primary Bot-upload-btn">
+                                                <i class="fas fa-upload"></i> Upload Credit Report
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="Bot-upload-files" id="uploadedReportsList">
+                                            <!-- Uploaded files will appear here -->
+                                        </div>
+                                        
+                                        <div class="Bot-upload-tips">
+                                            <h3 class="Bot-upload-tips-title">How to get your credit reports:</h3>
+                                            <div class="Bot-upload-tips-list">
+                                                <div class="Bot-upload-tip">
+                                                    <div class="Bot-upload-tip-icon">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </div>
+                                                    <div class="Bot-upload-tip-content">
+                                                        <h4>Free Annual Reports</h4>
+                                                        <p>Get free reports from all three bureaus at <a href="https://www.annualcreditreport.com" target="_blank">AnnualCreditReport.com</a></p>
+                                                    </div>
+                                                </div>
+                                                <div class="Bot-upload-tip">
+                                                    <div class="Bot-upload-tip-icon">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </div>
+                                                    <div class="Bot-upload-tip-content">
+                                                        <h4>Credit Monitoring Services</h4>
+                                                        <p>Download PDF reports from SmartCredit, IdentityIQ, or MyScoreIQ</p>
+                                                    </div>
+                                                </div>
+                                                <div class="Bot-upload-tip">
+                                                    <div class="Bot-upload-tip-icon">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </div>
+                                                    <div class="Bot-upload-tip-content">
+                                                        <h4>Bureau Websites</h4>
+                                                        <p>Download directly from Experian, Equifax, or TransUnion websites</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="Bot-tab-chat" class="Bot-tab-content">
+                                    <div class="Bot-chat-container">
+                                        <div class="Bot-chat-messages">
+                                            <!-- Chat messages will appear here -->
+                                        </div>
+                                        <div class="Bot-chat-input-container">
+                                            <textarea class="Bot-chat-input" placeholder="Ask me anything about credit repair..."></textarea>
+                                            <button class="Bot-chat-send">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="Bot-tab-letters" class="Bot-tab-content">
+                                    <div class="Bot-letters-container">
+                                        <h2 class="Bot-letters-title">My Dispute Letters</h2>
+                                        <p class="Bot-letters-description">View and download your saved dispute letters.</p>
+                                        
+                                        <div class="Bot-letters-list" id="savedLettersList">
+                                            <!-- Saved letters will appear here -->
+                                            <div class="Bot-empty-state">
+                                                <div class="Bot-empty-icon">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </div>
+                                                <h3 class="Bot-empty-title">No Letters Yet</h3>
+                                                <p class="Bot-empty-text">Complete the dispute workflow to generate your first letter.</p>
+                                                <button class="Bot-btn" id="startWorkflowBtn">Start Dispute Workflow</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Set up event listeners
+                    setTimeout(() => {
+                        setupEventListeners();
+
+                        // Set up upload area event listeners
+                        setupUploadAreaListeners();
+
+                        // Restore the previous tab state or default to 'workflow'
+                        restoreTabState();
+
+                        // Add welcome message to chat
+                        setTimeout(() => {
+                            addBotMessage(`👋 Hi there! I'm your JAM AI Credit Assistant. I can help you with:
+
+- Creating dispute letters
+- Understanding your credit report
+- Explaining credit laws and your rights
+- Providing credit improvement strategies
+
+What can I help you with today?`);
+                        }, 500);
+                    }, 100);
+
+                    // Mark as initialized
+                    isInitialized = true;
+
+                    return true;
+                },
+
+                reset: function () {
+                    isInitialized = false;
+                    currentStep = 1;
+                    workflowState = {
+                        disputeType: null,
+                        selectedItems: [],
+                        userInfo: {},
+                        generatedLetters: [],
+                        uploadedReports: []
+                    };
+                    localStorage.removeItem('jamBotActiveTab');
+                    localStorage.removeItem('jamBotWorkflowStep');
+                    localStorage.removeItem('jamBotWorkflowState');
+                },
+
+                switchTab: switchTab
             };
         })();
 
-        // Expose the module globally
-        window.jamTipBot = JamTipBotModule;
+        // Make the module globally available only if it doesn't already exist
+        if (!window.jamTipBot) {
+            window.jamTipBot = JamTipBotModule;
 
-        // Signal that the module is loaded
-        if (window.dispatchEvent) {
-            window.dispatchEvent(new CustomEvent('jamTipBotLoaded'));
+            // Initialize the module when the page loads only if directly accessed
+            document.addEventListener('DOMContentLoaded', function () {
+                // Only auto-initialize if this page is loaded directly, not as a script
+                if (document.querySelector('body > #jamTipBotContainer')) {
+                    const container = document.getElementById('jamTipBotContainer');
+                    if (container) {
+                        JamTipBotModule.init('jamTipBotContainer');
+                    }
+                }
+
+                // Always dispatch the loaded event
+                window.dispatchEvent(new Event('jamTipBotLoaded'));
+            });
+        }
+
+        // Function to set up option card listeners
+        function setupOptionCardListeners() {
+            const optionCards = document.querySelectorAll('.Bot-option-card');
+
+            optionCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const option = this.getAttribute('data-option');
+                    console.log('Option selected:', option);
+
+                    // Store the selected dispute type
+                    workflowState.disputeType = option;
+
+                    // Move to the next step
+                    goToNextStep();
+                });
+            });
+        }
+
+        // Function to set up upload area listeners
+        function setupUploadAreaListeners() {
+            const uploadArea = document.getElementById('creditReportUploadArea');
+            const fileInput = document.getElementById('creditReportFileInput');
+            const uploadButton = document.querySelector('.Bot-upload-btn');
+
+            if (uploadArea && fileInput) {
+                console.log('Found upload area and file input');
+
+                // Add CSS for continue button
+                const style = document.createElement('style');
+                style.textContent = `
+                    .Bot-upload-continue {
+                        margin-top: 30px;
+                        text-align: center;
+                        padding: 20px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        border: 1px solid #dee2e6;
+                    }
+                    
+                    .Bot-upload-continue-text {
+                        margin-bottom: 15px;
+                        font-weight: 500;
+                        color: #495057;
+                    }
+                    
+                    /* Fix for file input */
+                    #creditReportFileInput {
+                        position: absolute;
+                        width: 1px;
+                        height: 1px;
+                        padding: 0;
+                        margin: -1px;
+                        overflow: hidden;
+                        clip: rect(0, 0, 0, 0);
+                        border: 0;
+                    }
+                    
+                    /* Make sure the upload button is clickable */
+                    .Bot-upload-btn {
+                        position: relative;
+                        z-index: 10;
+                        cursor: pointer;
+                    }
+                `;
+                document.head.appendChild(style);
+
+                // Direct click handler for the upload button
+                if (uploadButton) {
+                    console.log('Found upload button');
+                    uploadButton.onclick = function (e) {
+                        console.log('Upload button clicked directly');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        fileInput.click();
+                        return false;
+                    };
+                } else {
+                    console.error('Upload button not found');
+                }
+
+                // Click on upload area (excluding the button)
+                uploadArea.addEventListener('click', function (e) {
+                    // Don't trigger if they clicked the button
+                    if (!e.target.closest('.Bot-upload-btn')) {
+                        console.log('Upload area clicked (not button)');
+                        fileInput.click();
+                    }
+                });
+
+                // File selected
+                fileInput.addEventListener('change', function () {
+                    console.log('File input change event triggered');
+                    if (this.files && this.files.length > 0) {
+                        console.log('File selected:', this.files[0].name);
+                        handleFileUpload(this.files[0]);
+                    }
+                });
+
+                // Drag and drop
+                uploadArea.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadArea.classList.add('Bot-upload-area-dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadArea.classList.remove('Bot-upload-area-dragover');
+                });
+
+                uploadArea.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadArea.classList.remove('Bot-upload-area-dragover');
+
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        console.log('File dropped:', e.dataTransfer.files[0].name);
+                        handleFileUpload(e.dataTransfer.files[0]);
+                    }
+                });
+
+                // Check if we need to show the continue button (for when page reloads)
+                updateContinueButtonVisibility();
+
+                // Update the reports list if there are already uploaded reports
+                updateUploadedReportsList();
+            } else {
+                console.error('Upload area or file input not found during setup');
+                // Log what elements were found to help debug
+                console.log('Elements found:', {
+                    uploadArea: !!uploadArea,
+                    fileInput: !!fileInput,
+                    uploadButton: !!uploadButton
+                });
+            }
         }
     </script>
 </body>

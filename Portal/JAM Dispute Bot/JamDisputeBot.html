@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAM AI Credit Bot - JAM Credit Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Bot Container Styles */
+        .Bot-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 600px;
+        }
+
+        /* Bot Header */
+        .Bot-header {
+            background: #09ccfc;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #07a3ca;
+        }
+
+        .Bot-logo {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .Bot-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .Bot-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+
+        /* Bot Tabs */
+        .Bot-tabs {
+            display: flex;
+            background: #e6f9ff;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .Bot-tab-btn {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .Bot-tab-btn.active {
+            color: #09ccfc;
+            border-bottom-color: #09ccfc;
+            background: white;
+        }
+
+        .Bot-tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+            color: #07a3ca;
+        }
+
+        .Bot-tab-btn i {
+            margin-right: 8px;
+        }
+
+        /* Bot Content Area */
+        .Bot-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .Bot-tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .Bot-tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Loading indicator */
+        .Bot-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            padding: 30px;
+        }
+
+        .Bot-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(9, 204, 252, 0.2);
+            border-radius: 50%;
+            border-top-color: #09ccfc;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        // Function to load the DisputeWorkflow module
+        function loadDisputeWorkflowModule() {
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (window.disputeWorkflow) {
+                    console.log('DisputeWorkflow module already loaded');
+                    resolve(window.disputeWorkflow);
+                    return;
+                }
+
+                console.log('Loading DisputeWorkflow module...');
+
+                // Create script element to load the module
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'DisputeWorkflow.html';
+                script.async = true;
+
+                script.onload = function () {
+                    // Wait for the module to be available
+                    const checkModule = setInterval(() => {
+                        if (window.disputeWorkflow) {
+                            clearInterval(checkModule);
+                            console.log('DisputeWorkflow module loaded successfully');
+                            resolve(window.disputeWorkflow);
+                        }
+                    }, 100);
+
+                    // Set a timeout in case the module doesn't load
+                    setTimeout(() => {
+                        if (!window.disputeWorkflow) {
+                            clearInterval(checkModule);
+                            reject(new Error('Timeout loading DisputeWorkflow module'));
+                        }
+                    }, 5000);
+                };
+
+                script.onerror = function () {
+                    console.error('Failed to load DisputeWorkflow module');
+                    reject(new Error('Failed to load DisputeWorkflow module'));
+                };
+
+                document.head.appendChild(script);
+            });
+        }
+
+        // JAM Tip Bot Module
+        const JamTipBotModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let activeTab = 'workflow'; // Default tab is workflow
+            let disputeWorkflowModule = null;
+            let workflowState = {
+                disputeType: null,
+                selectedItems: [],
+                userInfo: {},
+                generatedLetters: [],
+                uploadedReports: []
+            };
+
+            // Function to save the current tab state
+            function saveTabState(tabId) {
+                activeTab = tabId;
+                localStorage.setItem('jamBotActiveTab', tabId);
+
+                // Save workflow state if available
+                if (disputeWorkflowModule) {
+                    const currentStep = disputeWorkflowModule.getCurrentStep();
+                    const state = disputeWorkflowModule.getWorkflowState();
+
+                    localStorage.setItem('jamBotWorkflowStep', currentStep);
+                    localStorage.setItem('jamBotWorkflowState', JSON.stringify(state));
+                }
+            }
+
+            // Function to restore the tab state
+            function restoreTabState() {
+                const savedTab = localStorage.getItem('jamBotActiveTab') || 'workflow';
+                switchTab(savedTab);
+                return savedTab;
+            }
+
+            // Function to set up event listeners
+            function setupEventListeners() {
+                // Tab switching
+                const tabButtons = document.querySelectorAll('.Bot-tab-btn');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const tabId = this.getAttribute('data-tab');
+                        switchTab(tabId);
+                    });
+                });
+
+                // Start workflow button in letters tab
+                const startWorkflowBtn = document.getElementById('startWorkflowBtn');
+                if (startWorkflowBtn) {
+                    startWorkflowBtn.addEventListener('click', function () {
+                        switchTab('workflow');
+                    });
+                }
+            }
+
+            // Function to switch tabs
+            function switchTab(tabId) {
+                // Update active tab
+                activeTab = tabId;
+
+                // Get all tab buttons and content
+                const tabButtons = document.querySelectorAll('.Bot-tab-btn');
+                const tabContents = document.querySelectorAll('.Bot-tab-content');
+
+                // Remove active class from all buttons and content
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active class to selected button and content
+                const selectedButton = document.querySelector(`.Bot-tab-btn[data-tab="${tabId}"]`);
+                const selectedContent = document.getElementById(`Bot-tab-${tabId}`);
+
+                if (selectedButton) selectedButton.classList.add('active');
+                if (selectedContent) selectedContent.classList.add('active');
+
+                // Initialize workflow module if switching to workflow tab
+                if (tabId === 'workflow' && disputeWorkflowModule) {
+                    const workflowContainer = document.getElementById('Bot-tab-workflow');
+                    if (workflowContainer) {
+                        disputeWorkflowModule.updateView(workflowContainer);
+                    }
+                }
+
+                // Save the current tab state
+                saveTabState(tabId);
+            }
+
+            // Function to initialize the workflow module
+            async function initWorkflowModule() {
+                try {
+                    const workflowContainer = document.getElementById('Bot-tab-workflow');
+                    if (!workflowContainer) {
+                        console.error('Workflow container not found');
+                        return false;
+                    }
+
+                    // Show loading indicator
+                    workflowContainer.innerHTML = `
+                        <div class="Bot-loading">
+                            <div class="Bot-spinner"></div>
+                            <p>Loading dispute workflow module...</p>
+                        </div>
+                    `;
+
+                    // Load the DisputeWorkflow module
+                    disputeWorkflowModule = await loadDisputeWorkflowModule();
+
+                    // Restore saved state if available
+                    const savedStep = parseInt(localStorage.getItem('jamBotWorkflowStep') || '1');
+                    const savedState = JSON.parse(localStorage.getItem('jamBotWorkflowState') || '{}');
+
+                    // Create parent module interface for communication
+                    const parentModule = {
+                        saveWorkflowState: function (state) {
+                            workflowState = state;
+                            localStorage.setItem('jamBotWorkflowState', JSON.stringify(state));
+                        },
+
+                        getWorkflowState: function () {
+                            return savedState && Object.keys(savedState).length > 0 ? savedState : workflowState;
+                        },
+
+                        saveCurrentStep: function (step) {
+                            localStorage.setItem('jamBotWorkflowStep', step);
+                        },
+
+                        getCurrentStep: function () {
+                            return savedStep;
+                        },
+
+                        onWorkflowComplete: function (letter) {
+                            console.log('Workflow completed with letter:', letter);
+                            // Update letters tab
+                            updateLettersList();
+                            // Switch to letters tab
+                            setTimeout(() => switchTab('letters'), 1000);
+                        }
+                    };
+
+                    // Clear the loading indicator before initializing the module
+                    workflowContainer.innerHTML = '';
+
+                    // Initialize the workflow module
+                    const success = disputeWorkflowModule.init(workflowContainer, parentModule);
+
+                    if (success) {
+                        console.log('DisputeWorkflow module initialized successfully');
+                        return true;
+                    } else {
+                        console.error('Failed to initialize DisputeWorkflow module');
+                        workflowContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Failed to load dispute workflow. Please try refreshing the page.</p>
+                            </div>
+                        `;
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error initializing workflow module:', error);
+                    const workflowContainer = document.getElementById('Bot-tab-workflow');
+                    if (workflowContainer) {
+                        workflowContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error loading dispute workflow: ${error.message}</p>
+                                <button class="Bot-btn Bot-btn-primary" onclick="location.reload()">Reload</button>
+                            </div>
+                        `;
+                    }
+                    return false;
+                }
+            }
+
+            // Function to update the letters list
+            function updateLettersList() {
+                const lettersList = document.getElementById('lettersList');
+                if (!lettersList) return;
+
+                if (workflowState.generatedLetters && workflowState.generatedLetters.length > 0) {
+                    lettersList.innerHTML = workflowState.generatedLetters.map(letter => `
+                        <div class="Bot-letter-item">
+                            <div class="Bot-letter-info">
+                                <h3 class="Bot-letter-title">Dispute Letter</h3>
+                                <p class="Bot-letter-date">Created: ${new Date(letter.createdAt).toLocaleDateString()}</p>
+                                <p class="Bot-letter-type">Type: ${letter.disputeType || 'General'}</p>
+                            </div>
+                            <div class="Bot-letter-actions">
+                                <button class="Bot-btn Bot-btn-sm" data-letter-id="${letter.id}">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Add event listeners to download buttons
+                    const downloadButtons = lettersList.querySelectorAll('[data-letter-id]');
+                    downloadButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const letterId = this.getAttribute('data-letter-id');
+                            const letter = workflowState.generatedLetters.find(l => l.id === letterId);
+
+                            if (letter) {
+                                // Create a blob from the letter content
+                                const blob = new Blob([letter.content], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+
+                                // Create a link and trigger download
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `Dispute_Letter_${new Date(letter.createdAt).toLocaleDateString().replace(/\//g, '-')}.txt`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                            }
+                        });
+                    });
+                } else {
+                    lettersList.innerHTML = `
+                        <div class="Bot-empty-state">
+                            <p class="Bot-empty-text">Complete the dispute workflow to generate your first letter.</p>
+                            <button class="Bot-btn" id="startWorkflowBtn">Start Dispute Workflow</button>
+                        </div>
+                    `;
+
+                    // Add event listener to start workflow button
+                    const startWorkflowBtn = lettersList.querySelector('#startWorkflowBtn');
+                    if (startWorkflowBtn) {
+                        startWorkflowBtn.addEventListener('click', function () {
+                            switchTab('workflow');
+                        });
+                    }
+                }
+            }
+
+            // Public API
+            return {
+                init: function (containerId) {
+                    const container = document.getElementById(containerId);
+                    if (!container) return false;
+
+                    // Only initialize once
+                    if (isInitialized) {
+                        console.log('JAM Tip Bot Module already initialized');
+                        // Even if already initialized, restore the tab state
+                        restoreTabState();
+                        return true;
+                    }
+
+                    // Insert the widget HTML with only header and tabs
+                    container.innerHTML = `
+                        <div class="Bot-container">
+                            <div class="Bot-header">
+                                <div class="Bot-logo">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="Bot-header-text">
+                                    <h1 class="Bot-title">JAM Dispute Bot</h1>
+                                    <p class="Bot-subtitle">Your AI-powered credit repair assistant</p>
+                                </div>
+                            </div>
+                            
+                            <div class="Bot-tabs">
+                                <button class="Bot-tab-btn active" data-tab="workflow">
+                                    <i class="fas fa-tasks"></i> Dispute Workflow
+                                </button>
+                                <button class="Bot-tab-btn" data-tab="reports">
+                                    <i class="fas fa-file-alt"></i> Reports
+                                </button>
+                                <button class="Bot-tab-btn" data-tab="chat">
+                                    <i class="fas fa-comments"></i> Chat
+                                </button>
+                                <button class="Bot-tab-btn" data-tab="letters">
+                                    <i class="fas fa-envelope"></i> My Letters
+                                </button>
+                            </div>
+                            
+                            <div class="Bot-content">
+                                <!-- Workflow Tab (will be populated by DisputeWorkflowModule) -->
+                                <div id="Bot-tab-workflow" class="Bot-tab-content active">
+                                    <div class="Bot-loading">
+                                        <div class="Bot-spinner"></div>
+                                        <p>Loading dispute workflow...</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Chat Tab -->
+                                <div id="Bot-tab-chat" class="Bot-tab-content">
+                                    <div class="Bot-loading">
+                                        <div class="Bot-spinner"></div>
+                                        <p>Loading chat interface...</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Upload Reports Tab -->
+                                <div id="Bot-tab-reports" class="Bot-tab-content">
+                                    <div class="Bot-loading">
+                                        <div class="Bot-spinner"></div>
+                                        <p>Loading reports interface...</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Letters Tab -->
+                                <div id="Bot-tab-letters" class="Bot-tab-content">
+                                    <div class="Bot-loading">
+                                        <div class="Bot-spinner"></div>
+                                        <p>Loading letters interface...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Set up event listeners
+                    setTimeout(async () => {
+                        setupEventListeners();
+
+                        // Initialize the workflow module
+                        await initWorkflowModule();
+
+                        // Restore the previous tab state or default to 'workflow'
+                        restoreTabState();
+                    }, 100);
+
+                    // Mark as initialized
+                    isInitialized = true;
+
+                    return true;
+                },
+
+                reset: function () {
+                    isInitialized = false;
+                    workflowState = {
+                        disputeType: null,
+                        selectedItems: [],
+                        userInfo: {},
+                        generatedLetters: [],
+                        uploadedReports: []
+                    };
+                    localStorage.removeItem('jamBotActiveTab');
+                    localStorage.removeItem('jamBotWorkflowStep');
+                    localStorage.removeItem('jamBotWorkflowState');
+
+                    // Reset the workflow module if available
+                    if (disputeWorkflowModule) {
+                        disputeWorkflowModule.setCurrentStep(1);
+                        disputeWorkflowModule.setWorkflowState(workflowState);
+                    }
+                },
+
+                switchTab: switchTab
+            };
+        })();
+
+        // Make the module globally available
+        if (!window.jamTipBot) {
+            window.jamTipBot = JamTipBotModule;
+        }
+
+        // Initialize the module when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('jamTipBotContainer');
+            if (container) {
+                JamTipBotModule.init('jamTipBotContainer');
+            }
+
+            // Dispatch the loaded event
+            window.dispatchEvent(new Event('jamTipBotLoaded'));
+        });
+    </script>
+</body>
+
+</html>
