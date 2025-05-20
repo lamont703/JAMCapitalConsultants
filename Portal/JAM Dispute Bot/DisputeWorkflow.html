@@ -117,10 +117,13 @@
 
         /* Option Cards Styles */
         .Bot-option-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 20px;
             margin-top: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .Bot-option-card {
@@ -132,12 +135,19 @@
             transition: all 0.2s ease;
             text-align: left;
             border: 2px solid transparent;
+            display: flex;
+            align-items: center;
         }
 
         .Bot-option-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-color: #09ccfc;
+        }
+
+        .Bot-option-card.selected {
+            border: 2px solid #09ccfc;
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.2);
         }
 
         .Bot-option-card-icon {
@@ -150,19 +160,24 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            margin-bottom: 15px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .Bot-option-card-content {
+            flex: 1;
         }
 
         .Bot-option-card-title {
             font-size: 1.1rem;
-            margin-bottom: 10px;
+            margin: 0 0 5px;
             color: #343a40;
         }
 
         .Bot-option-card-desc {
             font-size: 0.9rem;
             color: #6c757d;
-            line-height: 1.4;
+            margin: 0;
         }
 
         /* Button Styles */
@@ -339,6 +354,36 @@
             color: #6c757d;
             margin-bottom: 30px;
         }
+
+        /* Selection summary styles */
+        .Bot-selection-summary {
+            background: #f0f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .Bot-selection-icon {
+            font-size: 2rem;
+            color: #09ccfc;
+            margin-bottom: 10px;
+        }
+
+        .Bot-selection-title {
+            font-size: 1.2rem;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        .Bot-selection-desc {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .Bot-continue-btn {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -351,15 +396,17 @@
             let currentStep = 1;
             let workflowState = {
                 disputeType: null,
+                disputeSubtype: null,
                 selectedItems: [],
                 userInfo: {},
                 generatedLetters: [],
                 uploadedReports: [],
                 evidenceFiles: []
             };
+            let parentModule = null;
 
             // Function to initialize the module
-            function init(container, parentModule) {
+            function init(container, parentModuleRef) {
                 if (!container) {
                     console.error('Container not provided to DisputeWorkflow module');
                     return false;
@@ -368,7 +415,7 @@
                 console.log('Initializing DisputeWorkflow module');
 
                 // Store reference to parent module for communication
-                this.parentModule = parentModule;
+                parentModule = parentModuleRef;
 
                 // Only initialize once
                 if (isInitialized) {
@@ -377,124 +424,97 @@
                     return true;
                 }
 
-                // Create workflow container if it doesn't exist
-                let workflowContainer = container.querySelector('.Bot-workflow-container');
-                if (!workflowContainer) {
-                    workflowContainer = document.createElement('div');
-                    workflowContainer.className = 'Bot-workflow-container';
-                    container.appendChild(workflowContainer);
-                }
-
-                // Create progress bar if it doesn't exist
-                let progressContainer = container.querySelector('.Bot-workflow-header');
-                if (!progressContainer) {
-                    progressContainer = document.createElement('div');
-                    progressContainer.className = 'Bot-workflow-header';
-                    progressContainer.innerHTML = `
-                        <div class="Bot-progress-container">
-                            <div class="Bot-progress-bar">
-                                <div class="Bot-progress-steps">
-                                    <div class="Bot-progress-step" data-step="1">
-                                        <div class="Bot-progress-step-number">1</div>
-                                        <div class="Bot-progress-label">Welcome</div>
-                                    </div>
-                                    <div class="Bot-progress-step" data-step="2">
-                                        <div class="Bot-progress-step-number">2</div>
-                                        <div class="Bot-progress-label">Type</div>
-                                    </div>
-                                    <div class="Bot-progress-step" data-step="3">
-                                        <div class="Bot-progress-step-number">3</div>
-                                        <div class="Bot-progress-label">Report</div>
-                                    </div>
-                                    <div class="Bot-progress-step" data-step="4">
-                                        <div class="Bot-progress-step-number">4</div>
-                                        <div class="Bot-progress-label">Details</div>
-                                    </div>
-                                    <div class="Bot-progress-step" data-step="5">
-                                        <div class="Bot-progress-step-number">5</div>
-                                        <div class="Bot-progress-label">Evidence</div>
-                                    </div>
-                                    <div class="Bot-progress-step" data-step="6">
-                                        <div class="Bot-progress-step-number">6</div>
-                                        <div class="Bot-progress-label">Generate</div>
-                                    </div>
-                                    <div class="Bot-progress-step" data-step="7">
-                                        <div class="Bot-progress-step-number">7</div>
-                                        <div class="Bot-progress-label">Download</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.insertBefore(progressContainer, workflowContainer);
-                }
-
-                // Restore state if available from parent
+                // Get saved state from parent if available
                 if (parentModule && parentModule.getWorkflowState) {
                     const savedState = parentModule.getWorkflowState();
                     if (savedState && Object.keys(savedState).length > 0) {
                         workflowState = savedState;
                     }
+                }
 
-                    if (parentModule.getCurrentStep) {
-                        currentStep = parentModule.getCurrentStep();
+                // Get current step from parent if available
+                if (parentModule && parentModule.getCurrentStep) {
+                    const savedStep = parentModule.getCurrentStep();
+                    if (savedStep && !isNaN(savedStep)) {
+                        currentStep = parseInt(savedStep);
                     }
                 }
 
-                // Update the view
-                updateWorkflowView(container);
+                // Render the workflow interface
+                renderWorkflowInterface(container);
 
                 // Mark as initialized
                 isInitialized = true;
-
                 return true;
             }
 
-            // Function to update the workflow view based on current step
+            // Function to render the workflow interface
+            function renderWorkflowInterface(container) {
+                container.innerHTML = `
+                    <div class="Bot-workflow-container">
+                        <div class="Bot-workflow-header">
+                            <div class="Bot-progress-container">
+                                <div class="Bot-progress-bar">
+                                    <div class="Bot-progress-steps">
+                                        <div class="Bot-progress-step active" data-step="1">
+                                            <div class="Bot-progress-step-number">1</div>
+                                            <div class="Bot-progress-label">Select Issue</div>
+                                        </div>
+                                        <div class="Bot-progress-step" data-step="2">
+                                            <div class="Bot-progress-step-number">2</div>
+                                            <div class="Bot-progress-label">Upload Report</div>
+                                        </div>
+                                        <div class="Bot-progress-step" data-step="3">
+                                            <div class="Bot-progress-step-number">3</div>
+                                            <div class="Bot-progress-label">Select Items</div>
+                                        </div>
+                                        <div class="Bot-progress-step" data-step="4">
+                                            <div class="Bot-progress-step-number">4</div>
+                                            <div class="Bot-progress-label">Generate Letter</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Step content will be inserted here -->
+                    </div>
+                `;
+
+                // Update the workflow view based on current step
+                updateWorkflowView(container);
+            }
+
+            // Function to update the workflow view
             function updateWorkflowView(container) {
                 if (!container) return;
 
                 // Update progress bar
                 updateProgressBar(container);
 
-                // Get or create workflow container
-                let workflowContainer = container.querySelector('.Bot-workflow-container');
-                if (!workflowContainer) {
-                    workflowContainer = document.createElement('div');
-                    workflowContainer.className = 'Bot-workflow-container';
-                    container.appendChild(workflowContainer);
-                }
-
-                // Generate content based on current step
+                // Render the appropriate step
                 switch (currentStep) {
                     case 1:
-                        renderWelcomeStep(workflowContainer);
+                        renderWelcomeStep(container);
                         break;
                     case 2:
-                        renderDisputeTypeStep(workflowContainer);
+                        renderDisputeTypeStep(container);
                         break;
                     case 3:
-                        renderUploadReportStep(workflowContainer);
+                        renderUserInfoStep(container);
                         break;
                     case 4:
-                        renderSelectItemsStep(workflowContainer);
-                        break;
-                    case 5:
-                        renderEvidenceStep(workflowContainer);
-                        break;
-                    case 6:
-                        renderGenerateLetterStep(workflowContainer);
-                        break;
-                    case 7:
-                        renderDownloadLetterStep(workflowContainer);
+                        renderGenerateLetterStep(container);
                         break;
                     default:
-                        renderWelcomeStep(workflowContainer);
+                        renderWelcomeStep(container);
                 }
             }
 
             // Step 1: Welcome
             function renderWelcomeStep(container) {
+                // Check if a dispute type has already been selected
+                const hasSelectedDisputeType = workflowState && workflowState.disputeType !== null;
+
                 container.innerHTML = `
                     <div class="Bot-welcome-screen">
                         <div class="Bot-welcome-avatar">
@@ -503,37 +523,58 @@
                         <h2 class="Bot-welcome-title">Welcome to JAM Dispute Bot</h2>
                         <p class="Bot-welcome-subtitle">Your AI-powered credit strategy expert</p>
                         
+                        ${hasSelectedDisputeType ? `
+                            <div class="Bot-selection-summary">
+                                <div class="Bot-selection-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <h3 class="Bot-selection-title">You selected: ${getDisputeTypeLabel(workflowState.disputeType)}</h3>
+                                <p class="Bot-selection-desc">You can continue with this selection or choose a different option below.</p>
+                                <button class="Bot-btn Bot-btn-primary Bot-continue-btn">
+                                    <i class="fas fa-arrow-right"></i> Continue with this selection
+                                </button>
+                            </div>
+                        ` : ''}
+                        
                         <div class="Bot-option-cards">
-                            <div class="Bot-option-card" data-option="collection">
+                            <div class="Bot-option-card ${workflowState && workflowState.disputeType === 'collection' ? 'selected' : ''}" data-option="collection">
                                 <div class="Bot-option-card-icon">
                                     <i class="fas fa-file-invoice-dollar"></i>
                                 </div>
-                                <h3 class="Bot-option-card-title">Remove a Collection</h3>
-                                <p class="Bot-option-card-desc">Dispute collection accounts on your credit report</p>
+                                <div class="Bot-option-card-content">
+                                    <h3 class="Bot-option-card-title">Remove a Collection</h3>
+                                    <p class="Bot-option-card-desc">Dispute collection accounts on your credit report</p>
+                                </div>
                             </div>
                             
-                            <div class="Bot-option-card" data-option="late_payment">
+                            <div class="Bot-option-card ${workflowState && workflowState.disputeType === 'late_payment' ? 'selected' : ''}" data-option="late_payment">
                                 <div class="Bot-option-card-icon">
                                     <i class="fas fa-calendar-times"></i>
                                 </div>
-                                <h3 class="Bot-option-card-title">Fix Late Payment</h3>
-                                <p class="Bot-option-card-desc">Dispute incorrect late payment records</p>
+                                <div class="Bot-option-card-content">
+                                    <h3 class="Bot-option-card-title">Fix Late Payment</h3>
+                                    <p class="Bot-option-card-desc">Dispute incorrect late payment records</p>
+                                </div>
                             </div>
                             
-                            <div class="Bot-option-card" data-option="not_mine">
+                            <div class="Bot-option-card ${workflowState && workflowState.disputeType === 'not_mine' ? 'selected' : ''}" data-option="not_mine">
                                 <div class="Bot-option-card-icon">
                                     <i class="fas fa-user-times"></i>
                                 </div>
-                                <h3 class="Bot-option-card-title">Not My Account</h3>
-                                <p class="Bot-option-card-desc">Dispute accounts that don't belong to you</p>
+                                <div class="Bot-option-card-content">
+                                    <h3 class="Bot-option-card-title">Not My Account</h3>
+                                    <p class="Bot-option-card-desc">Dispute accounts that don't belong to you</p>
+                                </div>
                             </div>
                             
-                            <div class="Bot-option-card" data-option="other_issues">
+                            <div class="Bot-option-card ${workflowState && workflowState.disputeType === 'other_issues' ? 'selected' : ''}" data-option="other_issues">
                                 <div class="Bot-option-card-icon">
                                     <i class="fas fa-question-circle"></i>
                                 </div>
-                                <h3 class="Bot-option-card-title">Other Issues</h3>
-                                <p class="Bot-option-card-desc">Address other credit report problems</p>
+                                <div class="Bot-option-card-content">
+                                    <h3 class="Bot-option-card-title">Other Issues</h3>
+                                    <p class="Bot-option-card-desc">Address other credit report problems</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -545,16 +586,51 @@
                     card.addEventListener('click', function () {
                         const option = this.getAttribute('data-option');
 
+                        // Update selected card visually
+                        optionCards.forEach(c => c.classList.remove('selected'));
+                        this.classList.add('selected');
+
                         // Store the selected dispute type
                         workflowState.disputeType = option;
 
                         // Save state
                         saveState();
 
-                        // Move to the next step
-                        goToNextStep();
+                        // Navigate to the Reports tab without advancing the step
+                        if (window.parent && typeof window.parent.switchTab === 'function') {
+                            window.parent.switchTab('reports');
+                        } else if (window.jamDisputeBot && typeof window.jamDisputeBot.switchTab === 'function') {
+                            window.jamDisputeBot.switchTab('reports');
+                        } else {
+                            const reportsTabBtn = document.querySelector('.Bot-tab-btn[data-tab="reports"]');
+                            if (reportsTabBtn) {
+                                reportsTabBtn.click();
+                            } else {
+                                console.error('Could not find a way to switch to the Reports tab');
+                            }
+                        }
                     });
                 });
+
+                // Add event listener to the continue button if it exists
+                const continueBtn = container.querySelector('.Bot-continue-btn');
+                if (continueBtn) {
+                    continueBtn.addEventListener('click', function () {
+                        // Navigate to the Reports tab without changing the selection
+                        if (window.parent && typeof window.parent.switchTab === 'function') {
+                            window.parent.switchTab('reports');
+                        } else if (window.jamDisputeBot && typeof window.jamDisputeBot.switchTab === 'function') {
+                            window.jamDisputeBot.switchTab('reports');
+                        } else {
+                            const reportsTabBtn = document.querySelector('.Bot-tab-btn[data-tab="reports"]');
+                            if (reportsTabBtn) {
+                                reportsTabBtn.click();
+                            } else {
+                                console.error('Could not find a way to switch to the Reports tab');
+                            }
+                        }
+                    });
+                }
             }
 
             // Helper function to get dispute type label
@@ -574,12 +650,12 @@
 
             // Function to save the current state
             function saveState() {
-                if (this.parentModule && this.parentModule.saveWorkflowState) {
-                    this.parentModule.saveWorkflowState(workflowState);
+                if (parentModule && typeof parentModule.saveWorkflowState === 'function') {
+                    parentModule.saveWorkflowState(workflowState);
                 }
 
-                if (this.parentModule && this.parentModule.saveCurrentStep) {
-                    this.parentModule.saveCurrentStep(currentStep);
+                if (parentModule && typeof parentModule.saveCurrentStep === 'function') {
+                    parentModule.saveCurrentStep(currentStep);
                 }
             }
 

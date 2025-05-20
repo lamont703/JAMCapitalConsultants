@@ -197,12 +197,141 @@
             });
         }
 
+        // Add this function to load the CreditReportUploader module
+        async function loadCreditReportUploaderModule() {
+            return new Promise((resolve, reject) => {
+                // Check if module is already loaded
+                if (window.creditReportUploader) {
+                    console.log('CreditReportUploader module already loaded');
+                    resolve(window.creditReportUploader);
+                    return;
+                }
+
+                console.log('Loading CreditReportUploader module...');
+
+                // Create script element
+                const script = document.createElement('script');
+                script.src = 'CreditReportUploader.html';
+                script.async = true;
+
+                // Set up event listeners
+                script.onload = () => {
+                    console.log('CreditReportUploader script loaded');
+                    // Wait for the module to be initialized
+                    if (window.creditReportUploader) {
+                        console.log('CreditReportUploader module ready');
+                        resolve(window.creditReportUploader);
+                    } else {
+                        // Listen for the module loaded event
+                        window.addEventListener('creditReportUploaderLoaded', () => {
+                            console.log('CreditReportUploader module initialized');
+                            resolve(window.creditReportUploader);
+                        }, { once: true });
+                    }
+                };
+
+                script.onerror = (error) => {
+                    console.error('Failed to load CreditReportUploader module:', error);
+                    reject(new Error('Failed to load CreditReportUploader module'));
+                };
+
+                // Add script to document
+                document.head.appendChild(script);
+            });
+        }
+
+        // Add this function to load the ChatModule
+        async function loadChatModule() {
+            return new Promise((resolve, reject) => {
+                // Check if module is already loaded
+                if (window.chatModule) {
+                    console.log('ChatModule already loaded');
+                    resolve(window.chatModule);
+                    return;
+                }
+
+                console.log('Loading ChatModule...');
+
+                // Create script element
+                const script = document.createElement('script');
+                script.src = 'ChatModule.html';
+                script.async = true;
+
+                // Set up event listeners
+                script.onload = () => {
+                    console.log('ChatModule script loaded');
+                    // Wait for the module to be initialized
+                    if (window.chatModule) {
+                        console.log('ChatModule ready');
+                        resolve(window.chatModule);
+                    } else {
+                        // Listen for the module loaded event
+                        window.addEventListener('chatModuleLoaded', () => {
+                            console.log('ChatModule initialized');
+                            resolve(window.chatModule);
+                        }, { once: true });
+                    }
+                };
+
+                script.onerror = (error) => {
+                    console.error('Failed to load ChatModule:', error);
+                    reject(new Error('Failed to load ChatModule'));
+                };
+
+                // Add script to document
+                document.head.appendChild(script);
+            });
+        }
+
+        // Add this function to load the LettersModule
+        async function loadLettersModule() {
+            return new Promise((resolve, reject) => {
+                // Check if module is already loaded
+                if (window.lettersModule) {
+                    console.log('LettersModule already loaded');
+                    resolve(window.lettersModule);
+                    return;
+                }
+
+                console.log('Loading LettersModule...');
+
+                // Create script element
+                const script = document.createElement('script');
+                script.src = 'LettersModule.html';
+                script.async = true;
+
+                // Set up event listeners
+                script.onload = () => {
+                    console.log('LettersModule script loaded');
+                    // Wait for the module to be initialized
+                    if (window.lettersModule) {
+                        console.log('LettersModule ready');
+                        resolve(window.lettersModule);
+                    } else {
+                        // Listen for the module loaded event
+                        window.addEventListener('lettersModuleLoaded', () => {
+                            console.log('LettersModule initialized');
+                            resolve(window.lettersModule);
+                        }, { once: true });
+                    }
+                };
+
+                script.onerror = (error) => {
+                    console.error('Failed to load LettersModule:', error);
+                    reject(new Error('Failed to load LettersModule'));
+                };
+
+                // Add script to document
+                document.head.appendChild(script);
+            });
+        }
+
         // JAM Tip Bot Module
         const JamTipBotModule = (function () {
             // Private variables
             let isInitialized = false;
             let activeTab = 'workflow'; // Default tab is workflow
-            let disputeWorkflowModule = null;
+            let currentStep = 1;
             let workflowState = {
                 disputeType: null,
                 selectedItems: [],
@@ -210,6 +339,10 @@
                 generatedLetters: [],
                 uploadedReports: []
             };
+            let disputeWorkflowModule = null;
+            let creditReportUploaderModule = null;
+            let chatModule = null;
+            let lettersModule = null;
 
             // Function to save the current tab state
             function saveTabState(tabId) {
@@ -218,7 +351,6 @@
 
                 // Save workflow state if available
                 if (disputeWorkflowModule) {
-                    const currentStep = disputeWorkflowModule.getCurrentStep();
                     const state = disputeWorkflowModule.getWorkflowState();
 
                     localStorage.setItem('jamBotWorkflowStep', currentStep);
@@ -255,34 +387,37 @@
 
             // Function to switch tabs
             function switchTab(tabId) {
-                // Update active tab
-                activeTab = tabId;
-
-                // Get all tab buttons and content
+                // Update active tab button
                 const tabButtons = document.querySelectorAll('.Bot-tab-btn');
-                const tabContents = document.querySelectorAll('.Bot-tab-content');
-
-                // Remove active class from all buttons and content
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-
-                // Add active class to selected button and content
-                const selectedButton = document.querySelector(`.Bot-tab-btn[data-tab="${tabId}"]`);
-                const selectedContent = document.getElementById(`Bot-tab-${tabId}`);
-
-                if (selectedButton) selectedButton.classList.add('active');
-                if (selectedContent) selectedContent.classList.add('active');
-
-                // Initialize workflow module if switching to workflow tab
-                if (tabId === 'workflow' && disputeWorkflowModule) {
-                    const workflowContainer = document.getElementById('Bot-tab-workflow');
-                    if (workflowContainer) {
-                        disputeWorkflowModule.updateView(workflowContainer);
+                tabButtons.forEach(btn => {
+                    if (btn.getAttribute('data-tab') === tabId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
                     }
-                }
+                });
+
+                // Update active tab content
+                const tabContents = document.querySelectorAll('.Bot-tab-content');
+                tabContents.forEach(content => {
+                    if (content.id === `Bot-tab-${tabId}`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
 
                 // Save the current tab state
                 saveTabState(tabId);
+
+                // Initialize modules if needed
+                if (tabId === 'reports' && !creditReportUploaderModule) {
+                    initReportsModule();
+                } else if (tabId === 'chat' && !chatModule) {
+                    initChatModule();
+                } else if (tabId === 'letters' && !lettersModule) {
+                    initLettersModule();
+                }
             }
 
             // Function to initialize the workflow module
@@ -370,6 +505,308 @@
                     }
                     return false;
                 }
+            }
+
+            // Add this function to initialize the reports tab
+            async function initReportsModule() {
+                try {
+                    const reportsContainer = document.getElementById('Bot-tab-reports');
+                    if (!reportsContainer) {
+                        console.error('Reports container not found');
+                        return false;
+                    }
+
+                    // Show loading indicator
+                    reportsContainer.innerHTML = `
+                        <div class="Bot-loading">
+                            <div class="Bot-spinner"></div>
+                            <p>Loading credit report uploader...</p>
+                        </div>
+                    `;
+
+                    // Load the CreditReportUploader module
+                    creditReportUploaderModule = await loadCreditReportUploaderModule();
+
+                    // Restore saved state if available
+                    const savedReports = JSON.parse(localStorage.getItem('jamBotUploadedReports') || '[]');
+
+                    // Create parent module interface for communication
+                    const parentModule = {
+                        saveReportsState: function (reports) {
+                            localStorage.setItem('jamBotUploadedReports', JSON.stringify(reports));
+                        },
+
+                        onReportUploaded: function (report) {
+                            console.log('Report uploaded:', report.name);
+
+                            // Notify the chat module about the uploaded report
+                            if (chatModule) {
+                                const chatContainer = document.getElementById('Bot-tab-chat');
+                                chatModule.onReportUploaded(chatContainer);
+                            }
+                        },
+
+                        onReportDeleted: function (reportId) {
+                            console.log('Report deleted:', reportId);
+                            // You can add additional functionality here
+                        }
+                    };
+
+                    // Clear the loading indicator before initializing the module
+                    reportsContainer.innerHTML = '';
+
+                    // Initialize the reports module
+                    const success = creditReportUploaderModule.init(reportsContainer, parentModule);
+
+                    // Set the uploaded reports if available
+                    if (success && savedReports.length > 0) {
+                        creditReportUploaderModule.setUploadedReports(savedReports);
+                        creditReportUploaderModule.updateView(reportsContainer);
+                    }
+
+                    if (success) {
+                        console.log('CreditReportUploader module initialized successfully');
+                        return true;
+                    } else {
+                        console.error('Failed to initialize CreditReportUploader module');
+                        reportsContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Failed to load credit report uploader. Please try refreshing the page.</p>
+                            </div>
+                        `;
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error initializing reports module:', error);
+                    const reportsContainer = document.getElementById('Bot-tab-reports');
+                    if (reportsContainer) {
+                        reportsContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error loading credit report uploader: ${error.message}</p>
+                                <button class="Bot-btn Bot-btn-primary" onclick="location.reload()">Reload</button>
+                            </div>
+                        `;
+                    }
+                    return false;
+                }
+            }
+
+            // Add this function to initialize the chat tab
+            async function initChatModule() {
+                try {
+                    const chatContainer = document.getElementById('Bot-tab-chat');
+                    if (!chatContainer) {
+                        console.error('Chat container not found');
+                        return false;
+                    }
+
+                    // Show loading indicator
+                    chatContainer.innerHTML = `
+                        <div class="Bot-loading">
+                            <div class="Bot-spinner"></div>
+                            <p>Loading chat interface...</p>
+                        </div>
+                    `;
+
+                    // Load the ChatModule
+                    chatModule = await loadChatModule();
+
+                    // Restore saved state if available
+                    const savedMessages = JSON.parse(localStorage.getItem('jamBotChatMessages') || '[]');
+
+                    // Create parent module interface for communication
+                    const parentModule = {
+                        saveChatState: function (messages) {
+                            localStorage.setItem('jamBotChatMessages', JSON.stringify(messages));
+                        },
+
+                        onMessageSent: function (message) {
+                            console.log('Message sent:', message);
+                            // Process the message and generate a response
+                            processUserMessage(message);
+                        }
+                    };
+
+                    // Clear the loading indicator before initializing the module
+                    chatContainer.innerHTML = '';
+
+                    // Initialize the chat module
+                    const success = chatModule.init(chatContainer, parentModule);
+
+                    // Set the chat messages if available
+                    if (success && savedMessages.length > 0) {
+                        chatModule.setChatMessages(savedMessages);
+                        chatModule.updateView(chatContainer);
+                    } else if (success) {
+                        // Add welcome message if no saved messages
+                        setTimeout(() => {
+                            chatModule.addBotMessage(`👋 Hi there! I'm your JAM AI Credit Assistant. I can help you with:
+
+- Creating dispute letters
+- Understanding your credit report
+- Explaining credit laws and your rights
+- Providing credit improvement strategies
+
+What can I help you with today?`, chatContainer);
+                        }, 500);
+                    }
+
+                    if (success) {
+                        console.log('ChatModule initialized successfully');
+                        return true;
+                    } else {
+                        console.error('Failed to initialize ChatModule');
+                        chatContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Failed to load chat interface. Please try refreshing the page.</p>
+                            </div>
+                        `;
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error initializing chat module:', error);
+                    const chatContainer = document.getElementById('Bot-tab-chat');
+                    if (chatContainer) {
+                        chatContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error loading chat interface: ${error.message}</p>
+                                <button class="Bot-btn Bot-btn-primary" onclick="location.reload()">Reload</button>
+                            </div>
+                        `;
+                    }
+                    return false;
+                }
+            }
+
+            // Add this function to initialize the letters tab
+            async function initLettersModule() {
+                try {
+                    const lettersContainer = document.getElementById('Bot-tab-letters');
+                    if (!lettersContainer) {
+                        console.error('Letters container not found');
+                        return false;
+                    }
+
+                    // Show loading indicator
+                    lettersContainer.innerHTML = `
+                        <div class="Bot-loading">
+                            <div class="Bot-spinner"></div>
+                            <p>Loading letters interface...</p>
+                        </div>
+                    `;
+
+                    // Load the LettersModule
+                    lettersModule = await loadLettersModule();
+
+                    // Restore saved state if available
+                    const savedLetters = JSON.parse(localStorage.getItem('jamBotSavedLetters') || '[]');
+
+                    // Create parent module interface for communication
+                    const parentModule = {
+                        saveLettersState: function (letters) {
+                            localStorage.setItem('jamBotSavedLetters', JSON.stringify(letters));
+                        },
+
+                        onLetterDownload: function (letter) {
+                            console.log('Letter download requested:', letter.name);
+                            // Create a blob from the letter content
+                            const blob = new Blob([letter.content || 'Letter content placeholder'], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+
+                            // Create a link and trigger download
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${letter.name.replace(/\s+/g, '_')}.txt`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        },
+
+                        onLetterDeleted: function (letterId) {
+                            console.log('Letter deleted:', letterId);
+                            // You can add additional functionality here
+                        },
+
+                        onLetterView: function (letter) {
+                            console.log('Letter view requested:', letter.name);
+                            // You can implement a letter preview modal here
+                        }
+                    };
+
+                    // Clear the loading indicator before initializing the module
+                    lettersContainer.innerHTML = '';
+
+                    // Initialize the letters module
+                    const success = lettersModule.init(lettersContainer, parentModule);
+
+                    // Set the saved letters if available
+                    if (success && savedLetters.length > 0) {
+                        lettersModule.setSavedLetters(savedLetters);
+                        lettersModule.updateView(lettersContainer);
+                    }
+
+                    if (success) {
+                        console.log('LettersModule initialized successfully');
+                        return true;
+                    } else {
+                        console.error('Failed to initialize LettersModule');
+                        lettersContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Failed to load letters interface. Please try refreshing the page.</p>
+                            </div>
+                        `;
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error initializing letters module:', error);
+                    const lettersContainer = document.getElementById('Bot-tab-letters');
+                    if (lettersContainer) {
+                        lettersContainer.innerHTML = `
+                            <div class="Bot-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error loading letters interface: ${error.message}</p>
+                                <button class="Bot-btn Bot-btn-primary" onclick="location.reload()">Reload</button>
+                            </div>
+                        `;
+                    }
+                    return false;
+                }
+            }
+
+            // Function to process user messages and generate responses
+            async function processUserMessage(message) {
+                const chatContainer = document.getElementById('Bot-tab-chat');
+                if (!chatContainer || !chatModule) return;
+
+                // Show typing indicator
+                chatModule.showTypingIndicator(chatContainer);
+
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Hide typing indicator
+                    chatModule.hideTypingIndicator(chatContainer);
+
+                    // Generate a simple response (in a real app, this would call an API)
+                    let response = "I'm processing your question about credit repair. This is a placeholder response. In the production version, this would connect to our AI backend.";
+
+                    // Add some context-aware responses
+                    if (message.toLowerCase().includes("dispute")) {
+                        response = "To dispute items on your credit report, you can use our Dispute Workflow tab. Would you like me to guide you through the process?";
+                    } else if (message.toLowerCase().includes("report") || message.toLowerCase().includes("upload")) {
+                        response = "You can upload your credit reports in the Reports tab. We support PDFs from major credit monitoring services.";
+                    } else if (message.toLowerCase().includes("letter")) {
+                        response = "We can help you generate customized dispute letters. You can find your saved letters in the My Letters tab.";
+                    }
+
+                    // Add the bot response
+                    chatModule.addBotMessage(response, chatContainer);
+                }, 1500);
             }
 
             // Function to update the letters list
@@ -466,7 +903,7 @@
                                     <i class="fas fa-tasks"></i> Dispute Workflow
                                 </button>
                                 <button class="Bot-tab-btn" data-tab="reports">
-                                    <i class="fas fa-file-alt"></i> Reports
+                                    <i class="fas fa-file-alt"></i> Upload Reports
                                 </button>
                                 <button class="Bot-tab-btn" data-tab="chat">
                                     <i class="fas fa-comments"></i> Chat
@@ -518,6 +955,15 @@
 
                         // Initialize the workflow module
                         await initWorkflowModule();
+
+                        // Initialize the reports module
+                        await initReportsModule();
+
+                        // Initialize the chat module
+                        await initChatModule();
+
+                        // Initialize the letters module
+                        await initLettersModule();
 
                         // Restore the previous tab state or default to 'workflow'
                         restoreTabState();

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Letters Module</title>
+    <style>
+        /* Letters Container Styles */
+        .Bot-letters-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .Bot-letters-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #343a40;
+            text-align: center;
+        }
+
+        .Bot-letters-description {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Letters List Styles */
+        .Bot-letters-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        /* Empty State Styles */
+        .Bot-empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .Bot-empty-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .Bot-empty-title {
+            font-size: 1.25rem;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        .Bot-empty-text {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        /* Letter Item Styles */
+        .Bot-letter-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .Bot-letter-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .Bot-letter-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #e6f9ff;
+            color: #09ccfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .Bot-letter-info {
+            flex: 1;
+        }
+
+        .Bot-letter-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .Bot-letter-date {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .Bot-letter-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .Bot-letter-action {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .Bot-letter-action:hover {
+            background: #f1f3f5;
+            color: #343a40;
+        }
+
+        .Bot-letter-action.download {
+            color: #09ccfc;
+        }
+
+        .Bot-letter-action.delete {
+            color: #dc3545;
+        }
+
+        /* Button Styles */
+        .Bot-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            background: #f1f3f5;
+            color: #495057;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .Bot-btn:hover {
+            background: #e9ecef;
+        }
+
+        .Bot-btn-primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .Bot-btn-primary:hover {
+            background: #07a3ca;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Letters Module
+        const LettersModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let savedLetters = [];
+            let parentModule = null;
+
+            // Function to initialize the module
+            function init(container, parentModuleRef) {
+                if (!container) {
+                    console.error('Container not provided to Letters module');
+                    return false;
+                }
+
+                console.log('Initializing Letters module');
+
+                // Store reference to parent module for communication
+                parentModule = parentModuleRef;
+
+                // Only initialize once
+                if (isInitialized) {
+                    console.log('Letters module already initialized');
+                    updateLettersList(container);
+                    return true;
+                }
+
+                // Render the letters interface
+                renderLettersInterface(container);
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Function to render the letters interface
+            function renderLettersInterface(container) {
+                container.innerHTML = `
+                    <div class="Bot-letters-container">
+                        <h2 class="Bot-letters-title">My Dispute Letters</h2>
+                        <p class="Bot-letters-description">View and download your saved dispute letters.</p>
+                        
+                        <div class="Bot-letters-list" id="savedLettersList">
+                            <!-- Saved letters will appear here -->
+                        </div>
+                    </div>
+                `;
+
+                // Update the letters list
+                updateLettersList(container);
+            }
+
+            // Function to set up event listeners
+            function setupEventListeners(container) {
+                // Listen for the "Start Workflow" button click
+                container.addEventListener('click', function (e) {
+                    if (e.target.id === 'startWorkflowBtn' || e.target.closest('#startWorkflowBtn')) {
+                        console.log('Start workflow button clicked');
+                        if (parentModule && typeof parentModule.switchToWorkflowTab === 'function') {
+                            parentModule.switchToWorkflowTab();
+                        }
+                    }
+
+                    // Handle download button clicks
+                    if (e.target.classList.contains('download-letter-btn') || e.target.closest('.download-letter-btn')) {
+                        const letterId = e.target.closest('.download-letter-btn').getAttribute('data-id');
+                        downloadLetter(letterId);
+                    }
+
+                    // Handle delete button clicks
+                    if (e.target.classList.contains('delete-letter-btn') || e.target.closest('.delete-letter-btn')) {
+                        const letterId = e.target.closest('.delete-letter-btn').getAttribute('data-id');
+                        deleteLetter(letterId, container);
+                    }
+
+                    // Handle view button clicks
+                    if (e.target.classList.contains('view-letter-btn') || e.target.closest('.view-letter-btn')) {
+                        const letterId = e.target.closest('.view-letter-btn').getAttribute('data-id');
+                        viewLetter(letterId);
+                    }
+                });
+            }
+
+            // Function to update the letters list
+            function updateLettersList(container) {
+                const lettersList = container.querySelector('#savedLettersList');
+                if (!lettersList) return;
+
+                // Clear the list
+                lettersList.innerHTML = '';
+
+                // If no letters, show empty state
+                if (savedLetters.length === 0) {
+                    lettersList.innerHTML = `
+                        <div class="Bot-empty-state">
+                            <div class="Bot-empty-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3 class="Bot-empty-title">No Letters Yet</h3>
+                            <p class="Bot-empty-text">Complete the dispute workflow to generate your first letter.</p>
+                            <button class="Bot-btn Bot-btn-primary" id="startWorkflowBtn">Start Dispute Workflow</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Add each letter to the list
+                savedLetters.forEach(letter => {
+                    const letterElement = document.createElement('div');
+                    letterElement.className = 'Bot-letter-item';
+                    letterElement.innerHTML = `
+                        <div class="Bot-letter-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="Bot-letter-info">
+                            <div class="Bot-letter-name">${letter.name}</div>
+                            <div class="Bot-letter-date">${formatDate(letter.createdAt)}</div>
+                        </div>
+                        <div class="Bot-letter-actions">
+                            <button class="Bot-letter-action view-letter-btn" title="View Letter" data-id="${letter.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="Bot-letter-action download download-letter-btn" title="Download Letter" data-id="${letter.id}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="Bot-letter-action delete delete-letter-btn" title="Delete Letter" data-id="${letter.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    lettersList.appendChild(letterElement);
+                });
+            }
+
+            // Function to download a letter
+            function downloadLetter(letterId) {
+                console.log(`Downloading letter ${letterId}`);
+                const letter = savedLetters.find(l => l.id === letterId);
+                if (!letter) return;
+
+                // In a real implementation, this would generate and download the letter
+                // For now, we'll just log it
+                if (parentModule && typeof parentModule.onLetterDownload === 'function') {
+                    parentModule.onLetterDownload(letter);
+                }
+            }
+
+            // Function to delete a letter
+            function deleteLetter(letterId, container) {
+                console.log(`Deleting letter ${letterId}`);
+                savedLetters = savedLetters.filter(letter => letter.id !== letterId);
+                updateLettersList(container);
+
+                // Notify parent module
+                if (parentModule && typeof parentModule.onLetterDeleted === 'function') {
+                    parentModule.onLetterDeleted(letterId);
+                }
+
+                // Save state
+                saveState();
+            }
+
+            // Function to view a letter
+            function viewLetter(letterId) {
+                console.log(`Viewing letter ${letterId}`);
+                const letter = savedLetters.find(l => l.id === letterId);
+                if (!letter) return;
+
+                // In a real implementation, this would show a preview of the letter
+                // For now, we'll just log it
+                if (parentModule && typeof parentModule.onLetterView === 'function') {
+                    parentModule.onLetterView(letter);
+                }
+            }
+
+            // Function to add a new letter
+            function addLetter(letter, container) {
+                if (!letter || !letter.id || !letter.name) return false;
+
+                // Add created date if not provided
+                if (!letter.createdAt) {
+                    letter.createdAt = new Date();
+                }
+
+                // Check if letter already exists
+                const existingIndex = savedLetters.findIndex(l => l.id === letter.id);
+                if (existingIndex >= 0) {
+                    // Update existing letter
+                    savedLetters[existingIndex] = letter;
+                } else {
+                    // Add new letter
+                    savedLetters.push(letter);
+                }
+
+                // Update the UI if container provided
+                if (container) {
+                    updateLettersList(container);
+                }
+
+                // Save state
+                saveState();
+                return true;
+            }
+
+            // Function to update the view
+            function updateView(container) {
+                updateLettersList(container);
+            }
+
+            // Function to save state
+            function saveState() {
+                if (parentModule && typeof parentModule.saveLettersState === 'function') {
+                    parentModule.saveLettersState(savedLetters);
+                }
+            }
+
+            // Helper function to format date
+            function formatDate(date) {
+                if (!date) return '';
+
+                if (typeof date === 'string') {
+                    date = new Date(date);
+                }
+
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+
+            // Public API
+            return {
+                init: init,
+
+                getSavedLetters: function () {
+                    return savedLetters;
+                },
+
+                setSavedLetters: function (letters) {
+                    if (Array.isArray(letters)) {
+                        savedLetters = letters;
+                    }
+                },
+
+                addLetter: addLetter,
+                updateView: updateView
+            };
+        })();
+
+        // Make the module globally available
+        window.lettersModule = LettersModule;
+
+        // Dispatch event when loaded
+        window.dispatchEvent(new Event('lettersModuleLoaded'));
+    </script>
+</body>
+
+</html>

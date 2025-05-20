@@ -1,6 +1,7 @@
 {
   "name": "jam-capital-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend server for JAM Capital Consultants",
   "main": "server.js",
   "scripts": {
@@ -8,7 +9,12 @@
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["credit", "finance", "express", "api"],
+  "keywords": [
+    "credit",
+    "finance",
+    "express",
+    "api"
+  ],
   "author": "JAM Capital Consultants",
   "license": "ISC",
   "dependencies": {
@@ -16,7 +22,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "openai": "^4.100.0",
+    "pdf-parse": "^1.1.1",
+    "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

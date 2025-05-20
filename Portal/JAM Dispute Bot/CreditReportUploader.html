@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Report Uploader Module</title>
+    <style>
+        /* Upload Container Styles */
+        .Bot-upload-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .Bot-upload-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .Bot-upload-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+
+        .Bot-upload-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        /* Upload Message Styles */
+        .Bot-upload-message {
+            margin-bottom: 30px;
+        }
+
+        .Bot-message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .Bot-bot-message {
+            align-items: flex-start;
+        }
+
+        .Bot-message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e6f9ff;
+            color: #09ccfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .Bot-message-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .Bot-bot-message .Bot-message-content {
+            background: #e6f9ff;
+        }
+
+        /* Upload Area Styles */
+        .Bot-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .Bot-upload-area:hover,
+        .Bot-upload-area.Bot-file-upload-dragover {
+            border-color: #09ccfc;
+            background: #e6f9ff;
+        }
+
+        .Bot-upload-icon {
+            font-size: 40px;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .Bot-upload-area-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+
+        .Bot-upload-area-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .Bot-upload-area-formats {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .Bot-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .Bot-btn i {
+            margin-right: 8px;
+        }
+
+        .Bot-btn-primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .Bot-btn-primary:hover {
+            background: #07a3ca;
+        }
+
+        .Bot-upload-btn {
+            margin-top: 10px;
+        }
+
+        /* Uploaded Files List */
+        .Bot-upload-files {
+            margin-bottom: 30px;
+        }
+
+        .Bot-upload-file {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .Bot-upload-file-icon {
+            font-size: 24px;
+            color: #09ccfc;
+            margin-right: 15px;
+        }
+
+        .Bot-upload-file-info {
+            flex: 1;
+        }
+
+        .Bot-upload-file-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .Bot-upload-file-size {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .Bot-upload-file-actions {
+            display: flex;
+        }
+
+        .Bot-upload-file-action {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 5px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .Bot-upload-file-action:hover {
+            background: #f8f9fa;
+            color: #dc3545;
+        }
+
+        /* Upload Tips */
+        .Bot-upload-tips {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .Bot-upload-tips-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+
+        .Bot-upload-tips-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .Bot-upload-tip {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .Bot-upload-tip-icon {
+            color: #28a745;
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+
+        .Bot-upload-tip-content h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #343a40;
+        }
+
+        .Bot-upload-tip-content p {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .Bot-upload-tip-content a {
+            color: #09ccfc;
+            text-decoration: none;
+        }
+
+        .Bot-upload-tip-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Continue Section Styles */
+        .Bot-continue-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 12px;
+        }
+
+        .Bot-continue-btn {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+        }
+
+        .Bot-continue-hint {
+            margin-top: 10px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Credit Report Uploader Module
+        const CreditReportUploaderModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let uploadedReports = [];
+            let parentModule = null;
+
+            // Function to initialize the module
+            function init(container, parent) {
+                if (!container) {
+                    console.error('Container not provided to CreditReportUploader module');
+                    return false;
+                }
+
+                console.log('Initializing CreditReportUploader module');
+
+                // Store reference to parent module for communication
+                parentModule = parent;
+
+                // Clear localStorage on page refresh/load
+                // We'll use sessionStorage to detect page refreshes
+                const pageLoadFlag = sessionStorage.getItem('jamBotUploaderPageLoaded');
+
+                if (!pageLoadFlag) {
+                    // This is a fresh page load (not just a tab switch)
+                    console.log('Fresh page load detected, clearing uploaded reports');
+
+                    // Clear all jamBot items related to files
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('jamBotFile_') || key === 'jamBotUploadedReports' || key === 'jamBotHasUploadedReports') {
+                            console.log('Clearing localStorage item:', key);
+                            localStorage.removeItem(key);
+                        }
+                    });
+
+                    // Also clear the in-memory array
+                    uploadedReports = [];
+
+                    // Set the flag to indicate page has been loaded in this session
+                    sessionStorage.setItem('jamBotUploaderPageLoaded', 'true');
+                }
+
+                // Only initialize once
+                if (isInitialized) {
+                    console.log('CreditReportUploader module already initialized');
+                    updateView(container);
+                    return true;
+                }
+
+                // Render the upload interface
+                renderUploadInterface(container);
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Function to render the upload interface
+            function renderUploadInterface(container) {
+                container.innerHTML = `
+                    <div class="Bot-upload-container">
+                        <div class="Bot-upload-header">
+                            <h2 class="Bot-upload-title">Upload Your Credit Reports</h2>
+                            <p class="Bot-upload-subtitle">Upload your credit reports to help us identify issues to dispute</p>
+                        </div>
+                        
+                        <div class="Bot-upload-message">
+                            <div class="Bot-message Bot-bot-message">
+                                <div class="Bot-message-avatar">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="Bot-message-content">
+                                    <p>To help you dispute items on your credit report, I'll need to see what's on your report first. You can upload reports from any of the three major bureaus (Experian, Equifax, or TransUnion).</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="Bot-upload-area" id="uploadArea">
+                            <div class="Bot-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3 class="Bot-upload-area-title">Drag & Drop Your Credit Report Files</h3>
+                            <p class="Bot-upload-area-subtitle">or click to browse your files</p>
+                            <p class="Bot-upload-area-formats">Supported formats: PDF, JPG, PNG</p>
+                            <input type="file" id="fileInput" class="Bot-file-input" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                            <button class="Bot-btn Bot-btn-primary" id="browseFilesBtn">
+                                <i class="fas fa-folder-open"></i> Browse Files
+                            </button>
+                        </div>
+                        
+                        <div class="Bot-uploaded-reports" id="uploadedReports">
+                            <h3 class="Bot-uploaded-reports-title">Uploaded Reports</h3>
+                            <div class="Bot-uploaded-reports-list" id="reportsList">
+                                <!-- Uploaded reports will appear here -->
+                            </div>
+                        </div>
+                        
+                        <div class="Bot-continue-section" id="continueSection" style="display: none;">
+                            <button class="Bot-btn Bot-btn-primary Bot-continue-btn" id="continueToChat">
+                                <i class="fas fa-arrow-right"></i> Continue to Chat
+                            </button>
+                            <p class="Bot-continue-hint">Click to continue to the chat where we'll analyze your reports and help you dispute items</p>
+                        </div>
+                    </div>
+                `;
+
+                // Add event listeners
+                setupUploadAreaListeners(container);
+            }
+
+            // Function to set up upload area event listeners
+            function setupUploadAreaListeners(container) {
+                const uploadArea = container.querySelector('#uploadArea');
+                const fileInput = container.querySelector('#fileInput');
+                const browseFilesBtn = container.querySelector('#browseFilesBtn');
+                const continueToChat = container.querySelector('#continueToChat');
+
+                if (!uploadArea || !fileInput || !browseFilesBtn) return;
+
+                // Browse files button click
+                browseFilesBtn.addEventListener('click', function () {
+                    fileInput.click();
+                });
+
+                // File input change
+                fileInput.addEventListener('change', function () {
+                    if (this.files.length > 0) {
+                        handleUploadedFiles(this.files, container);
+                    }
+                });
+
+                // Drag and drop events
+                uploadArea.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.add('Bot-file-upload-dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.remove('Bot-file-upload-dragover');
+                });
+
+                uploadArea.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.remove('Bot-file-upload-dragover');
+
+                    if (e.dataTransfer.files.length > 0) {
+                        handleUploadedFiles(e.dataTransfer.files, container);
+                    }
+                });
+
+                // Continue to chat button
+                if (continueToChat) {
+                    continueToChat.addEventListener('click', function () {
+                        // Navigate to the Chat tab
+                        if (window.parent && typeof window.parent.switchTab === 'function') {
+                            window.parent.switchTab('chat');
+                        } else if (window.jamDisputeBot && typeof window.jamDisputeBot.switchTab === 'function') {
+                            window.jamDisputeBot.switchTab('chat');
+                        } else {
+                            const chatTabBtn = document.querySelector('.Bot-tab-btn[data-tab="chat"]');
+                            if (chatTabBtn) {
+                                chatTabBtn.click();
+                            } else {
+                                console.error('Could not find a way to switch to the Chat tab');
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Function to handle uploaded files
+            function handleUploadedFiles(files, container) {
+                if (!files || files.length === 0) {
+                    console.log('No files to handle');
+                    return;
+                }
+
+                console.log(`Processing ${files.length} uploaded files`);
+
+                // Track how many files we need to process
+                let filesToProcess = 0;
+                let filesProcessed = 0;
+
+                Array.from(files).forEach(file => {
+                    // Check if file is a PDF
+                    if (file.type !== 'application/pdf') {
+                        console.warn('Skipping non-PDF file:', file.name);
+                        return;
+                    }
+
+                    filesToProcess++;
+
+                    // Create a unique ID for the report
+                    const reportId = 'report_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                    // Create a report object
+                    const report = {
+                        id: reportId,
+                        name: file.name,
+                        size: file.size,
+                        uploadDate: new Date(),
+                        file: file // Store the actual file object
+                    };
+
+                    // Add to uploaded reports
+                    uploadedReports.push(report);
+                    console.log('Added report to uploadedReports:', report.name);
+
+                    // Store file data in localStorage
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        try {
+                            // Store the file data as base64
+                            const fileData = {
+                                id: reportId,
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                data: e.target.result,
+                                uploadDate: new Date()
+                            };
+
+                            // Store in localStorage (this might fail if the file is too large)
+                            try {
+                                localStorage.setItem('jamBotFile_' + reportId, JSON.stringify(fileData));
+                                console.log('File stored in localStorage:', reportId);
+                            } catch (storageError) {
+                                console.error('Failed to store file in localStorage (likely too large):', storageError);
+                            }
+                        } catch (error) {
+                            console.error('Error processing file for storage:', error);
+                        }
+
+                        // Track processed files
+                        filesProcessed++;
+
+                        // If all files are processed, update UI and debug
+                        if (filesProcessed === filesToProcess) {
+                            // Update the UI
+                            updateUploadedReportsList(container);
+
+                            // Save state
+                            saveState();
+
+                            // Debug localStorage contents after all files are processed
+                            setTimeout(debugLocalStorage, 100); // Small delay to ensure localStorage is updated
+                        }
+                    };
+
+                    reader.onerror = function () {
+                        console.error('Error reading file:', file.name);
+                        filesProcessed++;
+
+                        // If all files are processed, update UI and debug
+                        if (filesProcessed === filesToProcess) {
+                            updateUploadedReportsList(container);
+                            saveState();
+                            setTimeout(debugLocalStorage, 100);
+                        }
+                    };
+
+                    // Read the file as a data URL (base64)
+                    reader.readAsDataURL(file);
+                });
+
+                // Update the UI immediately to show progress
+                updateUploadedReportsList(container);
+
+                // Notify parent module
+                if (parentModule && typeof parentModule.onReportUploaded === 'function') {
+                    uploadedReports.forEach(report => {
+                        parentModule.onReportUploaded(report);
+                    });
+                }
+            }
+
+            // Function to update the uploaded reports list
+            function updateUploadedReportsList(container) {
+                const reportsList = container.querySelector('#reportsList');
+                const uploadedReportsSection = container.querySelector('#uploadedReports');
+                const continueSection = container.querySelector('#continueSection');
+
+                if (!reportsList || !uploadedReportsSection) return;
+
+                reportsList.innerHTML = '';
+
+                if (uploadedReports.length === 0) {
+                    uploadedReportsSection.style.display = 'none';
+                    if (continueSection) {
+                        continueSection.style.display = 'none';
+                    }
+                    return;
+                }
+
+                uploadedReportsSection.style.display = 'block';
+
+                // Show the continue section when reports are uploaded
+                if (continueSection) {
+                    continueSection.style.display = 'block';
+                }
+
+                uploadedReports.forEach(report => {
+                    const fileSize = formatFileSize(report.size);
+                    const uploadDate = formatDate(report.uploadDate);
+
+                    const reportElement = document.createElement('div');
+                    reportElement.className = 'Bot-upload-file';
+                    reportElement.innerHTML = `
+                        <div class="Bot-upload-file-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="Bot-upload-file-info">
+                            <div class="Bot-upload-file-name">${report.name}</div>
+                            <div class="Bot-upload-file-size">${fileSize} • Uploaded ${uploadDate}</div>
+                        </div>
+                        <div class="Bot-upload-file-actions">
+                            <button class="Bot-upload-file-action Bot-delete-report" data-id="${report.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    reportsList.appendChild(reportElement);
+                });
+
+                // Add event listeners to delete buttons
+                const deleteButtons = container.querySelectorAll('.Bot-delete-report');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const reportId = this.getAttribute('data-id');
+                        deleteReport(reportId, container);
+                    });
+                });
+            }
+
+            // Function to delete a report
+            function deleteReport(reportId, container) {
+                console.log('Deleting report:', reportId);
+
+                // Remove from uploadedReports array
+                uploadedReports = uploadedReports.filter(report => report.id !== reportId);
+
+                // Remove from localStorage
+                localStorage.removeItem('jamBotFile_' + reportId);
+                console.log('Removed file from localStorage:', 'jamBotFile_' + reportId);
+
+                updateUploadedReportsList(container);
+
+                // Notify parent module
+                if (parentModule && typeof parentModule.onReportDeleted === 'function') {
+                    parentModule.onReportDeleted(reportId);
+                }
+
+                // Save state
+                saveState();
+
+                // Debug localStorage contents
+                debugLocalStorage();
+            }
+
+            // Function to update the view
+            function updateView(container) {
+                renderUploadInterface(container);
+                updateUploadedReportsList(container);
+            }
+
+            // Function to save state
+            function saveState() {
+                if (parentModule && typeof parentModule.saveReportsState === 'function') {
+                    // Create a serializable version of the reports (without the File object)
+                    const serializableReports = uploadedReports.map(report => ({
+                        id: report.id,
+                        name: report.name,
+                        size: report.size,
+                        uploadDate: report.uploadDate
+                    }));
+
+                    parentModule.saveReportsState(serializableReports);
+
+                    // Also set a flag in localStorage to indicate reports have been uploaded
+                    localStorage.setItem('jamBotHasUploadedReports', 'true');
+                }
+            }
+
+            // Helper function to format file size
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' bytes';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+
+            // Helper function to format date
+            function formatDate(date) {
+                if (!date) return '';
+
+                // Ensure date is a Date object
+                if (!(date instanceof Date)) {
+                    try {
+                        date = new Date(date);
+                    } catch (e) {
+                        return 'Unknown date';
+                    }
+                }
+
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    return 'Unknown date';
+                }
+
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
+                const diffDays = Math.floor(diffHours / 24);
+
+                if (diffMins < 1) return 'just now';
+                if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+                if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+
+                // Use a more compatible date formatting approach
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                return `${month}/${day}/${year}`;
+            }
+
+            // Function to debug localStorage contents
+            function debugLocalStorage() {
+                console.log('--- localStorage Debug ---');
+
+                // Check for report flags
+                console.log('jamBotHasUploadedReports:', localStorage.getItem('jamBotHasUploadedReports'));
+
+                // Check for reports metadata
+                const reportsJson = localStorage.getItem('jamBotUploadedReports');
+                console.log('jamBotUploadedReports:', reportsJson);
+
+                if (reportsJson) {
+                    try {
+                        const reports = JSON.parse(reportsJson);
+                        console.log('Reports count:', reports.length);
+                        reports.forEach(report => {
+                            console.log(`Report: ${report.id}, ${report.name}, ${formatFileSize(report.size)}`);
+                            console.log(`File data exists: ${localStorage.getItem('jamBotFile_' + report.id) ? 'Yes' : 'No'}`);
+                        });
+                    } catch (e) {
+                        console.error('Error parsing reports JSON:', e);
+                    }
+                }
+
+                // Count all jamBot items
+                let jamBotItemCount = 0;
+                let jamBotFileCount = 0;
+                let totalStorageUsed = 0;
+
+                console.log('\nDetailed localStorage items:');
+                console.log('---------------------------');
+
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('jamBot')) {
+                        jamBotItemCount++;
+                        const value = localStorage.getItem(key);
+                        const itemSize = (key.length + (value ? value.length : 0)) * 2; // Approximate size in bytes
+                        totalStorageUsed += itemSize;
+
+                        console.log(`${jamBotItemCount}. ${key}: ${formatFileSize(itemSize)}`);
+
+                        if (key.startsWith('jamBotFile_')) {
+                            jamBotFileCount++;
+                        }
+                    }
+                });
+
+                console.log('\nSummary:');
+                console.log('Total jamBot items:', jamBotItemCount);
+                console.log('File items:', jamBotFileCount);
+                console.log('Approximate storage used:', formatFileSize(totalStorageUsed));
+                console.log('------------------------');
+            }
+
+            // Public API
+            return {
+                init: init,
+
+                getUploadedReports: function () {
+                    return uploadedReports;
+                },
+
+                setUploadedReports: function (reports) {
+                    if (Array.isArray(reports)) {
+                        uploadedReports = reports;
+                    }
+                },
+
+                updateView: updateView
+            };
+        })();
+
+        // Make the module globally available
+        window.creditReportUploader = CreditReportUploaderModule;
+
+        // Dispatch event when loaded
+        window.dispatchEvent(new Event('creditReportUploaderLoaded'));
+    </script>
+</body>
+
+</html>

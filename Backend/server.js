@@ -1,49 +1,38 @@
 // server.js
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+import { chatRoutes } from './routes/chatRoutes.js';
 
-// Initialize express app
+// Load environment variables
+dotenv.config();
+
+// Set up __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Basic middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../Development Files')));
 
-// Serve static files from the frontend directory
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Routes
+app.use('/api/chatGptService', chatRoutes);
 
-// Basic health check route
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'JAM Capital Consultants is running' });
+// Serve the chat interface
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Development Files/ChatInterface.html'));
 });
 
-// Route to serve Interface.html
-app.get('/portal', (req, res) => {
-  const filePath = path.join(__dirname, '../Portal/Interface.html');
-  
-  fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading Interface.html:', err);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Error loading Portal interface' 
-      });
-    }
-    
-    res.setHeader('Content-Type', 'text/html');
-    res.send(data);
-  });
-});
-
-// Serve static files from the Portal directory
-app.use('/portal-assets', express.static(path.join(__dirname, '../Portal')));
-
-// Start the server
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Chat Module</title>
+    <style>
+        /* Chat Container Styles */
+        .Bot-chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .Bot-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .Bot-chat-input-container {
+            display: flex;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 24px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .Bot-chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            max-height: 100px;
+            min-height: 24px;
+            padding: 0;
+        }
+
+        .Bot-chat-send {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .Bot-chat-send:hover {
+            background: #07a3ca;
+        }
+
+        .Bot-chat-send:disabled {
+            background: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        /* Message Styles */
+        .Bot-message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .Bot-user-message {
+            justify-content: flex-end;
+        }
+
+        .Bot-bot-message {
+            align-items: flex-start;
+        }
+
+        .Bot-message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e6f9ff;
+            color: #09ccfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .Bot-user-message .Bot-message-avatar {
+            background: #09ccfc;
+            color: white;
+            margin-left: 15px;
+            margin-right: 0;
+            order: 2;
+        }
+
+        .Bot-message-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 18px;
+            max-width: 80%;
+        }
+
+        .Bot-bot-message .Bot-message-content {
+            background: #e6f9ff;
+            border-top-left-radius: 4px;
+        }
+
+        .Bot-user-message .Bot-message-content {
+            background: #09ccfc;
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        .Bot-message-typing {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+        }
+
+        .Bot-typing-indicator {
+            display: flex;
+            align-items: center;
+        }
+
+        .Bot-typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #adb5bd;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing-animation 1.5s infinite ease-in-out;
+        }
+
+        .Bot-typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .Bot-typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .Bot-typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-animation {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Message Button Styles */
+        .Bot-message-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .Bot-message-button {
+            background: #ffffff;
+            border: 1px solid #09ccfc;
+            color: #09ccfc;
+            border-radius: 18px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .Bot-message-button:hover {
+            background: #e6f9ff;
+        }
+
+        .Bot-message-button:active {
+            background: #09ccfc;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Chat Module
+        const ChatModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let parentModule = null;
+            let chatMessages = [];
+            let isProcessingMessage = false;
+
+            // Function to debug localStorage contents
+            function debugLocalStorage() {
+                console.log('--- Chat Module localStorage Debug ---');
+
+                // Count all items
+                let totalItems = 0;
+                let jamBotItems = 0;
+                let fileItems = 0;
+                let fileSize = 0;
+
+                console.log('All localStorage keys:');
+                Object.keys(localStorage).forEach((key, index) => {
+                    totalItems++;
+                    const value = localStorage.getItem(key);
+                    const size = (key.length + (value ? value.length : 0)) * 2; // Approximate size in bytes
+
+                    if (key.startsWith('jamBot')) {
+                        jamBotItems++;
+                        console.log(`${index + 1}. ${key}: ${formatSize(size)}`);
+
+                        if (key.startsWith('jamBotFile_')) {
+                            fileItems++;
+                            fileSize += size;
+
+                            // Try to get file type
+                            try {
+                                const fileData = JSON.parse(value);
+                                console.log(`   - File: ${fileData.name}, Type: ${fileData.type}, Size: ${formatSize(fileData.size)}`);
+                            } catch (e) {
+                                console.log('   - Could not parse file data');
+                            }
+                        }
+                    }
+                });
+
+                console.log('\nSummary:');
+                console.log(`Total localStorage items: ${totalItems}`);
+                console.log(`JAM Bot items: ${jamBotItems}`);
+                console.log(`File items: ${fileItems}`);
+                console.log(`Total file size: ${formatSize(fileSize)}`);
+                console.log('------------------------');
+            }
+
+            // Helper function to format file size
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' bytes';
+                else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                else return (bytes / 1048576).toFixed(1) + ' MB';
+            }
+
+            // Function to initialize the module
+            function init(container, parent) {
+                if (!container) {
+                    console.error('Container not provided to Chat module');
+                    return false;
+                }
+
+                console.log('Initializing Chat module');
+
+                // Debug localStorage contents when chat tab becomes active
+                console.log('--- Chat Tab Activated: localStorage Debug ---');
+                debugLocalStorage();
+
+                // Check if this is a page refresh using sessionStorage
+                const pageLoadFlag = sessionStorage.getItem('jamBotChatPageLoaded');
+                console.log('Session pageLoadFlag:', pageLoadFlag);
+
+                if (!pageLoadFlag) {
+                    // This is a fresh page load (not just a tab switch)
+                    console.log('Fresh page load detected, clearing localStorage');
+
+                    // Clear all localStorage items related to the bot
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('jamBot')) {
+                            console.log('Clearing localStorage item:', key);
+                            localStorage.removeItem(key);
+                        }
+                    });
+
+                    // Clear chat messages
+                    chatMessages = [];
+
+                    // Set the flag to indicate page has been loaded in this session
+                    sessionStorage.setItem('jamBotChatPageLoaded', 'true');
+                }
+
+                // Store reference to parent module for communication
+                parentModule = parent;
+
+                // Only initialize once
+                if (isInitialized) {
+                    console.log('Chat module already initialized');
+                    updateView(container);
+                    return true;
+                }
+
+                // Render the chat interface
+                renderChatInterface(container);
+
+                // Check for saved chat messages in localStorage
+                console.log('DEBUG: Checking jamBotChatMessages in localStorage');
+                const savedChatMessagesJson = localStorage.getItem('jamBotChatMessages');
+
+                if (savedChatMessagesJson) {
+                    try {
+                        const savedChatMessages = JSON.parse(savedChatMessagesJson);
+                        console.log('DEBUG: Found saved chat messages:', savedChatMessages.length);
+
+                        // Check for credit report message
+                        const hasReportMessage = savedChatMessages.some(msg =>
+                            msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
+                        );
+                        console.log('DEBUG: Has report message in saved chat:', hasReportMessage);
+
+                        // Check if we have valid reports
+                        const hasReports = checkForUploadedReports();
+                        console.log('DEBUG: hasReports check result:', hasReports);
+
+                        // If we have report messages but no actual reports, filter them out
+                        if (hasReportMessage && !hasReports) {
+                            console.log('DEBUG: Filtering out report messages from localStorage');
+
+                            const originalLength = savedChatMessages.length;
+                            chatMessages = savedChatMessages.filter(msg => {
+                                // Filter out the "I see you've uploaded your credit reports" message
+                                // and any related user responses
+                                const shouldKeep = !(
+                                    (msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")) ||
+                                    (msg.type === 'user' && (
+                                        msg.content.includes("Yes, analyze my reports") ||
+                                        msg.content.includes("No, I'll ask something else")
+                                    ))
+                                );
+
+                                if (!shouldKeep) {
+                                    console.log('DEBUG: Filtering out message:', msg.content.substring(0, 50) + '...');
+                                }
+
+                                return shouldKeep;
+                            });
+
+                            console.log('DEBUG: Filtered chat messages from', originalLength, 'to', chatMessages.length);
+
+                            // Save the filtered messages back to localStorage
+                            localStorage.setItem('jamBotChatMessages', JSON.stringify(chatMessages));
+                            console.log('DEBUG: Saved filtered messages back to localStorage');
+                        } else {
+                            // Just use the saved messages as is
+                            chatMessages = savedChatMessages;
+                        }
+                    } catch (e) {
+                        console.error('DEBUG: Error parsing saved chat messages:', e);
+                        chatMessages = [];
+                    }
+                } else {
+                    console.log('DEBUG: No saved chat messages found in localStorage');
+                }
+
+                // Restore saved state from parent module if available and we don't have messages yet
+                if (chatMessages.length === 0 && parentModule && typeof parentModule.getChatState === 'function') {
+                    const savedMessages = parentModule.getChatState();
+                    console.log('DEBUG: Got savedMessages from parent module:', savedMessages ? savedMessages.length : 0);
+
+                    if (Array.isArray(savedMessages) && savedMessages.length > 0) {
+                        console.log('Restoring saved chat state from parent module, messages count:', savedMessages.length);
+                        chatMessages = savedMessages;
+                    }
+                }
+
+                // If there are no messages, add the welcome message
+                if (chatMessages.length === 0) {
+                    console.log('No chat messages, adding welcome message');
+
+                    // First add the general welcome message
+                    addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
+
+                    // Then check if reports have been uploaded
+                    const hasUploadedReports = checkForUploadedReports();
+                    console.log('hasUploadedReports result:', hasUploadedReports);
+
+                    if (hasUploadedReports) {
+                        console.log('Adding report analysis prompt');
+                        // Add the report analysis prompt as the second message
+                        addBotMessageWithButtons(
+                            "I see you've uploaded your credit reports. Would you like me to analyze them for potential items to dispute?",
+                            [
+                                { text: "Yes, analyze my reports", value: "analyze_reports" },
+                                { text: "No, I'll ask something else", value: "skip_analysis" }
+                            ]
+                        );
+                    }
+                } else {
+                    console.log('DEBUG: Using existing chat messages, count:', chatMessages.length);
+                }
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Update messages display
+                updateMessagesDisplay(container);
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Function to render the chat interface
+            function renderChatInterface(container) {
+                console.log('Rendering chat interface');
+
+                // Create the chat container
+                container.innerHTML = `
+                    <div class="Bot-chat-container">
+                        <div class="Bot-chat-messages" id="chatMessages"></div>
+                        <div class="Bot-chat-input-container">
+                            <textarea class="Bot-chat-input" id="chatInput" placeholder="Type your message here..." rows="1"></textarea>
+                            <button class="Bot-chat-send" id="chatSend" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Update messages display
+                updateMessagesDisplay(container);
+            }
+
+            // Function to set up event listeners
+            function setupEventListeners(container) {
+                const chatInput = container.querySelector('#chatInput');
+                const sendButton = container.querySelector('#chatSend');
+
+                if (chatInput && sendButton) {
+                    // Send message on button click
+                    sendButton.addEventListener('click', function () {
+                        sendMessage(chatInput.value, container);
+                    });
+
+                    // Send message on Enter key (but allow Shift+Enter for new line)
+                    chatInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage(this.value, container);
+                        }
+                    });
+
+                    // Auto-resize textarea
+                    chatInput.addEventListener('input', function () {
+                        this.style.height = 'auto';
+                        this.style.height = (this.scrollHeight) + 'px';
+                    });
+
+                    // Disable/enable send button based on input
+                    chatInput.addEventListener('input', function () {
+                        sendButton.disabled = this.value.trim() === '';
+                    });
+
+                    // Initial button state
+                    sendButton.disabled = chatInput.value.trim() === '';
+                }
+            }
+
+            // Function to send a message
+            function sendMessage(message, container) {
+                const chatInput = container.querySelector('#chatInput');
+                const sendButton = container.querySelector('#chatSend');
+
+                // Don't send empty messages
+                message = message.trim();
+                if (!message || isProcessingMessage) return;
+
+                // Add user message to chat
+                addUserMessage(message);
+
+                // Clear input
+                chatInput.value = '';
+                chatInput.style.height = 'auto';
+                sendButton.disabled = true;
+
+                // Show typing indicator
+                showTypingIndicator(container);
+
+                // Process the message
+                processMessage(message, container);
+
+                // Update messages display
+                updateMessagesDisplay(container);
+
+                // Save chat state
+                saveState();
+            }
+
+            // Function to process a message
+            function processMessage(message, container) {
+                isProcessingMessage = true;
+
+                // Check if this is a response to the report analysis prompt
+                const isAnalysisConfirmation =
+                    checkForUploadedReports() &&
+                    chatMessages.length === 2 && // Initial bot message + user response
+                    (message.toLowerCase() === 'yes' ||
+                        message.toLowerCase() === 'analyze' ||
+                        message.toLowerCase().includes('analyze') ||
+                        message.toLowerCase().includes('check my reports'));
+
+                // Notify parent module if available
+                if (parentModule && typeof parentModule.onChatMessage === 'function') {
+                    // If this is a confirmation to analyze reports, send a special message
+                    const processPromise = isAnalysisConfirmation
+                        ? parentModule.onChatMessage('__ANALYZE_CREDIT_REPORTS__')
+                        : parentModule.onChatMessage(message);
+
+                    processPromise
+                        .then(response => {
+                            // Remove typing indicator
+                            hideTypingIndicator(container);
+
+                            // Add bot response
+                            addBotMessage(response);
+
+                            // Update messages display
+                            updateMessagesDisplay(container);
+
+                            // Save chat state
+                            saveState();
+
+                            isProcessingMessage = false;
+                        })
+                        .catch(error => {
+                            console.error('Error processing message:', error);
+
+                            // Remove typing indicator
+                            hideTypingIndicator(container);
+
+                            // Add error message
+                            addBotMessage("I'm sorry, I encountered an error processing your request. Please try again.");
+
+                            // Update messages display
+                            updateMessagesDisplay(container);
+
+                            isProcessingMessage = false;
+                        });
+                } else {
+                    // Simulate response if no parent handler
+                    setTimeout(() => {
+                        // Remove typing indicator
+                        hideTypingIndicator(container);
+
+                        // Add bot response based on whether this is an analysis confirmation
+                        if (isAnalysisConfirmation) {
+                            addBotMessage("I'm analyzing your credit reports now. I'll look for potential items to dispute such as late payments, collections, and accounts that may not belong to you. This analysis will help us identify the best items to focus on for improving your credit score.");
+                        } else {
+                            addBotMessage("I'm here to help with credit repair questions. What specific information are you looking for?");
+                        }
+
+                        // Update messages display
+                        updateMessagesDisplay(container);
+
+                        isProcessingMessage = false;
+                    }, 1500);
+                }
+            }
+
+            // Function to add a user message
+            function addUserMessage(message) {
+                chatMessages.push({
+                    type: 'user',
+                    content: message,
+                    timestamp: new Date()
+                });
+            }
+
+            // Function to add a bot message
+            function addBotMessage(message) {
+                chatMessages.push({
+                    type: 'bot',
+                    content: message,
+                    timestamp: new Date()
+                });
+            }
+
+            // Function to add a bot message with action buttons
+            function addBotMessageWithButtons(message, buttons) {
+                chatMessages.push({
+                    type: 'bot',
+                    content: message,
+                    buttons: buttons,
+                    timestamp: new Date()
+                });
+
+                // Save state
+                saveState();
+            }
+
+            // Function to show typing indicator
+            function showTypingIndicator(container) {
+                const messagesContainer = container.querySelector('#chatMessages');
+                if (!messagesContainer) return;
+
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'Bot-message Bot-bot-message';
+                typingIndicator.id = 'Bot-typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="Bot-message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="Bot-message-content Bot-message-typing">
+                        <div class="Bot-typing-indicator">
+                            <div class="Bot-typing-dot"></div>
+                            <div class="Bot-typing-dot"></div>
+                            <div class="Bot-typing-dot"></div>
+                        </div>
+                    </div>
+                `;
+
+                messagesContainer.appendChild(typingIndicator);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // Function to hide typing indicator
+            function hideTypingIndicator(container) {
+                const typingIndicator = container.querySelector('#Bot-typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            // Function to update messages display
+            function updateMessagesDisplay(container) {
+                const messagesContainer = container.querySelector('#chatMessages');
+                if (!messagesContainer) return;
+
+                // Clear existing messages (except typing indicator)
+                const typingIndicator = messagesContainer.querySelector('#Bot-typing-indicator');
+                messagesContainer.innerHTML = '';
+
+                // Add all messages
+                chatMessages.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `Bot-message Bot-${message.type}-message`;
+
+                    let messageContent = `
+                        <div class="Bot-message-avatar">
+                            <i class="fas fa-${message.type === 'user' ? 'user' : 'robot'}"></i>
+                        </div>
+                        <div class="Bot-message-content">
+                            ${formatMessageContent(message.content)}
+                            ${message.buttons ? renderMessageButtons(message.buttons) : ''}
+                        </div>
+                    `;
+
+                    messageElement.innerHTML = messageContent;
+                    messagesContainer.appendChild(messageElement);
+
+                    // Add event listeners to buttons if they exist
+                    if (message.buttons) {
+                        const buttonElements = messageElement.querySelectorAll('.Bot-message-button');
+                        buttonElements.forEach(button => {
+                            button.addEventListener('click', function () {
+                                const value = this.getAttribute('data-value');
+                                handleButtonClick(value, container);
+                            });
+                        });
+                    }
+                });
+
+                // Re-add typing indicator if it existed
+                if (typingIndicator) {
+                    messagesContainer.appendChild(typingIndicator);
+                }
+
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // Function to format message content (handle markdown, links, etc.)
+            function formatMessageContent(content) {
+                if (!content) return '';
+
+                // Convert URLs to links
+                content = content.replace(
+                    /(https?:\/\/[^\s]+)/g,
+                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+                );
+
+                // Convert line breaks to <br>
+                content = content.replace(/\n/g, '<br>');
+
+                return content;
+            }
+
+            // Function to render message buttons
+            function renderMessageButtons(buttons) {
+                if (!buttons || !buttons.length) return '';
+
+                return `
+                    <div class="Bot-message-buttons">
+                        ${buttons.map(button => `
+                            <button class="Bot-message-button" data-value="${button.value}">
+                                ${button.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Function to handle button clicks
+            function handleButtonClick(value, container) {
+                if (value === 'analyze_reports') {
+                    console.log('User clicked to analyze reports');
+
+                    // Add user message
+                    addUserMessage("Yes, analyze my reports");
+
+                    // Show typing indicator
+                    showTypingIndicator(container);
+
+                    // Get the credit report files from localStorage
+                    const reportFiles = getReportFilesFromLocalStorage();
+
+                    if (reportFiles.length === 0) {
+                        console.error('No report files found in localStorage');
+                        hideTypingIndicator(container);
+                        addBotMessage("I couldn't find any credit report files to analyze. Please make sure you've uploaded your reports in the Reports tab.");
+                        updateMessagesDisplay(container);
+                        saveState();
+                        return;
+                    }
+
+                    // Send the files to the backend for analysis
+                    sendReportsForAnalysis(reportFiles)
+                        .then(response => {
+                            // Hide typing indicator
+                            hideTypingIndicator(container);
+
+                            // Add bot response with the analysis results
+                            addBotMessage(response);
+
+                            // Update messages display
+                            updateMessagesDisplay(container);
+
+                            // Save chat state
+                            saveState();
+                        })
+                        .catch(error => {
+                            console.error('Error analyzing reports:', error);
+
+                            // Hide typing indicator
+                            hideTypingIndicator(container);
+
+                            // Add error message
+                            addBotMessage("I encountered an error while analyzing your reports. Please try again later or contact support if the problem persists.");
+
+                            // Update messages display
+                            updateMessagesDisplay(container);
+
+                            // Save chat state
+                            saveState();
+                        });
+                } else if (value === 'skip_analysis') {
+                    console.log('User clicked to skip analysis');
+
+                    // Add user message
+                    addUserMessage("No, I'll ask something else");
+
+                    // Add bot response
+                    addBotMessage("No problem! I'm here to help with any credit repair questions you have. Feel free to ask me anything about credit repair, dispute strategies, or how to improve your credit score.");
+
+                    // Save chat state
+                    saveState();
+                }
+            }
+
+            // Function to get report files from localStorage
+            function getReportFilesFromLocalStorage() {
+                const reportFiles = [];
+
+                try {
+                    const savedReportsJson = localStorage.getItem('jamBotUploadedReports') || '[]';
+                    const savedReports = JSON.parse(savedReportsJson);
+
+                    for (const report of savedReports) {
+                        const fileDataKey = 'jamBotFile_' + report.id;
+                        const fileDataJson = localStorage.getItem(fileDataKey);
+
+                        if (fileDataJson) {
+                            try {
+                                const fileData = JSON.parse(fileDataJson);
+                                reportFiles.push({
+                                    id: report.id,
+                                    name: report.name,
+                                    type: fileData.type,
+                                    data: fileData.data, // This should be the base64 data of the file
+                                    size: fileData.size
+                                });
+                            } catch (e) {
+                                console.error(`Error parsing file data for ${report.name}:`, e);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error getting report files from localStorage:', e);
+                }
+
+                return reportFiles;
+            }
+
+            // Function to send reports to backend for analysis
+            async function sendReportsForAnalysis(reportFiles) {
+                console.log(`Sending ${reportFiles.length} report files for analysis`);
+
+                try {
+                    // Create a FormData object to send the files
+                    const formData = new FormData();
+
+                    // Add each file to the FormData
+                    reportFiles.forEach((file, index) => {
+                        // Convert base64 data to a Blob
+                        const byteCharacters = atob(file.data.split(',')[1]);
+                        const byteArrays = [];
+
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteArrays.push(byteCharacters.charCodeAt(i));
+                        }
+
+                        const byteArray = new Uint8Array(byteArrays);
+                        const blob = new Blob([byteArray], { type: file.type });
+
+                        // Add the blob to FormData
+                        formData.append(`file${index}`, blob, file.name);
+                    });
+
+                    // Send the request to your backend
+                    const response = await fetch('/api/chatGptService/analyzeReports', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    return data.analysis || "I've analyzed your credit reports and found several items that could potentially be disputed. Would you like me to explain the specific items I found?";
+                } catch (error) {
+                    console.error('Error in sendReportsForAnalysis:', error);
+                    throw error;
+                }
+            }
+
+            // Function to update the view
+            function updateView(container) {
+                renderChatInterface(container);
+            }
+
+            // Function to save state
+            function saveState() {
+                console.log('Saving chat state, messages count:', chatMessages.length);
+                if (parentModule && typeof parentModule.saveChatState === 'function') {
+                    parentModule.saveChatState(chatMessages);
+                    console.log('Chat state saved via parent module');
+                } else {
+                    console.log('No parent module or saveChatState function available');
+                }
+            }
+
+            // Function to check if reports have been uploaded
+            function checkForUploadedReports() {
+                console.log('Checking for uploaded reports...');
+
+                // First check if we have any reports metadata
+                try {
+                    const savedReportsJson = localStorage.getItem('jamBotUploadedReports') || '[]';
+                    const savedReports = JSON.parse(savedReportsJson);
+                    console.log('Found', savedReports.length, 'reports in metadata');
+
+                    if (savedReports.length === 0) {
+                        console.log('No reports found in metadata');
+                        // Clear the flag if it's set but no reports exist
+                        if (localStorage.getItem('jamBotHasUploadedReports') === 'true') {
+                            console.log('Clearing incorrect hasUploadedReports flag');
+                            localStorage.removeItem('jamBotHasUploadedReports');
+                        }
+                        return false;
+                    }
+
+                    // Now check if any of these reports have actual file data in localStorage
+                    // and if they are of the correct type (PDF, JPG, PNG)
+                    let validFileFound = false;
+
+                    for (const report of savedReports) {
+                        const fileDataKey = 'jamBotFile_' + report.id;
+                        const fileDataJson = localStorage.getItem(fileDataKey);
+
+                        if (fileDataJson) {
+                            try {
+                                const fileData = JSON.parse(fileDataJson);
+                                const fileType = fileData.type ? fileData.type.toLowerCase() : '';
+
+                                // Check if it's a PDF, JPG, or PNG
+                                if (fileType.includes('pdf') ||
+                                    fileType.includes('jpg') ||
+                                    fileType.includes('jpeg') ||
+                                    fileType.includes('png')) {
+
+                                    console.log(`Valid credit report file found: ${report.name} (${fileType})`);
+                                    validFileFound = true;
+                                    // No need to check further files
+                                    break;
+                                } else {
+                                    console.log(`File found but not a valid credit report type: ${report.name} (${fileType})`);
+                                }
+                            } catch (e) {
+                                console.error(`Error parsing file data for ${report.name}:`, e);
+                            }
+                        } else {
+                            console.log(`No file data found for report: ${report.name}`);
+                        }
+                    }
+
+                    // If no valid files were found but the flag is set, clear it
+                    if (!validFileFound && localStorage.getItem('jamBotHasUploadedReports') === 'true') {
+                        console.log('No valid files found, clearing hasUploadedReports flag');
+                        localStorage.removeItem('jamBotHasUploadedReports');
+                    }
+
+                    return validFileFound;
+                } catch (e) {
+                    console.error('Error checking for uploaded reports:', e);
+                    // Clear the flag if there's an error
+                    if (localStorage.getItem('jamBotHasUploadedReports') === 'true') {
+                        console.log('Error occurred, clearing hasUploadedReports flag');
+                        localStorage.removeItem('jamBotHasUploadedReports');
+                    }
+                    return false;
+                }
+            }
+
+            // Public API
+            return {
+                init: init,
+
+                getChatMessages: function () {
+                    return chatMessages;
+                },
+
+                setChatMessages: function (messages) {
+                    if (Array.isArray(messages)) {
+                        chatMessages = messages;
+                    }
+                },
+
+                updateView: updateView,
+
+                addBotMessage: function (message, container) {
+                    addBotMessage(message);
+                    if (container) {
+                        updateMessagesDisplay(container);
+                    }
+                },
+
+                // Add this new method to handle report uploads
+                onReportUploaded: function (container) {
+                    console.log('ChatModule: Report uploaded notification received');
+
+                    // Check if we already have the report message in the chat
+                    const hasReportMessage = chatMessages.some(msg =>
+                        msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
+                    );
+
+                    // Only add the message if it doesn't already exist
+                    if (!hasReportMessage) {
+                        console.log('ChatModule: Adding report analysis prompt to chat');
+
+                        // Add the report analysis prompt
+                        addBotMessageWithButtons(
+                            "I see you've uploaded your credit reports. Would you like me to analyze them for potential items to dispute?",
+                            [
+                                { text: "Yes, analyze my reports", value: "analyze_reports" },
+                                { text: "No, I'll ask something else", value: "skip_analysis" }
+                            ]
+                        );
+
+                        // Update the display if container is provided
+                        if (container) {
+                            updateMessagesDisplay(container);
+                        } else {
+                            // Try to find the container
+                            const chatContainer = document.querySelector('.Bot-chat-container');
+                            if (chatContainer) {
+                                updateMessagesDisplay(chatContainer);
+                            }
+                        }
+
+                        // Save state
+                        saveState();
+                    } else {
+                        console.log('ChatModule: Report message already exists in chat, not adding again');
+                    }
+                }
+            };
+        })();
+
+        // Make the module globally available
+        window.chatModule = ChatModule;
+
+        // Dispatch event when loaded
+        window.dispatchEvent(new Event('chatModuleLoaded'));
+    </script>
+</body>
+
+</html>
