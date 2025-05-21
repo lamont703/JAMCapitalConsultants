@@ -305,7 +305,40 @@
         .formatted-content li {
             margin-bottom: 0.5em;
         }
+
+        .user-info-form {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .primary-button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -337,1198 +370,734 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('ChatInterface: DOM loaded, initializing chat interface');
+        // Add this variable definition at the top of your script
+        let uploadedFiles = [];
+        let fileList;
 
-            // DOM elements
-            const chatMessages = document.querySelector('.chat-messages');
-            const chatInput = document.querySelector('.chat-input');
-            const sendButton = document.querySelector('.send-button');
-            const fileInput = document.querySelector('#file-input');
-            const fileList = document.querySelector('.file-list');
+        // Define the send button
+        let sendButton;
+
+        // Define chatMessages at the global level
+        let chatMessages = document.querySelector('.chat-messages');
+
+        // Define these functions at the global level (outside of any other functions)
+        function showTypingIndicator() {
+            console.log('ChatInterface: Showing typing indicator');
             const typingIndicator = document.querySelector('.typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.style.display = 'flex';
+            } else {
+                // Create typing indicator if it doesn't exist
+                const typingIndicatorHtml = `
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                const indicatorElement = document.createElement('div');
+                indicatorElement.className = 'message bot-message';
+                indicatorElement.innerHTML = typingIndicatorHtml;
 
-            // State variables
-            let messages = [];
-            let uploadedFiles = [];
-            let sessionPageLoadFlag = true;
-
-            // Function to scroll to bottom of chat
-            function scrollToBottom() {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                // Add to chat messages
+                chatMessages = document.querySelector('.chat-messages');
+                if (chatMessages) {
+                    chatMessages.appendChild(indicatorElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
             }
+        }
 
-            // Function to show typing indicator
-            function showTypingIndicator() {
-                console.log('ChatInterface: Showing typing indicator');
-                typingIndicator.style.display = 'block';
-                scrollToBottom();
-            }
-
-            // Function to hide typing indicator
-            function hideTypingIndicator() {
-                console.log('ChatInterface: Hiding typing indicator');
+        function hideTypingIndicator() {
+            console.log('ChatInterface: Hiding typing indicator');
+            const typingIndicator = document.querySelector('.typing-indicator');
+            if (typingIndicator) {
                 typingIndicator.style.display = 'none';
             }
+        }
 
-            // Function to add a user message
-            function addUserMessage(message) {
-                console.log('ChatInterface: Adding user message:', message);
+        // Define addBotMessage at the global level
+        function addBotMessage(message, buttons = null) {
+            console.log('ChatInterface: Adding bot message:', message.substring(0, 100) + (message.length > 100 ? '...' : ''));
 
-                messages.push({
-                    type: 'user',
-                    content: message,
-                    timestamp: new Date()
+            // Create message element
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message bot-message';
+
+            // Format message content (handle markdown if needed)
+            const formattedMessage = message.replace(/\n/g, '<br>');
+
+            // Set inner HTML
+            if (buttons && buttons.length > 0) {
+                // Message with buttons
+                let buttonsHtml = '<div class="message-buttons">';
+                buttons.forEach(button => {
+                    buttonsHtml += `<button class="message-button" data-value="${button.value}">${button.text}</button>`;
                 });
+                buttonsHtml += '</div>';
 
-                // Add to UI
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message user-message';
-                messageElement.textContent = message;
+                messageElement.innerHTML = `<div class="message-content">${formattedMessage}</div>${buttonsHtml}`;
+            } else {
+                // Simple message
+                messageElement.innerHTML = `<div class="message-content">${formattedMessage}</div>`;
+            }
+
+            // Add to chat
+            chatMessages = document.querySelector('.chat-messages');
+            if (chatMessages) {
                 chatMessages.appendChild(messageElement);
-
-                // Scroll to bottom
-                scrollToBottom();
-
-                // Save to localStorage
-                localStorage.setItem('jamBotChatMessages', JSON.stringify(messages));
-            }
-
-            // Add this function to convert markdown-like text to HTML
-            function markdownToHtml(text) {
-                // Handle headings
-                text = text.replace(/^# (.*$)/gm, '<h1>$1</h1>');
-                text = text.replace(/^## (.*$)/gm, '<h2>$1</h2>');
-                text = text.replace(/^### (.*$)/gm, '<h3>$1</h3>');
-
-                // Handle bold text
-                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-                // Handle list items (assuming they start with numbers followed by a period)
-                text = text.replace(/^\d+\. (.*$)/gm, '<div class="list-item">$1</div>');
-
-                // Handle indented list items (assuming they start with a dash)
-                text = text.replace(/^- (.*$)/gm, '<div class="list-item-detail">$1</div>');
-
-                // Handle paragraphs (any line that's not a heading or list item)
-                const lines = text.split('\n');
-                let inParagraph = false;
-                let result = '';
-
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-
-                    // Skip empty lines
-                    if (line.trim() === '') {
-                        if (inParagraph) {
-                            result += '</p>\n';
-                            inParagraph = false;
-                        }
-                        continue;
-                    }
-
-                    // If the line is already processed as a heading or list item, add it as is
-                    if (line.startsWith('<h') || line.startsWith('<div class="list-item') || line.includes('<strong>')) {
-                        if (inParagraph) {
-                            result += '</p>\n';
-                            inParagraph = false;
-                        }
-                        result += line + '\n';
-                    } else {
-                        // Otherwise, treat it as part of a paragraph
-                        if (!inParagraph) {
-                            result += '<p>';
-                            inParagraph = true;
-                        } else {
-                            result += ' ';
-                        }
-                        result += line;
-                    }
-                }
-
-                // Close any open paragraph
-                if (inParagraph) {
-                    result += '</p>\n';
-                }
-
-                return result;
-            }
-
-            // Modify the addBotMessage function to handle markdown content
-            function addBotMessage(message, buttons = []) {
-                console.log('ChatInterface: Adding bot message:', message);
-
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'bot-message';
-
-                // Check if the message contains markdown-like formatting
-                if (message.includes('# ') || message.includes('## ') || message.includes('### ') ||
-                    message.includes('**') || /^\d+\. /.test(message)) {
-
-                    // Convert markdown to HTML
-                    const formattedContent = document.createElement('div');
-                    formattedContent.className = 'formatted-content';
-                    formattedContent.innerHTML = markdownToHtml(message);
-
-                    messageDiv.appendChild(formattedContent);
-                } else if (message.includes('<h1>') || message.includes('<h2>') || message.includes('<h3>') ||
-                    message.includes('<br>') || message.includes('<strong>')) {
-
-                    // Handle already formatted HTML
-                    const formattedContent = document.createElement('div');
-                    formattedContent.className = 'formatted-content';
-                    formattedContent.innerHTML = message;
-
-                    messageDiv.appendChild(formattedContent);
-                } else {
-                    // For regular text messages
-                    const textDiv = document.createElement('div');
-                    textDiv.textContent = message;
-                    messageDiv.appendChild(textDiv);
-                }
-
-                // Add buttons if provided
-                if (buttons.length > 0) {
-                    const buttonsDiv = document.createElement('div');
-                    buttonsDiv.className = 'message-buttons';
-
-                    buttons.forEach(button => {
-                        const buttonElement = document.createElement('button');
-                        buttonElement.textContent = button.text;
-                        buttonElement.onclick = () => handleButtonClick(button.value);
-                        buttonsDiv.appendChild(buttonElement);
-                    });
-
-                    messageDiv.appendChild(buttonsDiv);
-                }
-
-                chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            // Function to redraw all messages
-            function redrawMessages() {
-                console.log('ChatInterface: Redrawing messages');
-
-                // Clear chat messages
-                chatMessages.innerHTML = '';
-
-                // Redraw all messages
-                messages.forEach(msg => {
-                    if (msg.type === 'user') {
-                        const messageElement = document.createElement('div');
-                        messageElement.className = 'message user-message';
-                        messageElement.textContent = msg.content;
-                        chatMessages.appendChild(messageElement);
-                    } else if (msg.type === 'bot') {
-                        const messageElement = document.createElement('div');
-                        messageElement.className = 'message bot-message';
-                        messageElement.textContent = msg.content;
-
-                        // Add buttons if provided
-                        if (msg.buttons && msg.buttons.length > 0) {
-                            const buttonContainer = document.createElement('div');
-                            buttonContainer.className = 'button-container';
-
-                            msg.buttons.forEach(button => {
-                                const buttonElement = document.createElement('button');
-                                buttonElement.className = 'action-button';
-                                buttonElement.textContent = button.text;
-                                buttonElement.addEventListener('click', () => handleButtonClick(button.value));
-                                buttonContainer.appendChild(buttonElement);
-                            });
-
-                            messageElement.appendChild(buttonContainer);
-                        }
-
-                        chatMessages.appendChild(messageElement);
-                    }
-                });
-
-                // Scroll to bottom
-                scrollToBottom();
-                console.log('ChatInterface: Messages redrawn successfully');
-            }
-
-            // Function to check if reports have been uploaded
-            function checkForUploadedReports() {
-                console.log('ChatInterface: Checking for uploaded reports');
-
-                try {
-                    // Check if we have the flag in localStorage
-                    const hasUploadedReportsFlag = localStorage.getItem('jamBotHasUploadedReports');
-
-                    // Check if we have any reports in localStorage
-                    const savedReportsJson = localStorage.getItem('jamBotUploadedReports');
-                    let hasReports = false;
-
-                    if (savedReportsJson) {
-                        const savedReports = JSON.parse(savedReportsJson);
-                        hasReports = savedReports.length > 0;
-                        console.log(`ChatInterface: Found ${savedReports.length} reports in localStorage`);
-                    }
-
-                    const result = hasUploadedReportsFlag === 'true' || hasReports;
-                    console.log('ChatInterface: hasUploadedReports result:', result);
-                    return result;
-                } catch (e) {
-                    console.error('ChatInterface: Error checking for uploaded reports:', e);
-                    return false;
-                }
-            }
-
-            // Function to add a file to the UI
-            function addFileToUI(fileId, fileName) {
-                console.log(`ChatInterface: Adding file to UI: ${fileName} (${fileId})`);
-
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.dataset.id = fileId;
-
-                fileItem.innerHTML = `
-                    <div class="file-icon">📄</div>
-                    <div class="file-name">${fileName}</div>
-                    <button class="file-delete" data-id="${fileId}">×</button>
-                `;
-
-                fileList.appendChild(fileItem);
-
-                // Add event listener to delete button
-                const deleteButton = fileItem.querySelector('.file-delete');
-                deleteButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    deleteFile(fileId);
+            // Add click handlers for buttons
+            if (buttons && buttons.length > 0) {
+                messageElement.querySelectorAll('.message-button').forEach(buttonElement => {
+                    buttonElement.onclick = function () {
+                        const value = this.getAttribute('data-value');
+                        console.log('ChatInterface: Button clicked with value:', value);
+                        handleButtonClick(value);
+                    };
                 });
             }
 
-            // Function to delete a file
-            function deleteFile(fileId) {
-                console.log(`ChatInterface: Deleting file: ${fileId}`);
+            return messageElement;
+        }
 
-                // Remove from uploadedFiles array
-                uploadedFiles = uploadedFiles.filter(file => file.id !== fileId);
+        // Define addUserMessage at the global level
+        function addUserMessage(message) {
+            console.log('ChatInterface: Adding user message:', message);
 
-                // Remove from localStorage
-                localStorage.removeItem(`jamBotFile_${fileId}`);
+            // Create message element
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message user-message';
+            messageElement.innerHTML = `<div class="message-content">${message}</div>`;
 
-                // Remove from UI
-                const fileItem = fileList.querySelector(`.file-item[data-id="${fileId}"]`);
-                if (fileItem) {
-                    fileList.removeChild(fileItem);
+            // Add to chat
+            chatMessages = document.querySelector('.chat-messages');
+            if (chatMessages) {
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            return messageElement;
+        }
+
+        // Add this function to convert markdown-like text to HTML
+        function markdownToHtml(text) {
+            // Handle headings
+            text = text.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+            text = text.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+            text = text.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+
+            // Handle bold text
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Handle list items (assuming they start with numbers followed by a period)
+            text = text.replace(/^\d+\. (.*$)/gm, '<div class="list-item">$1</div>');
+
+            // Handle indented list items (assuming they start with a dash)
+            text = text.replace(/^- (.*$)/gm, '<div class="list-item-detail">$1</div>');
+
+            // Handle paragraphs (any line that's not a heading or list item)
+            const lines = text.split('\n');
+            let inParagraph = false;
+            let result = '';
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                // Skip empty lines
+                if (line.trim() === '') {
+                    if (inParagraph) {
+                        result += '</p>\n';
+                        inParagraph = false;
+                    }
+                    continue;
                 }
 
-                // Update uploadedReports in localStorage
-                const uploadedReports = uploadedFiles.map(file => ({
-                    id: file.id,
-                    name: file.name,
-                    size: file.size,
-                    uploadDate: new Date().toISOString()
-                }));
+                // If the line is already processed as a heading or list item, add it as is
+                if (line.startsWith('<h') || line.startsWith('<div class="list-item') || line.includes('<strong>')) {
+                    if (inParagraph) {
+                        result += '</p>\n';
+                        inParagraph = false;
+                    }
+                    result += line + '\n';
+                } else {
+                    // Otherwise, treat it as part of a paragraph
+                    if (!inParagraph) {
+                        result += '<p>';
+                        inParagraph = true;
+                    } else {
+                        result += ' ';
+                    }
+                    result += line;
+                }
+            }
 
-                localStorage.setItem('jamBotUploadedReports', JSON.stringify(uploadedReports));
+            // Close any open paragraph
+            if (inParagraph) {
+                result += '</p>\n';
+            }
 
-                // If no files left, remove the hasUploadedReports flag
-                if (uploadedFiles.length === 0) {
-                    console.log('ChatInterface: No files left, removing hasUploadedReports flag');
-                    localStorage.removeItem('jamBotHasUploadedReports');
+            return result;
+        }
 
-                    // Also remove the report message from chat if it exists
-                    const hasReportMessage = messages.some(msg =>
-                        msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
-                    );
+        // Function to redraw all messages
+        function redrawMessages() {
+            console.log('ChatInterface: Redrawing messages');
 
-                    if (hasReportMessage) {
-                        console.log('ChatInterface: Removing report message from chat');
+            // Clear chat messages
+            chatMessages.innerHTML = '';
 
-                        // Filter out the report message and related responses
-                        messages = messages.filter(msg => {
-                            const shouldKeep = !(
-                                (msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")) ||
-                                (msg.type === 'user' && (
-                                    msg.content.includes("Yes, analyze my reports") ||
-                                    msg.content.includes("No, I'll ask something else")
-                                ))
-                            );
+            // Redraw all messages
+            messages.forEach(msg => {
+                if (msg.type === 'user') {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message user-message';
+                    messageElement.textContent = msg.content;
+                    chatMessages.appendChild(messageElement);
+                } else if (msg.type === 'bot') {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message bot-message';
+                    messageElement.textContent = msg.content;
 
-                            if (!shouldKeep) {
-                                console.log('ChatInterface: Filtering out message:', msg.content.substring(0, 50) + '...');
-                            }
+                    // Add buttons if provided
+                    if (msg.buttons && msg.buttons.length > 0) {
+                        const buttonContainer = document.createElement('div');
+                        buttonContainer.className = 'button-container';
 
-                            return shouldKeep;
+                        msg.buttons.forEach(button => {
+                            const buttonElement = document.createElement('button');
+                            buttonElement.className = 'action-button';
+                            buttonElement.textContent = button.text;
+                            buttonElement.addEventListener('click', () => handleButtonClick(button.value));
+                            buttonContainer.appendChild(buttonElement);
                         });
 
-                        // Save to localStorage
-                        localStorage.setItem('jamBotChatMessages', JSON.stringify(messages));
-
-                        // Redraw messages
-                        redrawMessages();
+                        messageElement.appendChild(buttonContainer);
                     }
+
+                    chatMessages.appendChild(messageElement);
+                }
+            });
+
+            // Scroll to bottom
+            scrollToBottom();
+            console.log('ChatInterface: Messages redrawn successfully');
+        }
+
+        // Function to check if reports have been uploaded
+        function checkForUploadedReports() {
+            console.log('ChatInterface: Checking for uploaded reports');
+
+            try {
+                // Check if we have the flag in localStorage
+                const hasUploadedReportsFlag = localStorage.getItem('jamBotHasUploadedReports');
+
+                // Check if we have any reports in localStorage
+                const savedReportsJson = localStorage.getItem('jamBotUploadedReports');
+                let hasReports = false;
+
+                if (savedReportsJson) {
+                    const savedReports = JSON.parse(savedReportsJson);
+                    hasReports = savedReports.length > 0;
+                    console.log(`ChatInterface: Found ${savedReports.length} reports in localStorage`);
+                }
+
+                const result = hasUploadedReportsFlag === 'true' || hasReports;
+                console.log('ChatInterface: hasUploadedReports result:', result);
+                return result;
+            } catch (e) {
+                console.error('ChatInterface: Error checking for uploaded reports:', e);
+                return false;
+            }
+        }
+
+        // Function to add a file to the UI
+        function addFileToUI(fileId, fileName) {
+            console.log(`ChatInterface: Adding file to UI: ${fileName} (${fileId})`);
+
+            // Make sure fileList is initialized
+            if (!fileList) {
+                console.warn('ChatInterface: File list element not found in addFileToUI');
+                return;
+            }
+
+            // Create file element
+            const fileElement = document.createElement('div');
+            fileElement.className = 'file-item';
+            fileElement.dataset.fileId = fileId;
+
+            // Create file name element
+            const fileNameElement = document.createElement('span');
+            fileNameElement.className = 'file-name';
+            fileNameElement.textContent = fileName;
+
+            // Create remove button
+            const removeButton = document.createElement('button');
+            removeButton.className = 'file-remove';
+            removeButton.textContent = '×';
+            removeButton.onclick = function () {
+                removeFile(fileId);
+            };
+
+            // Add elements to file item
+            fileElement.appendChild(fileNameElement);
+            fileElement.appendChild(removeButton);
+
+            // Add file item to file list
+            fileList.appendChild(fileElement);
+        }
+
+        // Function to delete a file
+        function removeFile(fileId) {
+            console.log(`DEBUG: removeFile called for fileId: ${fileId}`);
+
+            try {
+                // Remove file data from localStorage - check both key formats
+                localStorage.removeItem(`file_${fileId}`);
+                localStorage.removeItem(`jamBotFile_${fileId}`);
+                console.log(`DEBUG: Removed file data for ${fileId} from localStorage`);
+
+                // Get uploaded reports - check both key formats
+                let uploadedReports = JSON.parse(localStorage.getItem('uploadedReports') || '[]');
+                if (uploadedReports.length === 0) {
+                    uploadedReports = JSON.parse(localStorage.getItem('jamBotUploadedReports') || '[]');
+                }
+                console.log('DEBUG: Current uploaded reports:', uploadedReports.length);
+
+                // Find the report to remove
+                const reportToRemove = uploadedReports.find(report => report.id === fileId);
+                if (reportToRemove) {
+                    console.log(`DEBUG: Found report to remove: ${reportToRemove.name}`);
+                } else {
+                    console.log(`DEBUG: Report with ID ${fileId} not found in uploaded reports`);
+                }
+
+                // Filter out the removed report
+                const updatedReports = uploadedReports.filter(report => report.id !== fileId);
+                console.log('DEBUG: Updated reports count:', updatedReports.length);
+
+                // Save updated reports list to both possible keys for consistency
+                localStorage.setItem('uploadedReports', JSON.stringify(updatedReports));
+                localStorage.setItem('jamBotUploadedReports', JSON.stringify(updatedReports));
+                console.log('DEBUG: Updated uploaded reports saved to localStorage');
+
+                // Remove from UI
+                const fileElement = document.querySelector(`.file-item[data-file-id="${fileId}"]`);
+                if (fileElement) {
+                    fileElement.remove();
+                    console.log(`DEBUG: Removed file element from UI`);
+                } else {
+                    console.log(`DEBUG: File element with ID ${fileId} not found in UI`);
+                }
+
+                // If no reports left, remove all flags
+                if (updatedReports.length === 0) {
+                    localStorage.removeItem('jamBotHasUploadedReports');
+                    localStorage.removeItem('hasUploadedReports');
+                    console.log('DEBUG: Removed hasUploadedReports flags');
+
+                    // Also clear any analysis data
+                    sessionStorage.removeItem('creditReportAnalysis');
+                    console.log('DEBUG: Cleared analysis data from sessionStorage');
+
+                    // Update uploadedFiles array
+                    uploadedFiles = [];
+                } else {
+                    // Update uploadedFiles array
+                    uploadedFiles = updatedReports.map(report => ({
+                        id: report.id,
+                        name: report.name,
+                        size: report.size,
+                        uploadDate: report.uploadDate
+                    }));
+                }
+
+                // Also remove the report message from chat if it exists
+                const hasReportMessage = messages.some(msg =>
+                    msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
+                );
+
+                if (hasReportMessage && updatedReports.length === 0) {
+                    console.log('ChatInterface: Removing report message from chat');
+
+                    // Filter out the report message and related responses
+                    messages = messages.filter(msg => {
+                        const shouldKeep = !(
+                            (msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")) ||
+                            (msg.type === 'user' && (
+                                msg.content.includes("Yes, analyze my reports") ||
+                                msg.content.includes("No, I'll ask something else")
+                            ))
+                        );
+
+                        if (!shouldKeep) {
+                            console.log('ChatInterface: Filtering out message:', msg.content.substring(0, 50) + '...');
+                        }
+
+                        return shouldKeep;
+                    });
+
+                    // Save to localStorage
+                    localStorage.setItem('jamBotChatMessages', JSON.stringify(messages));
+
+                    // Redraw messages
+                    redrawMessages();
                 }
 
                 console.log('ChatInterface: File deleted successfully');
+            } catch (error) {
+                console.error('DEBUG: Error removing file:', error);
             }
+        }
 
-            // Function to send reports for analysis
-            async function sendReportsForAnalysis(reportFiles, forceRefresh = false) {
-                console.log(`ChatInterface: Sending ${reportFiles.length} report files for analysis${forceRefresh ? ' (forced refresh)' : ''}`);
+        // Function to send reports for analysis
+        async function sendReportsForAnalysis(reportFiles, forceRefresh = false) {
+            console.log(`ChatInterface: Sending ${reportFiles.length} report files for analysis${forceRefresh ? ' (forced refresh)' : ''}`);
 
-                // Create a FormData object to send the files
-                const formData = new FormData();
-                let filesAdded = 0;
+            // Create a FormData object to send the files
+            const formData = new FormData();
+            let filesAdded = 0;
 
-                // Add each file to the FormData
-                for (const file of reportFiles) {
-                    console.log('ChatInterface: Processing file:', file);
+            // Add each file to the FormData
+            for (const file of reportFiles) {
+                console.log('ChatInterface: Processing file:', file);
 
-                    // If file is a File object directly
-                    if (file instanceof File) {
-                        formData.append('file', file, file.name);
-                        console.log(`ChatInterface: Added File object directly: ${file.name}`);
-                        filesAdded++;
-                        continue;
-                    }
+                // If file is a File object directly
+                if (file instanceof File) {
+                    formData.append('file', file, file.name);
+                    console.log(`ChatInterface: Added File object directly: ${file.name}`);
+                    filesAdded++;
+                    continue;
+                }
 
-                    // If file has a file property that is a File object
-                    if (file.file instanceof File) {
-                        formData.append('file', file.file, file.name);
-                        console.log(`ChatInterface: Added file from file property: ${file.name}`);
-                        filesAdded++;
-                        continue;
-                    }
+                // If file has a file property that is a File object
+                if (file.file instanceof File) {
+                    formData.append('file', file.file, file.name);
+                    console.log(`ChatInterface: Added file from file property: ${file.name}`);
+                    filesAdded++;
+                    continue;
+                }
 
-                    // If file has an id, try to get it from localStorage
-                    if (file.id) {
-                        const fileData = localStorage.getItem(file.id);
-                        if (fileData) {
-                            try {
-                                const parsedData = JSON.parse(fileData);
-                                if (parsedData.data && parsedData.data.startsWith('data:')) {
-                                    const base64Data = parsedData.data.split(',')[1];
-                                    const byteCharacters = atob(base64Data);
-                                    const byteArrays = [];
+                // If file has an id, try to get it from localStorage
+                if (file.id) {
+                    const fileData = localStorage.getItem(file.id);
+                    if (fileData) {
+                        try {
+                            const parsedData = JSON.parse(fileData);
+                            if (parsedData.data && parsedData.data.startsWith('data:')) {
+                                const base64Data = parsedData.data.split(',')[1];
+                                const byteCharacters = atob(base64Data);
+                                const byteArrays = [];
 
-                                    for (let i = 0; i < byteCharacters.length; i++) {
-                                        byteArrays.push(byteCharacters.charCodeAt(i));
-                                    }
-
-                                    const byteArray = new Uint8Array(byteArrays);
-                                    const blob = new Blob([byteArray], { type: parsedData.type || 'application/pdf' });
-
-                                    formData.append('file', blob, parsedData.name || file.name);
-                                    console.log(`ChatInterface: Added file from localStorage: ${parsedData.name || file.name}`);
-                                    filesAdded++;
-                                    continue;
+                                for (let i = 0; i < byteCharacters.length; i++) {
+                                    byteArrays.push(byteCharacters.charCodeAt(i));
                                 }
-                            } catch (e) {
-                                console.error('ChatInterface: Error processing file from localStorage:', e);
+
+                                const byteArray = new Uint8Array(byteArrays);
+                                const blob = new Blob([byteArray], { type: parsedData.type || 'application/pdf' });
+
+                                formData.append('file', blob, parsedData.name || file.name);
+                                console.log(`ChatInterface: Added file from localStorage: ${parsedData.name || file.name}`);
+                                filesAdded++;
+                                continue;
                             }
+                        } catch (e) {
+                            console.error('ChatInterface: Error processing file from localStorage:', e);
                         }
                     }
-
-                    console.error('ChatInterface: Could not process file:', file.name);
                 }
 
-                console.log(`ChatInterface: Successfully added ${filesAdded} files to FormData`);
+                console.error('ChatInterface: Could not process file:', file.name);
+            }
 
-                if (filesAdded === 0) {
-                    console.error('ChatInterface: No valid files could be processed');
-                    return {
-                        summary: "I couldn't process any of your credit report files. Please make sure they're in a supported format.",
-                        fullAnalysis: "There was an error processing your files. Please try uploading them again or contact support.",
-                        hasFindings: false
-                    };
-                }
+            console.log(`ChatInterface: Successfully added ${filesAdded} files to FormData`);
 
-                // Add the forceRefresh parameter if needed
-                if (forceRefresh) {
-                    formData.append('forceRefresh', 'true');
-                }
+            if (filesAdded === 0) {
+                console.error('ChatInterface: No valid files could be processed');
+                return {
+                    summary: "I couldn't process any of your credit report files. Please make sure they're in a supported format.",
+                    fullAnalysis: "There was an error processing your files. Please try uploading them again or contact support.",
+                    hasFindings: false
+                };
+            }
 
-                // Send the request to the backend
-                console.log('ChatInterface: Sending files to backend...');
+            // Add the forceRefresh parameter if needed
+            if (forceRefresh) {
+                formData.append('forceRefresh', 'true');
+            }
 
-                try {
-                    // Send the request and wait for the response
-                    const response = await fetch('http://localhost:3000/api/chatGptService/analyzeReports', {
-                        method: 'POST',
-                        body: formData
-                    });
+            // Send the request to the backend
+            console.log('ChatInterface: Sending files to backend...');
 
-                    console.log(`ChatInterface: Backend response status:`, response.status);
+            try {
+                // Send the request and wait for the response
+                const response = await fetch('http://localhost:3000/api/chatGptService/analyzeReports', {
+                    method: 'POST',
+                    body: formData
+                });
 
-                    // Handle non-OK responses
-                    if (!response.ok) {
-                        console.error(`ChatInterface: Server error with status ${response.status}`);
-                        return {
-                            summary: "I encountered an error while analyzing your reports.",
-                            fullAnalysis: `The server responded with status code ${response.status}. Please try again later or contact support.`,
-                            hasFindings: false
-                        };
-                    }
+                console.log(`ChatInterface: Backend response status:`, response.status);
 
-                    // Get the response data
-                    console.log('ChatInterface: Reading response data...');
-                    const responseData = await response.json();
-                    console.log('ChatInterface: Response data received:', responseData);
-
-                    // Create a properly structured result object
-                    const result = {
-                        summary: responseData.summary || "I've analyzed your credit reports and found several items that could potentially be disputed.",
-                        fullAnalysis: responseData.formattedAnalysis || responseData.analysis || responseData.detailedAnalysis || "Would you like me to explain the specific items I found?",
-                        hasFindings: responseData.foundItems || true,
-                        fromCache: responseData.fromCache || false
-                    };
-
-                    console.log(`ChatInterface: Returning structured result:`, result);
-                    return result;
-                } catch (error) {
-                    console.error('ChatInterface: Error in sendReportsForAnalysis:', error);
+                // Handle non-OK responses
+                if (!response.ok) {
+                    console.error(`ChatInterface: Server error with status ${response.status}`);
                     return {
                         summary: "I encountered an error while analyzing your reports.",
-                        fullAnalysis: `Error: ${error.message}. Please try again later or contact support.`,
+                        fullAnalysis: `The server responded with status code ${response.status}. Please try again later or contact support.`,
                         hasFindings: false
                     };
                 }
+
+                // Get the response data
+                console.log('ChatInterface: Reading response data...');
+                const responseData = await response.json();
+                console.log('ChatInterface: Response data received:', responseData);
+
+                // Create a properly structured result object
+                const result = {
+                    summary: responseData.summary || "I've analyzed your credit reports and found several items that could potentially be disputed.",
+                    fullAnalysis: responseData.formattedAnalysis || responseData.analysis || responseData.detailedAnalysis || "Would you like me to explain the specific items I found?",
+                    hasFindings: responseData.foundItems || true,
+                    fromCache: responseData.fromCache || false
+                };
+
+                console.log(`ChatInterface: Returning structured result:`, result);
+                return result;
+            } catch (error) {
+                console.error('ChatInterface: Error in sendReportsForAnalysis:', error);
+                return {
+                    summary: "I encountered an error while analyzing your reports.",
+                    fullAnalysis: `Error: ${error.message}. Please try again later or contact support.`,
+                    hasFindings: false
+                };
             }
-
-            // Function to show typing indicator
-            function showTypingIndicator() {
-                const typingIndicator = document.createElement('div');
-                typingIndicator.className = 'typing-indicator';
-                typingIndicator.id = 'typing-indicator';
-
-                // Add message div
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'typing-message';
-                messageDiv.textContent = 'Analyzing your credit reports...';
-                typingIndicator.appendChild(messageDiv);
-
-                // Add dots container
-                const dotsDiv = document.createElement('div');
-                dotsDiv.className = 'typing-dots';
-                dotsDiv.innerHTML = '<span></span><span></span><span></span>';
-                typingIndicator.appendChild(dotsDiv);
-
-                chatMessages.appendChild(typingIndicator);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // Function to update typing indicator message
-            function updateTypingIndicatorMessage(message) {
-                const messageDiv = document.querySelector('.typing-message');
-                if (messageDiv) {
-                    messageDiv.textContent = message;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }
-
-            // Function to handle button clicks
-            function handleButtonClick(value) {
-                console.log('ChatInterface: Button clicked with value:', value);
-
-                if (value === 'analyze_reports') {
-                    console.log('ChatInterface: User clicked to analyze reports');
-
-                    // Add user message
-                    addUserMessage("Yes, analyze my reports");
-
-                    // Show typing indicator with initial message
-                    showTypingIndicator();
-                    updateTypingIndicatorMessage("Starting analysis of your credit reports...");
-
-                    // Get the credit report files
-                    const reportFiles = uploadedFiles;
-
-                    if (reportFiles.length === 0) {
-                        console.error('ChatInterface: No report files found');
-                        hideTypingIndicator();
-                        addBotMessage("I couldn't find any credit report files to analyze. Please make sure you've uploaded your reports.");
-                        return;
-                    }
-
-                    // Define analysis steps with appropriate timing for a ~20 second process
-                    const analysisSteps = [
-                        { message: "Checking for cached analysis...", time: 0 },
-                        { message: "Extracting text from your credit reports...", time: 2000 },
-                        { message: "Processing account information...", time: 6000 },
-                        { message: "Identifying potential dispute items...", time: 10000 },
-                        { message: "Analyzing credit history patterns...", time: 14000 },
-                        { message: "Finalizing your credit report analysis...", time: 18000 }
-                    ];
-
-                    // Set up timers for each step
-                    const stepTimers = analysisSteps.map(step => {
-                        return setTimeout(() => {
-                            updateTypingIndicatorMessage(step.message);
-                        }, step.time);
-                    });
-
-                    // Add a dot animation for continuous feedback
-                    let dots = 0;
-                    const dotsInterval = setInterval(() => {
-                        dots = (dots + 1) % 4;
-                        const currentMessage = document.querySelector('.typing-message')?.textContent || '';
-                        const baseMessage = currentMessage.replace(/\.{1,3}$/, '');
-                        updateTypingIndicatorMessage(`${baseMessage}${'.'.repeat(dots)}`);
-                    }, 500);
-
-                    // Use async/await with proper cleanup
-                    (async () => {
-                        try {
-                            console.log('ChatInterface: Starting analysis...');
-                            const response = await sendReportsForAnalysis(reportFiles);
-                            console.log('ChatInterface: Analysis complete:', response);
-
-                            // Clear all timers
-                            stepTimers.forEach(timer => clearTimeout(timer));
-                            clearInterval(dotsInterval);
-
-                            // Hide typing indicator
-                            hideTypingIndicator();
-
-                            // Add bot message with the summary and buttons
-                            addBotMessage(
-                                (response.fromCache ? "📋 Using previously analyzed results: " : "") + response.summary,
-                                [
-                                    { text: "Show me the details", value: "show_analysis_details" },
-                                    { text: "Help me dispute these items", value: "start_disputes" }
-                                ]
-                            );
-
-                            // Store the full analysis for later
-                            sessionStorage.setItem('creditReportAnalysis', response.fullAnalysis);
-                        } catch (error) {
-                            // Clear all timers
-                            stepTimers.forEach(timer => clearTimeout(timer));
-                            clearInterval(dotsInterval);
-
-                            console.error('ChatInterface: Error in analysis process:', error);
-                            hideTypingIndicator();
-                            addBotMessage("I encountered an error while analyzing your reports. Please try again later or contact support if the problem persists.");
-                        }
-                    })();
-                } else if (value === 'show_analysis_details') {
-                    // Add user message
-                    addUserMessage("Show me the details");
-
-                    // Retrieve the stored full analysis
-                    const fullAnalysis = sessionStorage.getItem('creditReportAnalysis');
-                    if (fullAnalysis) {
-                        // Add the full analysis with proper formatting
-                        addBotMessage(fullAnalysis, [
-                            { text: "Help me dispute these items", value: "start_disputes" }
-                        ]);
-                    } else {
-                        addBotMessage("I'm sorry, I couldn't retrieve the detailed analysis. Would you like me to analyze your reports again?", [
-                            { text: "Analyze again", value: "analyze_reports" }
-                        ]);
-                    }
-                } else if (value === 'refresh_analysis') {
-                    // Add user message
-                    addUserMessage("Please refresh my analysis");
-
-                    // Show typing indicator
-                    showTypingIndicator();
-                    updateTypingIndicatorMessage("Starting a fresh analysis of your credit reports...");
-
-                    // Get the credit report files
-                    const reportFiles = uploadedFiles;
-
-                    if (reportFiles.length === 0) {
-                        hideTypingIndicator();
-                        addBotMessage("I couldn't find any credit report files to analyze. Please make sure you've uploaded your reports.");
-                        return;
-                    }
-
-                    // Similar to analyze_reports but with forceRefresh=true
-                    // ... (similar code to analyze_reports with forceRefresh=true)
-                } else if (value === 'start_disputes') {
-                    // Add user message
-                    addUserMessage("Help me dispute these items");
-
-                    // Get the full analysis from session storage
-                    const fullAnalysis = sessionStorage.getItem('creditReportAnalysis');
-                    if (!fullAnalysis) {
-                        addBotMessage("I couldn't find your credit report analysis. Let's analyze your reports first.", [
-                            { text: "Analyze my reports", value: "analyze_reports" }
-                        ]);
-                        return;
-                    }
-
-                    // Extract dispute items from the analysis
-                    const disputeItems = extractDisputeItems(fullAnalysis);
-
-                    // Show typing indicator briefly
-                    showTypingIndicator();
-
-                    // Use setTimeout to simulate processing time
-                    setTimeout(() => {
-                        hideTypingIndicator();
-
-                        // Add bot message explaining the dispute process
-                        addBotMessage(
-                            "I've identified the following items from your credit report that you might want to dispute. " +
-                            "Please select the items you'd like to generate dispute letters for:",
-                            []
-                        );
-
-                        // Show the dispute item selection interface
-                        handleDisputeItemSelection(disputeItems);
-                    }, 1500);
-                } else if (value === 'edit_letters') {
-                    // Add user message
-                    addUserMessage("I'd like to edit the letters");
-
-                    // Get the letters from session storage
-                    const letters = JSON.parse(sessionStorage.getItem('disputeLetters') || '[]');
-                    if (letters.length === 0) {
-                        addBotMessage("I couldn't find any dispute letters. Let's create some first.", [
-                            { text: "Start disputes", value: "start_disputes" }
-                        ]);
-                        return;
-                    }
-
-                    // Show letter editing interface
-                    // This would be a more complex UI component that allows editing letter content
-                    addBotMessage(
-                        "You can edit your dispute letters below. When you're done, click 'Save Changes' to update the letters.",
-                        []
-                    );
-
-                    // Create editable letter interface
-                    const editInterface = document.createElement('div');
-                    editInterface.className = 'letter-edit-interface';
-
-                    letters.forEach((letter, index) => {
-                        const letterEditor = document.createElement('div');
-                        letterEditor.className = 'letter-editor';
-
-                        const letterHeader = document.createElement('h4');
-                        letterHeader.textContent = `Letter ${index + 1}: ${letter.recipient || 'Credit Bureau'}`;
-
-                        const letterTextarea = document.createElement('textarea');
-                        letterTextarea.className = 'letter-content';
-                        letterTextarea.id = `letter-${index}`;
-                        letterTextarea.rows = 15;
-                        letterTextarea.value = letter.content;
-
-                        letterEditor.appendChild(letterHeader);
-                        letterEditor.appendChild(letterTextarea);
-                        editInterface.appendChild(letterEditor);
-                    });
-
-                    const saveButton = document.createElement('button');
-                    saveButton.className = 'save-letters-btn';
-                    saveButton.textContent = 'Save Changes';
-                    saveButton.onclick = () => {
-                        const updatedLetters = [];
-
-                        letters.forEach((letter, index) => {
-                            const textarea = document.getElementById(`letter-${index}`);
-                            updatedLetters.push({
-                                ...letter,
-                                content: textarea.value
-                            });
-                        });
-
-                        // Save updated letters
-                        sessionStorage.setItem('disputeLetters', JSON.stringify(updatedLetters));
-
-                        // Confirm to user
-                        addBotMessage("Your changes have been saved. You can now download your updated letters.", [
-                            { text: "Show my letters", value: "show_letters" }
-                        ]);
-                    };
-
-                    editInterface.appendChild(saveButton);
-                    chatMessages.appendChild(editInterface);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                } else if (value === 'show_letters') {
-                    // Add user message
-                    addUserMessage("Show my letters");
-
-                    // Get the letters from session storage
-                    const letters = JSON.parse(sessionStorage.getItem('disputeLetters') || '[]');
-                    if (letters.length === 0) {
-                        addBotMessage("I couldn't find any dispute letters. Let's create some first.", [
-                            { text: "Start disputes", value: "start_disputes" }
-                        ]);
-                        return;
-                    }
-
-                    // Display the letters
-                    const lettersHtml = `
-                        <h3>Your Dispute Letters</h3>
-                        <div class="dispute-letters">
-                            ${letters.map((letter, index) => `
-                                <div class="dispute-letter">
-                                    <h4>Letter ${index + 1}: ${letter.recipient || 'Credit Bureau'}</h4>
-                                    <pre>${letter.content}</pre>
-                                    <button class="download-btn" onclick="downloadLetter(${index})">Download as PDF</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-
-                    addBotMessage(lettersHtml, [
-                        { text: "Start over", value: "start_over" },
-                        { text: "Edit letters", value: "edit_letters" }
-                    ]);
-                } else if (value === 'start_over') {
-                    // Add user message
-                    addUserMessage("I'd like to start over");
-
-                    // Clear any stored analysis and letters
-                    sessionStorage.removeItem('creditReportAnalysis');
-                    sessionStorage.removeItem('disputeLetters');
-
-                    // Welcome message with options
-                    addBotMessage(
-                        "Let's start fresh! What would you like to do?",
-                        [
-                            { text: "Analyze my credit reports", value: "analyze_reports" },
-                            { text: "Ask a question about credit repair", value: "ask_question" }
-                        ]
-                    );
-                }
-            }
-
-            // Helper function to convert markdown to HTML
-            function convertMarkdownToHtml(markdown) {
-                // This is a simple implementation - you might want to use a proper markdown library
-                return markdown
-                    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-                    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-                    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                    .replace(/\*\*(.*)\*\*/gm, '<strong>$1</strong>')
-                    .replace(/\*(.*)\*/gm, '<em>$1</em>')
-                    .replace(/\n/gm, '<br>');
-            }
-
-            // Function to load uploaded files
-            function loadUploadedFiles() {
-                console.log('ChatInterface: Loading uploaded files');
-
-                try {
-                    // Clear existing files
-                    uploadedFiles = [];
-                    fileList.innerHTML = '';
-
-                    // Get saved reports from localStorage
-                    const savedReportsJson = localStorage.getItem('jamBotUploadedReports');
-                    if (!savedReportsJson) {
-                        console.log('ChatInterface: No saved reports found in localStorage');
-                        return;
-                    }
-
-                    const savedReports = JSON.parse(savedReportsJson);
-                    console.log(`ChatInterface: Found ${savedReports.length} saved reports`);
-
-                    // Load each file
-                    savedReports.forEach(report => {
-                        const fileDataKey = 'jamBotFile_' + report.id;
-                        const fileDataJson = localStorage.getItem(fileDataKey);
-
-                        if (fileDataJson) {
-                            try {
-                                const fileData = JSON.parse(fileDataJson);
-
-                                console.log(`ChatInterface: Loaded file from localStorage: ${report.name} (${report.id})`);
-
-                                // Add to uploadedFiles array
-                                uploadedFiles.push({
-                                    id: report.id,
-                                    name: report.name,
-                                    type: fileData.type,
-                                    size: fileData.size,
-                                    data: fileData.data
-                                });
-
-                                // Add to UI
-                                addFileToUI(report.id, report.name);
-                            } catch (e) {
-                                console.error(`ChatInterface: Error parsing file data for ${report.name}:`, e);
-                            }
-                        } else {
-                            console.log(`ChatInterface: No file data found for report: ${report.name}`);
-                        }
-                    });
-                } catch (e) {
-                    console.error('ChatInterface: Error loading uploaded files:', e);
-                }
-            }
-
-            // Function to load saved messages
-            function loadSavedMessages() {
-                console.log('ChatInterface: Loading saved messages from localStorage');
-
-                try {
-                    const savedMessagesJson = localStorage.getItem('jamBotChatMessages');
-                    if (savedMessagesJson) {
-                        const savedMessages = JSON.parse(savedMessagesJson);
-                        console.log(`ChatInterface: Found ${savedMessages.length} saved messages`);
-
-                        // Check if we have the report message but no reports
-                        const hasReportMessage = savedMessages.some(msg =>
-                            msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
-                        );
-
-                        console.log('ChatInterface: Has report message:', hasReportMessage);
-
-                        if (hasReportMessage) {
-                            const hasReports = checkForUploadedReports();
-                            console.log('ChatInterface: hasUploadedReports result:', hasReports);
-
-                            if (!hasReports) {
-                                console.log('ChatInterface: Filtering out report messages');
-
-                                // Filter out the report message and related responses
-                                messages = savedMessages.filter(msg => {
-                                    const shouldKeep = !(
-                                        (msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")) ||
-                                        (msg.type === 'user' && (
-                                            msg.content.includes("Yes, analyze my reports") ||
-                                            msg.content.includes("No, I'll ask something else")
-                                        ))
-                                    );
-
-                                    if (!shouldKeep) {
-                                        console.log('ChatInterface: Filtering out message:', msg.content.substring(0, 50) + '...');
-                                    }
-
-                                    return shouldKeep;
-                                });
-
-                                // Save the filtered messages back to localStorage
-                                localStorage.setItem('jamBotChatMessages', JSON.stringify(messages));
-                            } else {
-                                messages = savedMessages;
-                            }
-                        } else {
-                            messages = savedMessages;
-                        }
-
-                        // Redraw messages
-                        redrawMessages();
-                    } else {
-                        console.log('ChatInterface: No saved messages found');
-
-                        // Add welcome message
-                        addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
-
-                        // Check if reports have been uploaded
-                        const hasUploadedReports = checkForUploadedReports();
-                        console.log('ChatInterface: hasUploadedReports result:', hasUploadedReports);
-
-                        if (hasUploadedReports) {
-                            console.log('ChatInterface: Adding report analysis prompt');
-
-                            // Add the report analysis prompt
-                            addBotMessage(
-                                "I see you've uploaded your credit reports. Would you like me to analyze them for potential items to dispute?",
-                                [
-                                    { text: "Yes, analyze my reports", value: "analyze_reports" },
-                                    { text: "No, I'll ask something else", value: "skip_analysis" }
-                                ]
-                            );
-                        }
-                    }
-                } catch (e) {
-                    console.error('ChatInterface: Error loading saved messages:', e);
-
-                    // Add welcome message as fallback
-                    addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
-                }
-            }
-
-            // Function to debug localStorage
-            function debugLocalStorage() {
-                console.log('--- ChatInterface localStorage Debug ---');
-
-                // Get all localStorage keys
-                const keys = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    keys.push(localStorage.key(i));
-                }
-
-                console.log('All localStorage keys:');
-                keys.forEach((key, index) => {
-                    const size = localStorage.getItem(key).length;
-                    console.log(`${index + 1}. ${key}: ${size} bytes`);
-                });
-
-                // Check for JAM Bot specific items
-                const jamBotItems = keys.filter(key => key.startsWith('jamBot'));
-                console.log(`\nSummary:`);
-                console.log(`Total localStorage items: ${keys.length}`);
-                console.log(`JAM Bot items: ${jamBotItems.length}`);
-                console.log(`------------------------`);
-            }
-
-            // Set up event listeners
-            sendButton.addEventListener('click', function () {
-                const message = chatInput.value.trim();
-                if (message) {
-                    // Add user message
-                    addUserMessage(message);
-
-                    // Clear input
-                    chatInput.value = '';
-
-                    // Show typing indicator
-                    showTypingIndicator();
-
-                    // Send message to backend
-                    fetch('http://localhost:3000/api/chatGptService/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ message })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Hide typing indicator
-                            hideTypingIndicator();
-
-                            // Add bot response
-                            addBotMessage(data.response);
-                        })
-                        .catch(error => {
-                            console.error('ChatInterface: Error sending message to backend:', error);
-
-                            // Hide typing indicator
-                            hideTypingIndicator();
-
-                            // Add error message
-                            addBotMessage("I'm sorry, I encountered an error. Please try again later.");
-                        });
-                }
-            });
-
-            chatInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    sendButton.click();
-                }
-            });
-
-            fileInput.addEventListener('change', function (e) {
-                const files = e.target.files;
-                if (files.length > 0) {
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-
-                        // Check if file is a valid type (PDF, JPG, PNG)
-                        if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) {
-                            console.error(`ChatInterface: Invalid file type: ${file.type}`);
-                            alert('Please upload only PDF, JPG, or PNG files.');
-                            continue;
-                        }
-
-                        console.log(`ChatInterface: Processing file: ${file.name} (${file.type})`);
-
-                        // Generate a unique ID for the file
-                        const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-
-                        // Add to uploadedFiles array
-                        uploadedFiles.push({
-                            id: fileId,
-                            name: file.name,
-                            type: file.type,
-                            size: file.size,
-                            file: file
-                        });
-
-                        // Add to UI
-                        addFileToUI(fileId, file.name);
-
-                        // Read file as base64
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            // Store in localStorage
-                            try {
-                                localStorage.setItem(`jamBotFile_${fileId}`, JSON.stringify({
-                                    id: fileId,
-                                    name: file.name,
-                                    type: file.type,
-                                    size: file.size,
-                                    data: e.target.result
-                                }));
-
-                                console.log(`ChatInterface: File stored in localStorage: ${fileId}`);
-
-                                // Update uploadedReports in localStorage
-                                const uploadedReports = uploadedFiles.map(file => ({
-                                    id: file.id,
-                                    name: file.name,
-                                    size: file.size,
-                                    uploadDate: new Date().toISOString()
-                                }));
-
-                                localStorage.setItem('jamBotUploadedReports', JSON.stringify(uploadedReports));
-                                localStorage.setItem('jamBotHasUploadedReports', 'true');
-
-                                // Check if we need to add the report message
-                                const hasReportMessage = messages.some(msg =>
-                                    msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
-                                );
-
-                                if (!hasReportMessage) {
-                                    console.log('ChatInterface: Adding report analysis prompt');
-
-                                    // Add the report analysis prompt
-                                    addBotMessage(
-                                        "I see you've uploaded your credit reports. Would you like me to analyze them for potential items to dispute?",
-                                        [
-                                            { text: "Yes, analyze my reports", value: "analyze_reports" },
-                                            { text: "No, I'll ask something else", value: "skip_analysis" }
-                                        ]
-                                    );
-                                }
-                            } catch (e) {
-                                console.error(`ChatInterface: Error storing file in localStorage: ${e.message}`);
-                                alert('Error storing file. The file might be too large for localStorage.');
-                            }
-                        };
-
-                        reader.readAsDataURL(file);
-                    }
-
-                    // Reset file input
-                    fileInput.value = '';
-                }
-            });
-
-            // Initialize
-            debugLocalStorage();
-            loadSavedMessages();
-            loadUploadedFiles();
-            console.log('ChatInterface: Initialization complete');
-        });
-
-        // Add this function to handle dispute item selection
-        function handleDisputeItemSelection(items) {
-            // Create a message with selectable dispute items
-            const disputeItemsMessage = document.createElement('div');
-            disputeItemsMessage.className = 'bot-message';
-
-            // Create header
-            const header = document.createElement('h3');
-            header.textContent = 'Select items to dispute:';
-            disputeItemsMessage.appendChild(header);
-
-            // Create form with checkboxes for each item
-            const form = document.createElement('form');
-            form.id = 'dispute-items-form';
-
-            items.forEach((item, index) => {
-                const itemContainer = document.createElement('div');
-                itemContainer.className = 'dispute-item';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `dispute-item-${index}`;
-                checkbox.value = index;
-
-                const label = document.createElement('label');
-                label.htmlFor = `dispute-item-${index}`;
-                label.innerHTML = item.description || item;
-
-                itemContainer.appendChild(checkbox);
-                itemContainer.appendChild(label);
-                form.appendChild(itemContainer);
-            });
-
-            // Add submit button
-            const submitButton = document.createElement('button');
-            submitButton.type = 'button';
-            submitButton.className = 'dispute-submit-btn';
-            submitButton.textContent = 'Generate Dispute Letters';
-            submitButton.onclick = () => {
-                const selectedItems = [];
-                document.querySelectorAll('#dispute-items-form input:checked').forEach(checkbox => {
-                    selectedItems.push(items[parseInt(checkbox.value)]);
-                });
-
-                if (selectedItems.length === 0) {
-                    alert('Please select at least one item to dispute.');
-                    return;
-                }
-
-                // Generate dispute letters for selected items
-                generateDisputeLetters(selectedItems);
-            };
-
-            form.appendChild(submitButton);
-            disputeItemsMessage.appendChild(form);
-
-            // Add to chat
-            chatMessages.appendChild(disputeItemsMessage);
+        }
+
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.id = 'typing-indicator';
+
+            // Add message div
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'typing-message';
+            messageDiv.textContent = 'Analyzing your credit reports...';
+            typingIndicator.appendChild(messageDiv);
+
+            // Add dots container
+            const dotsDiv = document.createElement('div');
+            dotsDiv.className = 'typing-dots';
+            dotsDiv.innerHTML = '<span></span><span></span><span></span>';
+            typingIndicator.appendChild(dotsDiv);
+
+            chatMessages.appendChild(typingIndicator);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Function to extract dispute items from analysis
-        function extractDisputeItems(analysis) {
-            // This is a simple implementation - you might need more sophisticated parsing
-            // based on your actual analysis format
-            const items = [];
-
-            // Split by numbered items or bullet points
-            const lines = analysis.split('\n');
-            let currentItem = '';
-
-            for (const line of lines) {
-                // Check if line starts a new item (numbered or bullet)
-                if (/^\d+[\.\)]|^•|^\-\s/.test(line.trim())) {
-                    if (currentItem) {
-                        items.push(currentItem.trim());
-                    }
-                    currentItem = line;
-                } else if (currentItem) {
-                    currentItem += ' ' + line;
-                }
+        // Function to update typing indicator message
+        function updateTypingIndicatorMessage(message) {
+            const messageDiv = document.querySelector('.typing-message');
+            if (messageDiv) {
+                messageDiv.textContent = message;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-
-            // Add the last item
-            if (currentItem) {
-                items.push(currentItem.trim());
-            }
-
-            return items.length > 0 ? items : [
-                "Late payment on Capital One account from January 2023",
-                "Collections account from ABC Collections that is over 7 years old",
-                "Incorrect account balance on Chase credit card"
-            ]; // Fallback items if parsing fails
         }
 
-        // Function to generate dispute letters
-        async function generateDisputeLetters(selectedItems) {
-            // Show typing indicator
-            showTypingIndicator();
-            updateTypingIndicatorMessage("Generating dispute letters...");
+        // Function to handle button clicks
+        function handleButtonClick(value) {
+            console.log('ChatInterface: Button clicked with value:', value);
 
-            try {
-                // Prepare the request
-                const response = await fetch('http://localhost:3000/api/chatGptService/generateDisputeLetters', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ items: selectedItems })
-                });
+            if (value === 'analyze_reports') {
+                console.log('ChatInterface: User clicked to analyze reports');
 
-                if (!response.ok) {
-                    throw new Error(`Server responded with status: ${response.status}`);
+                // Add user message
+                addUserMessage("Yes, analyze my reports");
+
+                // Show typing indicator
+                showTypingIndicator();
+
+                // Make sure uploadedFiles is loaded
+                if (!uploadedFiles || uploadedFiles.length === 0) {
+                    console.log('ChatInterface: Loading uploaded files before analysis');
+                    loadUploadedFiles();
                 }
 
-                const data = await response.json();
-                hideTypingIndicator();
+                // Check if we have files to analyze
+                if (uploadedFiles.length === 0) {
+                    console.error('ChatInterface: No files found for analysis');
+                    hideTypingIndicator();
+                    addBotMessage("I couldn't find any credit report files to analyze. Please make sure you've uploaded your reports.");
+                    return;
+                }
 
-                // Display the generated letters
+                console.log(`ChatInterface: Analyzing ${uploadedFiles.length} files`);
+
+                // Simulate analysis (replace with actual API call)
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    addBotMessage("I've analyzed your credit reports and found several potential items to dispute. Would you like to see them?", [
+                        { text: "Yes, show me", value: "show_dispute_items" },
+                        { text: "No thanks", value: "skip_dispute_items" }
+                    ]);
+                }, 2000);
+            } else if (value === 'show_analysis_details') {
+                // Add user message
+                addUserMessage("Show me the details");
+
+                // Retrieve the stored full analysis
+                const fullAnalysis = sessionStorage.getItem('creditReportAnalysis');
+                if (fullAnalysis) {
+                    // Add the full analysis with proper formatting
+                    addBotMessage(fullAnalysis, [
+                        { text: "Help me dispute these items", value: "start_disputes" }
+                    ]);
+                } else {
+                    addBotMessage("I'm sorry, I couldn't retrieve the detailed analysis. Would you like me to analyze your reports again?", [
+                        { text: "Analyze again", value: "analyze_reports" }
+                    ]);
+                }
+            } else if (value === 'refresh_analysis') {
+                // Add user message
+                addUserMessage("Please refresh my analysis");
+
+                // Show typing indicator
+                showTypingIndicator();
+                updateTypingIndicatorMessage("Starting a fresh analysis of your credit reports...");
+
+                // Get the credit report files
+                const reportFiles = uploadedFiles;
+
+                if (reportFiles.length === 0) {
+                    hideTypingIndicator();
+                    addBotMessage("I couldn't find any credit report files to analyze. Please make sure you've uploaded your reports.");
+                    return;
+                }
+
+                // Similar to analyze_reports but with forceRefresh=true
+                // ... (similar code to analyze_reports with forceRefresh=true)
+            } else if (value === 'start_disputes') {
+                // Add user message
+                addUserMessage("Help me dispute these items");
+
+                // Get the full analysis from session storage
+                const fullAnalysis = sessionStorage.getItem('creditReportAnalysis');
+
+                if (fullAnalysis) {
+                    // Parse the dispute items from the analysis
+                    const disputeItems = parseDisputeItems(fullAnalysis);
+                    sessionStorage.setItem('disputeItems', JSON.stringify(disputeItems));
+
+                    if (disputeItems.length > 0) {
+                        // Show a message with the number of items found
+                        addBotMessage(`I found ${disputeItems.length} items that could potentially be disputed. Let's go through them one by one. Which item would you like to dispute first?`);
+
+                        // Create buttons for each dispute item
+                        const buttons = disputeItems.map(item => ({
+                            text: item.title,
+                            value: `dispute_item_${item.id}`
+                        }));
+
+                        // Add a message with buttons for each dispute item
+                        addBotMessage("Here are the items I found:", buttons);
+                    } else {
+                        addBotMessage("I couldn't identify specific dispute items from the analysis. Would you like me to help you create a custom dispute letter instead?", [
+                            { text: "Create custom dispute", value: "create_custom_dispute" }
+                        ]);
+                    }
+                } else {
+                    addBotMessage("I couldn't find the analysis details. Would you like me to analyze your reports again?", [
+                        { text: "Analyze again", value: "analyze_reports" }
+                    ]);
+                }
+            } else if (value === 'edit_letters') {
+                // Add user message
+                addUserMessage("I'd like to edit the letters");
+
+                // Get the letters from session storage
+                const letters = JSON.parse(sessionStorage.getItem('disputeLetters') || '[]');
+                if (letters.length === 0) {
+                    addBotMessage("I couldn't find any dispute letters. Let's create some first.", [
+                        { text: "Start disputes", value: "start_disputes" }
+                    ]);
+                    return;
+                }
+
+                // Show letter editing interface
+                // This would be a more complex UI component that allows editing letter content
+                addBotMessage(
+                    "You can edit your dispute letters below. When you're done, click 'Save Changes' to update the letters.",
+                    []
+                );
+
+                // Create editable letter interface
+                const editInterface = document.createElement('div');
+                editInterface.className = 'letter-edit-interface';
+
+                letters.forEach((letter, index) => {
+                    const letterEditor = document.createElement('div');
+                    letterEditor.className = 'letter-editor';
+
+                    const letterHeader = document.createElement('h4');
+                    letterHeader.textContent = `Letter ${index + 1}: ${letter.recipient || 'Credit Bureau'}`;
+
+                    const letterTextarea = document.createElement('textarea');
+                    letterTextarea.className = 'letter-content';
+                    letterTextarea.id = `letter-${index}`;
+                    letterTextarea.rows = 15;
+                    letterTextarea.value = letter.content;
+
+                    letterEditor.appendChild(letterHeader);
+                    letterEditor.appendChild(letterTextarea);
+                    editInterface.appendChild(letterEditor);
+                });
+
+                const saveButton = document.createElement('button');
+                saveButton.className = 'save-letters-btn';
+                saveButton.textContent = 'Save Changes';
+                saveButton.onclick = () => {
+                    const updatedLetters = [];
+
+                    letters.forEach((letter, index) => {
+                        const textarea = document.getElementById(`letter-${index}`);
+                        updatedLetters.push({
+                            ...letter,
+                            content: textarea.value
+                        });
+                    });
+
+                    // Save updated letters
+                    sessionStorage.setItem('disputeLetters', JSON.stringify(updatedLetters));
+
+                    // Confirm to user
+                    addBotMessage("Your changes have been saved. You can now download your updated letters.", [
+                        { text: "Show my letters", value: "show_letters" }
+                    ]);
+                };
+
+                editInterface.appendChild(saveButton);
+                chatMessages.appendChild(editInterface);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else if (value === 'show_letters') {
+                // Add user message
+                addUserMessage("Show my letters");
+
+                // Get the letters from session storage
+                const letters = JSON.parse(sessionStorage.getItem('disputeLetters') || '[]');
+                if (letters.length === 0) {
+                    addBotMessage("I couldn't find any dispute letters. Let's create some first.", [
+                        { text: "Start disputes", value: "start_disputes" }
+                    ]);
+                    return;
+                }
+
+                // Display the letters
                 const lettersHtml = `
                     <h3>Your Dispute Letters</h3>
                     <div class="dispute-letters">
-                        ${data.letters.map((letter, index) => `
+                        ${letters.map((letter, index) => `
                             <div class="dispute-letter">
                                 <h4>Letter ${index + 1}: ${letter.recipient || 'Credit Bureau'}</h4>
                                 <pre>${letter.content}</pre>
@@ -1542,35 +1111,648 @@
                     { text: "Start over", value: "start_over" },
                     { text: "Edit letters", value: "edit_letters" }
                 ]);
+            } else if (value === 'start_over') {
+                // Add user message
+                addUserMessage("I'd like to start over");
 
-                // Store the letters in session storage
-                sessionStorage.setItem('disputeLetters', JSON.stringify(data.letters));
-            } catch (error) {
-                console.error('Error generating dispute letters:', error);
-                hideTypingIndicator();
-                addBotMessage("I encountered an error while generating your dispute letters. Please try again later.");
+                // Clear any stored analysis and letters
+                sessionStorage.removeItem('creditReportAnalysis');
+                sessionStorage.removeItem('disputeLetters');
+
+                // Welcome message with options
+                addBotMessage(
+                    "Let's start fresh! What would you like to do?",
+                    [
+                        { text: "Analyze my credit reports", value: "analyze_reports" },
+                        { text: "Ask a question about credit repair", value: "ask_question" }
+                    ]
+                );
+            } else if (value.startsWith('dispute_item_')) {
+                const itemId = parseInt(value.replace('dispute_item_', ''));
+                const disputeItems = JSON.parse(sessionStorage.getItem('disputeItems') || '[]');
+                const selectedItem = disputeItems.find(item => item.id === itemId);
+
+                if (selectedItem) {
+                    // Add user message
+                    addUserMessage(`I want to dispute: ${selectedItem.title}`);
+
+                    // Store the selected item for later use
+                    sessionStorage.setItem('currentDisputeItem', JSON.stringify(selectedItem));
+
+                    // Ask for additional information
+                    addBotMessage(`I'll help you create a dispute letter for: **${selectedItem.title}**\n\n**Issue:** ${selectedItem.issue}\n\n**Dispute Reason:** ${selectedItem.reason}\n\nTo create the most effective dispute letter, I need a few more details:`, [
+                        { text: "Continue with basic info", value: "dispute_continue_basic" },
+                        { text: "Add more details", value: "dispute_add_details" }
+                    ]);
+                } else {
+                    addBotMessage("I couldn't find that item. Please select one of the available items to dispute.");
+                }
+            } else if (value === 'dispute_continue_basic') {
+                // Add user message
+                addUserMessage("Continue with basic info");
+
+                // Get the current dispute item
+                const selectedItem = JSON.parse(sessionStorage.getItem('currentDisputeItem'));
+
+                // Show the user information form
+                addBotMessage("To create a personalized dispute letter, I need some information from you:");
+                showUserInfoForm();
+            } else if (value === 'dispute_add_details') {
+                // Add user message
+                addUserMessage("Add more details");
+
+                // Ask for specific details
+                addBotMessage("Please provide any additional details that might help with your dispute. For example:\n\n- Account number (last 4 digits)\n- When you first noticed the issue\n- Any communications you've had with the creditor\n- Any supporting documentation you have");
+
+                // Set a flag to indicate we're waiting for additional details
+                sessionStorage.setItem('awaitingDisputeDetails', 'true');
+            } else if (value === 'dispute_another_item') {
+                // Add user message
+                addUserMessage("I want to dispute another item");
+
+                // Get the dispute items
+                const disputeItems = JSON.parse(sessionStorage.getItem('disputeItems') || '[]');
+
+                if (disputeItems.length > 0) {
+                    // Create buttons for each dispute item
+                    const buttons = disputeItems.map(item => ({
+                        text: item.title,
+                        value: `dispute_item_${item.id}`
+                    }));
+
+                    // Add a message with buttons for each dispute item
+                    addBotMessage("Which of these items would you like to dispute next?", buttons);
+                } else {
+                    addBotMessage("I couldn't find any more items to dispute. Would you like me to help you create a custom dispute letter instead?", [
+                        { text: "Create custom dispute", value: "create_custom_dispute" }
+                    ]);
+                }
+            } else if (value === 'download_letter_pdf') {
+                // Add user message
+                addUserMessage("Download as PDF");
+
+                // Get the current letter content
+                const letterContent = sessionStorage.getItem('currentDisputeLetter');
+                const letterTitle = sessionStorage.getItem('currentDisputeTitle') || "Dispute Letter";
+
+                if (letterContent) {
+                    // Generate and download the PDF
+                    generateAndDownloadPDF(letterContent, letterTitle);
+
+                    // Confirm to the user
+                    addBotMessage("Your dispute letter has been downloaded as a PDF. Is there anything else you'd like to do?", [
+                        { text: "Dispute another item", value: "dispute_another_item" },
+                        { text: "I'm done for now", value: "end_session" }
+                    ]);
+                } else {
+                    addBotMessage("I couldn't find the letter content. Please try generating the letter again.");
+                }
+            } else if (value === 'end_session') {
+                // Add user message
+                addUserMessage("I'm done for now");
+
+                // Thank the user
+                addBotMessage("Thank you for using JAM Dispute Bot! Your dispute letters have been saved. You can come back anytime to continue working on your disputes or generate new letters.");
             }
         }
 
-        // Function to download a letter as PDF
-        function downloadLetter(index) {
-            const letters = JSON.parse(sessionStorage.getItem('disputeLetters') || '[]');
-            if (!letters[index]) return;
+        // Helper function to convert markdown to HTML
+        function convertMarkdownToHtml(markdown) {
+            // This is a simple implementation - you might want to use a proper markdown library
+            return markdown
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/\*\*(.*)\*\*/gm, '<strong>$1</strong>')
+                .replace(/\*(.*)\*/gm, '<em>$1</em>')
+                .replace(/\n/gm, '<br>');
+        }
 
-            const letter = letters[index];
-            const filename = `dispute_letter_${index + 1}.txt`;
+        // Function to load uploaded files
+        function loadUploadedFiles() {
+            console.log('ChatInterface: Loading uploaded files');
+            try {
+                // Get uploaded reports from localStorage - use jamBotUploadedReports for consistency
+                const uploadedReportsJson = localStorage.getItem('jamBotUploadedReports');
 
-            // Create a blob and download it
-            const blob = new Blob([letter.content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
+                if (uploadedReportsJson) {
+                    const uploadedReports = JSON.parse(uploadedReportsJson);
+                    console.log(`ChatInterface: Found ${uploadedReports.length} reports in localStorage`);
 
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+                    // Convert to uploadedFiles format
+                    uploadedFiles = uploadedReports.map(report => {
+                        // Try to get the file data from localStorage - use jamBotFile_ prefix
+                        const fileDataJson = localStorage.getItem(`jamBotFile_${report.id}`);
+                        let fileData = null;
+
+                        if (fileDataJson) {
+                            try {
+                                fileData = JSON.parse(fileDataJson);
+                            } catch (e) {
+                                console.error(`ChatInterface: Error parsing file data for ${report.name}:`, e);
+                            }
+                        }
+
+                        return {
+                            id: report.id,
+                            name: report.name,
+                            size: report.size,
+                            uploadDate: report.uploadDate,
+                            data: fileData ? fileData.data : null
+                        };
+                    });
+
+                    console.log(`ChatInterface: Loaded ${uploadedFiles.length} files`);
+
+                    // Update the UI
+                    updateFileList();
+                } else {
+                    console.log('ChatInterface: No uploaded reports found in localStorage');
+                    uploadedFiles = [];
+                }
+            } catch (e) {
+                console.error('ChatInterface: Error loading uploaded files:', e);
+                uploadedFiles = [];
+            }
+        }
+
+        // Function to update the file list UI
+        function updateFileList() {
+            console.log('ChatInterface: Updating file list UI');
+
+            // Make sure fileList is initialized
+            if (!fileList) {
+                fileList = document.querySelector('.file-list') || document.getElementById('file-list');
+
+                // If still not found, create it
+                if (!fileList) {
+                    console.warn('ChatInterface: File list element not found, creating one');
+                    fileList = document.createElement('div');
+                    fileList.className = 'file-list';
+                    fileList.id = 'file-list';
+
+                    // Find a suitable parent to append it to
+                    const fileUpload = document.querySelector('.file-upload');
+                    if (fileUpload) {
+                        fileUpload.appendChild(fileList);
+                    } else {
+                        // If no chat container, append to body but hide it
+                        fileList.style.display = 'none';
+                        document.body.appendChild(fileList);
+                    }
+                }
+            }
+
+            // Now we can safely use fileList
+            fileList.innerHTML = ''; // Clear existing files
+
+            // Add each file to the UI
+            if (uploadedFiles && uploadedFiles.length > 0) {
+                uploadedFiles.forEach(file => {
+                    addFileToUI(file.id, file.name);
+                });
+            }
+        }
+
+        // Function to load saved messages
+        function loadSavedMessages() {
+            console.log('ChatInterface: Loading saved messages from localStorage');
+
+            try {
+                const savedMessagesJson = localStorage.getItem('jamBotChatMessages');
+                if (savedMessagesJson) {
+                    const savedMessages = JSON.parse(savedMessagesJson);
+                    console.log(`ChatInterface: Found ${savedMessages.length} saved messages`);
+
+                    // Check if we have the report message but no reports
+                    const hasReportMessage = savedMessages.some(msg =>
+                        msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
+                    );
+
+                    console.log('ChatInterface: Has report message:', hasReportMessage);
+
+                    if (hasReportMessage) {
+                        const hasReports = checkForUploadedReports();
+                        console.log('ChatInterface: hasUploadedReports result:', hasReports);
+
+                        if (!hasReports) {
+                            console.log('ChatInterface: Filtering out report messages');
+
+                            // Filter out the report message and related responses
+                            messages = savedMessages.filter(msg => {
+                                const shouldKeep = !(
+                                    (msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")) ||
+                                    (msg.type === 'user' && (
+                                        msg.content.includes("Yes, analyze my reports") ||
+                                        msg.content.includes("No, I'll ask something else")
+                                    ))
+                                );
+
+                                if (!shouldKeep) {
+                                    console.log('ChatInterface: Filtering out message:', msg.content.substring(0, 50) + '...');
+                                }
+
+                                return shouldKeep;
+                            });
+
+                            // Save the filtered messages back to localStorage
+                            localStorage.setItem('jamBotChatMessages', JSON.stringify(messages));
+                        } else {
+                            messages = savedMessages;
+                        }
+                    } else {
+                        messages = savedMessages;
+                    }
+
+                    // Redraw messages
+                    redrawMessages();
+                } else {
+                    console.log('ChatInterface: No saved messages found');
+
+                    // Add welcome message
+                    addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
+
+                    // Check if reports have been uploaded
+                    const hasUploadedReports = checkForUploadedReports();
+                    console.log('ChatInterface: hasUploadedReports result:', hasUploadedReports);
+
+                    if (hasUploadedReports) {
+                        console.log('ChatInterface: Adding report analysis prompt');
+
+                        // Add the report analysis prompt
+                        addBotMessage(
+                            "I see you've uploaded your credit reports. Would you like me to analyze them for potential items to dispute?",
+                            [
+                                { text: "Yes, analyze my reports", value: "analyze_reports" },
+                                { text: "No, I'll ask something else", value: "skip_analysis" }
+                            ]
+                        );
+                    }
+                }
+            } catch (e) {
+                console.error('ChatInterface: Error loading saved messages:', e);
+
+                // Add welcome message as fallback
+                addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
+            }
+        }
+
+        // Function to debug localStorage
+        function debugLocalStorage() {
+            console.log('--- ChatInterface localStorage Debug ---');
+
+            // Get all localStorage keys
+            const keys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                keys.push(localStorage.key(i));
+            }
+
+            console.log('All localStorage keys:');
+            keys.forEach((key, index) => {
+                const size = localStorage.getItem(key).length;
+                console.log(`${index + 1}. ${key}: ${size} bytes`);
+            });
+
+            // Check for JAM Bot specific items
+            const jamBotItems = keys.filter(key => key.startsWith('jamBot'));
+            console.log(`\nSummary:`);
+            console.log(`Total localStorage items: ${keys.length}`);
+            console.log(`JAM Bot items: ${jamBotItems.length}`);
+            console.log(`------------------------`);
+        }
+
+        // Set up event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize the chat messages container reference
+            chatMessages = document.querySelector('.chat-messages');
+
+            // Initialize the file list reference - do this before any functions that might use it
+            fileList = document.querySelector('.file-list') || document.getElementById('file-list');
+            if (!fileList) {
+                console.warn('ChatInterface: File list element not found');
+                // Create a file list container if it doesn't exist
+                fileList = document.createElement('div');
+                fileList.className = 'file-list';
+                fileList.id = 'file-list';
+
+                // Find a suitable parent to append it to
+                const fileUpload = document.querySelector('.file-upload');
+                if (fileUpload) {
+                    fileUpload.appendChild(fileList);
+                } else {
+                    // If no chat container, append to body but hide it
+                    fileList.style.display = 'none';
+                    document.body.appendChild(fileList);
+                }
+            }
+
+            // Initialize the send button reference
+            sendButton = document.querySelector('#send-button');
+
+            // Rest of your initialization code...
+        });
+
+        // Make sure you have a sendMessage function defined
+        function sendMessage() {
+            const messageInput = document.querySelector('#chat-input');
+            if (!messageInput) return;
+
+            const message = messageInput.value.trim();
+            if (message) {
+                // Add user message
+                addUserMessage(message);
+
+                // Clear input
+                messageInput.value = '';
+
+                // Process the message
+                processUserMessage(message);
+            }
+        }
+
+        // Initialize
+        debugLocalStorage();
+        loadSavedMessages();
+        loadUploadedFiles();
+        console.log('ChatInterface: Initialization complete');
+
+        // Add this function to handle scrolling to the bottom of the chat
+        function scrollToBottom() {
+            console.log('ChatInterface: Scrolling to bottom');
+            const chatMessages = document.querySelector('.chat-messages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // Add this function to handle file uploads
+        function setupFileUpload() {
+            console.log('ChatInterface: Setting up file upload');
+
+            const fileInput = document.getElementById('file-input');
+            if (!fileInput) {
+                console.error('ChatInterface: File input element not found');
+                return;
+            }
+
+            // Add change event listener to file input
+            fileInput.addEventListener('change', function (event) {
+                console.log('ChatInterface: File input change event triggered');
+
+                const files = event.target.files;
+                if (!files || files.length === 0) {
+                    console.log('ChatInterface: No files selected');
+                    return;
+                }
+
+                console.log(`ChatInterface: ${files.length} files selected`);
+
+                // Process each file
+                Array.from(files).forEach(file => {
+                    processUploadedFile(file);
+                });
+
+                // Clear the input so the same file can be selected again
+                fileInput.value = '';
+            });
+        }
+
+        // Function to process an uploaded file
+        function processUploadedFile(file) {
+            console.log(`ChatInterface: Processing file: ${file.name} (${file.type}, ${file.size} bytes)`);
+
+            // Generate a unique ID for the file
+            const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+            // Read the file as data URL
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const fileData = {
+                    id: fileId,
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: e.target.result,
+                    uploadDate: new Date().toISOString()
+                };
+
+                // Store file data in localStorage
+                try {
+                    localStorage.setItem(`file_${fileId}`, JSON.stringify({
+                        type: file.type,
+                        size: file.size,
+                        data: e.target.result
+                    }));
+
+                    // Get existing uploaded reports
+                    const uploadedReports = JSON.parse(localStorage.getItem('uploadedReports') || '[]');
+
+                    // Add this report to the list
+                    uploadedReports.push({
+                        id: fileId,
+                        name: file.name,
+                        size: file.size,
+                        uploadDate: new Date().toISOString()
+                    });
+
+                    // Save updated list
+                    localStorage.setItem('uploadedReports', JSON.stringify(uploadedReports));
+
+                    // Set flag that we have uploaded reports
+                    localStorage.setItem('jamBotHasUploadedReports', 'true');
+
+                    // Add to UI
+                    addFileToUI(fileId, file.name);
+
+                    console.log(`ChatInterface: File ${file.name} processed and stored successfully`);
+
+                    // Notify the user
+                    if (uploadedReports.length === 1) {
+                        // First file uploaded
+                        addBotMessage("I see you've uploaded your credit report. Would you like me to analyze it for potential dispute items?", [
+                            { text: "Yes, analyze my report", value: "analyze_reports" },
+                            { text: "No, I'll ask something else", value: "skip_analysis" }
+                        ]);
+                    } else if (uploadedReports.length > 1) {
+                        // Additional file uploaded
+                        addBotMessage(`Great! You've uploaded ${uploadedReports.length} credit reports. Would you like me to analyze them for potential dispute items?`, [
+                            { text: "Yes, analyze my reports", value: "analyze_reports" },
+                            { text: "No, I'll ask something else", value: "skip_analysis" }
+                        ]);
+                    }
+                } catch (error) {
+                    console.error('ChatInterface: Error storing file data:', error);
+
+                    // Check if it's a quota exceeded error
+                    if (error.name === 'QuotaExceededError' || error.message.includes('quota')) {
+                        addBotMessage("I couldn't store your file because the browser storage is full. Try clearing your browser data or using a different browser.");
+                    } else {
+                        addBotMessage("I encountered an error while processing your file. Please try again.");
+                    }
+                }
+            };
+
+            reader.onerror = function () {
+                console.error('ChatInterface: Error reading file:', reader.error);
+                addBotMessage("I couldn't read your file. Please try again with a different file.");
+            };
+
+            // Start reading the file
+            reader.readAsDataURL(file);
+        }
+
+        // Add this code to enhance the file upload functionality with debugging
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get file input element
+            const fileInput = document.getElementById('file-input');
+            const fileList = document.getElementById('file-list');
+
+            console.log('DEBUG: File input element found:', !!fileInput);
+            console.log('DEBUG: File list element found:', !!fileList);
+
+            if (fileInput) {
+                // Add event listener for file selection
+                fileInput.addEventListener('change', function (event) {
+                    console.log('DEBUG: File input change event triggered');
+                    console.log('DEBUG: Files selected:', event.target.files.length);
+
+                    // Process the selected files
+                    handleFileUpload(event.target.files);
+                });
+            } else {
+                console.error('DEBUG: File input element not found!');
+            }
+
+            // Add drag and drop support to the chat container
+            const chatContainer = document.querySelector('.chat-container');
+            if (chatContainer) {
+                console.log('DEBUG: Setting up drag and drop on chat container');
+
+                chatContainer.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('DEBUG: Drag over event on chat container');
+                    this.classList.add('drag-over');
+                });
+
+                chatContainer.addEventListener('dragleave', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('DEBUG: Drag leave event on chat container');
+                    this.classList.remove('drag-over');
+                });
+
+                chatContainer.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('DEBUG: Drop event on chat container');
+                    this.classList.remove('drag-over');
+
+                    if (e.dataTransfer.files.length > 0) {
+                        console.log('DEBUG: Files dropped:', e.dataTransfer.files.length);
+                        handleFileUpload(e.dataTransfer.files);
+                    }
+                });
+            }
+        });
+
+        // Function to handle file upload
+        function handleFileUpload(files) {
+            console.log('DEBUG: handleFileUpload called with', files.length, 'files');
+
+            // Convert FileList to Array for easier manipulation
+            const filesArray = Array.from(files);
+            console.log('DEBUG: Files array created with length:', filesArray.length);
+
+            // Process each file
+            filesArray.forEach((file, index) => {
+                console.log(`DEBUG: Processing file ${index + 1}/${filesArray.length}:`, file.name, file.type, file.size);
+
+                // Generate a unique ID for the file
+                const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                console.log('DEBUG: Generated file ID:', fileId);
+
+                // Read the file as data URL
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    console.log(`DEBUG: File ${file.name} loaded successfully`);
+
+                    try {
+                        // Store file data - use jamBotFile_ prefix for consistency
+                        localStorage.setItem(`jamBotFile_${fileId}`, JSON.stringify({
+                            name: file.name,
+                            type: file.type,
+                            data: e.target.result
+                        }));
+                        console.log(`DEBUG: File ${file.name} stored in localStorage with key: jamBotFile_${fileId}`);
+
+                        // Get existing uploaded reports or create new array - use jamBotUploadedReports for consistency
+                        const uploadedReports = JSON.parse(localStorage.getItem('jamBotUploadedReports') || '[]');
+                        console.log('DEBUG: Current uploaded reports:', uploadedReports.length);
+
+                        // Add new report to the array
+                        uploadedReports.push({
+                            id: fileId,
+                            name: file.name,
+                            size: file.size,
+                            uploadDate: new Date().toISOString()
+                        });
+
+                        // Save updated reports list
+                        localStorage.setItem('jamBotUploadedReports', JSON.stringify(uploadedReports));
+                        console.log('DEBUG: Updated uploaded reports saved to localStorage with key: jamBotUploadedReports');
+
+                        // Set flag that reports have been uploaded
+                        localStorage.setItem('jamBotHasUploadedReports', 'true');
+                        console.log('DEBUG: Set jamBotHasUploadedReports flag to true');
+
+                        // Add file to UI
+                        addFileToUI(fileId, file.name);
+                        console.log(`DEBUG: File ${file.name} added to UI`);
+
+                        // Always show the prompt after uploading a file
+                        console.log('DEBUG: Adding report analysis prompt');
+
+                        // Check if we already have this prompt in the chat
+                        const hasPrompt = Array.from(document.querySelectorAll('.message-content')).some(
+                            el => el.textContent.includes("I see you've uploaded your credit report")
+                        );
+
+                        if (!hasPrompt) {
+                            if (uploadedReports.length === 1) {
+                                addBotMessage(
+                                    "I see you've uploaded your credit report. Would you like me to analyze it to identify potential items to dispute?",
+                                    [
+                                        { text: "Yes, analyze my report", value: "analyze_reports" },
+                                        { text: "No, I'll ask something else", value: "skip_analysis" }
+                                    ]
+                                );
+                            } else {
+                                addBotMessage(
+                                    `I see you've uploaded ${uploadedReports.length} credit reports. Would you like me to analyze them to identify potential items to dispute?`,
+                                    [
+                                        { text: "Yes, analyze my reports", value: "analyze_reports" },
+                                        { text: "No, I'll ask something else", value: "skip_analysis" }
+                                    ]
+                                );
+                            }
+                        }
+                    } catch (error) {
+                        console.error('DEBUG: Error storing file data:', error);
+                        alert('Error uploading file: ' + error.message);
+                    }
+                };
+
+                reader.onerror = function () {
+                    console.error(`DEBUG: Error reading file ${file.name}`);
+                    alert('Error reading file: ' + file.name);
+                };
+
+                console.log(`DEBUG: Starting to read file ${file.name} as data URL`);
+                reader.readAsDataURL(file);
+            });
         }
     </script>
 </body>

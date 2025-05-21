@@ -196,6 +196,65 @@
             background: #09ccfc;
             color: white;
         }
+
+        /* Form Styles */
+        .Bot-form-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .Bot-dispute-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .Bot-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .Bot-form-group label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .Bot-form-group input,
+        .Bot-form-group textarea {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .Bot-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .Bot-form-submit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .Bot-form-submit:hover {
+            background-color: #0069d9;
+        }
+
+        .Bot-form-error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 
@@ -262,136 +321,56 @@
             // Function to initialize the module
             function init(container, parent) {
                 if (!container) {
-                    console.error('Container not provided to Chat module');
+                    console.error('Container element is required');
                     return false;
                 }
 
-                console.log('Initializing Chat module');
-
-                // Debug localStorage contents when chat tab becomes active
-                console.log('--- Chat Tab Activated: localStorage Debug ---');
-                debugLocalStorage();
-
-                // Check if this is a page refresh using sessionStorage
-                const pageLoadFlag = sessionStorage.getItem('jamBotChatPageLoaded');
-                console.log('Session pageLoadFlag:', pageLoadFlag);
-
-                if (!pageLoadFlag) {
-                    // This is a fresh page load (not just a tab switch)
-                    console.log('Fresh page load detected, clearing localStorage');
-
-                    // Clear all localStorage items related to the bot
-                    Object.keys(localStorage).forEach(key => {
-                        if (key.startsWith('jamBot')) {
-                            console.log('Clearing localStorage item:', key);
-                            localStorage.removeItem(key);
-                        }
-                    });
-
-                    // Clear chat messages
-                    chatMessages = [];
-
-                    // Set the flag to indicate page has been loaded in this session
-                    sessionStorage.setItem('jamBotChatPageLoaded', 'true');
+                // Set the parent module if provided
+                if (parent) {
+                    parentModule = parent;
                 }
 
-                // Store reference to parent module for communication
-                parentModule = parent;
+                // Check if this is a page refresh/new session
+                const isNewSession = !sessionStorage.getItem('jamBotSessionActive');
 
-                // Only initialize once
-                if (isInitialized) {
-                    console.log('Chat module already initialized');
-                    updateView(container);
-                    return true;
+                // If it's a new session, clear the chat history
+                if (isNewSession) {
+                    console.log('New session detected, clearing chat history');
+                    clearChatHistory();
+                    sessionStorage.setItem('jamBotSessionActive', 'true');
+                }
+
+                // Try to load saved messages
+                try {
+                    if (parentModule && typeof parentModule.getChatState === 'function') {
+                        const savedMessages = parentModule.getChatState();
+                        if (Array.isArray(savedMessages) && savedMessages.length > 0) {
+                            console.log('DEBUG: Using existing chat messages, count:', savedMessages.length);
+                            chatMessages = savedMessages;
+                        } else {
+                            console.log('DEBUG: No saved messages found, using default welcome message');
+                            // Add welcome message
+                            addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
+                        }
+                    } else {
+                        console.log('DEBUG: No parent module or getChatState function, using default welcome message');
+                        // Add welcome message
+                        addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
+                    }
+                } catch (e) {
+                    console.error('Error loading saved messages:', e);
+                    // Add welcome message as fallback
+                    addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
                 }
 
                 // Render the chat interface
                 renderChatInterface(container);
 
-                // Check for saved chat messages in localStorage
-                console.log('DEBUG: Checking jamBotChatMessages in localStorage');
-                const savedChatMessagesJson = localStorage.getItem('jamBotChatMessages');
-
-                if (savedChatMessagesJson) {
-                    try {
-                        const savedChatMessages = JSON.parse(savedChatMessagesJson);
-                        console.log('DEBUG: Found saved chat messages:', savedChatMessages.length);
-
-                        // Check for credit report message
-                        const hasReportMessage = savedChatMessages.some(msg =>
-                            msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")
-                        );
-                        console.log('DEBUG: Has report message in saved chat:', hasReportMessage);
-
-                        // Check if we have valid reports
-                        const hasReports = checkForUploadedReports();
-                        console.log('DEBUG: hasReports check result:', hasReports);
-
-                        // If we have report messages but no actual reports, filter them out
-                        if (hasReportMessage && !hasReports) {
-                            console.log('DEBUG: Filtering out report messages from localStorage');
-
-                            const originalLength = savedChatMessages.length;
-                            chatMessages = savedChatMessages.filter(msg => {
-                                // Filter out the "I see you've uploaded your credit reports" message
-                                // and any related user responses
-                                const shouldKeep = !(
-                                    (msg.type === 'bot' && msg.content.includes("I see you've uploaded your credit reports")) ||
-                                    (msg.type === 'user' && (
-                                        msg.content.includes("Yes, analyze my reports") ||
-                                        msg.content.includes("No, I'll ask something else")
-                                    ))
-                                );
-
-                                if (!shouldKeep) {
-                                    console.log('DEBUG: Filtering out message:', msg.content.substring(0, 50) + '...');
-                                }
-
-                                return shouldKeep;
-                            });
-
-                            console.log('DEBUG: Filtered chat messages from', originalLength, 'to', chatMessages.length);
-
-                            // Save the filtered messages back to localStorage
-                            localStorage.setItem('jamBotChatMessages', JSON.stringify(chatMessages));
-                            console.log('DEBUG: Saved filtered messages back to localStorage');
-                        } else {
-                            // Just use the saved messages as is
-                            chatMessages = savedChatMessages;
-                        }
-                    } catch (e) {
-                        console.error('DEBUG: Error parsing saved chat messages:', e);
-                        chatMessages = [];
-                    }
-                } else {
-                    console.log('DEBUG: No saved chat messages found in localStorage');
-                }
-
-                // Restore saved state from parent module if available and we don't have messages yet
-                if (chatMessages.length === 0 && parentModule && typeof parentModule.getChatState === 'function') {
-                    const savedMessages = parentModule.getChatState();
-                    console.log('DEBUG: Got savedMessages from parent module:', savedMessages ? savedMessages.length : 0);
-
-                    if (Array.isArray(savedMessages) && savedMessages.length > 0) {
-                        console.log('Restoring saved chat state from parent module, messages count:', savedMessages.length);
-                        chatMessages = savedMessages;
-                    }
-                }
-
-                // If there are no messages, add the welcome message
-                if (chatMessages.length === 0) {
-                    console.log('No chat messages, adding welcome message');
-
-                    // First add the general welcome message
-                    addBotMessage("Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?");
-
-                    // Then check if reports have been uploaded
-                    const hasUploadedReports = checkForUploadedReports();
-                    console.log('hasUploadedReports result:', hasUploadedReports);
-
-                    if (hasUploadedReports) {
-                        console.log('Adding report analysis prompt');
-                        // Add the report analysis prompt as the second message
+                // Check if reports have been uploaded
+                if (checkForUploadedReports()) {
+                    console.log('Reports found, adding analysis prompt');
+                    // Add the report analysis prompt if not already present
+                    if (!chatMessages.some(msg => msg.content.includes("Would you like me to analyze them"))) {
                         addBotMessageWithButtons(
                             "I see you've uploaded your credit reports. Would you like me to analyze them for potential items to dispute?",
                             [
@@ -400,18 +379,11 @@
                             ]
                         );
                     }
-                } else {
-                    console.log('DEBUG: Using existing chat messages, count:', chatMessages.length);
                 }
 
-                // Set up event listeners
-                setupEventListeners(container);
+                // Add form styles
+                addFormStyles();
 
-                // Update messages display
-                updateMessagesDisplay(container);
-
-                // Mark as initialized
-                isInitialized = true;
                 return true;
             }
 
@@ -517,12 +489,32 @@
                         message.toLowerCase().includes('analyze') ||
                         message.toLowerCase().includes('check my reports'));
 
+                // Check if this is a response about wanting to dispute items
+                const isDisputeConfirmation =
+                    message.toLowerCase().includes('yes') &&
+                    message.toLowerCase().includes('dispute') ||
+                    message.toLowerCase() === 'yes' ||
+                    message.toLowerCase().includes('generate letter') ||
+                    message.toLowerCase().includes('create letter');
+
+                // Check if user is selecting a specific item to dispute
+                const isItemSelection = message.toLowerCase().includes('item') &&
+                    (message.toLowerCase().includes('dispute') || /\d+/.test(message));
+
                 // Notify parent module if available
                 if (parentModule && typeof parentModule.onChatMessage === 'function') {
                     // If this is a confirmation to analyze reports, send a special message
-                    const processPromise = isAnalysisConfirmation
-                        ? parentModule.onChatMessage('__ANALYZE_CREDIT_REPORTS__')
-                        : parentModule.onChatMessage(message);
+                    let processPromise;
+
+                    if (isAnalysisConfirmation) {
+                        processPromise = parentModule.onChatMessage('__ANALYZE_CREDIT_REPORTS__');
+                    } else if (isDisputeConfirmation) {
+                        processPromise = parentModule.onChatMessage('__GENERATE_DISPUTE_LETTER__');
+                    } else if (isItemSelection) {
+                        processPromise = parentModule.onChatMessage(`__SELECT_DISPUTE_ITEM__:${message}`);
+                    } else {
+                        processPromise = parentModule.onChatMessage(message);
+                    }
 
                     processPromise
                         .then(response => {
@@ -531,6 +523,32 @@
 
                             // Add bot response
                             addBotMessage(response);
+
+                            // If this was a dispute confirmation, offer item selection
+                            if (isDisputeConfirmation) {
+                                // Get the last analysis from localStorage
+                                const lastAnalysis = JSON.parse(localStorage.getItem('jamBotLastAnalysis') || '{}');
+
+                                if (lastAnalysis && lastAnalysis.analysis) {
+                                    // Extract potential items to dispute from the analysis
+                                    const items = extractDisputeItemsFromAnalysis(lastAnalysis.analysis);
+
+                                    if (items.length > 0) {
+                                        // Add a message with the items to select
+                                        const itemsMessage = formatDisputeItemsForSelection(items);
+                                        addBotMessage(itemsMessage);
+                                    } else {
+                                        addBotMessage("I couldn't identify specific items from the analysis. Please tell me which item you'd like to dispute.");
+                                    }
+                                } else {
+                                    addBotMessage("Please specify which item from the analysis you'd like to dispute.");
+                                }
+                            }
+
+                            // If this was an item selection, offer to generate a letter
+                            if (isItemSelection) {
+                                addBotMessage("Great! I'll help you create a dispute letter for this item. Do you want to include any additional details about this dispute?");
+                            }
 
                             // Update messages display
                             updateMessagesDisplay(container);
@@ -560,9 +578,18 @@
                         // Remove typing indicator
                         hideTypingIndicator(container);
 
-                        // Add bot response based on whether this is an analysis confirmation
+                        // Add bot response based on message type
                         if (isAnalysisConfirmation) {
                             addBotMessage("I'm analyzing your credit reports now. I'll look for potential items to dispute such as late payments, collections, and accounts that may not belong to you. This analysis will help us identify the best items to focus on for improving your credit score.");
+                        } else if (isDisputeConfirmation) {
+                            const disputeOptions = "Based on the analysis, here are items you could dispute:\n\n" +
+                                "1. Late payment on Capital One account from March 2023\n" +
+                                "2. Collection account from ABC Collections ($450)\n" +
+                                "3. Incorrect address information\n\n" +
+                                "Which item would you like to dispute? (Please specify by number or description)";
+                            addBotMessage(disputeOptions);
+                        } else if (isItemSelection) {
+                            addBotMessage("Great choice. I'll help you create a dispute letter for this item. Would you like to include any additional details about why you're disputing this item?");
                         } else {
                             addBotMessage("I'm here to help with credit repair questions. What specific information are you looking for?");
                         }
@@ -573,6 +600,78 @@
                         isProcessingMessage = false;
                     }, 1500);
                 }
+            }
+
+            // Function to extract dispute items from analysis text
+            function extractDisputeItemsFromAnalysis(analysisText) {
+                if (!analysisText) return [];
+
+                const items = [];
+                const lines = analysisText.split('\n');
+
+                // Look for numbered items in the analysis
+                let currentItem = null;
+                let itemNumber = null;
+                let itemContent = '';
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+
+                    // Check for numbered items (e.g., "1. Item name")
+                    const numberMatch = line.match(/^(\d+)\.\s+(.+)/);
+
+                    if (numberMatch) {
+                        // If we were already collecting an item, save it
+                        if (currentItem !== null && itemContent) {
+                            items.push({
+                                id: currentItem,
+                                title: lines[currentItem].replace(/^\d+\.\s+/, '').trim(),
+                                content: itemContent.trim()
+                            });
+                        }
+
+                        // Start a new item
+                        currentItem = i;
+                        itemNumber = numberMatch[1];
+                        itemContent = line + '\n';
+                    }
+                    // Continue collecting content for the current item
+                    else if (currentItem !== null) {
+                        itemContent += line + '\n';
+
+                        // Check if we've reached the next numbered item or the end
+                        const nextNumberMatch = (i < lines.length - 1) ?
+                            lines[i + 1].trim().match(/^(\d+)\.\s+/) : null;
+
+                        if (nextNumberMatch || i === lines.length - 1) {
+                            items.push({
+                                id: currentItem,
+                                title: lines[currentItem].replace(/^\d+\.\s+/, '').trim(),
+                                content: itemContent.trim()
+                            });
+
+                            if (nextNumberMatch) {
+                                currentItem = null;
+                                itemContent = '';
+                            }
+                        }
+                    }
+                }
+
+                return items;
+            }
+
+            // Function to format dispute items for selection
+            function formatDisputeItemsForSelection(items) {
+                let message = "Based on the analysis, here are items you could dispute:\n\n";
+
+                items.forEach((item, index) => {
+                    message += `${index + 1}. ${item.title}\n${item.content}\n\n`;
+                });
+
+                message += "\nWhich item would you like to dispute? (Please specify by number or description)";
+
+                return message;
             }
 
             // Function to add a user message
@@ -750,6 +849,15 @@
                             // Add bot response with the analysis results
                             addBotMessage(response);
 
+                            // Add follow-up question with buttons
+                            addBotMessageWithButtons(
+                                "Would you like to dispute any of these items? I can help you generate a dispute letter.",
+                                [
+                                    { text: "Yes, help me dispute", value: "start_dispute" },
+                                    { text: "No, just browsing", value: "skip_dispute" }
+                                ]
+                            );
+
                             // Update messages display
                             updateMessagesDisplay(container);
 
@@ -780,9 +888,529 @@
                     // Add bot response
                     addBotMessage("No problem! I'm here to help with any credit repair questions you have. Feel free to ask me anything about credit repair, dispute strategies, or how to improve your credit score.");
 
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
                     // Save chat state
                     saveState();
+                } else if (value === 'start_dispute') {
+                    handleStartDispute(container);
+                } else if (value === 'skip_dispute') {
+                    console.log('User clicked to skip dispute process');
+
+                    // Add user message
+                    addUserMessage("No, just browsing");
+
+                    // Add bot response
+                    addBotMessage("No problem! If you change your mind or have any questions about the items in your report, feel free to ask. I'm here to help with any credit repair questions you have.");
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+                } else if (value.startsWith('dispute_item_')) {
+                    // Extract the item ID from the button value
+                    const itemId = parseInt(value.replace('dispute_item_', ''));
+
+                    // Get the last analysis from localStorage
+                    const lastAnalysis = JSON.parse(localStorage.getItem('jamBotLastAnalysis') || '{}');
+                    const analysisText = lastAnalysis.formattedAnalysis || lastAnalysis.analysis || lastAnalysis.detailedAnalysis;
+
+                    // Extract dispute items from the analysis
+                    const disputeItems = extractDisputeItemsFromAnalysis(analysisText);
+
+                    // Find the selected item
+                    const selectedItem = disputeItems.find(item => item.id === itemId);
+
+                    if (selectedItem) {
+                        // Add user message with the selected item
+                        addUserMessage(`I want to dispute: ${selectedItem.title}`);
+
+                        // Store the selected item for later use
+                        localStorage.setItem('jamBotSelectedDisputeItem', selectedItem.title);
+                        localStorage.setItem('jamBotSelectedDisputeItemContent', selectedItem.content);
+
+                        // Ask how the user wants to proceed with the dispute
+                        addBotMessageWithButtons(
+                            `You've selected to dispute: **${selectedItem.title}**\n\n${selectedItem.content}\n\nWould you like to add your own details about why this item should be disputed, or use standard dispute reasons?`,
+                            [
+                                { text: "I'll add details", value: "custom_dispute" },
+                                { text: "Use standard reasons", value: "standard_dispute" }
+                            ]
+                        );
+
+                        // Update messages display
+                        updateMessagesDisplay(container);
+
+                        // Save chat state
+                        saveState();
+                    } else {
+                        console.error('Selected item not found');
+                        addBotMessage("I couldn't find the item you selected. Please try again.");
+                        updateMessagesDisplay(container);
+                        saveState();
+                    }
+                } else if (value === 'standard_dispute') {
+                    console.log('User chose standard dispute reasons');
+
+                    // Add user message
+                    addUserMessage("No, just use standard reasons");
+
+                    // Get the selected dispute item
+                    const selectedItem = localStorage.getItem('jamBotSelectedDisputeItem');
+
+                    // Add bot response
+                    addBotMessage(`I'll generate a dispute letter using standard reasons for: "${selectedItem}". Please provide your personal information so I can include it in the letter.`);
+
+                    // Ask for user information with a structured form
+                    addBotMessageWithButtons(
+                        "What information would you like to include in the letter?",
+                        [
+                            { text: "Use my profile information", value: "use_profile_info" },
+                            { text: "I'll enter my information", value: "enter_custom_info" }
+                        ]
+                    );
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+                } else if (value === 'custom_dispute') {
+                    console.log('User wants to add custom dispute details');
+
+                    // Add user message
+                    addUserMessage("Yes, I'll add details");
+
+                    // Add bot response
+                    addBotMessage("Please provide any additional details about why you're disputing this item. This will help me create a more personalized dispute letter.");
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+                } else if (value === 'use_profile_info' || value === 'enter_custom_info') {
+                    console.log('User selected information source:', value);
+
+                    // Add user message
+                    addUserMessage(value === 'use_profile_info' ? "Use my profile information" : "I'll enter my information");
+
+                    // Get the selected dispute item
+                    const selectedItem = localStorage.getItem('jamBotSelectedDisputeItem');
+
+                    if (value === 'use_profile_info') {
+                        // In a real implementation, you would fetch the user's profile information here
+                        // For now, we'll simulate this
+
+                        // Add bot response
+                        addBotMessage("Great! I'll use your profile information to generate the dispute letter.");
+
+                        // Show typing indicator to simulate letter generation
+                        showTypingIndicator(container);
+
+                        // Simulate letter generation delay
+                        setTimeout(() => {
+                            // Hide typing indicator
+                            hideTypingIndicator(container);
+
+                            // Add the generated letter
+                            const sampleLetter = generateSampleDisputeLetter(selectedItem);
+                            addLetterOptionsButtons(container, sampleLetter);
+                        }, 2000);
+                    } else {
+                        // Ask for user information
+                        addBotMessage("Please provide the following information for your dispute letter:\n\n1. Your full name\n2. Your address\n3. Your phone number\n4. Your email address\n\nYou can enter this information in a single message.");
+
+                        // Update messages display
+                        updateMessagesDisplay(container);
+
+                        // Save chat state
+                        saveState();
+                    }
+                } else if (value === 'download_letter') {
+                    console.log('User clicked to download letter');
+
+                    // Add user message
+                    addUserMessage("Download this letter");
+
+                    // Get the letter from localStorage
+                    const letterContent = localStorage.getItem('jamBotDisputeLetter');
+
+                    if (letterContent) {
+                        // Download the letter
+                        downloadDisputeLetter(letterContent);
+
+                        // Add bot response
+                        addBotMessage("I've prepared your dispute letter for download. Is there anything else you'd like help with?");
+                    } else {
+                        // Add error message
+                        addBotMessage("I'm sorry, I couldn't find your dispute letter. Would you like me to generate a new one?", [
+                            { text: "Generate new letter", value: "new_letter" }
+                        ]);
+                    }
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+                } else if (value === 'view_all_letters') {
+                    console.log('User clicked to view all dispute letters');
+
+                    // Add user message
+                    addUserMessage("View all dispute letters");
+
+                    // Add bot response
+                    addBotMessage("I'll take you to your saved dispute letters where you can view, download, or manage them.");
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+
+                    // Navigate to the Letters tab
+                    navigateToLettersTab();
+                } else if (value === 'new_letter') {
+                    console.log('User clicked to generate a new letter');
+
+                    // Add user message
+                    addUserMessage("Generate a new letter");
+
+                    // Add bot response
+                    addBotMessageWithButtons(
+                        "I'd be happy to generate a new dispute letter for you. Would you like to dispute a different item or use different information for the same item?",
+                        [
+                            { text: "Dispute different item", value: "start_dispute" },
+                            { text: "Same item, different info", value: "same_item_new_info" }
+                        ]
+                    );
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+                } else if (value === 'same_item_new_info') {
+                    console.log('User wants to use same item with different info');
+
+                    // Add user message
+                    addUserMessage("Same item, different info");
+
+                    // Get the selected dispute item
+                    const selectedItem = localStorage.getItem('jamBotSelectedDisputeItem');
+
+                    if (selectedItem) {
+                        // Add bot response
+                        addBotMessageWithButtons(
+                            `I'll create a new dispute letter for: "${selectedItem}". How would you like to provide your information?`,
+                            [
+                                { text: "Use my profile information", value: "use_profile_info" },
+                                { text: "I'll enter my information", value: "enter_custom_info" }
+                            ]
+                        );
+                    } else {
+                        // Add error message
+                        addBotMessage("I couldn't find the item you were disputing. Let's start over.", [
+                            { text: "Start over", value: "start_dispute" }
+                        ]);
+                    }
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+                } else if (value === 'enter_custom_info') {
+                    console.log('User wants to enter custom information');
+
+                    // Add user message
+                    addUserMessage("I'll enter my information");
+
+                    // Create a form for user information
+                    const formHtml = `
+                        <div class="Bot-form-container">
+                            <h3>Please enter your information</h3>
+                            <form id="disputeInfoForm" class="Bot-dispute-form">
+                                <div class="Bot-form-group">
+                                    <label for="fullName">Full Name:</label>
+                                    <input type="text" id="fullName" name="fullName" required>
+                                </div>
+                                <div class="Bot-form-group">
+                                    <label for="address">Address:</label>
+                                    <textarea id="address" name="address" rows="3" required></textarea>
+                                </div>
+                                <div class="Bot-form-group">
+                                    <label for="phone">Phone Number:</label>
+                                    <input type="tel" id="phone" name="phone" required>
+                                </div>
+                                <div class="Bot-form-group">
+                                    <label for="email">Email Address:</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                                <div class="Bot-form-group">
+                                    <label for="ssn">Last 4 of SSN:</label>
+                                    <input type="text" id="ssn" name="ssn" maxlength="4" pattern="[0-9]{4}" required>
+                                </div>
+                                <div class="Bot-form-actions">
+                                    <button type="submit" class="Bot-form-submit">Submit Information</button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+
+                    // Add the form as a bot message
+                    addBotMessage(formHtml);
+
+                    // Update messages display
+                    updateMessagesDisplay(container);
+
+                    // Save chat state
+                    saveState();
+
+                    // Add event listener for form submission
+                    setTimeout(() => {
+                        const form = container.querySelector('#disputeInfoForm');
+                        if (form) {
+                            form.addEventListener('submit', function (event) {
+                                event.preventDefault();
+
+                                // Get form data
+                                const formData = {
+                                    fullName: form.fullName.value.trim(),
+                                    address: form.address.value.trim(),
+                                    phone: form.phone.value.trim(),
+                                    email: form.email.value.trim(),
+                                    ssn: form.ssn.value.trim()
+                                };
+
+                                // Validate form data
+                                if (!formData.fullName || !formData.address || !formData.phone ||
+                                    !formData.email || !formData.ssn) {
+                                    // Show error message
+                                    const errorDiv = document.createElement('div');
+                                    errorDiv.className = 'Bot-form-error';
+                                    errorDiv.textContent = 'Please fill out all fields.';
+                                    form.appendChild(errorDiv);
+                                    return;
+                                }
+
+                                // Store user information
+                                localStorage.setItem('jamBotUserInfo', JSON.stringify(formData));
+
+                                // Remove the form
+                                const formContainer = form.closest('.Bot-message-content');
+                                if (formContainer) {
+                                    formContainer.innerHTML = '<p>Thank you for providing your information.</p>';
+                                }
+
+                                // Get the selected dispute item
+                                const selectedItem = localStorage.getItem('jamBotSelectedDisputeItem');
+
+                                // Show typing indicator
+                                showTypingIndicator(container);
+
+                                // Simulate letter generation delay
+                                setTimeout(() => {
+                                    // Hide typing indicator
+                                    hideTypingIndicator(container);
+
+                                    // Add the generated letter with the user's information
+                                    const sampleLetter = generateDisputeLetterWithUserInfo(selectedItem, formData);
+                                    addLetterOptionsButtons(container, sampleLetter);
+                                }, 2000);
+                            });
+                        }
+                    }, 100);
                 }
+            }
+
+            // Function to download the dispute letter as PDF
+            function downloadDisputeLetter(letterContent) {
+                // We'll use jsPDF library to generate the PDF
+                // First, check if jsPDF is already loaded
+                if (typeof jsPDF === 'undefined') {
+                    // If not loaded, dynamically load the required libraries
+                    loadPdfLibraries()
+                        .then(() => {
+                            generateAndDownloadPdf(letterContent);
+                        })
+                        .catch(error => {
+                            console.error('Error loading PDF libraries:', error);
+                            // Fallback to text download if PDF generation fails
+                            downloadDisputeLetterAsText(letterContent);
+                        });
+                } else {
+                    // jsPDF is already loaded, generate the PDF directly
+                    generateAndDownloadPdf(letterContent);
+                }
+            }
+
+            // Function to load PDF libraries dynamically
+            function loadPdfLibraries() {
+                return new Promise((resolve, reject) => {
+                    // Load jsPDF library
+                    const jsPdfScript = document.createElement('script');
+                    jsPdfScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                    jsPdfScript.onload = () => {
+                        // After jsPDF is loaded, load html2canvas
+                        const html2canvasScript = document.createElement('script');
+                        html2canvasScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                        html2canvasScript.onload = resolve;
+                        html2canvasScript.onerror = reject;
+                        document.head.appendChild(html2canvasScript);
+                    };
+                    jsPdfScript.onerror = reject;
+                    document.head.appendChild(jsPdfScript);
+                });
+            }
+
+            // Function to generate and download the PDF
+            function generateAndDownloadPdf(letterContent) {
+                try {
+                    // Create a temporary div to render the letter content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.className = 'dispute-letter-container';
+                    tempDiv.style.width = '8.5in';
+                    tempDiv.style.padding = '1in';
+                    tempDiv.style.backgroundColor = 'white';
+                    tempDiv.style.color = 'black';
+                    tempDiv.style.fontFamily = 'Arial, sans-serif';
+                    tempDiv.style.fontSize = '12pt';
+                    tempDiv.style.lineHeight = '1.5';
+
+                    // Convert markdown to HTML
+                    tempDiv.innerHTML = convertMarkdownToHtml(letterContent);
+
+                    // Append to body temporarily (needed for html2canvas to work)
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.left = '-9999px';
+                    document.body.appendChild(tempDiv);
+
+                    // Use html2canvas to capture the rendered letter
+                    html2canvas(tempDiv, {
+                        scale: 2, // Higher scale for better quality
+                        useCORS: true,
+                        logging: false
+                    }).then(canvas => {
+                        // Create PDF with jsPDF
+                        const pdf = new jspdf.jsPDF({
+                            orientation: 'portrait',
+                            unit: 'in',
+                            format: 'letter' // 8.5 x 11 inches
+                        });
+
+                        // Add the canvas as an image to the PDF
+                        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                        pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 11);
+
+                        // Save the PDF
+                        pdf.save('Dispute_Letter.pdf');
+
+                        // Clean up
+                        document.body.removeChild(tempDiv);
+                    });
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    // Fallback to text download if PDF generation fails
+                    downloadDisputeLetterAsText(letterContent);
+                }
+            }
+
+            // Fallback function to download as text if PDF generation fails
+            function downloadDisputeLetterAsText(letterContent) {
+                console.warn('Falling back to text download');
+
+                // Create a blob with the letter content
+                const blob = new Blob([letterContent], { type: 'text/plain' });
+
+                // Create a URL for the blob
+                const url = URL.createObjectURL(blob);
+
+                // Create a temporary link element
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Dispute_Letter.txt';
+
+                // Append the link to the body
+                document.body.appendChild(a);
+
+                // Trigger the download
+                a.click();
+
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+
+            // Function to convert markdown to HTML
+            function convertMarkdownToHtml(markdown) {
+                // Basic markdown to HTML conversion
+                let html = markdown
+                    // Convert headers
+                    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+
+                    // Convert bold text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+
+                    // Convert italic text
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+
+                    // Convert line breaks
+                    .replace(/\n/g, '<br>');
+
+                return html;
+            }
+
+            // Helper function to generate a sample dispute letter (for demonstration)
+            function generateSampleDisputeLetter(item) {
+                const currentDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                return `
+# DISPUTE LETTER
+
+${currentDate}
+
+John Doe
+123 Main Street
+Anytown, CA 12345
+Phone: (555) 555-5555
+Email: johndoe@example.com
+
+Equifax Information Services LLC
+P.O. Box 740256
+Atlanta, GA 30374
+
+**RE: Dispute of Inaccurate Information in Credit Report**
+
+To Whom It May Concern:
+
+I am writing to dispute the following information in my credit report:
+
+**Item: ${item}**
+
+Under the Fair Credit Reporting Act, Section 611(a), I am requesting that you investigate this matter and remove this inaccurate information from my credit report.
+
+This item is inaccurate because [standard dispute reason based on item type]. I request that you verify this information with the furnisher and update my credit report accordingly.
+
+Please investigate this matter and remove or correct the disputed information to ensure my credit report is accurate and complete. If you verify this information, please provide me with copies of any documentation used in your investigation.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+
+John Doe
+`;
             }
 
             // Function to get report files from localStorage
@@ -828,7 +1456,7 @@
                     const formData = new FormData();
 
                     // Add each file to the FormData
-                    reportFiles.forEach((file, index) => {
+                    reportFiles.forEach((file) => {
                         // Convert base64 data to a Blob
                         const byteCharacters = atob(file.data.split(',')[1]);
                         const byteArrays = [];
@@ -840,22 +1468,46 @@
                         const byteArray = new Uint8Array(byteArrays);
                         const blob = new Blob([byteArray], { type: file.type });
 
-                        // Add the blob to FormData
-                        formData.append(`file${index}`, blob, file.name);
+                        // Add the blob to FormData - use 'file' as the field name to match backend
+                        formData.append('file', blob, file.name);
                     });
 
-                    // Send the request to your backend
-                    const response = await fetch('/api/chatGptService/analyzeReports', {
+                    console.log('Sending request to backend...');
+                    const response = await fetch('http://localhost:3000/api/chatGptService/analyzeReports', {
                         method: 'POST',
                         body: formData
                     });
 
+                    console.log('Response status:', response.status);
+
                     if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Server error response:', errorText);
                         throw new Error(`Server responded with status: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    return data.analysis || "I've analyzed your credit reports and found several items that could potentially be disputed. Would you like me to explain the specific items I found?";
+                    console.log('Response data:', data);
+
+                    // Store the analysis data for later use
+                    localStorage.setItem('jamBotLastAnalysis', JSON.stringify(data));
+
+                    // Format the response for the chat
+                    let analysisResponse = "";
+
+                    if (data.formattedAnalysis) {
+                        analysisResponse = data.formattedAnalysis;
+                    } else if (data.analysis) {
+                        analysisResponse = data.analysis;
+                    } else if (data.detailedAnalysis) {
+                        analysisResponse = data.detailedAnalysis;
+                    } else {
+                        analysisResponse = "I've analyzed your credit reports and found several items that could potentially be disputed.";
+                    }
+
+                    // We'll return just the analysis without the follow-up question
+                    // The follow-up with buttons will be added separately
+                    return analysisResponse;
                 } catch (error) {
                     console.error('Error in sendReportsForAnalysis:', error);
                     throw error;
@@ -950,6 +1602,235 @@
                 }
             }
 
+            // Function to clear chat history but keep welcome message
+            function clearChatHistory() {
+                console.log('Clearing chat history');
+
+                // Clear localStorage items related to chat
+                localStorage.removeItem('jamBotChatMessages');
+                localStorage.removeItem('jamBotLastAnalysis');
+                localStorage.removeItem('jamBotSelectedDisputeItem');
+                localStorage.removeItem('jamBotDisputeLetter');
+
+                // Reset chat messages to just the welcome message
+                chatMessages = [{
+                    type: 'bot',
+                    content: "Hi there! I'm your JAM AI assistant. How can I help you with credit repair today?"
+                }];
+
+                // Save the reset state
+                saveState();
+
+                console.log('Chat history cleared, reset to welcome message');
+            }
+
+            // Function to handle the start_dispute button click
+            function handleStartDispute(container) {
+                console.log('User clicked to start dispute process');
+
+                // Add user message
+                addUserMessage("Yes, help me dispute");
+
+                // Get the last analysis from localStorage
+                const lastAnalysis = JSON.parse(localStorage.getItem('jamBotLastAnalysis') || '{}');
+
+                if (!lastAnalysis || (!lastAnalysis.analysis && !lastAnalysis.formattedAnalysis && !lastAnalysis.detailedAnalysis)) {
+                    console.error('No analysis data found');
+                    addBotMessage("I couldn't find your credit report analysis. Let's analyze your reports first.");
+                    updateMessagesDisplay(container);
+                    saveState();
+                    return;
+                }
+
+                // Get the analysis text from the response
+                const analysisText = lastAnalysis.formattedAnalysis || lastAnalysis.analysis || lastAnalysis.detailedAnalysis;
+
+                // Extract dispute items from the analysis
+                const disputeItems = extractDisputeItemsFromAnalysis(analysisText);
+
+                if (disputeItems.length === 0) {
+                    console.log('No dispute items found in analysis');
+                    addBotMessage("I couldn't identify specific items to dispute from your credit report analysis. Would you like me to help you create a custom dispute letter instead?", [
+                        { text: "Create custom letter", value: "create_custom_letter" },
+                        { text: "Analyze reports again", value: "analyze_reports" }
+                    ]);
+                } else {
+                    console.log(`Found ${disputeItems.length} dispute items`);
+
+                    // Create buttons for each dispute item
+                    const buttons = disputeItems.map((item, index) => ({
+                        text: `Item ${index + 1}`,
+                        value: `dispute_item_${item.id}`
+                    }));
+
+                    // Format the dispute items for display
+                    let itemsMessage = "Great! Please select which item you'd like to dispute:\n\n";
+
+                    disputeItems.forEach((item, index) => {
+                        itemsMessage += `**Item ${index + 1}:** ${item.title}\n${item.content}\n\n`;
+                    });
+
+                    // Add the message with the formatted items and buttons
+                    addBotMessageWithButtons(itemsMessage, buttons);
+                }
+
+                // Update messages display
+                updateMessagesDisplay(container);
+
+                // Save chat state
+                saveState();
+            }
+
+            // Function to generate a dispute letter with user information
+            function generateDisputeLetterWithUserInfo(item, userInfo) {
+                const currentDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                return `
+# DISPUTE LETTER
+
+${currentDate}
+
+${userInfo.fullName}
+${userInfo.address}
+Phone: ${userInfo.phone}
+Email: ${userInfo.email}
+Last 4 of SSN: ${userInfo.ssn}
+
+Equifax Information Services LLC
+P.O. Box 740256
+Atlanta, GA 30374
+
+**RE: Dispute of Inaccurate Information in Credit Report**
+
+To Whom It May Concern:
+
+I am writing to dispute the following information in my credit report:
+
+**Item: ${item}**
+
+Under the Fair Credit Reporting Act, Section 611(a), I am requesting that you investigate this matter and remove this inaccurate information from my credit report.
+
+This item is inaccurate because [standard dispute reason based on item type]. I request that you verify this information with the furnisher and update my credit report accordingly.
+
+Please investigate this matter and remove or correct the disputed information to ensure my credit report is accurate and complete. If you verify this information, please provide me with copies of any documentation used in your investigation.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+
+${userInfo.fullName}
+`;
+            }
+
+            // Add CSS styles for the form
+            function addFormStyles() {
+                const styleElement = document.createElement('style');
+                styleElement.textContent = `
+                    .Bot-form-container {
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        padding: 15px;
+                        margin-top: 10px;
+                    }
+                    
+                    .Bot-dispute-form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 12px;
+                    }
+                    
+                    .Bot-form-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+                    
+                    .Bot-form-group label {
+                        font-weight: bold;
+                        font-size: 14px;
+                    }
+                    
+                    .Bot-form-group input,
+                    .Bot-form-group textarea {
+                        padding: 8px;
+                        border: 1px solid #ced4da;
+                        border-radius: 4px;
+                        font-size: 14px;
+                    }
+                    
+                    .Bot-form-actions {
+                        display: flex;
+                        justify-content: flex-end;
+                        margin-top: 10px;
+                    }
+                    
+                    .Bot-form-submit {
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        padding: 8px 16px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    }
+                    
+                    .Bot-form-submit:hover {
+                        background-color: #0069d9;
+                    }
+                    
+                    .Bot-form-error {
+                        color: #dc3545;
+                        font-size: 14px;
+                        margin-top: 8px;
+                    }
+                `;
+
+                document.head.appendChild(styleElement);
+            }
+
+            // Function to navigate to the Letters tab
+            function navigateToLettersTab() {
+                // Check if the parent module (JamTipBotModule) is available
+                if (window.jamTipBot && typeof window.jamTipBot.switchTab === 'function') {
+                    // Use the switchTab function to navigate to the letters tab
+                    window.jamTipBot.switchTab('letters');
+                } else {
+                    console.error('Cannot navigate to Letters tab: jamTipBot module not available');
+                }
+            }
+
+            // Function to update the letter options to include "View all dispute letters"
+            function addLetterOptionsButtons(container, letterContent) {
+                // Hide typing indicator
+                hideTypingIndicator(container);
+
+                // Add the generated letter
+                addBotMessage(letterContent);
+
+                // Store the letter for download
+                localStorage.setItem('jamBotDisputeLetter', letterContent);
+
+                // Add follow-up options with the new "View all dispute letters" button
+                addBotMessageWithButtons(
+                    "Here's your dispute letter. What would you like to do next?",
+                    [
+                        { text: "Download this letter", value: "download_letter" },
+                        { text: "Generate a new letter", value: "new_letter" },
+                        { text: "View all dispute letters", value: "view_all_letters" }
+                    ]
+                );
+
+                // Update messages display
+                updateMessagesDisplay(container);
+
+                // Save chat state
+                saveState();
+            }
+
             // Public API
             return {
                 init: init,
@@ -1020,6 +1901,12 @@
 
         // Dispatch event when loaded
         window.dispatchEvent(new Event('chatModuleLoaded'));
+
+        // Add event listener for page unload to mark session as ended
+        window.addEventListener('beforeunload', function () {
+            // Remove the session active flag when the page is unloaded
+            sessionStorage.removeItem('jamBotSessionActive');
+        });
     </script>
 </body>
 
