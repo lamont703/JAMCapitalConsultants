@@ -47,14 +47,22 @@ export async function generateDisputeLetter(disputeDetails) {
     creditorName, 
     accountNumber, 
     issueDescription,
-    userInfo
+    userInfo,
+    creditorInfo,
+    currentDate
   } = disputeDetails;
   
-  let prompt = `Generate a professional dispute letter for a ${disputeType} issue with ${creditorName} (account ending in ${accountNumber}). 
+  let prompt = `Generate a professional dispute letter for a ${disputeType} issue with ${creditorName} (account ending in ${accountNumber}).
   
 Issue details: ${issueDescription}
 
-The letter should follow JAM Capital Consultants' dispute framework, reference relevant FCRA sections, and be formatted as a proper business letter with placeholders for the user's information.`;
+${userInfo || ''}
+
+${creditorInfo || ''}
+
+${currentDate || ''}
+
+The letter should follow JAM Capital Consultants' dispute framework, reference relevant FCRA sections, and be formatted as a proper business letter with the user's information included above. Include the current date, sender's information, recipient's information, subject line, salutation, body, closing, and signature.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -62,7 +70,7 @@ The letter should follow JAM Capital Consultants' dispute framework, reference r
       messages: [
         {
           role: "system",
-          content: "You are JAM Dispute Bot — a friendly, knowledgeable AI assistant trained in U.S. consumer credit law, dispute best practices, and the proprietary methodology of JAM Capital Consultants. Your task is to generate professional, legally sound dispute letters based on JAM's expert principles."
+          content: "You are JAM Dispute Bot — a friendly, knowledgeable AI assistant trained in U.S. consumer credit law, dispute best practices, and the proprietary methodology of JAM Capital Consultants. Your task is to generate professional, legally sound dispute letters based on JAM's expert principles. Include all user and creditor information provided in the proper business letter format."
         },
         {
           role: "user",

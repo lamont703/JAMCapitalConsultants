@@ -183,7 +183,7 @@ ${analysisResult.detailedAnalysis}
   // Generate dispute letters
   async generateDisputeLetters(req, res) {
     try {
-      const { items } = req.body;
+      const { items, userInfo, creditorInfo, currentDate } = req.body;
       
       if (!items || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ error: 'No items provided for dispute' });
@@ -196,29 +196,42 @@ ${analysisResult.detailedAnalysis}
         `Item ${index + 1}: ${typeof item === 'string' ? item : item.description || JSON.stringify(item)}`
       ).join('\n\n');
       
-      // Generate dispute letters using ChatGPT
-      const prompt = `Generate professional dispute letters for the following items from my credit report:
+      // Add user and creditor information to the prompt
+      const userInfoText = userInfo ? 
+        `User Information:
+        Name: ${userInfo.name}
+        Address: ${userInfo.address}
+        Phone: ${userInfo.phone}
+        Email: ${userInfo.email}` : '';
       
-${itemsText}
-
-For each item, create a separate letter addressed to the appropriate credit bureau or creditor. 
-Follow the standard dispute letter format including:
-1. My contact information (use placeholder data)
-2. Date
-3. Recipient's contact information
-4. Reference to the Fair Credit Reporting Act
-5. Clear identification of the disputed item
-6. Request for investigation and removal
-7. Professional closing`;
-
+      const creditorInfoText = creditorInfo ?
+        `Creditor Information:
+        Name: ${creditorInfo.name}
+        Address: ${creditorInfo.address}
+        Account Number: ${creditorInfo.accountNumber}` : '';
+      
+      const dateText = currentDate ? `Current Date: ${currentDate}` : '';
+      
+      // Generate dispute letters using ChatGPT
       const response = await generateDisputeLetter({
         disputeType: 'multiple items',
-        creditorName: 'various creditors',
-        accountNumber: 'multiple',
-        issueDescription: itemsText
+        creditorName: creditorInfo?.name || 'various creditors',
+        accountNumber: creditorInfo?.accountNumber || 'multiple',
+        issueDescription: itemsText,
+        userInfo: userInfoText,
+        creditorInfo: creditorInfoText,
+        currentDate: dateText
       });
 
-      // Parse the generated text into separate letters
+      // Return the letter directly for single items
+      if (items.length === 1) {
+        return res.json({ 
+          success: true,
+          letter: response
+        });
+      }
+      
+      // Parse the generated text into separate letters for multiple items
       const letters = parseDisputeLetters(response, items);
       
       return res.json({ 
