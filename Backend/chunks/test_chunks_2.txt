@@ -1,0 +1,442 @@
+ation Loan
+Date of First Delinquency:08/2013
+Comments:180 Days past due
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014180180180180
+2013*6090120150****6090150
+2012************
+
+2011************
+2010************
+2009************
+2008************
+2007*****
+Historical Account Information
+N/AN/A03/201402/201401/201412/2013
+Balance$10157$10157$10157$10157
+Scheduled
+Payment Amount
+$98$98$98$98
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302
+Credit Limit
+Amount Past Due$790$692$593$494
+Type of LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+Comments180 Days past due180 Days past due180 Days past due150 Days past due
+Comments
+11/201310/201309/201308/201307/201306/2013
+Balance$10157$10157$10157$10157$9909$9909
+Scheduled
+Payment Amount
+$98$98$98$98
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302$9302$9302
+
+Credit Limit
+Amount Past Due$395$296$0$0
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsStudent loan -
+payment deferred
+Student loan -
+payment deferred
+CommentsAccount in
+forbearance
+Account in
+forbearance
+05/201304/201303/201302/2013N/A12/2012
+Balance$9909$9909$9909$9909$9909
+Scheduled
+Payment Amount
+$98$98$98$98$98
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302$9302
+Credit Limit
+Amount Past Due$593$494$395$296
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+Comments150 Days past due120 Days past due
+Comments
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+AES/EFS FINANCE CO4183792949PA0XXXX05/24/2006$11,82305/31/2014$1,109120+ DAYS
+PAST DUE
+AES/PHEAA-ADV
+PO Box 61047
+Harrisburg , PA-171061047
+(717) 720-3118
+Account Number:4183792949PA0XXXXCurrent Status:120+ DAYS PAST
+DUE
+Account Owner:Individual Account.High Credit:$ 9,067
+Type of Account :InstallmentCredit Limit:
+Term Duration:133 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:05/24/2006Balance:$ 11,823
+Date Reported:05/31/2014Amount Past Due:$ 1,109
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:$ 110Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:38
+Creditor Classification:Activity Description:N/A
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:08/2013
+Comments:180 Days past due
+
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014180180180180
+2013*6090120150****6090150
+2012************
+2011************
+2010************
+2009************
+2008************
+2007*****
+Historical Account Information
+N/AN/A03/201402/201401/201412/2013
+Balance$11823$11823$11823$11823
+Scheduled
+Payment Amount
+$110$110$110$110
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9067$9067$9067$9067
+Credit Limit
+Amount Past Due$887$776$665$554
+Type of LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+Comments180 Days past due180 Days past due180 Days past due150 Days past due
+Comments
+11/201310/201309/201308/201307/201306/2013
+Balance$11823$11823$11823$11823$11535$11535
+
+Scheduled
+Payment Amount
+$110$110$110$110
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9067$9067$9067$9067$9067$9067
+Credit Limit
+Amount Past Due$443$332$0$0
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsStudent loan -
+payment deferred
+Student loan -
+payment deferred
+CommentsAccount in
+forbearance
+Account in
+forbearance
+05/201304/201303/201302/2013N/A12/2012
+Balance$11535$11535$11535$11535$11535
+Scheduled
+Payment Amount
+$110$110$110$110$110
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9067$9067$9067$9067$9067
+Credit Limit
+Amount Past Due$665$554$443$332
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+Comments150 Days past due120 Days past due
+Comments
+
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+AES/PHEAA4183792949PA0XXXX05/24/200610/31/2012$0PAYS AS
+AGREED
+PHEAA-HELP
+PO Box 2461
+Harrisburg , PA-171052461
+(717) 720-2471
+Account Number:4183792949PA0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,302
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Deferred
+Date Opened:05/24/2006Balance:
+Date Reported:10/31/2012Amount Past Due:$ 0
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:10/2012
+Date Major Delinquency First Reported:Months Reviewed:19
+Creditor Classification:Activity Description:N/A
+
+Charge Off Amount:Deferred Payment Start Date:12/2012
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:Student loan - payment deferred
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012*********
+2011************
+2010************
+2009************
+2008************
+2007************
+2006********
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+
+N/A10/201209/201208/201207/201206/2012
+Balance$9909$9909$9909$9909$9909
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302$9302
+Credit Limit
+Amount Past Due$0$0$0$0$0
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsStudent loan -
+payment deferred
+Student loan -
+payment deferred
+Student loan -
+payment deferred
+Student loan -
+payment deferred
+Student loan -
+payment deferred
+AES/PHEAA4183792949PA0XXXX05/24/200610/31/2012$0PAYS AS
+AGREED
+PHEAA-HELP
+PO Box 2461
+Harrisburg , PA-171052461
+(717) 720-2471
+Account Number:4183792949PA0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,067
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Deferred
+Date Opened:05/24/2006Balance:
+Date Reported:10/31/2012Amount Past Due:$ 0
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:10/2012
+Date Major Delinquency First Reported:Months Reviewed:19
+Creditor Classification:Activity Description:N/A
+
+Charge Off Amount:Deferred Payment Start Date:12/2012
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:Student loan - payment deferred
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012*********
+2011************
+2010************
+2009************
+2008************
+2007************
+2006********
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+
+N/A10/201209/201208/201207/201206/2012
+Balance$11118$11118$11118$11118$11118
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9067$9067$9067$9067$9067
+Credit Limit
+Amount Past Due$0$0$0$0$0
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsStudent loan -
+payment deferred
+Student loan -
+payment deferred
+Student loan -
+payment deferred
+Student loan -
+payment deferred
+Student loan -
+payment deferred
+CREDIT ACCEPTANCE
+CO
+7701XXXX12/23/2013$15,44005/14/2014PAYS AS
+AGREED
+CREDIT ACCEPTANCE CORPORAT
+25505 W 12 Mile Rd
+Southfield , MI-480341846
+(800) 634-1506
+Account Number:7701XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 16,091
+Type of Account :InstallmentCredit Limit:
+Term Duration:60 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:12/23/2013Balance:$ 15,440
+Date Reported:05/14/2014Amount Past Due:
+Date of Last Payment:05/2014Actual Payment Amount:$ 495
+Scheduled Payment Amount:$ 472Date of Last Activity:05/2014
+Date Major Delinquency First Reported:Months Reviewed:4
+Creditor Classification:Activity Description:N/A
+
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Auto
+Date of First Delinquency:N/A
+Comments:Fixed rate
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014****
+2013*
+Historical Account Information
+N/A04/201403/201402/201401/2014N/A
+Balance$15585$15727$15866$16091
+Scheduled
+Payment Amount
+$472$472$472$472
+Actual Payment
+Amount
+$495$472$472
+Date of Last
+Payment
+04/201403/201401/2014
+High Credit$16091$16091$16091$16091
+Credit Limit
+Amount Past Due
+Type of LoanAutoAutoAutoAuto
+Activity Designator
+CommentsFixed rateFixed rateFixed rateFixed rate
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+

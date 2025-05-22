@@ -1,0 +1,329 @@
+every
+month)
+Date Opened:07/07/2005Balance:$ 0
+Date Reported:06/01/2014Amount Past Due:
+Date of Last Payment:03/2008Actual Payment Amount:
+Scheduled Payment Amount:$ 130Date of Last Activity:03/2008
+
+Date Major Delinquency First Reported:Months Reviewed:99
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:03/2008Type of Loan:Auto
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+No 81-Month Payment Data available for display.
+GR LK HGH ED CORP1229778909788XXXXN/A$3,23405/31/2014$3,234
+GREAT LAKES HIGHER EDUCATI
+2401 International Ln
+Madison , WI-537043121
+(608) 246-1700
+Account Number:1229778909788XXXXCurrent Status:
+Account Owner:Individual Account.High Credit:$ 2,962
+Type of Account :InstallmentCredit Limit:
+Term Duration:1 MonthsTerms Frequency:Single Payment
+Loan
+Date Opened:N/ABalance:$ 3,234
+Date Reported:05/31/2014Amount Past Due:$ 3,234
+Date of Last Payment:12/2013Actual Payment Amount:
+Scheduled Payment Amount:$ 3,234Date of Last Activity:N/A
+Date Major Delinquency First Reported:05/2014Months Reviewed:N/A
+Creditor Classification:Activity Description:N/A
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:11/2012
+Comments:Collection account
+81-Month Payment History
+
+No 81-Month Payment Data available for display.
+OHIO STATE UNIV STUD29778909635XXXX04/04/2002$1,99006/06/2014$1,990
+OHIO STATE UNIV STUDENT
+Student Loan Svcs
+1800 Cannon Dr Rm 250
+Columbus , OH-432102209
+(614) 292-4806
+Account Number:29778909635XXXXCurrent Status:
+Account Owner:Individual Account.High Credit:$ 2,532
+Type of Account :InstallmentCredit Limit:
+Term Duration:61 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:04/04/2002Balance:$ 1,990
+Date Reported:06/06/2014Amount Past Due:$ 1,990
+Date of Last Payment:04/2012Actual Payment Amount:
+Scheduled Payment Amount:$ 50Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:97
+Creditor Classification:Activity Description:N/A
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:09/2008
+Comments:Collection account
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014CACACACACA
+2013CACACACACACACACACACACACA
+2012CACACACACACACACACACACACA
+2011180CACACACACACACACACACACA
+2010120120120120120180180180180180180180
+200990120120120120*120120120120120120
+2008**********3060
+
+2007****
+Historical Account Information
+N/A04/201403/201402/201401/201412/2013
+Balance$1973$1964$1955$1946$1937
+Scheduled
+Payment Amount
+$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+04/201204/201204/201204/201204/2012
+High Credit$2532$2532$2532$2532$2532
+Credit Limit
+Amount Past Due$1973$1964$1955$1946$1937
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsCollection accountCollection accountCollection accountCollection accountCollection account
+11/201310/201309/201308/201307/201306/2013
+Balance$1928$1919$1910$1901$1892$1883
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+04/201204/201204/201204/201204/201204/2012
+High Credit$2532$2532$2532$2532$2532$2532
+Credit Limit
+Amount Past Due$1928$1919$1910$1901$1892$1883
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+
+Activity Designator
+CommentsCollection accountCollection accountCollection accountCollection accountCollection accountCollection account
+05/201304/201303/201302/201301/201312/2012
+Balance$1875$2704$2691$2678$2665$2652
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+04/201204/201204/201204/201204/201204/2012
+High Credit$2532$2532$2532$2532$2532$2532
+Credit Limit
+Amount Past Due$1875$2704$2691$2678$2665$2652
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsCollection accountCollection accountCollection accountCollection accountCollection accountCollection account
+11/201210/201209/201208/201207/201206/2012
+Balance$2639$2627$2614$2351$2339$2327
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+04/201204/201204/201204/201204/201204/2012
+High Credit$2532$2532$2532$2532$2532$2532
+Credit Limit
+Amount Past Due$2639$2627$2614$2351$2339$2327
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+
+Activity Designator
+CommentsCollection accountCollection accountCollection accountCollection accountCollection accountCollection account
+OHIO STATE UNIV STUD297789096PEXXXX07/01/2001$008/01/2006PAYS AS
+AGREED
+OHIO STATE UNIV STUDENT
+Student Loan Svcs
+1800 Cannon Dr Rm 250
+Columbus , OH-432102209
+(614) 292-4806
+Account Number:297789096PEXXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 4,000
+Type of Account :InstallmentCredit Limit:
+Term Duration:120 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:07/01/2001Balance:$ 0
+Date Reported:08/01/2006Amount Past Due:
+Date of Last Payment:05/2006Actual Payment Amount:
+Scheduled Payment Amount:$ 42Date of Last Activity:05/2006
+Date Major Delinquency First Reported:Months Reviewed:4
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:05/2006Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+No 81-Month Payment Data available for display.
+SALLIE MAE9768852180100012XXXX06/16/2006$012/31/2013120+ DAYS
+PAST DUE
+SALLIE MAE
+PO Box 9500
+Wilkes Barre , PA-187739500
+
+Account Number:9768852180100012XXXXCurrent Status:120+ DAYS PAST
+DUE
+Account Owner:Individual Account.High Credit:$ 2,625
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:
+Date Opened:06/16/2006Balance:$ 0
+Date Reported:12/31/2013Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:19
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:12/2013Type of Loan:Education Loan
+Date of First Delinquency:12/2012
+Comments:Student loan assigned to government,
+Variable adjustable Rate
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2013*90120150180180180180180180180
+2012************
+2011************
+2010************
+2009************
+2008************
+2007**********
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+11/201310/201309/201308/201307/201306/2013
+Balance$2984$2978$2972$2966$2961$2955
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$2625$2625$2625$2625$2625$2625
+Credit Limit
+Amount Past Due$650$600$550$500$450$400
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsVariable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Comments180 Days past due180 Days past due180 Days past due180 Days past due180 Days past due180 Days past due
+05/201304/201303/201302/201301/201312/2012
+
+Balance$2946$2937$2929$2920$2911$2903
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$2625$2625$2625$2625$2625$2625
+Credit Limit
+Amount Past Due$350$300$250$200
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsVariable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Comments180 Days past due150 Days past due120 Days past due
+11/201210/201209/201208/201207/201206/2012
+Balance$2894$2885$2881$2881$2881$2881
+Scheduled
+Payment Amount
+$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$2625$2625$2625$2625$2625$2625
+Credit Limit
+Amount Past Due
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsVariable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+
+Comments
+SLM ENTITIES/GLELSI29778909688XXXX06/01/2006$005/31/2012PAYS AS
+AGREED
+SLM ENTITIES/GLELSI
+PO Box 7860
+Madison , WI-537077860
+(608) 246-1750
+Account Number:29778909688XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 2,880
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:
+Date Opened:06/01/2006Balance:$ 0
+Date Reported:05/31/2012Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:04/2012
+Date Major Delinquency First Reported:Months Reviewed:1
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:05/2012Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012****
+2011************
+2010************
+2009************
+2008************
+2007************
+2006*******
+STUDENT LOAN SERVICI4183792949EG0XXXX05/01/2005$005/01/2006PAYS AS
+

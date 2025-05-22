@@ -1,3 +1,4 @@
+// fileProcessing.js - handles the processing of credit report files, including PDF and image extraction. 2nd step in the credit report analysis process. 
 import fs from 'fs';
 import { promisify } from 'util';
 import pdfParse from 'pdf-parse/lib/pdf-parse.js';

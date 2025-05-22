@@ -1,4 +1,4 @@
-// middleware/errorHandler.js
+// middleware/errorHandler.js - error handler middleware for credit report analysis app 
 const errorHandler = (err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   

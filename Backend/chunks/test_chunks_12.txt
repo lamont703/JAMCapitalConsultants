@@ -1,0 +1,358 @@
+01302/201301/201312/2012
+Balance$1832$1832$1832$1832$1832$1832
+Scheduled
+Payment Amount
+$196$196$196$196$196$196
+Actual Payment
+Amount
+Date of Last
+Payment
+02/201002/201002/201002/201002/201002/2010
+
+High Credit
+Credit Limit
+Amount Past Due
+Type of LoanAutoAutoAutoAutoAutoAuto
+Activity Designator
+CommentsCharged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+11/201210/201209/201208/201207/201206/2012
+Balance$1832$1832$1832$1832$1832$1832
+Scheduled
+Payment Amount
+$196$196$196$196$196$196
+Actual Payment
+Amount
+Date of Last
+Payment
+02/201002/201002/201002/201002/201002/2010
+High Credit
+Credit Limit
+Amount Past Due
+Type of LoanAutoAutoAutoAutoAutoAuto
+Activity Designator
+CommentsCharged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+BMI FEDERAL CREDIT U66117XXXX03/25/2008$006/01/2014PAYS AS
+AGREED
+BMI FEDERAL CREDIT UNION
+505 King Ave
+Columbus , OH-432012696
+(800) 822-9423
+Account Number:66117XXXXCurrent Status:PAYS AS AGREED
+
+Account Owner:Individual Account.High Credit:$ 5,485
+Type of Account :InstallmentCredit Limit:
+Term Duration:36 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:03/25/2008Balance:$ 0
+Date Reported:06/01/2014Amount Past Due:
+Date of Last Payment:04/2009Actual Payment Amount:
+Scheduled Payment Amount:$ 173Date of Last Activity:04/2009
+Date Major Delinquency First Reported:Months Reviewed:75
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:04/2009Type of Loan:Auto
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014*****
+2013************
+2012************
+2011************
+2010************
+200960*120120********
+2008*****3060603060
+BMI FEDERAL CREDIT U66117XXXX04/13/2007$006/01/2014PAYS AS
+AGREED
+BMI FEDERAL CREDIT UNION
+505 King Ave
+Columbus , OH-432012696
+(800) 822-9423
+Account Number:66117XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 1,900
+
+Type of Account :InstallmentCredit Limit:
+Term Duration:36 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:04/13/2007Balance:$ 0
+Date Reported:06/01/2014Amount Past Due:
+Date of Last Payment:04/2009Actual Payment Amount:
+Scheduled Payment Amount:$ 67Date of Last Activity:04/2009
+Date Major Delinquency First Reported:Months Reviewed:86
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:04/2009Type of Loan:Unsecured
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014*****
+2013************
+2012************
+2011************
+2010************
+200960*120120********
+2008*******3060909090
+2007****
+CHASE BANK USA, NA418586691194XXXX03/01/2008$003/01/2009CHARGE-OFF$3,000
+Chase Card Services
+PO Box 15298
+Wilmington , DE-198505298
+(800) 955-9900
+Account Number:418586691194XXXXCurrent Status:CHARGE-OFF
+Account Owner:Individual Account.High Credit:$ 3,289
+Type of Account :RevolvingCredit Limit:$ 3,000
+
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:03/01/2008Balance:$ 0
+Date Reported:03/01/2009Amount Past Due:
+Date of Last Payment:07/2008Actual Payment Amount:
+Scheduled Payment Amount:$ 2,561Date of Last Activity:N/A
+Date Major Delinquency First Reported:03/2009Months Reviewed:12
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Credit Card
+Date of First Delinquency:08/2008
+Comments:Charged off account
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2009120120
+2008******306090120
+CITIMORTGAGE111972XXXX07/01/2007$011/01/2010PAYS 31-60
+DAYS
+CITIMORTGAGE
+PO Box 6243
+Sioux Falls , SD-571176243
+(800) 283-7918
+Account Number:111972XXXXCurrent Status:PAYS 31-60 DAYS
+Account Owner:Individual Account.High Credit:$ 44,350
+Type of Account :MortgageCredit Limit:
+Term Duration:27 YearsTerms Frequency:Monthly (due every
+month)
+Date Opened:07/01/2007Balance:$ 0
+Date Reported:11/01/2010Amount Past Due:
+Date of Last Payment:09/2010Actual Payment Amount:
+Scheduled Payment Amount:$ 370Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:39
+
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:11/2010Type of Loan:Conventional RE
+Mortgage
+Date of First Delinquency:10/2010
+Comments:Fannie Mae account
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2010120*********
+2009**306090120120120120120120120
+2008******30609090120*
+2007******
+DISCOVER FINANCIAL S601100530198XXXX03/05/2008$1,60005/22/2014$1,600CHARGE-OFF$1,000
+DISCOVER FINANCIAL SVCS LL
+PO Box 15316
+Wilmington , DE-198505316
+Account Number:601100530198XXXXCurrent Status:CHARGE-OFF
+Account Owner:Individual Account.High Credit:$ 1,678
+Type of Account :RevolvingCredit Limit:$ 1,000
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:03/05/2008Balance:$ 1,600
+Date Reported:05/22/2014Amount Past Due:$ 1,600
+Date of Last Payment:07/2008Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:N/A
+Date Major Delinquency First Reported:02/2009Months Reviewed:74
+Creditor Classification:Activity Description:N/A
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Credit Card
+
+Date of First Delinquency:04/2008
+Comments:Charged off account
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014COCOCOCO
+2013COCOCOCOCOCOCOCOCOCOCOCO
+2012COCOCOCOCOCOCOCOCOCOCOCO
+2011COCOCOCOCOCOCOCOCOCOCOCO
+2010*****COCOCOCOCOCOCO
+2009120120**********
+2008******306090120
+Historical Account Information
+N/A04/201403/201402/201401/201412/2013
+Balance$1600$1600$1600$1600$1600
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+07/200807/200807/200807/200807/2008
+High Credit$1678$1678$1678$1678$1678
+Credit Limit$1000$1000$1000$1000$1000
+Amount Past Due$1600$1600$1600$1600$1600
+Type of LoanCredit CardCredit CardCredit CardCredit CardCredit Card
+Activity Designator
+CommentsCharged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+11/201310/201309/201308/201307/2013N/A
+
+Balance$1600$1600$1600$1600$1600
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+07/200807/200807/200807/200807/2008
+High Credit$1678$1678$1678$1678$1678
+Credit Limit$1000$1000$1000$1000$1000
+Amount Past Due$1600$1600$1600$1600$1600
+Type of LoanCredit CardCredit CardCredit CardCredit CardCredit Card
+Activity Designator
+CommentsCharged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+05/2013N/A03/201302/201301/201312/2012
+Balance$1600$1600$1600$1678$1678
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+07/200807/200807/200807/200807/2008
+High Credit$1678$1678$1678$1678$1678
+Credit Limit$1000$1000$1000$1000$1000
+Amount Past Due$1600$1600$1600$1678$1678
+Type of LoanCredit CardCredit CardCredit CardCredit CardCredit Card
+Activity Designator
+CommentsCharged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+
+11/201210/201209/201208/201207/201206/2012
+Balance$1678$1678$1678$1678$1678$1678
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+07/200807/200807/200807/200807/200807/2008
+High Credit$1678$1678$1678$1678$1678$1678
+Credit Limit$1000$1000$1000$1000$1000$1000
+Amount Past Due$1678$1678$1678$1678$1678$1678
+Type of LoanCredit CardCredit CardCredit CardCredit CardCredit CardCredit Card
+Activity Designator
+CommentsCharged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+Charged off
+account
+GR LK HGH ED CORP1229778909788XXXXN/A$3,23405/31/2014$3,234
+GREAT LAKES HIGHER EDUCATI
+2401 International Ln
+Madison , WI-537043121
+(608) 246-1700
+Account Number:1229778909788XXXXCurrent Status:
+Account Owner:Individual Account.High Credit:$ 2,962
+Type of Account :InstallmentCredit Limit:
+Term Duration:1 MonthsTerms Frequency:Single Payment
+Loan
+Date Opened:N/ABalance:$ 3,234
+Date Reported:05/31/2014Amount Past Due:$ 3,234
+Date of Last Payment:12/2013Actual Payment Amount:
+Scheduled Payment Amount:$ 3,234Date of Last Activity:N/A
+Date Major Delinquency First Reported:05/2014Months Reviewed:N/A
+Creditor Classification:Activity Description:N/A
+
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:11/2012
+Comments:Collection account
+81-Month Payment History
+No 81-Month Payment Data available for display.
+HSBC BEST BUY169607-215790XXXX03/01/2008$003/01/2009120+ DAYS
+PAST DUE
+$0
+HSBC BEST BUY
+PO Box 9
+Buffalo , NY-142400009
+(888) 385-8916
+Account Number:169607-215790XXXXCurrent Status:120+ DAYS PAST
+DUE
+Account Owner:Individual Account.High Credit:$ 1,180
+Type of Account :RevolvingCredit Limit:$ 0
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:03/01/2008Balance:$ 0
+Date Reported:03/01/2009Amount Past Due:
+Date of Last Payment:03/2009Actual Payment Amount:
+Scheduled Payment Amount:$ 78Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:11
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:03/2009Type of Loan:Charge Account
+Date of First Delinquency:08/2008
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+

@@ -93,19 +93,33 @@ The letter should follow JAM Capital Consultants' dispute framework, reference r
 
 /**
  * Analyzes credit report text and returns structured findings
- * @param {string} reportText - The extracted text from credit reports
+ * @param {string} reportData - Either extracted text or JSON string of disputable items
+ * @param {boolean} isStructured - Whether the input is structured data
  * @returns {Promise<Object>} - Structured analysis results
  */
-export async function analyzeCreditReports(reportText) {
+export async function analyzeCreditReports(reportData, isStructured = false) {
   try {
-    const prompt = `I've uploaded my credit reports. Please analyze the following extracted text from my credit reports and identify potential items to dispute based on JAM Capital Consultants' dispute framework. Look for inconsistencies, errors, or items that could be challenged.
+    let prompt;
+    
+    if (isStructured) {
+      prompt = `I've uploaded my credit reports and extracted the following disputable items. Please analyze these items and provide guidance on which ones I should dispute and why.
+
+Here are the extracted disputable items:
+${reportData}
+
+Please format your response in two parts:
+1. A brief summary of what you found (2-3 sentences)
+2. A detailed list of potential dispute items with explanation for each`;
+    } else {
+      prompt = `I've uploaded my credit reports. Please analyze the following extracted text from my credit reports and identify potential items to dispute based on JAM Capital Consultants' dispute framework. Look for inconsistencies, errors, or items that could be challenged.
 
 Format your response in two parts:
 1. A brief summary of what you found (2-3 sentences)
 2. A detailed list of potential dispute items with explanation
 
 Here's the extracted text:
-${reportText}`;
+${reportData}`;
+    }
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",

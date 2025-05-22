@@ -1,0 +1,416 @@
+redit grantor
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012*******30
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/A10/201209/201208/201207/201206/2012
+Balance$1937$1869$1802$1789$1591
+Scheduled
+Payment Amount
+$84$83$49$70$44
+Actual Payment
+Amount
+$120$60$343
+Date of Last
+Payment
+07/201207/201207/201206/201205/2012
+High Credit$1937$1903$1903$1903$1903
+Credit Limit$2000$2000$2000$2000$2000
+Amount Past Due$132
+Type of LoanCredit CardCredit CardCredit CardCredit CardCredit Card
+Activity Designator
+SALLIE MAE9768852180100012XXXX06/16/2006$012/31/2013120+ DAYS
+PAST DUE
+SALLIE MAE
+PO Box 9500
+Wilkes Barre , PA-187739500
+Account Number:9768852180100012XXXXCurrent Status:120+ DAYS PAST
+DUE
+Account Owner:Individual Account.High Credit:$ 2,625
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:
+
+Date Opened:06/16/2006Balance:$ 0
+Date Reported:12/31/2013Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:19
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:12/2013Type of Loan:Education Loan
+Date of First Delinquency:12/2012
+Comments:Student loan assigned to government,
+Variable adjustable Rate
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2013*90120150180180180180180180180
+2012************
+2011************
+2010************
+2009************
+2008************
+2007**********
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+11/201310/201309/201308/201307/201306/2013
+Balance$2984$2978$2972$2966$2961$2955
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$2625$2625$2625$2625$2625$2625
+Credit Limit
+Amount Past Due$650$600$550$500$450$400
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsVariable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Comments180 Days past due180 Days past due180 Days past due180 Days past due180 Days past due180 Days past due
+05/201304/201303/201302/201301/201312/2012
+Balance$2946$2937$2929$2920$2911$2903
+Scheduled
+Payment Amount
+$50$50$50$50$50$50
+Actual Payment
+Amount
+
+Date of Last
+Payment
+High Credit$2625$2625$2625$2625$2625$2625
+Credit Limit
+Amount Past Due$350$300$250$200
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsVariable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Comments180 Days past due150 Days past due120 Days past due
+11/201210/201209/201208/201207/201206/2012
+Balance$2894$2885$2881$2881$2881$2881
+Scheduled
+Payment Amount
+$50$50
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$2625$2625$2625$2625$2625$2625
+Credit Limit
+Amount Past Due
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsVariable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Variable/adjustable
+Rate
+Comments
+XPRESS LOAN SERVICIN4183792949EG0XXXX05/01/2006$001/01/2011PAYS AS
+AGREED
+XPRESS LOAN SERVICING/
+
+1500 W 3rd St Ste 125
+Deutsche Bank
+Cleveland , OH-441131422
+(888) 811-7101
+Account Number:4183792949EG0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,302
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:05/01/2006Balance:$ 0
+Date Reported:01/01/2011Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:07/2009
+Date Major Delinquency First Reported:Months Reviewed:36
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:01/2011Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2010************
+20096090120120****60***
+2008************
+2007************
+2006********
+XPRESS LOAN SERVICIN4183792949EG0XXXX05/01/2006$001/01/2011PAYS AS
+AGREED
+XPRESS LOAN SERVICING/
+1500 W 3rd St Ste 125
+Deutsche Bank
+Cleveland , OH-441131422
+(888) 811-7101
+
+Account Number:4183792949EG0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,067
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:05/01/2006Balance:$ 0
+Date Reported:01/01/2011Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:07/2009
+Date Major Delinquency First Reported:Months Reviewed:36
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:01/2011Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2010************
+20096090120120****60***
+2008************
+2007************
+2006********
+Collections
+A collection is an account that has been turned over to a collection agency by one of your creditors because they believe the account
+has not been paid as agreed.
+WILLIAMS & FUDGE INC,
+Agency Address:PO Box 266
+Rock Hill, SC 297316266
+(803) 329-9791
+Date Reported:05/2014
+Date Assigned:11/2012
+Creditor Classification:Educational
+
+Creditor Name:OHIO CHRISTIAN UNIVERSITY AR
+Accounts Number:395XXXX
+Account Owner:Individual Account.
+Original Amount Owned:$1,806
+Date of 1 st Delinquency:10/2012
+Balance Date:05/2014
+Balance Owned:$1,806
+Last Payment Date :N/A
+Status Date:05/2014
+Status:D - Unpaid
+Comments:N/A
+CONVERGENT OUTSOURCING INC
+Agency Address:800 SW 39th St
+Renton, WA 980574975
+(800) 444-8485
+Date Reported:12/2013
+Date Assigned:04/2013
+Creditor Classification:
+Creditor Name:T MOBILE USA
+Accounts Number:3690XXXX
+Account Owner:Individual Account.
+Original Amount Owned:$558
+Date of 1 st Delinquency:09/2011
+Balance Date:12/2013
+Balance Owned:$558
+Last Payment Date :N/A
+Status Date:12/2013
+Status:D - Unpaid
+Comments:N/A
+Public Records
+Public record information includes bankruptcies, liens or judgments and comes from federal, state or county court records.
+
+Bankruptcy
+Date Filed:
+Case Number:
+Court Number/Name:
+Court Address:170 N High StColumbus , OH 432152417
+Liabilities:
+Individual/Joint:
+Individual/Business:
+Bankruptcy Disposition:
+Current Disposition Date:N/A
+Asset Amount:
+Exempt Amount:
+Date Verified:N/A
+Date Reported:N/A
+Prior Disposition:
+Comments:
+Judgments
+Type:Judgment
+Date Filed:05/2011
+Case Number:2011CVF02276
+Court Number/Name:
+Court Address:375 S High St
+Columbus , OH 432154520
+Plaintiff:LVNV FUNDING LLC
+Defendant:EVANS LAMONT
+Amount:$1,180
+Status:
+Date Reported:N/A
+Satisfied Date:
+Verified Date:
+Comments:
+
+Judgments
+Judgments
+Type:Judgment
+Date Filed:04/2011
+Case Number:2011CVF02148
+Court Number/Name:
+Court Address:375 S High St
+Columbus , OH 432154520
+Plaintiff:UNIFUND CCR PARTNERS
+Defendant:EVANS LAMONT
+Amount:$3,289
+Status:
+Date Reported:N/A
+Satisfied Date:
+Verified Date:
+Comments:
+Judgments
+Type:Judgment
+Date Filed:11/2010
+Case Number:2010CVF36775
+Court Number/Name:
+Court Address:375 S High St
+Columbus , OH 432154520
+Plaintiff:BMI FEDERAL CREDIT UNION
+Defendant:EVANS LAMONT
+Amount:$8,159
+Status:
+Date Reported:N/A
+Satisfied Date:
+Verified Date:
+Comments:
+
+Judgments
+Judgments
+Type:Judgment
+Date Filed:12/2009
+Case Number:2009CVF30470
+Court Number/Name:
+Court Address:375 S High St
+Columbus , OH 432154520
+Plaintiff:DISCOVER BANK
+Defendant:EVANS LAMONT T
+Amount:$1,678
+Status:
+Date Reported:N/A
+Satisfied Date:
+Verified Date:
+Comments:
+You have no Tax Liens on file.
+Personal Information
+The following information is added to your file either when creditors enter requests to view your credit history, or when you report it to
+Equifax directly.
+Name:Lamont Evans
+Social Security Number:XXX-XX-9096
+Age or Date of Birth:February 16, 1982
+Address Information
+Current/PreviousStreet AddressDate Reported
+Current
+5696 BEECHCROFT RD APT
+ECOLUMBUS,OH,43229
+First Reported 09/2007Last
+Reported 06/09/2014
+Former Address1
+PO BOX 29674
+COLUMBUS,OH,43229
+First Reported 08/2007Last
+Reported 03/06/2013
+Former Address2
+6140 CLEVELAND
+AVECOLUMBUS,OH,43231
+First Reported 03/2014Last
+Reported 06/03/2014
+Former Address3
+4215 THOMP SON DR
+DAYTON,OH,45416
+First Reported 07/2006Last
+Reported 01/12/2011
+Former Address4
+4600 NORTHTOWNE BLVD APT
+215COLUMBUS,OH,43229
+First Reported 07/2006Last
+Reported 01/12/2011
+Former Address5
+6177 DEEWOOD CT
+First Reported 09/2005Last
+

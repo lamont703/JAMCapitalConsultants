@@ -1,0 +1,362 @@
+nt:Actual Payment Amount:$ 250
+Scheduled Payment Amount:$ 399Date of Last Activity:N/A
+Date Major Delinquency First Reported:10/2013Months Reviewed:2
+Creditor Classification:Activity Description:N/A
+
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Child Support
+Date of First Delinquency:09/2013
+Comments:Collection account,
+Customer has now located consumer
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2013***CACA
+Historical Account Information
+N/AN/AN/AN/AN/A12/2013
+Balance$4966
+Scheduled
+Payment Amount
+$399
+Actual Payment
+Amount
+$250
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due$4966
+Type of LoanChild Support
+Activity Designator
+CommentsCollection account
+CommentsCustomer has now
+located consumer
+11/201310/2013N/AN/AN/AN/A
+Balance$4807$4648
+
+Scheduled
+Payment Amount
+$399$399
+Actual Payment
+Amount
+$250$250
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due$4807$4648
+Type of LoanChild SupportChild Support
+Activity Designator
+CommentsCollection accountCollection account
+CommentsCustomer has now
+located consumer
+Customer has now
+located consumer
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+Payment History Key
+MeaningSymbolMeaningSymbol
+Pays or Paid as Agreed:*180+ Days Past Due:180
+30-59 Days Past Due:30Collection Account:CA
+60-89 Days Past Due:60Foreclosure:F
+90-119 Days Past Due:90Voluntary Surrender:VS
+120-149 Days Past Due:120Repossession:R
+150-179 Days Past Due:150Charge Off:CO
+Inquiries
+A request for your credit history is called an inquiry. Inquiries remain on your credit report for two years. There are two types of
+inquiries - those that may impact your credit rating and those that do not.
+Inquiries that may impact your credit rating
+These inquiries are made by companies with whom you have applied for a loan or credit.
+Name of CompanyDate of Inquiry
+GMAC AUTOMOTIVE BANK07/05/13
+Creditor Contact Information
+GMAC AUTOMOTIVE BANK
+6985 Union Park Ctr
+Midvale, UT 840474177
+(800) 200-4622
+
+BOB CALDWELL CHRYSLER JEEP07/05/13
+Creditor Contact Information
+BOB CALDWELL CHRYSLER JEEP
+1889 Morse Rd
+Columbus, OH 432296603
+CAPITAL ONE12/21/13, 07/06/13, 07/05/13
+Creditor Contact Information
+CAPITAL ONE
+PO Box 30253
+Salt Lake City, UT 841300253
+(800) 695-6950
+CARMAX AUTO FINANCE12/18/13, 07/05/13, 03/20/13
+Creditor Contact Information
+CARMAX AUTO FINANCE
+225 Chastain Meadows Ct NW
+Kennesaw, GA 301445841
+COASTAL CREDIT CORPORATION12/23/13
+Creditor Contact Information
+COASTAL CREDIT CORPORATION
+3852 Virginia Beach Blvd
+Virginia Beach, VA 234522438
+(757) 340-6000
+Credco::466026794707/05/13
+Creditor Contact Information
+Credco
+PO Box 509124
+San Diego, CA 921509124
+(800) 523-0233
+MIRACLE MOTOR MART12/21/13
+Creditor Contact Information
+MIRACLE MOTOR MART
+2380 Morse Rd
+Columbus, OH 432295857
+NATIONAL AUTO ACCEPTANCE CORP12/23/13
+Creditor Contact Information
+NATIONAL AUTO ACCEPTANCE CORP
+Pce-Dt
+4639 W Broad St
+
+Columbus, OH 432281610
+NICHOLAS FINANCE CORPORATI12/23/13, 07/05/13
+Creditor Contact Information
+NICHOLAS FINANCE CORPORATI
+2454 N McMullen Booth Rd
+Clearwater, FL 337591353
+(727) 431-6130
+PRESTIGE FINANCIAL SERVICE12/21/13
+Creditor Contact Information
+PRESTIGE FINANCIAL SERVICE
+PO Box 26707
+Salt Lake City, UT 841260707
+REGIONAL ACCEPTANCE07/05/13
+Creditor Contact Information
+REGIONAL ACCEPTANCE
+1420 E Fire Tower Rd
+Greenville, NC 278584139
+(866) 644-7687
+RICART USED CARS12/23/13
+Creditor Contact Information
+RICART USED CARS
+4255 S Hamilton Rd
+Groveport, OH 431259332
+WELLS FARGO DEALER SERVICE07/06/13
+Creditor Contact Information
+WELLS FARGO DEALER SERVICE
+Credit Bureau Disputes
+PO Box 1697
+Winterville, NC 285901697
+Inquiries that do not impact your credit rating
+These inquiries include requests from employers, companies making promotional offers and your own requests to check your credit.
+These inquiries are only viewable by you.
+Company InformationDate of Inquiry
+EQUIFAX06/09/14
+AR-FANNIE MAE CONSUMER RES CTR.04/22/14
+ND-RESEARCH GRP OF ORANGE COUNTY09/17/12
+ND-WILLIAMS & FUDGE INC,11/21/12
+
+PrefixPrefix Description
+PRMInquiries with this prefix indicate that only your name and address were
+given to a credit grantor so they can provide you a firm offer of credit or
+insurance.(PRM inquiries remain for twelve months.)
+AM or ARInquiries with these prefixes indicate a periodic review of your credit
+history by one of your creditors.(AM and AR inquiries remain for twelve
+months.)
+EMPLInquiries with this prefix indicate an employment inquiry. (EMPL inquiries
+remain for 24 months)
+PRInquiries with this prefix indicate that a creditor reviewed your account as
+part of a portfolio they are purchasing.(PR inquiries remain for 12
+months.)
+Equifax or EFXInquiries with these prefixes indicate Equifax's activity in response to your
+contact with us for a copy of your credit file or a research request.
+NDInquiries with this prefix are general inquiries that do not display to credit
+grantors.(ND inquiries remain for 24 months.)
+ND MRInquiries with this prefix indicate the reissue of a mortgage credit file
+containing information from your Equifax credit file to another company in
+connection with a mortgage loan.(ND inquiries remain for 24 months.)
+Negative Accounts
+Accounts that contain a negative account status. Accounts not paid as agreed generally remain on your credit file for 7 years from the
+date the account first became past due leading to the current not paid status. Late Payment History generally remains on your credit
+file for 7 years from the date of the late payment.
+Open Accounts
+Account NameAccount NumberDate Opened BalanceDate
+Reported
+Past
+Due
+StatusCredit Limit
+AES/EFS FINANCE CO4183792949PA0XXXX05/24/2006$10,15705/31/2014$988120+ DAYS
+PAST DUE
+AES/PHEAA-ADV
+PO Box 61047
+Harrisburg , PA-171061047
+(717) 720-3118
+Account Number:4183792949PA0XXXXCurrent Status:120+ DAYS PAST
+DUE
+Account Owner:Individual Account.High Credit:$ 9,302
+Type of Account :InstallmentCredit Limit:
+Term Duration:127 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:05/24/2006Balance:$ 10,157
+Date Reported:05/31/2014Amount Past Due:$ 988
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:$ 98Date of Last Activity:N/A
+
+Date Major Delinquency First Reported:Months Reviewed:38
+Creditor Classification:Activity Description:N/A
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:08/2013
+Comments:180 Days past due
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014180180180180
+2013*6090120150****6090150
+2012************
+2011************
+2010************
+2009************
+2008************
+2007*****
+Historical Account Information
+N/AN/A03/201402/201401/201412/2013
+Balance$10157$10157$10157$10157
+Scheduled
+Payment Amount
+$98$98$98$98
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302
+Credit Limit
+Amount Past Due$790$692$593$494
+Type of LoanEducation LoanEducation LoanEducation LoanEducation Loan
+
+Activity Designator
+Comments180 Days past due180 Days past due180 Days past due150 Days past due
+Comments
+11/201310/201309/201308/201307/201306/2013
+Balance$10157$10157$10157$10157$9909$9909
+Scheduled
+Payment Amount
+$98$98$98$98
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302$9302$9302
+Credit Limit
+Amount Past Due$395$296$0$0
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+CommentsStudent loan -
+payment deferred
+Student loan -
+payment deferred
+CommentsAccount in
+forbearance
+Account in
+forbearance
+05/201304/201303/201302/2013N/A12/2012
+Balance$9909$9909$9909$9909$9909
+Scheduled
+Payment Amount
+$98$98$98$98$98
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$9302$9302$9302$9302$9302
+Credit Limit
+
+Amount Past Due$593$494$395$296
+Type of LoanEducation LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+Comments150 Days past due120 Days past due
+Comments
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+Comments
+Comments
+AES/EFS FINANCE CO4183792949PA0XXXX05/24/2006$11,82305/31/2014$1,109120+ DAYS
+PAST DUE
+AES/PHEAA-ADV
+PO Box 61047
+Harrisburg , PA-171061047
+(717) 720-3118
+Account Number:4183792949PA0XXXXCurrent Status:120+ DAYS PAST
+DUE
+Account Owner:Individual Account.High Credit:$ 9,067
+Type of Account :InstallmentCredit Limit:
+
+Term Duration:133 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:05/24/2006Balance:$ 11,823
+Date Reported:05/31/2014Amount Past Due:$ 1,109
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:$ 110Date of Last Activity:N/A
+Date Major Delinquency First Reported:Months Reviewed:38
+Creditor Classification:Activity Description:N/A
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:08/2013
+Comments:180 Days past due
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2014180180180180
+2013*6090120150****6090150
+2012************
+2011************
+2010************
+2009************
+2008************
+2007*****
+Historical Account Information
+N/AN/A03/201402/201401/201412/2013
+Balance$11823$11823$11823$11823
+Scheduled
+Payment Amount
+$110$110$110$110
+Actual Payment
+Amount
+Date of Last
+

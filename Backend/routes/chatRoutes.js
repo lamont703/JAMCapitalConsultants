@@ -1,34 +1,24 @@
+// routes/chatRoutes.js - routes for credit report analysis app 
 import express from 'express';
-import multer from 'multer';
+import upload from '../utils/fileUpload.js';
 import { chatController } from '../controllers/chatController.js';
 
 const router = express.Router();
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
+// Use the upload middleware for file uploads
+router.post('/upload', upload.single('file'), (req, res) => {
+  // Handle the uploaded file
+  const filePath = req.file.path;
+  // Process the file...
+  res.json({ success: true, filePath });
 });
 
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (req, file, cb) => {
-    // Accept only PDFs and images
-    if (
-      file.mimetype === 'application/pdf' ||
-      file.mimetype === 'image/jpeg' ||
-      file.mimetype === 'image/png'
-    ) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF, JPEG, and PNG files are allowed'));
-    }
-  }
+// For multiple files
+router.post('/upload-multiple', upload.array('files', 5), (req, res) => {
+  // Handle multiple uploaded files
+  const filePaths = req.files.map(file => file.path);
+  // Process the files...
+  res.json({ success: true, filePaths });
 });
 
 // Chat endpoint
@@ -40,4 +30,7 @@ router.post('/analyzeReports', upload.array('file', 5), chatController.analyzeRe
 // New route for dispute letter generation
 router.post('/generateDisputeLetters', chatController.generateDisputeLetters);
 
-export { router as chatRoutes };
+// New route for cache management
+router.get('/manage-cache', chatController.manageCache);
+
+export default router;

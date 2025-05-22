@@ -1,0 +1,356 @@
+rMayJunJulAugSepOctNovDec
+2012****
+2011************
+2010************
+2009************
+2008************
+2007************
+2006*******
+STUDENT LOAN SERVICI4183792949EG0XXXX05/01/2005$005/01/2006PAYS AS
+
+AGREED
+AES/PHEAA-ADV
+PO Box 61047
+Harrisburg , PA-171061047
+(717) 720-3118
+Account Number:4183792949EG0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,159
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:05/01/2005Balance:$ 0
+Date Reported:05/01/2006Amount Past Due:
+Date of Last Payment:05/2006Actual Payment Amount:$ 9,302
+Scheduled Payment Amount:Date of Last Activity:05/2006
+Date Major Delinquency First Reported:Months Reviewed:2
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:05/2006Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:Refinanced
+81-Month Payment History
+No 81-Month Payment Data available for display.
+STUDENT LOAN SERVICI4183792949EG0XXXX05/01/2005$005/01/2006PAYS AS
+AGREED
+AES/PHEAA-ADV
+PO Box 61047
+Harrisburg , PA-171061047
+(717) 720-3118
+Account Number:4183792949EG0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 4,904
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Monthly (due every
+month)
+
+Date Opened:05/01/2005Balance:$ 0
+Date Reported:05/01/2006Amount Past Due:
+Date of Last Payment:05/2006Actual Payment Amount:$ 5,067
+Scheduled Payment Amount:Date of Last Activity:05/2006
+Date Major Delinquency First Reported:Months Reviewed:2
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:05/2006Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:Refinanced
+81-Month Payment History
+No 81-Month Payment Data available for display.
+STUDENT LOAN XPRESS/29778909687XXXX06/16/2006$004/30/2012PAYS AS
+AGREED
+STUDENT LOAN XPRESS/GLELSI
+PO Box 7860
+Madison , WI-537077860
+(608) 246-1750
+Account Number:29778909687XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 2,880
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:
+Date Opened:06/16/2006Balance:$ 0
+Date Reported:04/30/2012Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:03/2012
+Date Major Delinquency First Reported:Months Reviewed:24
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:04/2012Type of Loan:Education Loan
+
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012***
+2011************
+2010************
+2009************
+2008************
+2007************
+2006*******
+U S DEPARTMENT OF ED70000186016XXXX09/23/2008$010/22/2012PAYS AS
+AGREED
+U S DEPARTMENT OF EDU AFSA
+PO BOX 7202
+UTICA , NY-13504-7202
+Account Number:70000186016XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 589
+Type of Account :InstallmentCredit Limit:
+Term Duration:300 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:09/23/2008Balance:$ 0
+Date Reported:10/22/2012Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:09/2012
+Date Major Delinquency First Reported:Months Reviewed:12
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:09/2012Type of Loan:Education Loan
+Date of First Delinquency:N/A
+
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012*********
+2011************
+2010************
+2009************
+2008****
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/A09/201208/201207/201206/2012
+Balance$662$662$662$662
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+
+High Credit$589$589$589$589
+Credit Limit
+Amount Past Due
+Type of LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+U S DEPARTMENT OF ED70000186016XXXX11/06/2007$010/22/2012PAYS AS
+AGREED
+U S DEPARTMENT OF EDU AFSA
+PO BOX 7202
+UTICA , NY-13504-7202
+Account Number:70000186016XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 3,500
+Type of Account :InstallmentCredit Limit:
+Term Duration:300 MonthsTerms Frequency:Monthly (due every
+month)
+Date Opened:11/06/2007Balance:$ 0
+Date Reported:10/22/2012Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:09/2012
+Date Major Delinquency First Reported:Months Reviewed:12
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:09/2012Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2012*********
+
+2011************
+2010************
+2009************
+2008************
+2007**
+Historical Account Information
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/AN/AN/AN/AN/A
+Balance
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit
+Credit Limit
+Amount Past Due
+Type of Loan
+Activity Designator
+N/AN/A09/201208/201207/201206/2012
+Balance$3996$3996$3996$3996
+Scheduled
+Payment Amount
+Actual Payment
+Amount
+Date of Last
+Payment
+High Credit$3500$3500$3500$3500
+Credit Limit
+Amount Past Due
+
+Type of LoanEducation LoanEducation LoanEducation LoanEducation Loan
+Activity Designator
+U S DEPARTMENT OF ED297789XXXX11/01/2007$009/01/2011PAYS AS
+AGREED
+U S DEPARTMENT OF EDU AFSA
+PO BOX 7202
+UTICA , NY-13504-7202
+Account Number:297789XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 4,089
+Type of Account :InstallmentCredit Limit:
+Term Duration:129 MonthsTerms Frequency:
+Date Opened:11/01/2007Balance:$ 0
+Date Reported:09/01/2011Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:$ 52Date of Last Activity:08/2011
+Date Major Delinquency First Reported:Months Reviewed:46
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2011********
+2010************
+2009************
+2008************
+2007**
+U S DEPARTMENT OF ED297789XXXX09/01/2000$006/01/2005PAYS AS
+AGREED
+
+U S DEPARTMENT OF EDU AFSA
+PO BOX 7202
+UTICA , NY-13504-7202
+Account Number:297789XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 16,870
+Type of Account :InstallmentCredit Limit:
+Term Duration:120 MonthsTerms Frequency:
+Date Opened:09/01/2000Balance:$ 0
+Date Reported:06/01/2005Amount Past Due:
+Date of Last Payment:06/2005Actual Payment Amount:
+Scheduled Payment Amount:$ 135Date of Last Activity:06/2005
+Date Major Delinquency First Reported:Months Reviewed:3
+Creditor Classification:Activity Description:Paid and Closed
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+No 81-Month Payment Data available for display.
+XPRESS LOAN SERVICIN4183792949EG0XXXX05/01/2006$001/01/2011PAYS AS
+AGREED
+XPRESS LOAN SERVICING/
+1500 W 3rd St Ste 125
+Deutsche Bank
+Cleveland , OH-441131422
+(888) 811-7101
+Account Number:4183792949EG0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,302
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:05/01/2006Balance:$ 0
+
+Date Reported:01/01/2011Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:07/2009
+Date Major Delinquency First Reported:Months Reviewed:36
+Creditor Classification:Activity Description:Transfer/Sold
+Charge Off Amount:Deferred Payment Start Date:
+Balloon Payment Amount:Balloon Payment Date:
+Date Closed:01/2011Type of Loan:Education Loan
+Date of First Delinquency:N/A
+Comments:
+81-Month Payment History
+YearJanFebMarAprMayJunJulAugSepOctNovDec
+2010************
+20096090120120****60***
+2008************
+2007************
+2006********
+XPRESS LOAN SERVICIN4183792949EG0XXXX05/01/2006$001/01/2011PAYS AS
+AGREED
+XPRESS LOAN SERVICING/
+1500 W 3rd St Ste 125
+Deutsche Bank
+Cleveland , OH-441131422
+(888) 811-7101
+Account Number:4183792949EG0XXXXCurrent Status:PAYS AS AGREED
+Account Owner:Individual Account.High Credit:$ 9,067
+Type of Account :InstallmentCredit Limit:
+Term Duration:Terms Frequency:Monthly (due every
+month)
+Date Opened:05/01/2006Balance:$ 0
+Date Reported:01/01/2011Amount Past Due:
+Date of Last Payment:Actual Payment Amount:
+Scheduled Payment Amount:Date of Last Activity:07/2009
+
