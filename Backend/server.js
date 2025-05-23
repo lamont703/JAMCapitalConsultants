@@ -1,35 +1,45 @@
 // server.js
 import express from 'express';
 import cors from 'cors';
-import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import dotenv from 'dotenv';
-import { chatRoutes } from './routes/chatRoutes.js';
+import fs from 'fs';
 
-// Load environment variables
-dotenv.config();
+// Import routes
+import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
 
-// Set up __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+
+// Get the directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Create chunks directory if it doesn't exist
+const chunksDir = path.join(__dirname, 'chunks');
+if (!fs.existsSync(chunksDir)) {
+  fs.mkdirSync(chunksDir, { recursive: true });
+}
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../Development Files')));
+app.use(express.static(path.join(__dirname, '../Frontend')));
 
-// Routes
-app.use('/api/chatGptService', chatRoutes);
+// Use routes
+app.use('/api/chat', chatRoutesModule);
+app.use('/api/chatGptService', chatRoutesModule);
+console.log('check server.js routes');
 
-// Serve the chat interface
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Development Files/ChatInterface.html'));
+// Serve the frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Development Files'));
 });
 
 // Start server

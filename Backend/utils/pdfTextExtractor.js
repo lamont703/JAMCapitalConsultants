@@ -8,17 +8,132 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
+ * Chunks a credit report text into manageable sections for processing
+ * @param {string} reportText - The full text of the credit report
+ * @param {number} maxChunkSize - Maximum size of each chunk in characters (default: 10000)
+ * @param {number} overlapSize - Number of characters to overlap between chunks (default: 200)
+ * @return {Array<string>} Array of text chunks
+ */
+function chunkReportText(reportText, maxChunkSize = 100000, overlapSize = 200) {
+  console.log(`\n===== CHUNKING REPORT TEXT =====`);
+  console.log(`Total text length: ${reportText ? reportText.length : 0} characters`);
+  console.log(`Max chunk size: ${maxChunkSize}, Overlap size: ${overlapSize}`);
+  
+  if (!reportText || reportText.length === 0) {
+    console.log(`Warning: Empty report text provided to chunker`);
+    return [];
+  }
+  
+  // Normalize line endings and whitespace
+  const normalizedText = reportText
+    .replace(/\r\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  
+  // If the text is small enough, return it as a single chunk
+  if (normalizedText.length <= maxChunkSize) {
+    console.log(`Text is small enough to process as a single chunk`);
+    return [normalizedText];
+  }
+  
+  // Split the text into chunks
+  const chunks = [];
+  let currentPosition = 0;
+  
+  // Safety check to prevent infinite loops
+  let safetyCounter = 0;
+  const maxIterations = 1000;
+  
+  while (currentPosition < normalizedText.length && safetyCounter < maxIterations) {
+    safetyCounter++;
+    
+    // Determine end position for this chunk
+    let endPosition = Math.min(currentPosition + maxChunkSize, normalizedText.length);
+    
+    // Try to find a paragraph break to split at
+    if (endPosition < normalizedText.length) {
+      const paragraphBreak = normalizedText.lastIndexOf('\n\n', endPosition);
+      if (paragraphBreak > currentPosition && paragraphBreak > endPosition - maxChunkSize / 2) {
+        endPosition = paragraphBreak + 2; // Include the paragraph break
+      } else {
+        // Try to find a line break
+        const lineBreak = normalizedText.lastIndexOf('\n', endPosition);
+        if (lineBreak > currentPosition && lineBreak > endPosition - maxChunkSize / 2) {
+          endPosition = lineBreak + 1; // Include the line break
+        }
+      }
+    }
+    
+    // Extract the chunk
+    const chunk = normalizedText.substring(currentPosition, endPosition);
+    chunks.push(chunk);
+    
+    // Move position for next chunk, including overlap
+    const nextPosition = Math.max(currentPosition, endPosition - overlapSize);
+    
+    // Check if we're making progress
+    if (nextPosition <= currentPosition) {
+      console.log(`Warning: Chunking not making progress at position ${currentPosition}. Breaking loop.`);
+      // Force progress by moving forward at least one character
+      currentPosition = endPosition;
+    } else {
+      currentPosition = nextPosition;
+    }
+    
+    // Debug output
+    console.log(`Chunk ${chunks.length}: ${chunk.length} chars, Next position: ${currentPosition}/${normalizedText.length}`);
+  }
+  
+  if (safetyCounter >= maxIterations) {
+    console.log(`Warning: Reached maximum iterations (${maxIterations}). Chunking may be incomplete.`);
+  }
+  
+  console.log(`Created ${chunks.length} chunks`);
+  return chunks;
+}
+
+/**
+ * Saves chunks to text files for debugging and analysis
+ * @param {Array<string>} chunks - Array of text chunks
+ * @param {string} filePrefix - Prefix for the output files
+ * @return {void}
+ */
+function saveChunksToFiles(chunks, filePrefix) {
+  if (!chunks || chunks.length === 0) {
+    console.log('No chunks to save');
+    return;
+  }
+  
+  // Create chunks directory if it doesn't exist
+  const chunksDir = path.join(__dirname, '../chunks');
+  if (!fs.existsSync(chunksDir)) {
+    fs.mkdirSync(chunksDir, { recursive: true });
+  }
+  
+  // Save each chunk to a file
+  chunks.forEach((chunk, index) => {
+    const filePath = path.join(chunksDir, `${filePrefix}_${index + 1}.txt`);
+    fs.writeFileSync(filePath, chunk);
+    console.log(`Saved ${filePrefix}_${index + 1} to ${filePath} (${chunk.length} characters)`);
+  });
+  
+  console.log(`Saved ${chunks.length} chunks to ${chunksDir}`);
+}
+
+/**
  * Tests PDF text extraction using a custom approach
  * @param {string} filePath - Path to the PDF file
+ * @param {string} outputPrefix - Prefix for output chunk files
+ * @param {Object} options - Additional options
  */
-export async function testPdfExtraction(filePath) {
+export async function testPdfExtraction(filePath, outputPrefix = 'test_chunks', options = {}) {
   try {
     console.log(`\n===== TESTING PDF EXTRACTION: ${filePath} =====\n`);
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {
       console.error(`File does not exist: ${filePath}`);
-      return;
+      return '';
     }
     
     // Read the file as buffer
@@ -33,9 +148,11 @@ export async function testPdfExtraction(filePath) {
       console.error("PDF validation failed - file may be corrupted:", err.message);
     }
     
-    // Use the existing PDF extraction function from your codebase
-    console.log(`Extracting text using your existing function...`);
+    // Import the extractTextFromPdf function first
     const { extractTextFromPdf } = await import('./fileProcessing.js');
+    
+    // Now use the imported function
+    console.log(`Extracting text using your existing function...`);
     const reportText = await extractTextFromPdf(filePath);
     
     console.log(`PDF extraction successful. Text length: ${reportText.length} characters\n`);
@@ -43,171 +160,25 @@ export async function testPdfExtraction(filePath) {
     // Show basic stats
     const lines = reportText.split('\n');
     console.log(`Number of lines: ${lines.length}`);
-    console.log(`Average line length: ${Math.round(reportText.length / lines.length)} characters\n`);
     
-    // Show the first 10 lines
-    console.log(`===== FIRST 10 LINES =====`);
-    for (let i = 0; i < Math.min(10, lines.length); i++) {
-      console.log(`Line ${i+1}: ${lines[i].substring(0, 100)}${lines[i].length > 100 ? '...' : ''}`);
-    }
-    
-    // Show a sample from the middle
-    console.log(`\n===== MIDDLE SAMPLE =====`);
-    const middleIndex = Math.floor(lines.length / 2);
-    for (let i = middleIndex; i < Math.min(middleIndex + 10, lines.length); i++) {
-      console.log(`Line ${i+1}: ${lines[i].substring(0, 100)}${lines[i].length > 100 ? '...' : ''}`);
-    }
-    
-    // Look for common credit report sections with improved patterns
-    console.log(`\n===== SECTION DETECTION =====`);
-    const sectionPatterns = [
-      { 
-        pattern: /\b(?:personal|consumer)\s+information\b/i, 
-        name: "Personal Information",
-        priority: 1
-      },
-      { 
-        pattern: /\b(?:accounts?|tradelines?)\s+(?:in\s+good\s+standing)?\b/i, 
-        name: "Accounts",
-        priority: 2
-      },
-      { 
-        pattern: /\bpublic\s+records?\b/i, 
-        name: "Public Records",
-        priority: 3
-      },
-      { 
-        pattern: /\b(?:credit\s+)?inquiries\b/i, 
-        name: "Inquiries",
-        priority: 4
-      },
-      { 
-        pattern: /\bcollections?\s+(?:accounts?)?\b/i, 
-        name: "Collections",
-        priority: 5
-      },
-      { 
-        pattern: /\bcredit\s+score\b/i, 
-        name: "Credit Score",
-        priority: 6
-      },
-      {
-        pattern: /\b(?:potentially\s+)?negative\s+(?:items?|accounts?)\b/i,
-        name: "Negative Items",
-        priority: 7
-      },
-      {
-        pattern: /\bcharge(?:-|\s+)?offs?\b/i,
-        name: "Charge-Offs",
-        priority: 8
-      }
-    ];
-
-    // First pass: Find all occurrences of each section pattern
-    const sectionOccurrences = [];
-
-    for (const section of sectionPatterns) {
-      for (let i = 0; i < lines.length; i++) {
-        if (section.pattern.test(lines[i])) {
-          sectionOccurrences.push({
-            name: section.name,
-            lineIndex: i,
-            priority: section.priority,
-            line: lines[i].trim()
-          });
-        }
-      }
-    }
-
-    // Sort occurrences by line index and then by priority (for same line)
-    sectionOccurrences.sort((a, b) => {
-      if (a.lineIndex === b.lineIndex) {
-        return a.priority - b.priority;
-      }
-      return a.lineIndex - b.lineIndex;
-    });
-
-    // Filter out duplicate sections on the same line (keep the higher priority one)
-    const uniqueSections = [];
-    let lastLineIndex = -1;
-
-    for (const occurrence of sectionOccurrences) {
-      if (occurrence.lineIndex !== lastLineIndex) {
-        uniqueSections.push(occurrence);
-        lastLineIndex = occurrence.lineIndex;
-      }
-    }
-
-    // Display the detected sections
-    if (uniqueSections.length === 0) {
-      console.log("No sections detected in the document");
-    } else {
-      console.log(`Found ${uniqueSections.length} distinct sections:`);
-      
-      for (const section of uniqueSections) {
-        console.log(`Found "${section.name}" section at line ${section.lineIndex + 1}: "${section.line}"`);
-        
-        // Show a few lines after this section header
-        console.log(`  Context:`);
-        for (let i = section.lineIndex + 1; i < Math.min(section.lineIndex + 5, lines.length); i++) {
-          console.log(`    ${lines[i].trim().substring(0, 100)}${lines[i].length > 100 ? '...' : ''}`);
-        }
-        
-        // If this isn't the last section, show the section length
-        const nextSectionIndex = uniqueSections.indexOf(section) + 1;
-        if (nextSectionIndex < uniqueSections.length) {
-          const nextSection = uniqueSections[nextSectionIndex];
-          const sectionLength = nextSection.lineIndex - section.lineIndex;
-          console.log(`  Section length: ${sectionLength} lines`);
-        }
-      }
-    }
-    
-    // Check for account numbers (masked with X's)
-    console.log(`\n===== ACCOUNT NUMBER DETECTION =====`);
-    const accountNumberPattern = /\b(?:\d{4}[ -]?){3}\d{4}\b|\bXX+\d{4}\b/;
-    let accountNumberCount = 0;
-    
-    for (let i = 0; i < lines.length; i++) {
-      if (accountNumberPattern.test(lines[i])) {
-        accountNumberCount++;
-        if (accountNumberCount <= 3) { // Show only first 3 examples
-          console.log(`Found potential account number at line ${i+1}: "${lines[i].trim().substring(0, 100)}..."`);
-        }
-      }
-    }
-    
-    console.log(`Total potential account numbers found: ${accountNumberCount}`);
-    
-    // Check for common PDF extraction issues
-    console.log(`\n===== EXTRACTION QUALITY CHECK =====`);
-    
-    // Check for character encoding issues
-    const nonAsciiCount = (reportText.match(/[^\x00-\x7F]/g) || []).length;
-    console.log(`Non-ASCII characters: ${nonAsciiCount} (${(nonAsciiCount / reportText.length * 100).toFixed(2)}% of text)`);
-    
-    // Check for layout issues (lines that might be merged incorrectly)
-    const longLineCount = lines.filter(line => line.length > 200).length;
-    console.log(`Unusually long lines (>200 chars): ${longLineCount} (${(longLineCount / lines.length * 100).toFixed(2)}% of lines)`);
-    
-    // Check for potential table data
-    const tableLineCount = lines.filter(line => (line.match(/\s{3,}/g) || []).length > 3).length;
-    console.log(`Potential table lines (with multiple spaces): ${tableLineCount} (${(tableLineCount / lines.length * 100).toFixed(2)}% of lines)`);
-    
-    console.log(`\n===== PDF EXTRACTION TEST COMPLETE =====\n`);
+    // Process the chunks using the correct prefix
     console.log(`\n===== CHUNK TESTING =====\n`);
-    const { chunkReportText, saveChunksToFiles } = await import('./reportChunker.js');
-    const textChunks = chunkReportText(reportText, 10000, 200);
-    saveChunksToFiles(textChunks, 'test_chunks');
+    const textChunks = chunkReportText(reportText, 100000, 200);
+    
+    // Use the outputPrefix parameter instead of hardcoded 'test_chunks'
+    saveChunksToFiles(textChunks, outputPrefix);
     console.log(`\n===== CHUNK TESTING COMPLETE =====\n`);
+
+    return reportText;
   } catch (error) {
-    console.error('Error testing PDF extraction:', error);
+    console.error('Error in PDF text extraction:', error);
     console.error(error.stack);
+    return '';
   }
 }
 
 // Main function
-async function main() {
+/*async function main() {
   // Use the specific file path you provided
   const filePath = './uploads/1747722766395-Equifax_FACT_Rpt_06092014.pdf';
   
@@ -216,13 +187,13 @@ async function main() {
     process.exit(1);
   }
   
-  console.log(`Testing PDF extraction for: ${filePath}`);
+  //console.log(`Testing PDF extraction for: ${filePath}`);
   
   // Run the test
   await testPdfExtraction(filePath);
-}
+}*/
 
-main().catch(err => {
-  console.error('Error in main function:', err);
-  process.exit(1);
-});
+//main().catch(err => {
+//  console.error('Error in main function:', err);
+//  process.exit(1);
+//});

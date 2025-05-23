@@ -19,8 +19,8 @@ const __dirname = path.dirname(__filename);
  * @return {Object} Structured report data
  */
 export async function analyzeReport(reportText) {
-  console.log(`\n===== ANALYZING CREDIT REPORT =====`);
-  console.log(`Report text length: ${reportText.length} characters`);
+  //console.log(`\n===== ANALYZING CREDIT REPORT =====`);
+  //console.log(`Report text length: ${reportText.length} characters`);
   
   try {
     // Normalize line endings and remove excessive whitespace
@@ -29,7 +29,7 @@ export async function analyzeReport(reportText) {
       .replace(/\n{3,}/g, '\n\n')
       .trim();
     
-    console.log(`Normalized text length: ${normalizedText.length} characters`);
+    //console.log(`Normalized text length: ${normalizedText.length} characters`);
     
     // Use GPT to analyze the report instead of manual parsing
     const analysisResults = await processReportWithGpt('', normalizedText);
@@ -56,8 +56,8 @@ export async function analyzeReport(reportText) {
  */
 export async function processReportWithGpt(filePath, reportText) {
   try {
-    console.log(`\n===== PROCESSING REPORT WITH GPT =====`);
-    console.log(`Text length: ${reportText.length} characters`);
+    //console.log(`\n===== PROCESSING REPORT WITH GPT =====`);
+    //console.log(`Text length: ${reportText.length} characters`);
     
     // Create a system prompt that instructs GPT on how to analyze credit reports
     const systemPrompt = `You are a credit report analysis expert. Your task is to analyze credit report text and identify potential items that could be disputed. 
@@ -87,7 +87,7 @@ ${reportText}
 Return ONLY a valid JSON array of disputable items with no additional text or explanation.`;
 
     // Call GPT API
-    console.log(`Calling GPT API to analyze report...`);
+    //console.log(`Calling GPT API to analyze report...`);
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -109,7 +109,7 @@ Return ONLY a valid JSON array of disputable items with no additional text or ex
       const disputableItems = parsedResponse.items || parsedResponse;
       
       if (Array.isArray(disputableItems)) {
-        console.log(`Successfully extracted ${disputableItems.length} disputable items`);
+        //console.log(`Successfully extracted ${disputableItems.length} disputable items`);
         return disputableItems;
       } else {
         console.error(`Response is not an array: ${typeof disputableItems}`);
@@ -133,7 +133,7 @@ Return ONLY a valid JSON array of disputable items with no additional text or ex
  */
 export async function extractTextFromPdf(filePath) {
   try {
-    console.log(`Extracting text from PDF: ${filePath}`);
+    //console.log(`Extracting text from PDF: ${filePath}`);
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {
@@ -161,7 +161,7 @@ export async function extractTextFromPdf(filePath) {
       renderPage: () => Promise.resolve()
     });
     
-    console.log(`PDF extraction successful. Text length: ${pdfData.text.length} characters`);
+    //console.log(`PDF extraction successful. Text length: ${pdfData.text.length} characters`);
     return pdfData.text;
   } catch (error) {
     console.error(`Error extracting text from PDF: ${filePath}`, error);
@@ -176,7 +176,7 @@ export async function extractTextFromPdf(filePath) {
  */
 export async function analyzeReportFile(filePath) {
   try {
-    console.log(`\n===== ANALYZING CREDIT REPORT FILE: ${filePath} =====\n`);
+    //console.log(`\n===== ANALYZING CREDIT REPORT FILE: ${filePath} =====\n`);
     
     // Extract text from PDF
     const reportText = await extractTextFromPdf(filePath);
