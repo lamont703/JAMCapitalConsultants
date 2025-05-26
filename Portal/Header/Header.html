@@ -375,9 +375,124 @@
             }
 
             function handleLogout() {
-                // In a real app, this would clear session data and redirect
-                window.location.href = 'https://jamcapitalconsultants.com/login';
+                console.log('=== LOGOUT INITIATED ===');
+                console.log('Current authToken exists:', !!localStorage.getItem('authToken'));
+
+                // Show loading state if there's a logout button
+                const logoutButton = document.getElementById('header-logoutButton');
+                if (logoutButton) {
+                    logoutButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+                    logoutButton.disabled = true;
+                }
+
+                // Get the auth token for the logout request
+                const authToken = localStorage.getItem('authToken');
+
+                // Make logout request to backend (optional but recommended)
+                if (authToken) {
+                    console.log('Making logout API call...');
+
+                    fetch('http://localhost:3000/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    })
+                        .then(response => {
+                            console.log('Logout API response status:', response.status);
+                            console.log('Logout API response ok:', response.ok);
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Server logout response:', data);
+                            performClientSideLogout();
+                        })
+                        .catch(error => {
+                            console.error('Logout request failed:', error);
+                            console.log('Proceeding with client-side cleanup anyway...');
+                            performClientSideLogout();
+                        });
+                } else {
+                    console.log('No token found, proceeding with client-side cleanup...');
+                    performClientSideLogout();
+                }
             }
+
+            function performClientSideLogout() {
+                console.log('=== PERFORMING CLIENT-SIDE LOGOUT ===');
+
+                try {
+                    // Log before clearing
+                    console.log('Before clearing - authToken exists:', !!localStorage.getItem('authToken'));
+                    console.log('Before clearing - userData exists:', !!localStorage.getItem('userData'));
+
+                    // Clear all authentication data from localStorage
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('currentAnalysisData');
+                    localStorage.removeItem('userPreferences');
+
+                    // Clear sessionStorage as well
+                    sessionStorage.clear();
+
+                    // Clear any cookies if you're using them
+                    document.cookie.split(";").forEach(function (c) {
+                        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                    });
+
+                    // Log after clearing
+                    console.log('After clearing - authToken exists:', !!localStorage.getItem('authToken'));
+                    console.log('After clearing - userData exists:', !!localStorage.getItem('userData'));
+
+                    // Track logout event for analytics
+                    if (typeof analytics !== 'undefined') {
+                        analytics.track('UserLogout', {
+                            timestamp: new Date().toISOString(),
+                            method: 'manual'
+                        });
+                    }
+
+                    console.log('Client-side logout completed');
+                    console.log('Redirecting to login page...');
+
+                    // Redirect to login page
+                    window.location.href = 'https://jamcapitalconsultants.com/login';
+
+                } catch (error) {
+                    console.error('Error during client-side logout:', error);
+                    // Force redirect even if there's an error
+                    window.location.href = 'https://jamcapitalconsultants.com/login';
+                }
+            }
+
+            // Optional: Add automatic logout on token expiration
+            function checkTokenExpiration() {
+                const authToken = localStorage.getItem('authToken');
+
+                if (authToken) {
+                    try {
+                        // Decode JWT to check expiration (basic check - don't rely on this for security)
+                        const payload = JSON.parse(atob(authToken.split('.')[1]));
+                        const currentTime = Date.now() / 1000;
+
+                        if (payload.exp && payload.exp < currentTime) {
+                            console.log('Token expired, logging out automatically');
+                            handleLogout();
+                        }
+                    } catch (error) {
+                        console.error('Error checking token expiration:', error);
+                        // If we can't decode the token, it's probably invalid
+                        handleLogout();
+                    }
+                }
+            }
+
+            // Check token expiration every 5 minutes
+            setInterval(checkTokenExpiration, 5 * 60 * 1000);
+
+            // Check immediately when page loads
+            document.addEventListener('DOMContentLoaded', checkTokenExpiration);
 
             // Initialize header
             function init(containerId) {

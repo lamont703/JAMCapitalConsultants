@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { extractTextFromImage } from '../utils/fileProcessing.js';
-import { testPdfExtraction } from '../utils/pdfTextExtractor.js';
-import { generateDisputeResponse, analyzeCreditReports, generateDisputeLetter } from '../utils/chatGptService.js';
+import { PdfExtraction } from '../utils/pdfTextExtractor.js';
+import { generateDisputeResponse, generateDisputeLetter } from '../utils/chatGptService.js';
 import crypto from 'crypto';
 import { ensureCacheDirectory, cleanupCache, clearCache, getCacheStats } from '../utils/cacheManager.js';
 import { analyzeChunks, analyzeChunksFromFiles, comprehensiveAnalyzeChunksFromFiles } from '../utils/gptAnalyzer.js';
@@ -26,7 +26,7 @@ async function extractTextFromFiles(files) {
       // Extract text based on file type
       if (file.mimetype === 'application/pdf') {
         console.log(`Extracting text from PDF file: ${file.path}`);
-        extractedText = await testPdfExtraction(file.path);
+        extractedText = await PdfExtraction(file.path);
         console.log(`Extracted ${extractedText.length} characters from PDF`);
       } else if (file.mimetype.startsWith('image/')) {
         console.log(`Extracting text from image file: ${file.path}`);
@@ -72,10 +72,14 @@ export const chatController = {
     }
   },
   
-  // Analyze credit reports
+  // Analyze credit reports (Keep this for now)
   async analyzeReports(req, res) {
+    // Add startTime at the very beginning
+    const startTime = Date.now();
+    
     try {
       console.log('\n===== ANALYZING CREDIT REPORTS =====\n');
+      console.log(`Analysis started at: ${new Date().toISOString()}`);
       
       // Check if files were uploaded
       if (!req.files || req.files.length === 0) {
@@ -93,6 +97,7 @@ export const chatController = {
       
       // Create a cache file path for this analysis
       const cacheFilePath = path.join(__dirname, `../cache/analysis_${sessionId}.json`);
+      console.log(`Cache file will be saved to: ${cacheFilePath}`);
       
       // Clean up old cache files
       cleanupCache();
@@ -111,128 +116,182 @@ export const chatController = {
       
       for (const file of req.files) {
         try {
-          console.log(`\n----- Processing file: ${file.originalname} -----`);
-          console.log(`File type: ${file.mimetype}, Size: ${file.size} bytes`);
+          console.log(`\n----- Processing ${file.originalname} -----`);
+          console.log(`File size: ${file.size} bytes`);
+          console.log(`File type: ${file.mimetype}`);
           
           // Generate a unique prefix for this file's chunks
-          const filePrefix = `${sessionId}_${path.basename(file.originalname, path.extname(file.originalname))}`;
+          const filePrefix = crypto.randomBytes(8).toString('hex') + '_' + Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9]/g, '_');
           
-          // Extract text based on file type
           if (file.mimetype === 'application/pdf') {
-            console.log(`Extracting text from PDF file: ${file.path}`);
-            
-            // Debug: Check if file exists and is readable
-            if (!fs.existsSync(file.path)) {
-              console.error(`PDF file does not exist: ${file.path}`);
-              continue;
-            }
-            
-            // Use testPdfExtraction which handles both extraction and chunking
-            await testPdfExtraction(file.path, filePrefix, { silent: false });
-            
-            // Debug: Check if chunks were created
-            const chunkFiles = fs.readdirSync(chunksDir)
-              .filter(f => f.startsWith(filePrefix));
-            
-            console.log(`Found ${chunkFiles.length} chunk files for ${file.originalname}`);
-            
-            if (chunkFiles.length === 0) {
-              console.error(`No chunks were created for ${file.originalname}`);
-              continue;
-            }
-            
-            // Debug: Check content of first chunk
-            const firstChunkPath = path.join(chunksDir, chunkFiles[0]);
-            const chunkContent = fs.readFileSync(firstChunkPath, 'utf8');
-            console.log(`First chunk contains ${chunkContent.length} characters`);
-            console.log(`Sample content: ${chunkContent.substring(0, 200)}...`);
-            
-            // Now analyze the chunks using gptAnalyzer
-            console.log(`Analyzing chunks for ${file.originalname}...`);
-            const pdfDisputableItems = await comprehensiveAnalyzeChunksFromFiles(chunksDir, filePrefix, { showOutput: true });
-            
-            console.log(`Found ${pdfDisputableItems.length} disputable items in ${file.originalname}`);
-            allDisputableItems.push(...pdfDisputableItems);
-            
-            // Store the processed file info
-            processedFiles.push({
-              filename: file.originalname,
-              path: file.path,
-              chunks: chunkFiles.length,
-              items: pdfDisputableItems.length
-            });
-          } 
-          else if (file.mimetype.startsWith('image/')) {
-            console.log(`Extracting text from image file: ${file.path}`);
-            const extractedText = await extractTextFromImage(file.path);
+            console.log(`Extracting text from PDF: ${file.path}`);
+
+            // Extract text from PDF
+            const extractedText = await PdfExtraction(file.path);
+            console.log(`Extracted ${extractedText.length} characters from PDF`);
             
             // Save the extracted text to a chunk file
             const chunkPath = path.join(chunksDir, `${filePrefix}_1.txt`);
             fs.writeFileSync(chunkPath, extractedText);
+            console.log(`Saved extracted text to: ${chunkPath}`);
             
-            // Analyze the chunk
-            console.log(`Analyzing text from image ${file.originalname}...`);
-            const imageDisputableItems = await comprehensiveAnalyzeChunksFromFiles(chunksDir, filePrefix, { showOutput: false });
+            // Analyze the chunk with debugging
+            console.log(`Analyzing PDF content from ${file.originalname}...`);
+            console.log(`Calling comprehensiveAnalyzeChunksFromFiles with:`);
+            console.log(`- chunksDir: ${chunksDir}`);
+            console.log(`- filePrefix: ${filePrefix}`);
             
-            console.log(`Found ${imageDisputableItems.length} disputable items in ${file.originalname}`);
-            allDisputableItems.push(...imageDisputableItems);
+            const textAnalysisResult = await comprehensiveAnalyzeChunksFromFiles(chunksDir, filePrefix, { showOutput: true });
             
-            // Store the processed file info
-            processedFiles.push({
-              filename: file.originalname,
-              path: file.path,
-              textLength: extractedText.length,
-              items: imageDisputableItems.length
-            });
-          } 
+            // Debug the result
+            console.log(`Analysis result type: ${typeof textAnalysisResult}`);
+            console.log(`Analysis result:`, textAnalysisResult);
+            
+            if (!textAnalysisResult) {
+              console.error(`ERROR: comprehensiveAnalyzeChunksFromFiles returned undefined/null`);
+              throw new Error('Analysis function returned no results');
+            }
+            
+            if (!textAnalysisResult.summary) {
+              console.error(`ERROR: Analysis result missing summary property`);
+              console.log(`Available properties:`, Object.keys(textAnalysisResult));
+              
+              // Try to handle different return formats
+              if (Array.isArray(textAnalysisResult)) {
+                console.log(`Result is an array with ${textAnalysisResult.length} items`);
+                // Create a summary object for array results
+                const summary = {
+                  uniqueItems: textAnalysisResult.length,
+                  totalItems: textAnalysisResult.length,
+                  categories: {}
+                };
+                
+                // Count items by category
+                textAnalysisResult.forEach(item => {
+                  const category = item.analysis_pass || 'unknown';
+                  summary.categories[category] = (summary.categories[category] || 0) + 1;
+                });
+                
+                // Reconstruct the expected format
+                const reconstructedResult = {
+                  summary: summary,
+                  allItems: textAnalysisResult,
+                  categorizedItems: {}
+                };
+                
+                console.log(`Reconstructed result with summary:`, reconstructedResult.summary);
+                
+                console.log(`Found ${reconstructedResult.summary.uniqueItems} disputable items in ${file.originalname}`);
+                
+                // Store categorized results
+                processedFiles.push({
+                  filename: file.originalname,
+                  path: file.path,
+                  textLength: extractedText.length,
+                  totalItems: reconstructedResult.summary.uniqueItems,
+                  categories: reconstructedResult.summary.categories
+                });
+                
+                // Add to overall items
+                allDisputableItems.push(...reconstructedResult.allItems);
+                
+              } else {
+                throw new Error('Analysis result has unexpected format - not array and no summary');
+              }
+            } else {
+              // Normal case - result has summary
+              console.log(`Found ${textAnalysisResult.summary.uniqueItems} disputable items in ${file.originalname}`);
+              
+              // Store categorized results
+              processedFiles.push({
+                filename: file.originalname,
+                path: file.path,
+                textLength: extractedText.length,
+                totalItems: textAnalysisResult.summary.uniqueItems,
+                categories: textAnalysisResult.summary.categories
+              });
+              
+              // Add to overall items for legacy compatibility
+              allDisputableItems.push(...textAnalysisResult.allItems);
+            }
+          }
           else {
             console.log(`Reading text from file: ${file.path}`);
             const extractedText = fs.readFileSync(file.path, 'utf8');
+            console.log(`Read ${extractedText.length} characters from text file`);
             
             // Save the extracted text to a chunk file
             const chunkPath = path.join(chunksDir, `${filePrefix}_1.txt`);
             fs.writeFileSync(chunkPath, extractedText);
+            console.log(`Saved text to: ${chunkPath}`);
             
             // Analyze the chunk
             console.log(`Analyzing text from ${file.originalname}...`);
-            const textDisputableItems = await comprehensiveAnalyzeChunksFromFiles(chunksDir, filePrefix, { showOutput: false });
+            const textAnalysisResult = await comprehensiveAnalyzeChunksFromFiles(chunksDir, filePrefix, { showOutput: false });
             
-            console.log(`Found ${textDisputableItems.length} disputable items in ${file.originalname}`);
-            allDisputableItems.push(...textDisputableItems);
+            console.log(`Found ${textAnalysisResult.summary.uniqueItems} disputable items in ${file.originalname}`);
             
-            // Store the processed file info
+            // Store categorized results
             processedFiles.push({
               filename: file.originalname,
               path: file.path,
               textLength: extractedText.length,
-              items: textDisputableItems.length
+              analysisResult: textAnalysisResult,
+              totalItems: textAnalysisResult.summary.uniqueItems
             });
+            
+            // Add to overall items for legacy compatibility
+            allDisputableItems.push(...textAnalysisResult.allItems);
           }
           
           console.log(`\n----- Completed processing ${file.originalname} -----`);
           
         } catch (error) {
           console.error(`Error processing file ${file.originalname}:`, error);
+          console.error(`Error stack:`, error.stack);
           // Continue with other files even if one fails
         }
       }
       
-      // Generate a summary and detailed analysis using GPT
-      console.log(`\nGenerating analysis for ${allDisputableItems.length} disputable items...`);
+      // Calculate processing time for file analysis
+      const fileProcessingTime = Date.now() - startTime;
+      console.log(`\nFile processing completed in ${fileProcessingTime}ms`);
       
-      // Convert disputable items to a string for the GPT analysis
-      const itemsForAnalysis = JSON.stringify(allDisputableItems, null, 2);
-      const analysisResult = await analyzeCreditReports(itemsForAnalysis, true);
+      // Generate a summary from the comprehensive analysis results
+      console.log(`\nGenerating summary for ${allDisputableItems.length} disputable items...`);
+
+      const gptAnalysisStart = Date.now();
+
+      // Categorize items for better organization
+      const categorizedItems = {};
+      allDisputableItems.forEach(item => {
+        const category = item.analysis_pass || 'other';
+        if (!categorizedItems[category]) {
+          categorizedItems[category] = [];
+        }
+        categorizedItems[category].push(item);
+      });
       
-      // Format the analysis for display
-      const formattedAnalysis = analysisResult.detailedAnalysis.replace(/\n/g, '<br>');
+      // Create a simple summary instead of re-analyzing
+      const analysisResult = {
+        summary: `Found ${allDisputableItems.length} potential dispute items across ${processedFiles.length} credit report(s). Items include ${Object.keys(categorizedItems).join(', ')} issues.`,
+        detailedAnalysis: generateDetailedSummary(allDisputableItems, categorizedItems),
+        foundItems: allDisputableItems.length > 0
+      };
+
+      const gptAnalysisTime = Date.now() - gptAnalysisStart;
+      console.log(`Summary generation completed in ${gptAnalysisTime}ms`);
+      
+      // Calculate total processing time
+      const totalProcessingTime = Date.now() - startTime;
+      console.log(`Total analysis time: ${totalProcessingTime}ms`);
       
       // Prepare response object with both structured and formatted data
       const responseObj = {
         summary: analysisResult.summary,
         analysis: analysisResult.detailedAnalysis,
-        formattedAnalysis: formattedAnalysis,
-        foundItems: analysisResult.foundItems || allDisputableItems.length > 0,
+        formattedAnalysis: analysisResult.detailedAnalysis.replace(/\n/g, '<br>'),
+        foundItems: analysisResult.foundItems,
         extractedItems: allDisputableItems,
         processedFiles: processedFiles
       };
@@ -240,14 +299,121 @@ export const chatController = {
       // Add a flag to indicate this is a fresh analysis
       responseObj.fromCache = false;
       
-      // Save the result to cache
-      fs.writeFileSync(cacheFilePath, JSON.stringify(responseObj));
-      console.log('Analysis result cached for future use');
+      console.log(`\nCategorized items:`, Object.keys(categorizedItems).map(cat => `${cat}: ${categorizedItems[cat].length}`));
       
-      return res.json(responseObj);
+      // Save results to cache with better formatting
+      try {
+        const cacheData = {
+          timestamp: new Date().toISOString(),
+          summary: {
+            totalFiles: processedFiles.length,
+            totalUniqueItems: allDisputableItems.length,
+            analysisDate: new Date().toLocaleDateString(),
+            processingTime: `${totalProcessingTime}ms`,
+            fileProcessingTime: `${fileProcessingTime}ms`,
+            gptAnalysisTime: `${gptAnalysisTime}ms`
+          },
+          
+          // Categorized dispute items for easy reading
+          disputeItems: {
+            personalInformation: categorizedItems.personal_info || [],
+            accountStatus: categorizedItems.account_status || [],
+            paymentHistory: categorizedItems.payment_history || [],
+            duplicateAccounts: categorizedItems.duplicates || [],
+            unauthorizedInquiries: categorizedItems.inquiries || [],
+            collections: categorizedItems.collections || [],
+            unverifiableInfo: categorizedItems.unverifiable || [],
+            outdatedInfo: categorizedItems.outdated || []
+          },
+          
+          // Individual dispute items with clear structure
+          allDisputeItems: allDisputableItems.map((item, index) => ({
+            id: index + 1,
+            creditor: item.creditor_name,
+            accountNumber: item.account_number,
+            accountType: item.account_type,
+            issueType: item.issue_type,
+            issueDetails: item.issue_details,
+            disputeReason: item.dispute_reason,
+            confidenceLevel: item.confidence_level,
+            category: item.analysis_pass,
+            originalText: item.original_text?.substring(0, 200) + '...' // Truncate for readability
+          })),
+          
+          // File processing details
+          processedFiles: processedFiles.map(file => ({
+            filename: file.filename,
+            itemsFound: file.totalItems || file.items,
+            fileSize: file.textLength ? `${Math.round(file.textLength / 1024)}KB` : 'Unknown',
+            processingStatus: 'Success'
+          })),
+          
+          // GPT Analysis Summary
+          gptAnalysis: {
+            summary: analysisResult.summary,
+            detailedAnalysis: analysisResult.detailedAnalysis,
+            foundItems: analysisResult.foundItems
+          },
+          
+          // Dispute recommendations by priority
+          disputeRecommendations: {
+            highPriority: allDisputableItems
+              .filter(item => item.confidence_level === 'high')
+              .map(item => ({
+                creditor: item.creditor_name,
+                issue: item.issue_type,
+                reason: item.dispute_reason
+              })),
+            
+            mediumPriority: allDisputableItems
+              .filter(item => item.confidence_level === 'medium')
+              .map(item => ({
+                creditor: item.creditor_name,
+                issue: item.issue_type,
+                reason: item.dispute_reason
+              })),
+            
+            lowPriority: allDisputableItems
+              .filter(item => item.confidence_level === 'low')
+              .map(item => ({
+                creditor: item.creditor_name,
+                issue: item.issue_type,
+                reason: item.dispute_reason
+              }))
+          }
+        };
+
+        // Save to cache with pretty formatting
+        fs.writeFileSync(cacheFilePath, JSON.stringify(cacheData, null, 2));
+        console.log(`\nResults cached to: ${cacheFilePath}`);
+        console.log(`Cache file size: ${Math.round(fs.statSync(cacheFilePath).size / 1024)}KB`);
+        
+      } catch (cacheError) {
+        console.error('Error saving to cache:', cacheError);
+        console.error('Cache error stack:', cacheError.stack);
+      }
+      
+      console.log(`\n===== ANALYSIS COMPLETE =====`);
+      console.log(`Total items found: ${allDisputableItems.length}`);
+      console.log(`Files processed: ${processedFiles.length}`);
+      console.log(`Total time: ${totalProcessingTime}ms`);
+      console.log(`Analysis finished at: ${new Date().toISOString()}`);
+      
+      res.json(responseObj);
+      
     } catch (error) {
-      console.error('Error analyzing reports:', error);
-      return res.status(500).json({ error: 'Failed to analyze reports' });
+      const errorTime = Date.now() - startTime;
+      console.error('\n===== ANALYSIS ERROR =====');
+      console.error(`Error occurred after ${errorTime}ms`);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      console.error('Error at:', new Date().toISOString());
+      
+      res.status(500).json({ 
+        error: 'Failed to analyze credit reports',
+        details: error.message,
+        processingTime: `${errorTime}ms`
+      });
     }
   },
   
@@ -271,7 +437,7 @@ export const chatController = {
     }
   },
 
-  // Clear analysis cache
+  // Clear analysis cache (Keep this for now)
   async clearCache(req, res) {
     try {
       // Get the cache directory
@@ -341,7 +507,7 @@ export default chatController;
       console.log("Successfully imported pdfTextExtractor module");
       
       // Test the PDF extraction
-      return module.testPdfExtraction(testFilePath);
+      return module.PdfExtraction(testFilePath);
     })
     .then(text => {
       console.log(`\nExtracted ${text ? text.length : 0} characters from PDF`);
@@ -353,3 +519,22 @@ export default chatController;
       process.exit(1);
     });
 }*/
+
+function generateDetailedSummary(items, categorizedItems) {
+  let summary = `## Credit Report Analysis Summary\n\n`;
+  summary += `I've analyzed your credit reports and found **${items.length} potential dispute items** that could be challenged.\n\n`;
+  
+  Object.keys(categorizedItems).forEach(category => {
+    const categoryItems = categorizedItems[category];
+    summary += `### ${category.replace('_', ' ').toUpperCase()} (${categoryItems.length} items)\n`;
+    categoryItems.slice(0, 3).forEach(item => {
+      summary += `- **${item.creditor_name}**: ${item.issue_type} - ${item.dispute_reason}\n`;
+    });
+    if (categoryItems.length > 3) {
+      summary += `- ...and ${categoryItems.length - 3} more items\n`;
+    }
+    summary += `\n`;
+  });
+  
+  return summary;
+}

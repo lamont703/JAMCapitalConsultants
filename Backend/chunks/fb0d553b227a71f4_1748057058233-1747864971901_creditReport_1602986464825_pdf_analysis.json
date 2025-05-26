@@ -1,0 +1,52 @@
+[
+  {
+    "creditor_name": "CAPITAL BANK",
+    "account_number": "xxxx",
+    "account_type": "REVOLVING",
+    "issue_type": "Charge-Off",
+    "issue_details": "Account shows a charge-off status with a balance of $0, which may be misleading.",
+    "dispute_reason": "The account is reported as a charge-off but shows a balance of $0, which could be inaccurate.",
+    "original_text": "Account Status: CHARGE_OFF Balance: $0",
+    "chunk_number": 1
+  },
+  {
+    "creditor_name": "PENN CREDIT CORPORATION",
+    "account_number": "xxxx2619",
+    "account_type": "OTHER",
+    "issue_type": "Collection",
+    "issue_details": "Collection account shows as paid but may still be affecting credit score.",
+    "dispute_reason": "The account is marked as paid but may still be reported inaccurately.",
+    "original_text": "Status: PAID",
+    "chunk_number": 1
+  },
+  {
+    "creditor_name": "BMI FEDERAL CREDIT UNION",
+    "account_number": "xxxx0007",
+    "account_type": "INSTALLMENT",
+    "issue_type": "Closed Account",
+    "issue_details": "Account shows no payment history and was closed, which may not reflect accurate credit behavior.",
+    "dispute_reason": "No payment history reported for a closed account may be misleading.",
+    "original_text": "You currently do not have any Payment History in your file.",
+    "chunk_number": 1
+  },
+  {
+    "creditor_name": "NAVIENT",
+    "account_number": "xxxx0180",
+    "account_type": "INSTALLMENT",
+    "issue_type": "Closed Account",
+    "issue_details": "Account shows no payment history and was closed, which may not reflect accurate credit behavior.",
+    "dispute_reason": "No payment history reported for a closed account may be misleading.",
+    "original_text": "You currently do not have any Payment History in your file.",
+    "chunk_number": 1
+  },
+  {
+    "creditor_name": "CREDIT ACCEPTANCE CORPORATION",
+    "account_number": "xxxx0049",
+    "account_type": "INSTALLMENT",
+    "issue_type": "Repossession",
+    "issue_details": "Account shows a repossession status with a balance of $14,443, which may not be accurate.",
+    "dispute_reason": "The account is reported as a repossession but may not reflect accurate payment history.",
+    "original_text": "Account Status: REPOSSESSION Balance: $14,443",
+    "chunk_number": 1
+  }
+]

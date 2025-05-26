@@ -4,12 +4,16 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { CosmosService } from './services/cosmosService.js';
+import authRoutes from './routes/authRoutes.js';
+import { GoHighLevelService } from './services/ghlService.js';
+import ghlRoutes from './routes/ghlRoutes.js';
 
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -35,14 +39,45 @@ app.use(express.static(path.join(__dirname, '../Frontend')));
 // Use routes
 app.use('/api/chat', chatRoutesModule);
 app.use('/api/chatGptService', chatRoutesModule);
-console.log('check server.js routes');
+app.use('/api/auth', authRoutes);
+app.use('/api/ghl', ghlRoutes);
 
 // Serve the frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../Development Files'));
 });
 
+let cosmosService;
+
+// Initialize CosmosDB on startup
+async function initializeApp() {
+    try {
+        cosmosService = new CosmosService();
+        await cosmosService.initialize();
+        console.log('CosmosDB initialized successfully');
+        
+        // Make cosmosService available globally
+        app.locals.cosmosService = cosmosService;
+        
+        // Try to initialize GoHighLevel service (now it should work!)
+        try {
+            const ghlService = new GoHighLevelService();
+            await ghlService.initialize();
+            console.log('GoHighLevel service initialized successfully');
+            app.locals.ghlService = ghlService;
+        } catch (ghlError) {
+            console.warn('GoHighLevel initialization failed (continuing without GHL):', ghlError.message);
+            app.locals.ghlService = null;
+        }
+        
+    } catch (error) {
+        console.error('Failed to initialize core services:', error);
+        process.exit(1);
+    }
+}
+
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  await initializeApp();
 });

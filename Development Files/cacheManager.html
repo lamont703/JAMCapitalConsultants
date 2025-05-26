@@ -124,121 +124,97 @@
         // Fetch cache statistics when page loads
         document.addEventListener('DOMContentLoaded', fetchCacheStats);
 
-        // Function to fetch cache statistics
-        function fetchCacheStats() {
+        // Function to display cache statistics
+        function displayCacheStats(stats) {
             const statsContainer = document.getElementById('stats-container');
-            statsContainer.innerHTML = `
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Loading cache statistics...</p>
-                </div>
-            `;
 
-            fetch('http://localhost:3000/api/chatGptService/manage-cache?action=stats')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch cache statistics');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        const stats = data.stats;
-                        const usagePercentage = (stats.fileCount / stats.maxFiles) * 100;
+            if (!stats || Object.keys(stats).length === 0) {
+                statsContainer.innerHTML = '<p>No cache statistics available.</p>';
+                return;
+            }
 
-                        let html = `
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Cache Usage (${stats.fileCount}/${stats.maxFiles} files)</label>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: ${usagePercentage}%;" 
-                                        aria-valuenow="${usagePercentage}" aria-valuemin="0" aria-valuemax="100">
-                                        ${usagePercentage.toFixed(1)}%
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="stats-item d-flex justify-content-between">
-                                <span>Total Files:</span>
-                                <span class="fw-bold">${stats.fileCount}</span>
-                            </div>
-                            <div class="stats-item d-flex justify-content-between">
-                                <span>Maximum Files:</span>
-                                <span class="fw-bold">${stats.maxFiles}</span>
-                            </div>
-                            <div class="stats-item d-flex justify-content-between">
-                                <span>Total Size:</span>
-                                <span class="fw-bold">${stats.sizeInMB} MB</span>
-                            </div>
-                        `;
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr><th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Metric</th><th style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">Value</th></tr>';
 
-                        statsContainer.innerHTML = html;
-                    } else {
-                        statsContainer.innerHTML = `
-                            <div class="alert alert-danger">
-                                Failed to fetch cache statistics: ${data.error || 'Unknown error'}
-                            </div>
-                        `;
-                    }
-                })
-                .catch(error => {
-                    statsContainer.innerHTML = `
-                        <div class="alert alert-danger">
-                            ${error.message}
-                        </div>
-                    `;
-                });
+            // Add each stat to the table
+            for (const [key, value] of Object.entries(stats)) {
+                const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                html += `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">${formattedKey}</td><td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">${value}</td></tr>`;
+            }
+
+            html += '</table>';
+            statsContainer.innerHTML = html;
+        }
+
+        // Function to display messages
+        function displayMessage(message, isError = false) {
+            const messageContainer = document.getElementById('action-result');
+            messageContainer.textContent = message;
+            messageContainer.className = isError ? 'text-danger' : 'text-success';
+
+            // Hide the message after 5 seconds
+            setTimeout(() => {
+                messageContainer.textContent = '';
+            }, 5000);
+        }
+
+        // Function to display error messages
+        function displayError(message) {
+            displayMessage(message, true);
+        }
+
+        // Function to fetch cache statistics
+        async function fetchCacheStats() {
+            try {
+                const response = await fetch('http://localhost:3000/api/chat/manage-cache?action=stats');
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                const data = await response.json();
+                displayCacheStats(data);
+            } catch (error) {
+                console.error('Error fetching cache stats:', error);
+                displayError('Failed to fetch cache statistics');
+            }
         }
 
         // Function to clear cache
-        function clearCache() {
-            const actionResult = document.getElementById('action-result');
-            const clearButton = document.getElementById('clear-cache-btn');
+        async function clearCache() {
+            try {
+                // Show loading state
+                const button = document.getElementById('clear-cache-btn');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Clearing...';
+                button.disabled = true;
 
-            // Disable button and show loading state
-            clearButton.disabled = true;
-            clearButton.innerHTML = `
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Clearing Cache...
-            `;
-
-            fetch('http://localhost:3000/api/chatGptService/manage-cache?action=clear')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to clear cache');
+                const response = await fetch('http://localhost:3000/api/chat/manage-cache?action=clear', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        actionResult.innerHTML = `
-                            <div class="alert alert-success">
-                                ${data.message}
-                            </div>
-                        `;
-                        // Refresh stats after clearing
-                        fetchCacheStats();
-                    } else {
-                        actionResult.innerHTML = `
-                            <div class="alert alert-danger">
-                                Failed to clear cache: ${data.error || 'Unknown error'}
-                            </div>
-                        `;
-                    }
-                })
-                .catch(error => {
-                    actionResult.innerHTML = `
-                        <div class="alert alert-danger">
-                            ${error.message}
-                        </div>
-                    `;
-                })
-                .finally(() => {
-                    // Re-enable button
-                    clearButton.disabled = false;
-                    clearButton.innerHTML = 'Clear All Cache';
                 });
+
+                // Reset button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server responded with status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayMessage(`Cache cleared: ${data.message || 'Success'}`);
+                fetchCacheStats(); // Refresh stats after clearing
+            } catch (error) {
+                console.error('Error clearing cache:', error);
+                displayError(`Failed to clear cache: ${error.message}`);
+
+                // Reset button if error occurs
+                const button = document.getElementById('clear-cache-btn');
+                button.innerHTML = 'Clear All Cache';
+                button.disabled = false;
+            }
         }
     </script>
 </body>

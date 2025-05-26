@@ -11,6 +11,7 @@ const readFile = promisify(fs.readFile);
  * @param {string} filePath - Path to the PDF file
  * @returns {Promise<string>} - Extracted text content
  */
+// Keep this for now
 export async function extractTextFromPdf(filePath) {
   try {
     console.log(`Processing PDF file: ${filePath}`);

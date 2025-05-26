@@ -15,8 +15,12 @@ const storage = multer.diskStorage({
 });
 
 // Create a more flexible multer instance
-const upload = multer({ storage: storage });
-
+const upload = multer({
+  dest: 'uploads/',
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 // Create router
 const router = express.Router();
 
@@ -39,12 +43,12 @@ if (chatController.sendMessage) {
   router.post('/send', (req, res) => res.status(501).json({ error: 'Not implemented' }));
 }
 
-// Fix: Change to accept 'file' field name to match frontend
+// Fix: Change to accept 'file' field name to match frontend (Keep this route at /analyze-reports)
 if (chatController.analyzeReports) {
-  router.post('/analyze', upload.array('file'), chatController.analyzeReports);
+  router.post('/analyze', upload.array('reports'), chatController.analyzeReports);
 } else {
   console.error("Warning: chatController.analyzeReports is undefined");
-  router.post('/analyze', upload.array('file'), (req, res) => res.status(501).json({ error: 'Not implemented' }));
+  router.post('/analyze', upload.array('reports'), (req, res) => res.status(501).json({ error: 'Not implemented' }));
 }
 
 if (chatController.generateLetter) {

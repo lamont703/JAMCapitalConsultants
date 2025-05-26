@@ -21,6 +21,7 @@ export function ensureCacheDirectory() {
 /**
  * Cleans up old cache files if the cache exceeds the maximum size
  */
+// Keep this for now
 export function cleanupCache() {
   ensureCacheDirectory();
   
@@ -63,6 +64,7 @@ export function cleanupCache() {
  * Clears all cache files
  * @returns {number} Number of files deleted
  */
+// Keep this for now
 export function clearCache() {
   ensureCacheDirectory();
   

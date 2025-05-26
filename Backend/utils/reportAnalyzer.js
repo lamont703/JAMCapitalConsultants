@@ -1,3 +1,4 @@
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,7 +18,7 @@ const __dirname = path.dirname(__filename);
  * Analyzes a credit report and extracts structured information
  * @param {string} reportText - The raw text from the credit report
  * @return {Object} Structured report data
- */
+ 
 export async function analyzeReport(reportText) {
   //console.log(`\n===== ANALYZING CREDIT REPORT =====`);
   //console.log(`Report text length: ${reportText.length} characters`);
@@ -47,13 +48,13 @@ export async function analyzeReport(reportText) {
     };
   }
 }
-
+*/
 /**
  * Process a report chunk with GPT to extract disputable items
  * @param {string} filePath - Path to the file (for reference only)
  * @param {string} reportText - Text content to analyze
  * @returns {Promise<Array>} - Array of disputable items
- */
+
 export async function processReportWithGpt(filePath, reportText) {
   try {
     //console.log(`\n===== PROCESSING REPORT WITH GPT =====`);
@@ -125,12 +126,12 @@ Return ONLY a valid JSON array of disputable items with no additional text or ex
     return [];
   }
 }
-
+ */
 /**
  * Processes a PDF file and extracts text using the improved method
  * @param {string} filePath - Path to the PDF file
  * @returns {Promise<string>} - Extracted text
- */
+
 export async function extractTextFromPdf(filePath) {
   try {
     //console.log(`Extracting text from PDF: ${filePath}`);
@@ -168,12 +169,12 @@ export async function extractTextFromPdf(filePath) {
     throw error;
   }
 }
-
+ */
 /**
  * Main function to analyze a credit report file
  * @param {string} filePath - Path to the credit report file
  * @returns {Promise<Object>} - Analysis results
- */
+
 export async function analyzeReportFile(filePath) {
   try {
     //console.log(`\n===== ANALYZING CREDIT REPORT FILE: ${filePath} =====\n`);
@@ -194,3 +195,4 @@ export async function analyzeReportFile(filePath) {
     };
   }
 } 
+ */

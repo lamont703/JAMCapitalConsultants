@@ -316,6 +316,32 @@
                 min-height: -webkit-fill-available;
             }
         }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background-color: #fee;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-success {
+            background-color: #f0fff4;
+            color: #38a169;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert i {
+            font-size: 1rem;
+        }
     </style>
 </head>
 
@@ -431,72 +457,196 @@
             });
         });
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
 
-            // Get input values
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            const button = event.target.querySelector('button');
 
-            // Check if fields aren't empty
-            if (email && password) {
-                // Show feedback that login is processing
-                const button = event.target.querySelector('button');
-                button.innerHTML = 'Logging in...';
-                button.disabled = true;
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
 
-                // Track login attempt if analytics is available
-                if (typeof analytics !== 'undefined') {
-                    analytics.track('LoginAttempt', {
-                        email: email,
-                        timestamp: new Date().toISOString()
-                    });
+            // Show loading state
+            button.innerHTML = 'Logging in...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store token and user data
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+
+                    // Track successful login
+                    if (typeof analytics !== 'undefined') {
+                        analytics.track('LoginSuccess', {
+                            email: email,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+
+                    // Show success message
+                    showSuccess('Login successful! Redirecting...');
+
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+
+                } else {
+                    showError(data.error || 'Login failed');
+                    resetButton(button, 'Log In to Dashboard');
                 }
 
-                // Simulate a brief delay then redirect
-                setTimeout(() => {
-                    window.location.href = 'https://jamcapitalconsultants.com/dashboard';
-                }, 1000);
-            } else {
-                // Basic validation to ensure fields aren't empty
-                alert('Please fill in all fields');
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please check your connection and try again.');
+                resetButton(button, 'Log In to Dashboard');
             }
         }
 
-        function handleRegistration(event) {
+        async function handleRegistration(event) {
             event.preventDefault();
 
-            // Get input values
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const phone = document.getElementById('register-phone').value;
             const password = document.getElementById('register-password').value;
+            const button = event.target.querySelector('button');
 
-            // Check if fields aren't empty
-            if (name && email && phone && password) {
-                // Show feedback that registration is processing
-                const button = event.target.querySelector('button');
-                button.innerHTML = 'Creating Account...';
-                button.disabled = true;
+            // Basic validation
+            if (!name || !email || !phone || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
 
-                // Track registration if analytics is available
-                if (typeof analytics !== 'undefined') {
-                    analytics.track('Registration', {
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        timestamp: new Date().toISOString()
-                    });
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            // Password validation
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+
+            // Show loading state
+            button.innerHTML = 'Creating Account...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, phone, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store token and user data
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+
+                    // Track successful registration
+                    if (typeof analytics !== 'undefined') {
+                        analytics.track('RegistrationSuccess', {
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+
+                    // Show success message
+                    showSuccess('Account created successfully! Redirecting...');
+
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+
+                } else {
+                    showError(data.error || 'Registration failed');
+                    resetButton(button, 'Create Account');
                 }
 
-                // Simulate a brief delay then redirect
-                setTimeout(() => {
-                    window.location.href = 'https://jamcapitalconsultants.com/dashboard';
-                }, 1000);
-            } else {
-                // Basic validation to ensure fields aren't empty
-                alert('Please fill in all fields');
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError('Network error. Please check your connection and try again.');
+                resetButton(button, 'Create Account');
             }
+        }
+
+        // Helper functions
+        function showError(message) {
+            // Remove existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create error alert
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-error';
+            alert.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            `;
+
+            // Insert at top of login container
+            const loginContainer = document.querySelector('.login-container');
+            loginContainer.insertBefore(alert, loginContainer.firstChild);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            // Remove existing alerts
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create success alert
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success';
+            alert.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            `;
+
+            // Insert at top of login container
+            const loginContainer = document.querySelector('.login-container');
+            loginContainer.insertBefore(alert, loginContainer.firstChild);
+        }
+
+        function resetButton(button, originalText) {
+            button.innerHTML = originalText;
+            button.disabled = false;
         }
     </script>
 </body>

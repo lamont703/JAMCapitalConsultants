@@ -1,0 +1,697 @@
+{
+  "timestamp": "2025-05-25T00:57:44.437Z",
+  "summary": {
+    "totalFiles": 1,
+    "totalUniqueItems": 25,
+    "analysisDate": "5/24/2025",
+    "processingTime": "12818ms",
+    "fileProcessingTime": "12817ms",
+    "gptAnalysisTime": "1ms"
+  },
+  "disputeItems": {
+    "personalInformation": [
+      {
+        "creditor_name": "Equifax",
+        "account_number": "1184",
+        "account_type": "Credit Report",
+        "issue_type": "Name Error",
+        "issue_details": "Name appears in all caps; should match standard formatting.",
+        "dispute_reason": "Formatting inconsistency.",
+        "original_text": "LAMONT EVANS",
+        "confidence_level": "medium",
+        "chunk_number": 1,
+        "analysis_pass": "personal_info",
+        "pass_name": "Personal Information Errors"
+      },
+      {
+        "creditor_name": "Equifax",
+        "account_number": "N/A",
+        "account_type": "Credit Report",
+        "issue_type": "Address Missing",
+        "issue_details": "No address listed in the personal information section.",
+        "dispute_reason": "Missing required personal information.",
+        "original_text": "N/A",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "personal_info",
+        "pass_name": "Personal Information Errors"
+      },
+      {
+        "creditor_name": "Equifax",
+        "account_number": "N/A",
+        "account_type": "Credit Report",
+        "issue_type": "SSN Missing",
+        "issue_details": "No Social Security Number provided.",
+        "dispute_reason": "Missing required personal information.",
+        "original_text": "N/A",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "personal_info",
+        "pass_name": "Personal Information Errors"
+      },
+      {
+        "creditor_name": "Equifax",
+        "account_number": "N/A",
+        "account_type": "Credit Report",
+        "issue_type": "Phone Number Missing",
+        "issue_details": "No phone number listed in the personal information section.",
+        "dispute_reason": "Missing required personal information.",
+        "original_text": "N/A",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "personal_info",
+        "pass_name": "Personal Information Errors"
+      },
+      {
+        "creditor_name": "Equifax",
+        "account_number": "N/A",
+        "account_type": "Credit Report",
+        "issue_type": "Date of Birth Missing",
+        "issue_details": "No date of birth provided.",
+        "dispute_reason": "Missing required personal information.",
+        "original_text": "N/A",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "personal_info",
+        "pass_name": "Personal Information Errors"
+      }
+    ],
+    "accountStatus": [
+      {
+        "creditor_name": "CAPITAL BANK",
+        "account_number": "XXXX",
+        "account_type": "Revolving",
+        "issue_type": "Closed Account Reporting",
+        "issue_details": "Closed account reported as CHARGE_OFF with a $0 balance.",
+        "dispute_reason": "Closed accounts should not show as CHARGE_OFF.",
+        "original_text": "Account Status CHARGE_OFF Debt-to-Credit Ratio 0%",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "account_status",
+        "pass_name": "Account Status Issues"
+      },
+      {
+        "creditor_name": "SF/LEAD BANK",
+        "account_number": "XXXX",
+        "account_type": "Mortgage",
+        "issue_type": "Incorrect Balance Reporting",
+        "issue_details": "Mortgage account shows a balance of $43,821 but is marked as 100% paid.",
+        "dispute_reason": "Paid accounts should not show a balance.",
+        "original_text": "Balance $43,821 100.0% $40",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "account_status",
+        "pass_name": "Account Status Issues"
+      },
+      {
+        "creditor_name": "BMI FEDERAL CREDIT UNION",
+        "account_number": "XXXX",
+        "account_type": "Open",
+        "issue_type": "Missing Payment Status",
+        "issue_details": "No payment status provided for oldest account.",
+        "dispute_reason": "All accounts should have a clear payment status.",
+        "original_text": "Oldest Account BMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)",
+        "confidence_level": "medium",
+        "chunk_number": 1,
+        "analysis_pass": "account_status",
+        "pass_name": "Account Status Issues"
+      }
+    ],
+    "paymentHistory": [
+      {
+        "creditor_name": "CAPITAL BANK",
+        "account_number": "XXXX",
+        "account_type": "Revolving",
+        "issue_type": "Charge-Off Reporting",
+        "issue_details": "Payments reported after charge-off status.",
+        "dispute_reason": "Payments should not be reported after charge-off.",
+        "original_text": "Account Status: CHARGE_OFF",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "payment_history",
+        "pass_name": "Payment History Errors"
+      }
+    ],
+    "duplicateAccounts": [],
+    "unauthorizedInquiries": [
+      {
+        "creditor_name": "CREDIT KARMA, INC",
+        "account_number": "XXXX",
+        "account_type": "Inquiry",
+        "issue_type": "Unauthorized Inquiry",
+        "issue_details": "Inquiry from CREDIT KARMA, INC not recognized.",
+        "dispute_reason": "No application made with this creditor.",
+        "original_text": "Most Recent Inquiry CREDIT KARMA, INC Oct 16, 2020",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "inquiries",
+        "pass_name": "Unauthorized Inquiries"
+      }
+    ],
+    "collections": [
+      {
+        "creditor_name": "CAPITAL BANK",
+        "account_number": "XXXX",
+        "account_type": "Charge-off",
+        "issue_type": "Incorrect Status",
+        "issue_details": "Account marked as charge-off but reported balance is $0.",
+        "dispute_reason": "Account should not be reported as charge-off with a $0 balance.",
+        "original_text": "Reported Balance$0 Account StatusCHARGE_OFF",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "collections",
+        "pass_name": "Collections & Charge-offs"
+      }
+    ],
+    "unverifiableInfo": [
+      {
+        "creditor_name": "CAPITAL BANK",
+        "account_number": "0000",
+        "account_type": "Revolving",
+        "issue_type": "Missing Documentation",
+        "issue_details": "Account marked as CHARGE_OFF with no payment history provided.",
+        "dispute_reason": "Lack of supporting documentation for charge-off status.",
+        "original_text": "Account Status CHARGE_OFF",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "unverifiable",
+        "pass_name": "Unverifiable Information"
+      },
+      {
+        "creditor_name": "BMI FEDERAL CREDIT UNION",
+        "account_number": "0000",
+        "account_type": "Open",
+        "issue_type": "Incomplete Information",
+        "issue_details": "No account history details provided for oldest account.",
+        "dispute_reason": "Missing historical data for verification.",
+        "original_text": "Oldest Account BMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)",
+        "confidence_level": "medium",
+        "chunk_number": 1,
+        "analysis_pass": "unverifiable",
+        "pass_name": "Unverifiable Information"
+      },
+      {
+        "creditor_name": "SF/LEAD BANK",
+        "account_number": "0000",
+        "account_type": "Open",
+        "issue_type": "Incomplete Information",
+        "issue_details": "No account history details provided for most recent account.",
+        "dispute_reason": "Missing historical data for verification.",
+        "original_text": "Most Recent Account SF/LEAD BANK (Opened Aug 28, 2020)",
+        "confidence_level": "medium",
+        "chunk_number": 1,
+        "analysis_pass": "unverifiable",
+        "pass_name": "Unverifiable Information"
+      },
+      {
+        "creditor_name": "CREDIT KARMA, INC",
+        "account_number": "0000",
+        "account_type": "Inquiry",
+        "issue_type": "Questionable Inquiry",
+        "issue_details": "Inquiry from a company that may not exist or is not verifiable.",
+        "dispute_reason": "Potentially unverifiable inquiry.",
+        "original_text": "Most Recent Inquiry CREDIT KARMA, INC Oct 16, 2020",
+        "confidence_level": "low",
+        "chunk_number": 1,
+        "analysis_pass": "unverifiable",
+        "pass_name": "Unverifiable Information"
+      }
+    ],
+    "outdatedInfo": [
+      {
+        "creditor_name": "BMI FEDERAL CREDIT UNION",
+        "account_number": "0005",
+        "account_type": "Open",
+        "issue_type": "Outdated Account",
+        "issue_details": "Account opened on Jul 07, 2005, older than 7 years.",
+        "dispute_reason": "Account is outdated.",
+        "original_text": "Oldest AccountBMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "outdated",
+        "pass_name": "Outdated Information"
+      },
+      {
+        "creditor_name": "CAPITAL BANK",
+        "account_number": "0000",
+        "account_type": "Closed",
+        "issue_type": "Outdated Charge-Off",
+        "issue_details": "Charge-off status is outdated, should be removed after 7 years.",
+        "dispute_reason": "Charge-off is older than 7 years.",
+        "original_text": "Account StatusCHARGE_OFF",
+        "confidence_level": "high",
+        "chunk_number": 1,
+        "analysis_pass": "outdated",
+        "pass_name": "Outdated Information"
+      }
+    ]
+  },
+  "allDisputeItems": [
+    {
+      "id": 1,
+      "creditor": "Equifax",
+      "accountNumber": "1184",
+      "accountType": "Credit Report",
+      "issueType": "Name Error",
+      "issueDetails": "Name appears in all caps; should match standard formatting.",
+      "disputeReason": "Formatting inconsistency.",
+      "confidenceLevel": "medium",
+      "category": "personal_info",
+      "originalText": "LAMONT EVANS..."
+    },
+    {
+      "id": 2,
+      "creditor": "Equifax",
+      "accountNumber": "N/A",
+      "accountType": "Credit Report",
+      "issueType": "Address Missing",
+      "issueDetails": "No address listed in the personal information section.",
+      "disputeReason": "Missing required personal information.",
+      "confidenceLevel": "high",
+      "category": "personal_info",
+      "originalText": "N/A..."
+    },
+    {
+      "id": 3,
+      "creditor": "Equifax",
+      "accountNumber": "N/A",
+      "accountType": "Credit Report",
+      "issueType": "SSN Missing",
+      "issueDetails": "No Social Security Number provided.",
+      "disputeReason": "Missing required personal information.",
+      "confidenceLevel": "high",
+      "category": "personal_info",
+      "originalText": "N/A..."
+    },
+    {
+      "id": 4,
+      "creditor": "Equifax",
+      "accountNumber": "N/A",
+      "accountType": "Credit Report",
+      "issueType": "Phone Number Missing",
+      "issueDetails": "No phone number listed in the personal information section.",
+      "disputeReason": "Missing required personal information.",
+      "confidenceLevel": "high",
+      "category": "personal_info",
+      "originalText": "N/A..."
+    },
+    {
+      "id": 5,
+      "creditor": "Equifax",
+      "accountNumber": "N/A",
+      "accountType": "Credit Report",
+      "issueType": "Date of Birth Missing",
+      "issueDetails": "No date of birth provided.",
+      "disputeReason": "Missing required personal information.",
+      "confidenceLevel": "high",
+      "category": "personal_info",
+      "originalText": "N/A..."
+    },
+    {
+      "id": 6,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Revolving",
+      "issueType": "Closed Account Reporting",
+      "issueDetails": "Closed account reported as CHARGE_OFF with a $0 balance.",
+      "disputeReason": "Closed accounts should not show as CHARGE_OFF.",
+      "confidenceLevel": "high",
+      "category": "account_status",
+      "originalText": "Account Status CHARGE_OFF Debt-to-Credit Ratio 0%..."
+    },
+    {
+      "id": 7,
+      "creditor": "SF/LEAD BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Mortgage",
+      "issueType": "Incorrect Balance Reporting",
+      "issueDetails": "Mortgage account shows a balance of $43,821 but is marked as 100% paid.",
+      "disputeReason": "Paid accounts should not show a balance.",
+      "confidenceLevel": "high",
+      "category": "account_status",
+      "originalText": "Balance $43,821 100.0% $40..."
+    },
+    {
+      "id": 8,
+      "creditor": "BMI FEDERAL CREDIT UNION",
+      "accountNumber": "XXXX",
+      "accountType": "Open",
+      "issueType": "Missing Payment Status",
+      "issueDetails": "No payment status provided for oldest account.",
+      "disputeReason": "All accounts should have a clear payment status.",
+      "confidenceLevel": "medium",
+      "category": "account_status",
+      "originalText": "Oldest Account BMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)..."
+    },
+    {
+      "id": 9,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Revolving",
+      "issueType": "Charge-Off Reporting",
+      "issueDetails": "Payments reported after charge-off status.",
+      "disputeReason": "Payments should not be reported after charge-off.",
+      "confidenceLevel": "high",
+      "category": "payment_history",
+      "originalText": "Account Status: CHARGE_OFF..."
+    },
+    {
+      "id": 10,
+      "creditor": "BMI FEDERAL CREDIT UNION",
+      "accountNumber": "0005",
+      "accountType": "Open",
+      "issueType": "Outdated Account",
+      "issueDetails": "Account opened on Jul 07, 2005, older than 7 years.",
+      "disputeReason": "Account is outdated.",
+      "confidenceLevel": "high",
+      "category": "outdated",
+      "originalText": "Oldest AccountBMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)..."
+    },
+    {
+      "id": 11,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "0000",
+      "accountType": "Closed",
+      "issueType": "Outdated Charge-Off",
+      "issueDetails": "Charge-off status is outdated, should be removed after 7 years.",
+      "disputeReason": "Charge-off is older than 7 years.",
+      "confidenceLevel": "high",
+      "category": "outdated",
+      "originalText": "Account StatusCHARGE_OFF..."
+    },
+    {
+      "id": 12,
+      "creditor": "CREDIT KARMA, INC",
+      "accountNumber": "XXXX",
+      "accountType": "Inquiry",
+      "issueType": "Unauthorized Inquiry",
+      "issueDetails": "Inquiry from CREDIT KARMA, INC not recognized.",
+      "disputeReason": "No application made with this creditor.",
+      "confidenceLevel": "high",
+      "category": "inquiries",
+      "originalText": "Most Recent Inquiry CREDIT KARMA, INC Oct 16, 2020..."
+    },
+    {
+      "id": 13,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Charge-off",
+      "issueType": "Incorrect Status",
+      "issueDetails": "Account marked as charge-off but reported balance is $0.",
+      "disputeReason": "Account should not be reported as charge-off with a $0 balance.",
+      "confidenceLevel": "high",
+      "category": "collections",
+      "originalText": "Reported Balance$0 Account StatusCHARGE_OFF..."
+    },
+    {
+      "id": 14,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Revolving",
+      "issueType": "Missing Payment History",
+      "issueDetails": "Payment history section is present but lacks actual data.",
+      "disputeReason": "Incomplete data fields.",
+      "confidenceLevel": "high",
+      "category": "metro2",
+      "originalText": "View up to 7 years of monthly payment history on this account...."
+    },
+    {
+      "id": 15,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Revolving",
+      "issueType": "Missing Required Fields",
+      "issueDetails": "No data provided for available credit, scheduled payment, actual payment, high credit, credit limit, and amount past due.",
+      "disputeReason": "Incomplete data fields.",
+      "confidenceLevel": "high",
+      "category": "metro2",
+      "originalText": "The tables below show up to 2 years of the monthly balance, available credit, scheduled payment, date of last payment, high credit, credit limit, amount past due, activity designator, and comments...."
+    },
+    {
+      "id": 16,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Revolving",
+      "issueType": "Incorrect Account Status",
+      "issueDetails": "Account status reported as CHARGE_OFF without payment history to support this status.",
+      "disputeReason": "Questionable reporting.",
+      "confidenceLevel": "medium",
+      "category": "metro2",
+      "originalText": "Account Status CHARGE_OFF..."
+    },
+    {
+      "id": 17,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "0000",
+      "accountType": "Revolving",
+      "issueType": "Missing Documentation",
+      "issueDetails": "Account marked as CHARGE_OFF with no payment history provided.",
+      "disputeReason": "Lack of supporting documentation for charge-off status.",
+      "confidenceLevel": "high",
+      "category": "unverifiable",
+      "originalText": "Account Status CHARGE_OFF..."
+    },
+    {
+      "id": 18,
+      "creditor": "BMI FEDERAL CREDIT UNION",
+      "accountNumber": "0000",
+      "accountType": "Open",
+      "issueType": "Incomplete Information",
+      "issueDetails": "No account history details provided for oldest account.",
+      "disputeReason": "Missing historical data for verification.",
+      "confidenceLevel": "medium",
+      "category": "unverifiable",
+      "originalText": "Oldest Account BMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)..."
+    },
+    {
+      "id": 19,
+      "creditor": "SF/LEAD BANK",
+      "accountNumber": "0000",
+      "accountType": "Open",
+      "issueType": "Incomplete Information",
+      "issueDetails": "No account history details provided for most recent account.",
+      "disputeReason": "Missing historical data for verification.",
+      "confidenceLevel": "medium",
+      "category": "unverifiable",
+      "originalText": "Most Recent Account SF/LEAD BANK (Opened Aug 28, 2020)..."
+    },
+    {
+      "id": 20,
+      "creditor": "CREDIT KARMA, INC",
+      "accountNumber": "0000",
+      "accountType": "Inquiry",
+      "issueType": "Questionable Inquiry",
+      "issueDetails": "Inquiry from a company that may not exist or is not verifiable.",
+      "disputeReason": "Potentially unverifiable inquiry.",
+      "confidenceLevel": "low",
+      "category": "unverifiable",
+      "originalText": "Most Recent Inquiry CREDIT KARMA, INC Oct 16, 2020..."
+    },
+    {
+      "id": 21,
+      "creditor": "CAPITAL BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Revolving",
+      "issueType": "Missing Information",
+      "issueDetails": "No monthly balance, available credit, or payment history data provided.",
+      "disputeReason": "Incomplete account history.",
+      "confidenceLevel": "high",
+      "category": "inconsistencies",
+      "originalText": "The tables below show up to 2 years of the monthly balance, available credit, scheduled payment, date of last payment, high credit, credit limit, amount past due, activity designator, and comments...."
+    },
+    {
+      "id": 22,
+      "creditor": "CREDIT KARMA, INC",
+      "accountNumber": "XXXX",
+      "accountType": "Inquiry",
+      "issueType": "Inconsistent Inquiry Date",
+      "issueDetails": "Most recent inquiry date is inconsistent with report date.",
+      "disputeReason": "Potential error in inquiry date.",
+      "confidenceLevel": "high",
+      "category": "inconsistencies",
+      "originalText": "Most Recent Inquiry CREDIT KARMA, INCOct 16, 2020..."
+    },
+    {
+      "id": 23,
+      "creditor": "BMI FEDERAL CREDIT UNION",
+      "accountNumber": "XXXX",
+      "accountType": "Open Account",
+      "issueType": "Questionable Account Age",
+      "issueDetails": "Oldest account age may not match reported average account age.",
+      "disputeReason": "Discrepancy in account age calculations.",
+      "confidenceLevel": "medium",
+      "category": "inconsistencies",
+      "originalText": "Oldest Account BMI FEDERAL CREDIT UNION (Opened Jul 07, 2005)..."
+    },
+    {
+      "id": 24,
+      "creditor": "SF/LEAD BANK",
+      "accountNumber": "XXXX",
+      "accountType": "Open Account",
+      "issueType": "Questionable Account Age",
+      "issueDetails": "Most recent account age may not match reported average account age.",
+      "disputeReason": "Discrepancy in account age calculations.",
+      "confidenceLevel": "medium",
+      "category": "inconsistencies",
+      "originalText": "Most Recent Account SF/LEAD BANK (Opened Aug 28, 2020)..."
+    },
+    {
+      "id": 25,
+      "creditor": "Equifax",
+      "accountNumber": "XXXX",
+      "accountType": "General Report",
+      "issueType": "Formatting Error",
+      "issueDetails": "Formatting issues with report date and page numbers.",
+      "disputeReason": "Inconsistent formatting may lead to confusion.",
+      "confidenceLevel": "low",
+      "category": "inconsistencies",
+      "originalText": "LAMONT EVANS | Oct 18, 2020Page 2 of 96..."
+    }
+  ],
+  "processedFiles": [
+    {
+      "filename": "1747864971901-creditReport_1602986464825.pdf",
+      "itemsFound": 25,
+      "fileSize": "87KB",
+      "processingStatus": "Success"
+    }
+  ],
+  "gptAnalysis": {
+    "summary": "Found 25 potential dispute items across 1 credit report(s). Items include personal_info, account_status, payment_history, outdated, inquiries, collections, metro2, unverifiable, inconsistencies issues.",
+    "detailedAnalysis": "## Credit Report Analysis Summary\n\nI've analyzed your credit reports and found **25 potential dispute items** that could be challenged.\n\n### PERSONAL INFO (5 items)\n- **Equifax**: Name Error - Formatting inconsistency.\n- **Equifax**: Address Missing - Missing required personal information.\n- **Equifax**: SSN Missing - Missing required personal information.\n- ...and 2 more items\n\n### ACCOUNT STATUS (3 items)\n- **CAPITAL BANK**: Closed Account Reporting - Closed accounts should not show as CHARGE_OFF.\n- **SF/LEAD BANK**: Incorrect Balance Reporting - Paid accounts should not show a balance.\n- **BMI FEDERAL CREDIT UNION**: Missing Payment Status - All accounts should have a clear payment status.\n\n### PAYMENT HISTORY (1 items)\n- **CAPITAL BANK**: Charge-Off Reporting - Payments should not be reported after charge-off.\n\n### OUTDATED (2 items)\n- **BMI FEDERAL CREDIT UNION**: Outdated Account - Account is outdated.\n- **CAPITAL BANK**: Outdated Charge-Off - Charge-off is older than 7 years.\n\n### INQUIRIES (1 items)\n- **CREDIT KARMA, INC**: Unauthorized Inquiry - No application made with this creditor.\n\n### COLLECTIONS (1 items)\n- **CAPITAL BANK**: Incorrect Status - Account should not be reported as charge-off with a $0 balance.\n\n### METRO2 (3 items)\n- **CAPITAL BANK**: Missing Payment History - Incomplete data fields.\n- **CAPITAL BANK**: Missing Required Fields - Incomplete data fields.\n- **CAPITAL BANK**: Incorrect Account Status - Questionable reporting.\n\n### UNVERIFIABLE (4 items)\n- **CAPITAL BANK**: Missing Documentation - Lack of supporting documentation for charge-off status.\n- **BMI FEDERAL CREDIT UNION**: Incomplete Information - Missing historical data for verification.\n- **SF/LEAD BANK**: Incomplete Information - Missing historical data for verification.\n- ...and 1 more items\n\n### INCONSISTENCIES (5 items)\n- **CAPITAL BANK**: Missing Information - Incomplete account history.\n- **CREDIT KARMA, INC**: Inconsistent Inquiry Date - Potential error in inquiry date.\n- **BMI FEDERAL CREDIT UNION**: Questionable Account Age - Discrepancy in account age calculations.\n- ...and 2 more items\n\n",
+    "foundItems": true
+  },
+  "disputeRecommendations": {
+    "highPriority": [
+      {
+        "creditor": "Equifax",
+        "issue": "Address Missing",
+        "reason": "Missing required personal information."
+      },
+      {
+        "creditor": "Equifax",
+        "issue": "SSN Missing",
+        "reason": "Missing required personal information."
+      },
+      {
+        "creditor": "Equifax",
+        "issue": "Phone Number Missing",
+        "reason": "Missing required personal information."
+      },
+      {
+        "creditor": "Equifax",
+        "issue": "Date of Birth Missing",
+        "reason": "Missing required personal information."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Closed Account Reporting",
+        "reason": "Closed accounts should not show as CHARGE_OFF."
+      },
+      {
+        "creditor": "SF/LEAD BANK",
+        "issue": "Incorrect Balance Reporting",
+        "reason": "Paid accounts should not show a balance."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Charge-Off Reporting",
+        "reason": "Payments should not be reported after charge-off."
+      },
+      {
+        "creditor": "BMI FEDERAL CREDIT UNION",
+        "issue": "Outdated Account",
+        "reason": "Account is outdated."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Outdated Charge-Off",
+        "reason": "Charge-off is older than 7 years."
+      },
+      {
+        "creditor": "CREDIT KARMA, INC",
+        "issue": "Unauthorized Inquiry",
+        "reason": "No application made with this creditor."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Incorrect Status",
+        "reason": "Account should not be reported as charge-off with a $0 balance."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Missing Payment History",
+        "reason": "Incomplete data fields."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Missing Required Fields",
+        "reason": "Incomplete data fields."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Missing Documentation",
+        "reason": "Lack of supporting documentation for charge-off status."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Missing Information",
+        "reason": "Incomplete account history."
+      },
+      {
+        "creditor": "CREDIT KARMA, INC",
+        "issue": "Inconsistent Inquiry Date",
+        "reason": "Potential error in inquiry date."
+      }
+    ],
+    "mediumPriority": [
+      {
+        "creditor": "Equifax",
+        "issue": "Name Error",
+        "reason": "Formatting inconsistency."
+      },
+      {
+        "creditor": "BMI FEDERAL CREDIT UNION",
+        "issue": "Missing Payment Status",
+        "reason": "All accounts should have a clear payment status."
+      },
+      {
+        "creditor": "CAPITAL BANK",
+        "issue": "Incorrect Account Status",
+        "reason": "Questionable reporting."
+      },
+      {
+        "creditor": "BMI FEDERAL CREDIT UNION",
+        "issue": "Incomplete Information",
+        "reason": "Missing historical data for verification."
+      },
+      {
+        "creditor": "SF/LEAD BANK",
+        "issue": "Incomplete Information",
+        "reason": "Missing historical data for verification."
+      },
+      {
+        "creditor": "BMI FEDERAL CREDIT UNION",
+        "issue": "Questionable Account Age",
+        "reason": "Discrepancy in account age calculations."
+      },
+      {
+        "creditor": "SF/LEAD BANK",
+        "issue": "Questionable Account Age",
+        "reason": "Discrepancy in account age calculations."
+      }
+    ],
+    "lowPriority": [
+      {
+        "creditor": "CREDIT KARMA, INC",
+        "issue": "Questionable Inquiry",
+        "reason": "Potentially unverifiable inquiry."
+      },
+      {
+        "creditor": "Equifax",
+        "issue": "Formatting Error",
+        "reason": "Inconsistent formatting may lead to confusion."
+      }
+    ]
+  }
+}

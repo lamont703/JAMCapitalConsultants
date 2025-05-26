@@ -255,11 +255,409 @@
             font-size: 14px;
             margin-top: 8px;
         }
+
+        /* Add this CSS for the category filter */
+        .category-filter {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border: 1px solid #007bff;
+            background-color: white;
+            color: #007bff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .category-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .category-btn.all {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .dispute-items-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: white;
+        }
+
+        .dispute-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+
+        .dispute-item h5 {
+            margin: 0 0 8px 0;
+            color: #495057;
+            font-size: 16px;
+        }
+
+        .dispute-item .creditor {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .dispute-item .issue-type {
+            color: #dc3545;
+            font-weight: 500;
+        }
+
+        .dispute-item .confidence {
+            float: right;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .confidence.high {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .confidence.medium {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .confidence.low {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .item-count {
+            font-size: 14px;
+            color: #6c757d;
+            margin-left: 10px;
+        }
     </style>
 </head>
 
 <body>
     <script>
+        // Add this debugging system at the top of your ChatModule.html script section
+        const DEBUG_ENABLED = true;
+        const functionCallStack = [];
+        let debugCounter = 0;
+
+        function debugLog(functionName, action = 'CALLED', data = null) {
+            if (!DEBUG_ENABLED) return;
+
+            debugCounter++;
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const logEntry = {
+                counter: debugCounter,
+                timestamp: timestamp,
+                function: functionName,
+                action: action,
+                data: data
+            };
+
+            functionCallStack.push(logEntry);
+
+            // Console log with clear formatting
+            console.log(`🔍 [${debugCounter}] ${timestamp} - ${functionName} ${action}`, data ? data : '');
+
+            // Keep only last 50 entries to prevent memory issues
+            if (functionCallStack.length > 50) {
+                functionCallStack.shift();
+            }
+        }
+
+        function showDebugSummary() {
+            console.log('=== FUNCTION CALL SUMMARY ===');
+            functionCallStack.forEach(entry => {
+                console.log(`${entry.counter}. ${entry.timestamp} - ${entry.function} ${entry.action}`);
+            });
+        }
+
+        // Now add debugging to all your key functions:
+
+        // 1. Add to handleButtonClick
+        function handleButtonClick(value, container) {
+            debugLog('handleButtonClick', 'STARTED', { value: value });
+
+            console.log('Button clicked:', value);
+
+            // Your existing code...
+
+            debugLog('handleButtonClick', 'COMPLETED');
+        }
+
+        // 2. Add to sendReportsForAnalysis
+        async function sendReportsForAnalysis(reportFiles) {
+            debugLog('sendReportsForAnalysis', 'STARTED', { fileCount: reportFiles.length });
+
+            console.log('=== SEND REPORTS FOR ANALYSIS DEBUG ===');
+            console.log('Files to analyze:', reportFiles.length);
+
+            try {
+                // Your existing code...
+
+                debugLog('sendReportsForAnalysis', 'SUCCESS', { extractedItemsCount: data.extractedItems?.length });
+                return data.analysis || data.summary || 'Analysis completed successfully';
+
+            } catch (error) {
+                debugLog('sendReportsForAnalysis', 'ERROR', { error: error.message });
+                throw error;
+            }
+        }
+
+        // 3. Add to handleStartDispute
+        function handleStartDispute() {
+            debugLog('handleStartDispute', 'STARTED');
+
+            console.log('=== HANDLE START DISPUTE DEBUG ===');
+            console.log('User clicked to start dispute process');
+
+            // Your existing code...
+
+            if (!analysisData || !analysisData.extractedItems || analysisData.extractedItems.length === 0) {
+                debugLog('handleStartDispute', 'NO_DATA_FOUND');
+                addMessage("I couldn't find any analysis data. Please analyze your reports first before starting the dispute process.", 'bot');
+                return;
+            }
+
+            debugLog('handleStartDispute', 'CALLING_DISPLAY_INTERFACE', { itemCount: analysisData.extractedItems.length });
+            displayCategoryFilterInterface(analysisData);
+
+            debugLog('handleStartDispute', 'COMPLETED');
+        }
+
+        // 4. Add to displayCategoryFilterInterface
+        function displayCategoryFilterInterface(analysisData) {
+            debugLog('displayCategoryFilterInterface', 'STARTED', {
+                hasData: !!analysisData,
+                itemCount: analysisData?.extractedItems ? Object.keys(analysisData.extractedItems).length : 0
+            });
+
+            console.log('=== DISPLAY CATEGORY FILTER INTERFACE ===');
+
+            if (!analysisData || !analysisData.extractedItems) {
+                debugLog('displayCategoryFilterInterface', 'NO_DATA', analysisData);
+                addMessage("I couldn't find any dispute items to display. Please try analyzing your reports again.", 'bot');
+                return;
+            }
+
+            // Convert extractedItems object to array if it's an object
+            let itemsArray;
+            if (Array.isArray(analysisData.extractedItems)) {
+                itemsArray = analysisData.extractedItems;
+                debugLog('displayCategoryFilterInterface', 'ITEMS_ALREADY_ARRAY', { arrayLength: itemsArray.length });
+            } else if (typeof analysisData.extractedItems === 'object') {
+                // Convert object to array of values
+                itemsArray = Object.values(analysisData.extractedItems);
+                debugLog('displayCategoryFilterInterface', 'CONVERTED_OBJECT_TO_ARRAY', {
+                    originalType: 'object',
+                    arrayLength: itemsArray.length,
+                    objectKeys: Object.keys(analysisData.extractedItems).length
+                });
+            } else {
+                debugLog('displayCategoryFilterInterface', 'INVALID_DATA_TYPE', typeof analysisData.extractedItems);
+                addMessage("The analysis data format is not recognized. Please try analyzing your reports again.", 'bot');
+                return;
+            }
+
+            if (itemsArray.length === 0) {
+                debugLog('displayCategoryFilterInterface', 'NO_ITEMS_IN_ARRAY');
+                addMessage("No dispute items were found in your analysis.", 'bot');
+                return;
+            }
+
+            // Store the analysis data globally
+            currentAnalysisData = analysisData;
+            debugLog('displayCategoryFilterInterface', 'DATA_STORED_GLOBALLY');
+
+            // Categorize items using the array
+            const categorizedItems = {};
+            itemsArray.forEach(item => {
+                const category = item.analysis_pass || 'other';
+                if (!categorizedItems[category]) {
+                    categorizedItems[category] = [];
+                }
+                categorizedItems[category].push(item);
+            });
+
+            debugLog('displayCategoryFilterInterface', 'ITEMS_CATEGORIZED', {
+                categories: Object.keys(categorizedItems),
+                totalItems: itemsArray.length
+            });
+
+            console.log('Categorized items:', Object.keys(categorizedItems).map(cat => `${cat}: ${categorizedItems[cat].length}`));
+
+            // Create the category selection message
+            let categoryMessage = `Great! I found **${itemsArray.length}** potential dispute items in your credit reports.\n\n`;
+            categoryMessage += `Here are the categories of issues I found:\n\n`;
+
+            // Add category breakdown
+            Object.keys(categorizedItems).forEach(category => {
+                const count = categorizedItems[category].length;
+                const categoryName = formatCategoryName(category);
+                categoryMessage += `• **${categoryName}**: ${count} item${count > 1 ? 's' : ''}\n`;
+            });
+
+            categoryMessage += `\nHow would you like to proceed?`;
+
+            debugLog('displayCategoryFilterInterface', 'CALLING_ADD_BOT_MESSAGE_WITH_BUTTONS');
+
+            // Check if addBotMessageWithButtons exists
+            if (typeof addBotMessageWithButtons === 'function') {
+                debugLog('displayCategoryFilterInterface', 'FUNCTION_EXISTS', 'addBotMessageWithButtons');
+                addBotMessageWithButtons(categoryMessage, [
+                    { text: "View by Category", value: "view_by_category" },
+                    { text: "Show High Priority Items", value: "show_high_priority" },
+                    { text: "Search by Creditor", value: "search_creditor" },
+                    { text: "Show All Items", value: "show_all_items" }
+                ]);
+            } else {
+                debugLog('displayCategoryFilterInterface', 'FUNCTION_NOT_FOUND', 'addBotMessageWithButtons');
+                console.error('addBotMessageWithButtons function not found!');
+
+                // Fallback to regular message
+                addMessage(categoryMessage, 'bot');
+                addMessage("Please type: 1 for Category View, 2 for High Priority, 3 for Search, 4 for All Items", 'bot');
+            }
+
+            debugLog('displayCategoryFilterInterface', 'COMPLETED');
+        }
+
+        // 5. Add to addBotMessageWithButtons (if it exists)
+        function addBotMessageWithButtons(message, buttons) {
+            debugLog('addBotMessageWithButtons', 'STARTED', {
+                messageLength: message.length,
+                buttonCount: buttons.length
+            });
+
+            // Your existing code...
+
+            debugLog('addBotMessageWithButtons', 'COMPLETED');
+        }
+
+        // 6. Add to addMessage
+        function addMessage(content, type, buttons = null) {
+            debugLog('addMessage', 'STARTED', {
+                type: type,
+                contentLength: content.length,
+                hasButtons: !!buttons
+            });
+
+            // Your existing code...
+
+            debugLog('addMessage', 'COMPLETED');
+        }
+
+        // 7. Add to handleCategoryAction
+        function handleCategoryAction(action) {
+            debugLog('handleCategoryAction', 'STARTED', { action: action });
+
+            console.log('=== HANDLING CATEGORY ACTION ===');
+            console.log('Action:', action);
+
+            if (!currentAnalysisData || !currentAnalysisData.extractedItems) {
+                debugLog('handleCategoryAction', 'NO_CURRENT_DATA');
+                addMessage("Sorry, I lost the analysis data. Please analyze your reports again.", 'bot');
+                return;
+            }
+
+            switch (action) {
+                case 'view_by_category':
+                    debugLog('handleCategoryAction', 'CALLING_SHOW_BY_CATEGORY');
+                    showItemsByCategory();
+                    break;
+                case 'show_high_priority':
+                    debugLog('handleCategoryAction', 'CALLING_SHOW_HIGH_PRIORITY');
+                    showHighPriorityItems();
+                    break;
+                case 'search_creditor':
+                    debugLog('handleCategoryAction', 'CALLING_SEARCH_CREDITOR');
+                    addMessage("What creditor would you like to search for? (e.g., 'Capital One', 'Chase', 'Experian')", 'bot');
+                    break;
+                case 'show_all_items':
+                    debugLog('handleCategoryAction', 'CALLING_SHOW_ALL_ITEMS');
+                    showAllItems();
+                    break;
+                default:
+                    debugLog('handleCategoryAction', 'UNKNOWN_ACTION', action);
+                    addMessage("I didn't understand that option. Please try again.", 'bot');
+            }
+
+            debugLog('handleCategoryAction', 'COMPLETED');
+        }
+
+        // 8. Add debugging to check if functions exist
+        function checkFunctionAvailability() {
+            debugLog('checkFunctionAvailability', 'STARTED');
+
+            const functionsToCheck = [
+                'addBotMessageWithButtons',
+                'addMessage',
+                'addBotMessage',
+                'handleButtonClick',
+                'displayCategoryFilterInterface',
+                'handleCategoryAction',
+                'showItemsByCategory',
+                'showHighPriorityItems',
+                'showAllItems'
+            ];
+
+            functionsToCheck.forEach(funcName => {
+                const exists = typeof window[funcName] === 'function';
+                debugLog('checkFunctionAvailability', exists ? 'FUNCTION_EXISTS' : 'FUNCTION_MISSING', funcName);
+            });
+
+            debugLog('checkFunctionAvailability', 'COMPLETED');
+        }
+
+        // Call this when the page loads
+        window.addEventListener('load', () => {
+            debugLog('WINDOW_LOAD', 'TRIGGERED');
+            checkFunctionAvailability();
+        });
+
+        // Add a helper to show what functions are being called in real-time
+        function startRealTimeDebug() {
+            console.log('🚀 Real-time debugging started. All function calls will be logged.');
+            setInterval(() => {
+                if (functionCallStack.length > 0) {
+                    const lastCall = functionCallStack[functionCallStack.length - 1];
+                    console.log(`📊 Last function: ${lastCall.function} ${lastCall.action}`);
+                }
+            }, 5000);
+        }
+
+        // Call this in console to start real-time monitoring
+        // startRealTimeDebug();
+
         // Chat Module
         const ChatModule = (function () {
             // Private variables
@@ -529,19 +927,11 @@
                                 // Get the last analysis from localStorage
                                 const lastAnalysis = JSON.parse(localStorage.getItem('jamBotLastAnalysis') || '{}');
 
-                                if (lastAnalysis && lastAnalysis.analysis) {
-                                    // Extract potential items to dispute from the analysis
-                                    const items = extractDisputeItemsFromAnalysis(lastAnalysis.analysis);
-
-                                    if (items.length > 0) {
-                                        // Add a message with the items to select
-                                        const itemsMessage = formatDisputeItemsForSelection(items);
-                                        addBotMessage(itemsMessage);
-                                    } else {
-                                        addBotMessage("I couldn't identify specific items from the analysis. Please tell me which item you'd like to dispute.");
-                                    }
+                                if (lastAnalysis && lastAnalysis.extractedItems && lastAnalysis.extractedItems.length > 0) {
+                                    // Create the category filter interface
+                                    displayCategoryFilterInterface(container, lastAnalysis.extractedItems);
                                 } else {
-                                    addBotMessage("Please specify which item from the analysis you'd like to dispute.");
+                                    addBotMessage("I couldn't identify specific items from the analysis. Please tell me which item you'd like to dispute.");
                                 }
                             }
 
@@ -603,6 +993,7 @@
             }
 
             // Function to extract dispute items from analysis text
+            //Keep this for now, this is where the dispute items are extracted from the analysis text.
             function extractDisputeItemsFromAnalysis(analysisText) {
                 if (!analysisText) return [];
 
@@ -675,6 +1066,7 @@
             }
 
             // Function to add a user message
+            //Keep this for now, this is where the user messages are added.
             function addUserMessage(message) {
                 chatMessages.push({
                     type: 'user',
@@ -684,6 +1076,7 @@
             }
 
             // Function to add a bot message
+            //Keep this for now, this is where the bot messages are added.
             function addBotMessage(message) {
                 chatMessages.push({
                     type: 'bot',
@@ -693,6 +1086,7 @@
             }
 
             // Function to add a bot message with action buttons
+            //Keep this for now, this is where the bot messages with buttons are added.
             function addBotMessageWithButtons(message, buttons) {
                 chatMessages.push({
                     type: 'bot',
@@ -706,6 +1100,7 @@
             }
 
             // Function to show typing indicator
+            //Keep this for now, these are our typing dots.
             function showTypingIndicator(container) {
                 const messagesContainer = container.querySelector('#chatMessages');
                 if (!messagesContainer) return;
@@ -731,6 +1126,7 @@
             }
 
             // Function to hide typing indicator
+            //Keep this for now, this is where the typing indicator is removed.
             function hideTypingIndicator(container) {
                 const typingIndicator = container.querySelector('#Bot-typing-indicator');
                 if (typingIndicator) {
@@ -739,6 +1135,7 @@
             }
 
             // Function to update messages display
+            //Keep this for now, this is where the messages are updated.
             function updateMessagesDisplay(container) {
                 const messagesContainer = container.querySelector('#chatMessages');
                 if (!messagesContainer) return;
@@ -818,7 +1215,12 @@
             }
 
             // Function to handle button clicks
+            //Keep this for "Yes, analyze my reports" button. This is where event handling for all buttons is handled.
             function handleButtonClick(value, container) {
+                debugLog('handleButtonClick', 'STARTED', { value: value });
+
+                console.log('Button clicked:', value);
+
                 if (value === 'analyze_reports') {
                     console.log('User clicked to analyze reports');
 
@@ -1225,6 +1627,8 @@
                         }
                     }, 100);
                 }
+
+                debugLog('handleButtonClick', 'COMPLETED');
             }
 
             // Function to download the dispute letter as PDF
@@ -1369,6 +1773,7 @@
             }
 
             // Helper function to generate a sample dispute letter (for demonstration)
+            //Keep this for now, this is where the sample dispute letter is generated.
             function generateSampleDisputeLetter(item) {
                 const currentDate = new Date().toLocaleDateString('en-US', {
                     year: 'numeric',
@@ -1414,6 +1819,7 @@ John Doe
             }
 
             // Function to get report files from localStorage
+            //Keep this for now, this is where the report files are retrieved from localStorage
             function getReportFilesFromLocalStorage() {
                 const reportFiles = [];
 
@@ -1448,32 +1854,80 @@ John Doe
             }
 
             // Function to send reports to backend for analysis
+            //Keep this for now, this is where the reports are sent to the backend for analysis.
             async function sendReportsForAnalysis(reportFiles) {
-                console.log(`Sending ${reportFiles.length} report files for analysis`);
+                debugLog('sendReportsForAnalysis', 'STARTED', { fileCount: reportFiles.length });
+
+                console.log('=== SEND REPORTS FOR ANALYSIS DEBUG ===');
+                console.log('Files to analyze:', reportFiles.length);
 
                 try {
-                    // Create a FormData object to send the files
+                    // Create FormData to send files
                     const formData = new FormData();
 
                     // Add each file to the FormData
-                    reportFiles.forEach((file) => {
-                        // Convert base64 data to a Blob
-                        const byteCharacters = atob(file.data.split(',')[1]);
-                        const byteArrays = [];
+                    for (let i = 0; i < reportFiles.length; i++) {
+                        const reportFile = reportFiles[i];
+                        console.log(`Processing file ${i + 1}:`, reportFile.name);
 
-                        for (let i = 0; i < byteCharacters.length; i++) {
-                            byteArrays.push(byteCharacters.charCodeAt(i));
+                        // Get file data from localStorage - it's stored as JSON
+                        const fileDataJson = localStorage.getItem(`jamBotFile_${reportFile.id}`);
+                        if (!fileDataJson) {
+                            throw new Error(`File data not found for ${reportFile.name}`);
                         }
 
-                        const byteArray = new Uint8Array(byteArrays);
-                        const blob = new Blob([byteArray], { type: file.type });
+                        // Parse the JSON to get the file data object
+                        let fileDataObj;
+                        try {
+                            fileDataObj = JSON.parse(fileDataJson);
+                        } catch (parseError) {
+                            throw new Error(`Failed to parse file data for ${reportFile.name}: ${parseError.message}`);
+                        }
 
-                        // Add the blob to FormData - use 'file' as the field name to match backend
-                        formData.append('file', blob, file.name);
-                    });
+                        // Extract the base64 data from the data URL
+                        const dataUrl = fileDataObj.data;
+                        if (!dataUrl || !dataUrl.startsWith('data:')) {
+                            throw new Error(`Invalid data URL format for ${reportFile.name}`);
+                        }
 
-                    console.log('Sending request to backend...');
-                    const response = await fetch('http://localhost:3000/api/chatGptService/analyzeReports', {
+                        // Split the data URL to get just the base64 part
+                        const base64Data = dataUrl.split(',')[1];
+                        if (!base64Data) {
+                            throw new Error(`No base64 data found in data URL for ${reportFile.name}`);
+                        }
+
+                        console.log(`Base64 data length: ${base64Data.length}`);
+
+                        // Validate base64 data before decoding
+                        if (!base64Data.match(/^[A-Za-z0-9+/]*={0,2}$/)) {
+                            throw new Error(`Invalid base64 format for ${reportFile.name}`);
+                        }
+
+                        try {
+                            // Convert base64 back to blob
+                            const byteCharacters = atob(base64Data);
+                            const byteNumbers = new Array(byteCharacters.length);
+                            for (let j = 0; j < byteCharacters.length; j++) {
+                                byteNumbers[j] = byteCharacters.charCodeAt(j);
+                            }
+                            const byteArray = new Uint8Array(byteNumbers);
+                            const blob = new Blob([byteArray], { type: fileDataObj.type || 'application/pdf' });
+
+                            console.log(`Converted to blob: ${blob.size} bytes`);
+
+                            // Add file to FormData
+                            formData.append('reports', blob, reportFile.name);
+
+                        } catch (decodeError) {
+                            console.error(`Error decoding base64 for ${reportFile.name}:`, decodeError);
+                            throw new Error(`Failed to decode file data for ${reportFile.name}: ${decodeError.message}`);
+                        }
+                    }
+
+                    console.log('FormData prepared, sending request...');
+
+                    // Send the request
+                    const response = await fetch('http://localhost:3000/api/chat/analyze', {
                         method: 'POST',
                         body: formData
                     });
@@ -1482,34 +1936,35 @@ John Doe
 
                     if (!response.ok) {
                         const errorText = await response.text();
-                        console.error('Server error response:', errorText);
-                        throw new Error(`Server responded with status: ${response.status}`);
+                        console.error('Server error:', errorText);
+                        throw new Error(`Server error: ${response.status} - ${errorText}`);
                     }
 
                     const data = await response.json();
-                    console.log('Response data:', data);
 
-                    // Store the analysis data for later use
-                    localStorage.setItem('jamBotLastAnalysis', JSON.stringify(data));
+                    console.log('=== ANALYSIS RESPONSE DEBUG ===');
+                    console.log('Response data keys:', Object.keys(data));
+                    console.log('Response data.extractedItems exists:', !!data.extractedItems);
+                    console.log('Response data.extractedItems length:', data.extractedItems?.length || 'N/A');
 
-                    // Format the response for the chat
-                    let analysisResponse = "";
-
-                    if (data.formattedAnalysis) {
-                        analysisResponse = data.formattedAnalysis;
-                    } else if (data.analysis) {
-                        analysisResponse = data.analysis;
-                    } else if (data.detailedAnalysis) {
-                        analysisResponse = data.detailedAnalysis;
-                    } else {
-                        analysisResponse = "I've analyzed your credit reports and found several items that could potentially be disputed.";
+                    if (data.error) {
+                        throw new Error(data.error);
                     }
 
-                    // We'll return just the analysis without the follow-up question
-                    // The follow-up with buttons will be added separately
-                    return analysisResponse;
+                    // Store the analysis data globally AND in localStorage
+                    currentAnalysisData = data;
+
+                    // Store in localStorage for the dispute handler
+                    localStorage.setItem('jamBotLastAnalysis', JSON.stringify(data));
+                    localStorage.setItem('creditReportAnalysis', JSON.stringify(data));
+                    localStorage.setItem('lastAnalysisData', JSON.stringify(data));
+
+                    debugLog('sendReportsForAnalysis', 'SUCCESS', { extractedItemsCount: data.extractedItems?.length });
+                    return data.analysis || data.summary || 'Analysis completed successfully';
+
                 } catch (error) {
-                    console.error('Error in sendReportsForAnalysis:', error);
+                    debugLog('sendReportsForAnalysis', 'ERROR', { error: error.message });
+                    console.log('=== ANALYSIS ERROR ===', error);
                     throw error;
                 }
             }
@@ -1520,6 +1975,7 @@ John Doe
             }
 
             // Function to save state
+            //Keep this for now, this is where the chat state is saved.
             function saveState() {
                 console.log('Saving chat state, messages count:', chatMessages.length);
                 if (parentModule && typeof parentModule.saveChatState === 'function') {
@@ -1625,60 +2081,119 @@ John Doe
             }
 
             // Function to handle the start_dispute button click
+            //Keep this for now, this is where the dispute process is started.
             function handleStartDispute(container) {
+                debugLog('handleStartDispute', 'STARTED');
+
+                console.log('=== HANDLE START DISPUTE DEBUG ===');
                 console.log('User clicked to start dispute process');
 
                 // Add user message
                 addUserMessage("Yes, help me dispute");
 
-                // Get the last analysis from localStorage
-                const lastAnalysis = JSON.parse(localStorage.getItem('jamBotLastAnalysis') || '{}');
+                // Debug localStorage contents
+                console.log('=== LOCALSTORAGE DEBUG ===');
+                const allLocalStorageKeys = Object.keys(localStorage);
+                console.log('All localStorage keys:', allLocalStorageKeys);
 
-                if (!lastAnalysis || (!lastAnalysis.analysis && !lastAnalysis.formattedAnalysis && !lastAnalysis.detailedAnalysis)) {
-                    console.error('No analysis data found');
-                    addBotMessage("I couldn't find your credit report analysis. Let's analyze your reports first.");
+                // Check for different possible keys
+                const possibleKeys = ['jamBotLastAnalysis', 'creditReportAnalysis', 'lastAnalysisData'];
+                possibleKeys.forEach(key => {
+                    const data = localStorage.getItem(key);
+                    console.log(`localStorage['${key}']:`, data ? 'EXISTS' : 'NULL');
+                    if (data) {
+                        try {
+                            const parsed = JSON.parse(data);
+                            console.log(`${key} parsed:`, {
+                                type: typeof parsed,
+                                hasExtractedItems: !!parsed.extractedItems,
+                                extractedItemsLength: parsed.extractedItems ? parsed.extractedItems.length : 'N/A',
+                                keys: Object.keys(parsed)
+                            });
+                        } catch (e) {
+                            console.log(`${key} parse error:`, e.message);
+                        }
+                    }
+                });
+
+                // Get the last analysis from localStorage with multiple fallbacks
+                let lastAnalysis = null;
+                let dataSource = 'none';
+
+                // Try jamBotLastAnalysis first
+                try {
+                    const jamBotData = localStorage.getItem('jamBotLastAnalysis');
+                    if (jamBotData) {
+                        lastAnalysis = JSON.parse(jamBotData);
+                        dataSource = 'jamBotLastAnalysis';
+                        console.log('Found data in jamBotLastAnalysis');
+                    }
+                } catch (e) {
+                    console.error('Error parsing jamBotLastAnalysis:', e);
+                }
+
+                // Fallback to creditReportAnalysis
+                if (!lastAnalysis) {
+                    try {
+                        const creditData = localStorage.getItem('creditReportAnalysis');
+                        if (creditData) {
+                            lastAnalysis = JSON.parse(creditData);
+                            dataSource = 'creditReportAnalysis';
+                            console.log('Found data in creditReportAnalysis');
+                        }
+                    } catch (e) {
+                        console.error('Error parsing creditReportAnalysis:', e);
+                    }
+                }
+
+                // Fallback to lastAnalysisData
+                if (!lastAnalysis) {
+                    try {
+                        const lastData = localStorage.getItem('lastAnalysisData');
+                        if (lastData) {
+                            lastAnalysis = JSON.parse(lastData);
+                            dataSource = 'lastAnalysisData';
+                            console.log('Found data in lastAnalysisData');
+                        }
+                    } catch (e) {
+                        console.error('Error parsing lastAnalysisData:', e);
+                    }
+                }
+
+                console.log('=== ANALYSIS DATA DEBUG ===');
+                console.log('Data source:', dataSource);
+                console.log('lastAnalysis exists:', !!lastAnalysis);
+
+                if (lastAnalysis) {
+                    console.log('lastAnalysis type:', typeof lastAnalysis);
+                    console.log('lastAnalysis keys:', Object.keys(lastAnalysis));
+                    console.log('lastAnalysis.extractedItems exists:', !!lastAnalysis.extractedItems);
+                    console.log('lastAnalysis.extractedItems type:', typeof lastAnalysis.extractedItems);
+                    console.log('lastAnalysis.extractedItems length:', lastAnalysis.extractedItems ? lastAnalysis.extractedItems.length : 'N/A');
+
+                    // Log first few items for inspection
+                    if (lastAnalysis.extractedItems && lastAnalysis.extractedItems.length > 0) {
+                        console.log('First extracted item:', lastAnalysis.extractedItems[0]);
+                        console.log('Sample of extracted items (first 3):', lastAnalysis.extractedItems.slice(0, 3));
+                    }
+                }
+
+                if (!lastAnalysis || !lastAnalysis.extractedItems || lastAnalysis.extractedItems.length === 0) {
+                    debugLog('handleStartDispute', 'NO_DATA_FOUND');
+                    console.error('=== NO DISPUTE ITEMS FOUND ===');
+                    console.error('lastAnalysis:', lastAnalysis);
+                    console.error('extractedItems:', lastAnalysis ? lastAnalysis.extractedItems : 'lastAnalysis is null');
+
+                    addMessage("I couldn't find your credit report analysis data. Let's analyze your reports first.", 'bot');
                     updateMessagesDisplay(container);
                     saveState();
                     return;
                 }
 
-                // Get the analysis text from the response
-                const analysisText = lastAnalysis.formattedAnalysis || lastAnalysis.analysis || lastAnalysis.detailedAnalysis;
+                debugLog('handleStartDispute', 'CALLING_DISPLAY_INTERFACE', { itemCount: lastAnalysis.extractedItems.length });
+                displayCategoryFilterInterface(lastAnalysis);
 
-                // Extract dispute items from the analysis
-                const disputeItems = extractDisputeItemsFromAnalysis(analysisText);
-
-                if (disputeItems.length === 0) {
-                    console.log('No dispute items found in analysis');
-                    addBotMessage("I couldn't identify specific items to dispute from your credit report analysis. Would you like me to help you create a custom dispute letter instead?", [
-                        { text: "Create custom letter", value: "create_custom_letter" },
-                        { text: "Analyze reports again", value: "analyze_reports" }
-                    ]);
-                } else {
-                    console.log(`Found ${disputeItems.length} dispute items`);
-
-                    // Create buttons for each dispute item
-                    const buttons = disputeItems.map((item, index) => ({
-                        text: `Item ${index + 1}`,
-                        value: `dispute_item_${item.id}`
-                    }));
-
-                    // Format the dispute items for display
-                    let itemsMessage = "Great! Please select which item you'd like to dispute:\n\n";
-
-                    disputeItems.forEach((item, index) => {
-                        itemsMessage += `**Item ${index + 1}:** ${item.title}\n${item.content}\n\n`;
-                    });
-
-                    // Add the message with the formatted items and buttons
-                    addBotMessageWithButtons(itemsMessage, buttons);
-                }
-
-                // Update messages display
-                updateMessagesDisplay(container);
-
-                // Save chat state
-                saveState();
+                debugLog('handleStartDispute', 'COMPLETED');
             }
 
             // Function to generate a dispute letter with user information
@@ -1831,6 +2346,330 @@ ${userInfo.fullName}
                 saveState();
             }
 
+            // Add this new function to create the category filter interface
+            //Keep this for now, this is where the category filter interface is created.
+            function displayCategoryFilterInterface(container, extractedItems) {
+                // Categorize the items
+                const categories = {};
+                extractedItems.forEach(item => {
+                    const category = item.analysis_pass || 'uncategorized';
+                    if (!categories[category]) {
+                        categories[category] = [];
+                    }
+                    categories[category].push(item);
+                });
+
+                // Create the category filter HTML
+                const categoryFilterHTML = `
+                    <div class="category-filter">
+                        <h4>Select a Category to View Dispute Items:</h4>
+                        <div class="category-buttons" id="categoryButtons"></div>
+                        <div class="item-count" id="itemCount">Select a category to view items</div>
+                        <div class="dispute-items-container" id="disputeItemsContainer">
+                            <p style="text-align: center; color: #666; padding: 20px;">
+                                Choose a category above to view the specific items you can dispute.
+                            </p>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="category-btn" onclick="proceedWithSelectedItems()" style="background-color: #28a745; color: white; border-color: #28a745;">
+                                Proceed with Selected Items
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Add the category filter to the chat
+                const chatMessages = container.querySelector('#chatMessages');
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'message bot-message';
+                categoryDiv.innerHTML = categoryFilterHTML;
+                chatMessages.appendChild(categoryDiv);
+
+                // Initialize the category buttons and functionality
+                initializeCategoryFilter(categories, extractedItems);
+            }
+
+            // Add this function to initialize the category filter
+            //Keep this for now, this is where the category filter is initialized.
+            function initializeCategoryFilter(categories, extractedItems) {
+                const categoryButtons = document.getElementById('categoryButtons');
+                const disputeItemsContainer = document.getElementById('disputeItemsContainer');
+                const itemCount = document.getElementById('itemCount');
+
+                // Track selected items
+                window.selectedDisputeItems = [];
+
+                // Add "All" button
+                const allButton = document.createElement('button');
+                allButton.className = 'category-btn all active';
+                allButton.textContent = `All Items (${extractedItems.length})`;
+                allButton.onclick = () => {
+                    setActiveButton(allButton);
+                    displayItems(extractedItems, 'All Categories');
+                };
+                categoryButtons.appendChild(allButton);
+
+                // Add category buttons
+                Object.keys(categories).forEach(category => {
+                    const button = document.createElement('button');
+                    button.className = 'category-btn';
+                    button.textContent = `${formatCategoryName(category)} (${categories[category].length})`;
+                    button.onclick = () => {
+                        setActiveButton(button);
+                        displayItems(categories[category], formatCategoryName(category));
+                    };
+                    categoryButtons.appendChild(button);
+                });
+
+                // Display all items initially
+                displayItems(extractedItems, 'All Categories');
+
+                function setActiveButton(activeButton) {
+                    categoryButtons.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    activeButton.classList.add('active');
+                }
+
+                function displayItems(items, categoryName) {
+                    itemCount.textContent = `Showing ${items.length} items in ${categoryName}`;
+
+                    disputeItemsContainer.innerHTML = items.map((item, index) => `
+                        <div class="dispute-item" data-item-id="${item.creditor_name}-${index}">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h5>
+                                    <span class="creditor">${item.creditor_name || 'Unknown Creditor'}</span>
+                                    <span class="confidence ${item.confidence_level || 'medium'}">${(item.confidence_level || 'medium').toUpperCase()}</span>
+                                </h5>
+                                <label class="item-checkbox">
+                                    <input type="checkbox" onchange="toggleItemSelection('${item.creditor_name}-${index}', this.checked, ${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                                    <span>Select for Dispute</span>
+                                </label>
+                            </div>
+                            <div class="issue-type"><strong>Issue:</strong> ${item.issue_type || 'Unknown Issue'}</div>
+                            <div><strong>Account:</strong> ${item.account_number || 'N/A'} (${item.account_type || 'Unknown Type'})</div>
+                            <div><strong>Details:</strong> ${item.issue_details || 'No details available'}</div>
+                            <div><strong>Dispute Reason:</strong> ${item.dispute_reason || 'No reason provided'}</div>
+                            ${item.original_text ? `<div><strong>Original Text:</strong> <em>${item.original_text.substring(0, 200)}${item.original_text.length > 200 ? '...' : ''}</em></div>` : ''}
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Add this function to handle item selection
+            function toggleItemSelection(itemId, isSelected, itemData) {
+                if (!window.selectedDisputeItems) {
+                    window.selectedDisputeItems = [];
+                }
+
+                if (isSelected) {
+                    // Add item to selection
+                    window.selectedDisputeItems.push({
+                        id: itemId,
+                        data: itemData
+                    });
+                } else {
+                    // Remove item from selection
+                    window.selectedDisputeItems = window.selectedDisputeItems.filter(item => item.id !== itemId);
+                }
+
+                console.log(`Selected items count: ${window.selectedDisputeItems.length}`);
+            }
+
+            // Add this function to proceed with selected items
+            function proceedWithSelectedItems() {
+                if (!window.selectedDisputeItems || window.selectedDisputeItems.length === 0) {
+                    alert('Please select at least one item to dispute.');
+                    return;
+                }
+
+                // Add user message
+                addUserMessage(`I want to dispute ${window.selectedDisputeItems.length} selected items`);
+
+                // Create summary of selected items
+                let summaryMessage = `Perfect! You've selected ${window.selectedDisputeItems.length} items to dispute:\n\n`;
+
+                window.selectedDisputeItems.forEach((item, index) => {
+                    summaryMessage += `${index + 1}. **${item.data.creditor_name}** - ${item.data.issue_type}\n`;
+                });
+
+                summaryMessage += `\nWould you like me to generate dispute letters for these items?`;
+
+                // Add bot response with options
+                addBotMessageWithButtons(summaryMessage, [
+                    { text: "Generate dispute letters", value: "generate_letters" },
+                    { text: "Select different items", value: "reselect_items" },
+                    { text: "Get more details first", value: "item_details" }
+                ]);
+
+                // Update messages display
+                updateMessagesDisplay(document.querySelector('.Bot-chat-container'));
+                saveState();
+            }
+
+            // Add the CSS for the new elements
+            function addCategoryFilterStyles() {
+                if (document.getElementById('categoryFilterStyles')) return;
+
+                const style = document.createElement('style');
+                style.id = 'categoryFilterStyles';
+                style.textContent = `
+                    .category-filter {
+                        margin: 20px 0;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        border: 1px solid #dee2e6;
+                    }
+
+                    .category-buttons {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        margin-bottom: 15px;
+                    }
+
+                    .category-btn {
+                        padding: 8px 16px;
+                        border: 1px solid #007bff;
+                        background-color: white;
+                        color: #007bff;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: all 0.3s ease;
+                    }
+
+                    .category-btn:hover {
+                        background-color: #007bff;
+                        color: white;
+                    }
+
+                    .category-btn.active {
+                        background-color: #007bff;
+                        color: white;
+                    }
+
+                    .category-btn.all {
+                        background-color: #28a745;
+                        color: white;
+                        border-color: #28a745;
+                    }
+
+                    .dispute-items-container {
+                        max-height: 500px;
+                        overflow-y: auto;
+                        border: 1px solid #dee2e6;
+                        border-radius: 8px;
+                        padding: 15px;
+                        background-color: white;
+                    }
+
+                    .dispute-item {
+                        padding: 12px;
+                        margin-bottom: 10px;
+                        border: 1px solid #e9ecef;
+                        border-radius: 6px;
+                        background-color: #f8f9fa;
+                    }
+
+                    .dispute-item h5 {
+                        margin: 0 0 8px 0;
+                        color: #495057;
+                        font-size: 16px;
+                    }
+
+                    .dispute-item .creditor {
+                        font-weight: bold;
+                        color: #007bff;
+                    }
+
+                    .dispute-item .issue-type {
+                        color: #dc3545;
+                        font-weight: 500;
+                    }
+
+                    .dispute-item .confidence {
+                        padding: 2px 8px;
+                        border-radius: 12px;
+                        font-size: 12px;
+                        font-weight: bold;
+                    }
+
+                    .confidence.high {
+                        background-color: #dc3545;
+                        color: white;
+                    }
+
+                    .confidence.medium {
+                        background-color: #ffc107;
+                        color: black;
+                    }
+
+                    .confidence.low {
+                        background-color: #28a745;
+                        color: white;
+                    }
+
+                    .item-count {
+                        font-size: 14px;
+                        color: #666;
+                        margin-bottom: 10px;
+                        font-weight: 500;
+                    }
+
+                    .item-checkbox {
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        font-size: 12px;
+                        color: #007bff;
+                        cursor: pointer;
+                    }
+
+                    .item-checkbox input[type="checkbox"] {
+                        margin: 0;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Add the styles when the module loads
+            addCategoryFilterStyles();
+
+            function formatCategoryName(category) {
+                const categoryNames = {
+                    'personal_info': 'Personal Information',
+                    'account_status': 'Account Status',
+                    'payment_history': 'Payment History',
+                    'duplicates': 'Duplicate Accounts',
+                    'inquiries': 'Unauthorized Inquiries',
+                    'collections': 'Collections & Charge-offs',
+                    'unverifiable': 'Unverifiable Information',
+                    'outdated': 'Outdated Information',
+                    'uncategorized': 'Uncategorized'
+                };
+                return categoryNames[category] || category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Add this function to check localStorage status
+            function debugLocalStorage() {
+                console.log('=== LOCALSTORAGE DEBUG CHECK ===');
+                const jamBotData = localStorage.getItem('jamBotLastAnalysis');
+                console.log('jamBotLastAnalysis exists:', !!jamBotData);
+
+                if (jamBotData) {
+                    try {
+                        const parsed = JSON.parse(jamBotData);
+                        console.log('Parsed data keys:', Object.keys(parsed));
+                        console.log('extractedItems exists:', !!parsed.extractedItems);
+                        console.log('extractedItems length:', parsed.extractedItems ? parsed.extractedItems.length : 'N/A');
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                    }
+                }
+            }
+
             // Public API
             return {
                 init: init,
@@ -1907,6 +2746,641 @@ ${userInfo.fullName}
             // Remove the session active flag when the page is unloaded
             sessionStorage.removeItem('jamBotSessionActive');
         });
+
+        // Add this to your chatModule.html script section
+
+        let currentAnalysisData = null;
+        let selectedDisputeItems = [];
+
+        // Function to handle analysis response and start guided conversation
+        function handleAnalysisResponse(responseData) {
+            currentAnalysisData = responseData;
+
+            // Display the analysis summary first
+            addMessage(responseData.analysis, 'bot');
+
+            // Start the guided conversation
+            setTimeout(() => {
+                startDisputeGuidance();
+            }, 1000);
+        }
+
+        function startDisputeGuidance() {
+            const totalItems = currentAnalysisData.extractedItems.length;
+
+            const guidanceMessage = `
+Great! I found **${totalItems} potential dispute items** in your credit report. 
+
+Let me help you prioritize which items to dispute first. I'll show you the items by category so you can choose the ones that are most important to you.
+
+Would you like to:
+1. 📋 See all items by category
+2. 🎯 Focus on high-priority items only
+3. 🔍 Search for specific creditors
+4. ❓ Get recommendations on what to dispute first
+
+Just type the number of your choice!
+            `;
+
+            addMessage(guidanceMessage, 'bot');
+        }
+
+        // Function to categorize and display items
+        function showItemsByCategory() {
+            const categories = {};
+
+            // Group items by category
+            currentAnalysisData.extractedItems.forEach((item, index) => {
+                const category = item.analysis_pass || 'other';
+                if (!categories[category]) {
+                    categories[category] = [];
+                }
+                categories[category].push({ ...item, index });
+            });
+
+            let categoryMessage = "## 📊 Dispute Items by Category\n\n";
+
+            Object.keys(categories).forEach(category => {
+                const categoryName = formatCategoryName(category);
+                const items = categories[category];
+
+                categoryMessage += `### ${categoryName} (${items.length} items)\n`;
+
+                items.slice(0, 3).forEach(item => {
+                    categoryMessage += `• **${item.creditor_name}** - ${item.issue_type}\n`;
+                });
+
+                if (items.length > 3) {
+                    categoryMessage += `• ...and ${items.length - 3} more items\n`;
+                }
+
+                categoryMessage += `\n`;
+            });
+
+            categoryMessage += "\nWhich category would you like to explore first? Just type the category name (e.g., 'personal information', 'account status', etc.)";
+
+            addMessage(categoryMessage, 'bot');
+        }
+
+        function showHighPriorityItems() {
+            const highPriorityItems = currentAnalysisData.extractedItems.filter(
+                item => item.confidence_level === 'high'
+            );
+
+            if (highPriorityItems.length === 0) {
+                addMessage("I didn't find any items marked as high priority. Let me show you medium priority items instead.", 'bot');
+                showMediumPriorityItems();
+                return;
+            }
+
+            let message = `## 🎯 High Priority Dispute Items (${highPriorityItems.length} items)\n\n`;
+            message += "These items have the highest chance of successful dispute:\n\n";
+
+            highPriorityItems.forEach((item, index) => {
+                message += `**${index + 1}. ${item.creditor_name}**\n`;
+                message += `   • Issue: ${item.issue_type}\n`;
+                message += `   • Reason: ${item.dispute_reason}\n`;
+                message += `   • Account: ${item.account_type}\n\n`;
+            });
+
+            message += "Would you like to:\n";
+            message += "• Type a number to select an item for dispute\n";
+            message += "• Type 'select multiple' to choose several items\n";
+            message += "• Type 'back' to see other options";
+
+            addMessage(message, 'bot');
+        }
+
+        function searchCreditors(searchTerm) {
+            const matchingItems = currentAnalysisData.extractedItems.filter(item =>
+                item.creditor_name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (matchingItems.length === 0) {
+                addMessage(`I didn't find any items for "${searchTerm}". Try searching for another creditor name.`, 'bot');
+                return;
+            }
+
+            let message = `## 🔍 Found ${matchingItems.length} items for "${searchTerm}"\n\n`;
+
+            matchingItems.forEach((item, index) => {
+                message += `**${index + 1}. ${item.creditor_name}**\n`;
+                message += `   • Issue: ${item.issue_type}\n`;
+                message += `   • Details: ${item.issue_details}\n`;
+                message += `   • Priority: ${item.confidence_level}\n\n`;
+            });
+
+            message += "Type a number to select an item, or 'back' to return to the main menu.";
+
+            addMessage(message, 'bot');
+        }
+
+        function selectDisputeItem(itemIndex) {
+            const item = currentAnalysisData.extractedItems[itemIndex];
+
+            if (!item) {
+                addMessage("Sorry, I couldn't find that item. Please try again.", 'bot');
+                return;
+            }
+
+            selectedDisputeItems.push(item);
+
+            const confirmMessage = `
+✅ **Selected for Dispute:**
+**${item.creditor_name}** - ${item.issue_type}
+
+**Details:** ${item.issue_details}
+**Dispute Reason:** ${item.dispute_reason}
+
+Would you like to:
+1. 📝 Generate a dispute letter for this item now
+2. ➕ Add more items to dispute together
+3. 📋 Review all selected items
+4. 🔄 Start over with different items
+
+Type your choice (1-4)!
+            `;
+
+            addMessage(confirmMessage, 'bot');
+        }
+
+        function generateDisputeLetter() {
+            if (selectedDisputeItems.length === 0) {
+                addMessage("You haven't selected any items to dispute yet. Please select at least one item first.", 'bot');
+                return;
+            }
+
+            addMessage("Perfect! I'll generate a professional dispute letter for your selected items. This may take a moment...", 'bot');
+
+            // Prepare dispute details for the letter generation
+            const disputeDetails = {
+                items: selectedDisputeItems,
+                disputeType: 'factual', // You can make this dynamic based on item types
+                userInfo: {
+                    // You'll need to collect this from the user or have it stored
+                    name: 'User Name',
+                    address: 'User Address',
+                    city: 'City',
+                    state: 'State',
+                    zip: 'ZIP'
+                }
+            };
+
+            // Call your dispute letter generation API
+            fetch('http://localhost:3000/api/chat/generate-dispute-letter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(disputeDetails)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const letterMessage = `
+## 📄 Your Dispute Letter
+
+${data.letter}
+
+**Next Steps:**
+1. Review the letter carefully
+2. Print and sign the letter
+3. Send via certified mail to the credit bureau
+4. Keep copies for your records
+
+Would you like to:
+• Generate letters for other items
+• Download this letter as PDF
+• Get guidance on mailing procedures
+                `;
+                        addMessage(letterMessage, 'bot');
+                    } else {
+                        addMessage("Sorry, there was an error generating your dispute letter. Please try again.", 'bot');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating dispute letter:', error);
+                    addMessage("Sorry, there was an error generating your dispute letter. Please try again.", 'bot');
+                });
+        }
+
+        // Enhanced message handler for the guided conversation
+        function handleGuidedConversation(userMessage) {
+            const message = userMessage.toLowerCase().trim();
+
+            // Handle main menu choices
+            if (message === '1' || message.includes('category')) {
+                showItemsByCategory();
+            } else if (message === '2' || message.includes('high priority')) {
+                showHighPriorityItems();
+            } else if (message === '3' || message.includes('search')) {
+                addMessage("What creditor would you like to search for? (e.g., 'Capital One', 'Chase', 'Experian')", 'bot');
+            } else if (message === '4' || message.includes('recommend')) {
+                showRecommendations();
+            }
+            // Handle item selection
+            else if (/^\d+$/.test(message)) {
+                const itemIndex = parseInt(message) - 1;
+                selectDisputeItem(itemIndex);
+            }
+            // Handle letter generation
+            else if (message.includes('generate') || message === '1') {
+                generateDisputeLetter();
+            }
+            // Handle creditor search
+            else if (currentAnalysisData && message.length > 2) {
+                searchCreditors(message);
+            }
+            // Handle navigation
+            else if (message === 'back') {
+                startDisputeGuidance();
+            } else {
+                // Default response
+                addMessage("I'm not sure what you'd like to do. Type 'menu' to see your options again, or ask me a specific question about your credit report.", 'bot');
+            }
+        }
+
+        // Helper functions
+        function formatCategoryName(category) {
+            const categoryNames = {
+                'personal_info': '👤 Personal Information',
+                'account_status': '📊 Account Status',
+                'payment_history': '💳 Payment History',
+                'duplicates': '🔄 Duplicate Accounts',
+                'inquiries': '🔍 Inquiries',
+                'collections': '⚠️ Collections',
+                'unverifiable': '❓ Unverifiable Info',
+                'outdated': '📅 Outdated Info',
+                'inconsistencies': '⚡ Inconsistencies',
+                'metro2': '🔧 Metro2 Compliance'
+            };
+
+            return categoryNames[category] || category.replace('_', ' ').toUpperCase();
+        }
+
+        function showRecommendations() {
+            const message = `
+## 💡 My Recommendations
+
+Based on your credit report analysis, here's what I recommend disputing first:
+
+**🎯 Start with High-Impact Items:**
+1. **Personal Information Errors** - These are usually easy wins
+2. **Duplicate Accounts** - Clear violations that should be removed
+3. **Outdated Information** - Items older than 7 years
+
+**📈 For Maximum Credit Score Impact:**
+1. Focus on accounts with high balances first
+2. Dispute recent late payments
+3. Challenge unverifiable collections
+
+**⚖️ Legal Strategy:**
+1. Start with factual disputes (easiest to prove)
+2. Then move to verification requests
+3. Finally, use Metro2 compliance issues
+
+Would you like me to show you items in any of these categories?
+            `;
+
+            addMessage(message, 'bot');
+        }
+
+        // Update your existing sendMessage function to handle the guided conversation
+        function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
+
+            if (message === '') return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            // If we have analysis data, handle guided conversation
+            if (currentAnalysisData) {
+                handleGuidedConversation(message);
+            } else {
+                // Regular chat handling
+                handleRegularChat(message);
+            }
+        }
+
+        // Update your file upload success handler
+        function handleUploadSuccess(data) {
+            // Store the analysis data
+            currentAnalysisData = data;
+
+            // Display initial analysis
+            addMessage(data.analysis, 'bot');
+
+            // Start guided conversation
+            setTimeout(() => {
+                startDisputeGuidance();
+            }, 1500);
+        }
+
+        // Run this in your browser console to debug the stored file
+        const reportFiles = getReportFilesFromLocalStorage();
+        if (reportFiles.length > 0) {
+            debugFileStorage(reportFiles[0].id);
+        }
+
+        // Add this after your sendReportsForAnalysis function
+        function displayCategoryFilterInterface(analysisData) {
+            console.log('=== DISPLAY CATEGORY FILTER INTERFACE ===');
+            console.log('Analysis data:', analysisData);
+            console.log('Extracted items count:', analysisData.extractedItems?.length);
+
+            if (!analysisData || !analysisData.extractedItems || analysisData.extractedItems.length === 0) {
+                addMessage("I couldn't find any dispute items to display. Please try analyzing your reports again.", 'bot');
+                return;
+            }
+
+            // Store the analysis data globally
+            currentAnalysisData = analysisData;
+
+            // Categorize items
+            const categorizedItems = {};
+            analysisData.extractedItems.forEach(item => {
+                const category = item.analysis_pass || 'other';
+                if (!categorizedItems[category]) {
+                    categorizedItems[category] = [];
+                }
+                categorizedItems[category].push(item);
+            });
+
+            console.log('Categorized items:', Object.keys(categorizedItems).map(cat => `${cat}: ${categorizedItems[cat].length}`));
+
+            // Create the category selection message
+            let categoryMessage = `Great! I found **${analysisData.extractedItems.length}** potential dispute items in your credit reports.\n\n`;
+            categoryMessage += `Here are the categories of issues I found:\n\n`;
+
+            // Add category breakdown
+            Object.keys(categorizedItems).forEach(category => {
+                const count = categorizedItems[category].length;
+                const categoryName = formatCategoryName(category);
+                categoryMessage += `• **${categoryName}**: ${count} item${count > 1 ? 's' : ''}\n`;
+            });
+
+            categoryMessage += `\nHow would you like to proceed?`;
+
+            // Add the message
+            addMessage(categoryMessage, 'bot');
+
+            // Create buttons for different viewing options
+            const buttons = [
+                { text: "View by Category", action: "view_by_category" },
+                { text: "Show High Priority Items", action: "show_high_priority" },
+                { text: "Search by Creditor", action: "search_creditor" },
+                { text: "Show All Items", action: "show_all_items" }
+            ];
+
+            // Add buttons to the interface
+            addButtonsToChat(buttons);
+        }
+
+        // Function to add buttons to the chat interface
+        function addButtonsToChat(buttons) {
+            console.log('=== ADDING BUTTONS TO CHAT ===');
+            console.log('Buttons to add:', buttons);
+
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) {
+                console.error('Chat messages container not found');
+                return;
+            }
+
+            // Create button container
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'bot-message-buttons';
+            buttonContainer.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 10px;
+                padding: 10px;
+            `;
+
+            // Create buttons
+            buttons.forEach(button => {
+                const buttonElement = document.createElement('button');
+                buttonElement.textContent = button.text;
+                buttonElement.className = 'chat-option-button';
+                buttonElement.style.cssText = `
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: background-color 0.3s;
+                `;
+
+                // Add hover effect
+                buttonElement.onmouseover = () => buttonElement.style.background = '#0056b3';
+                buttonElement.onmouseout = () => buttonElement.style.background = '#007bff';
+
+                // Add click handler
+                buttonElement.onclick = () => handleCategoryAction(button.action);
+
+                buttonContainer.appendChild(buttonElement);
+            });
+
+            // Add to chat
+            chatMessages.appendChild(buttonContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to handle category actions
+        function handleCategoryAction(action) {
+            debugLog('handleCategoryAction', 'STARTED', { action: action });
+
+            console.log('=== HANDLING CATEGORY ACTION ===');
+            console.log('Action:', action);
+
+            if (!currentAnalysisData || !currentAnalysisData.extractedItems) {
+                debugLog('handleCategoryAction', 'NO_CURRENT_DATA');
+                addMessage("Sorry, I lost the analysis data. Please analyze your reports again.", 'bot');
+                return;
+            }
+
+            // Remove previous buttons
+            const existingButtons = document.querySelectorAll('.bot-message-buttons');
+            existingButtons.forEach(btn => btn.remove());
+
+            switch (action) {
+                case 'view_by_category':
+                    debugLog('handleCategoryAction', 'CALLING_SHOW_BY_CATEGORY');
+                    showItemsByCategory();
+                    break;
+                case 'show_high_priority':
+                    debugLog('handleCategoryAction', 'CALLING_SHOW_HIGH_PRIORITY');
+                    showHighPriorityItems();
+                    break;
+                case 'search_creditor':
+                    debugLog('handleCategoryAction', 'CALLING_SEARCH_CREDITOR');
+                    addMessage("What creditor would you like to search for? (e.g., 'Capital One', 'Chase', 'Experian')", 'bot');
+                    break;
+                case 'show_all_items':
+                    debugLog('handleCategoryAction', 'CALLING_SHOW_ALL_ITEMS');
+                    showAllItems();
+                    break;
+                default:
+                    debugLog('handleCategoryAction', 'UNKNOWN_ACTION', action);
+                    addMessage("I didn't understand that option. Please try again.", 'bot');
+            }
+
+            debugLog('handleCategoryAction', 'COMPLETED');
+        }
+
+        // Function to format category names
+        function formatCategoryName(category) {
+            const categoryMap = {
+                'personal_info': 'Personal Information',
+                'account_status': 'Account Status',
+                'payment_history': 'Payment History',
+                'duplicates': 'Duplicate Accounts',
+                'inquiries': 'Unauthorized Inquiries',
+                'collections': 'Collections',
+                'unverifiable': 'Unverifiable Information',
+                'outdated': 'Outdated Information',
+                'inconsistencies': 'Data Inconsistencies',
+                'metro2': 'Metro2 Compliance',
+                'other': 'Other Issues'
+            };
+
+            return categoryMap[category] || category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        // Function to show items by category
+        function showItemsByCategory() {
+            if (!currentAnalysisData || !currentAnalysisData.extractedItems) {
+                addMessage("No analysis data available.", 'bot');
+                return;
+            }
+
+            // Categorize items
+            const categorizedItems = {};
+            currentAnalysisData.extractedItems.forEach(item => {
+                const category = item.analysis_pass || 'other';
+                if (!categorizedItems[category]) {
+                    categorizedItems[category] = [];
+                }
+                categorizedItems[category].push(item);
+            });
+
+            let message = "**Items by Category:**\n\n";
+
+            Object.keys(categorizedItems).forEach(category => {
+                const items = categorizedItems[category];
+                const categoryName = formatCategoryName(category);
+
+                message += `**${categoryName} (${items.length} items):**\n`;
+                items.forEach((item, index) => {
+                    message += `${index + 1}. ${item.creditor_name} - ${item.issue_type}\n`;
+                    message += `   Account: ${item.account_number || 'N/A'}\n`;
+                    message += `   Issue: ${item.issue_details}\n\n`;
+                });
+            });
+
+            message += "Which items would you like to dispute? You can tell me the numbers or category names.";
+
+            addMessage(message, 'bot');
+        }
+
+        // Function to show high priority items
+        function showHighPriorityItems() {
+            if (!currentAnalysisData || !currentAnalysisData.extractedItems) {
+                addMessage("No analysis data available.", 'bot');
+                return;
+            }
+
+            const highPriorityItems = currentAnalysisData.extractedItems.filter(item =>
+                item.confidence_level === 'high' ||
+                item.issue_type.toLowerCase().includes('error') ||
+                item.issue_type.toLowerCase().includes('unauthorized')
+            );
+
+            if (highPriorityItems.length === 0) {
+                addMessage("I didn't find any high-priority items. Would you like to see all items instead?", 'bot');
+                return;
+            }
+
+            let message = `**High Priority Items (${highPriorityItems.length} items):**\n\n`;
+
+            highPriorityItems.forEach((item, index) => {
+                message += `${index + 1}. **${item.creditor_name}** - ${item.issue_type}\n`;
+                message += `   Account: ${item.account_number || 'N/A'}\n`;
+                message += `   Issue: ${item.issue_details}\n`;
+                message += `   Confidence: ${item.confidence_level}\n\n`;
+            });
+
+            message += "Which of these high-priority items would you like to dispute?";
+
+            addMessage(message, 'bot');
+        }
+
+        // Function to show all items
+        function showAllItems() {
+            if (!currentAnalysisData || !currentAnalysisData.extractedItems) {
+                addMessage("No analysis data available.", 'bot');
+                return;
+            }
+
+            let message = `**All Dispute Items (${currentAnalysisData.extractedItems.length} total):**\n\n`;
+
+            currentAnalysisData.extractedItems.forEach((item, index) => {
+                message += `${index + 1}. **${item.creditor_name}** - ${item.issue_type}\n`;
+                message += `   Account: ${item.account_number || 'N/A'}\n`;
+                message += `   Issue: ${item.issue_details}\n\n`;
+            });
+
+            message += "Which items would you like to dispute? You can tell me the numbers.";
+
+            addMessage(message, 'bot');
+        }
+
+        // Update your handleStartDispute function to call displayCategoryFilterInterface
+        function handleStartDispute() {
+            debugLog('handleStartDispute', 'STARTED');
+
+            console.log('=== HANDLE START DISPUTE DEBUG ===');
+            console.log('User clicked to start dispute process');
+
+            // Check currentAnalysisData first
+            let analysisData = currentAnalysisData;
+
+            if (!analysisData) {
+                // Fallback to localStorage
+                try {
+                    const storedData = localStorage.getItem('jamBotLastAnalysis') ||
+                        localStorage.getItem('creditReportAnalysis') ||
+                        localStorage.getItem('lastAnalysisData');
+                    if (storedData) {
+                        analysisData = JSON.parse(storedData);
+                    }
+                } catch (e) {
+                    console.error('Error parsing stored analysis data:', e);
+                }
+            }
+
+            console.log('=== ANALYSIS DATA DEBUG ===');
+            console.log('Data source:', analysisData === currentAnalysisData ? 'currentAnalysisData' : 'localStorage');
+            console.log('Analysis data exists:', !!analysisData);
+            console.log('Extracted items count:', analysisData?.extractedItems?.length || 0);
+
+            if (!analysisData || !analysisData.extractedItems || analysisData.extractedItems.length === 0) {
+                debugLog('handleStartDispute', 'NO_DATA_FOUND');
+                console.log('=== NO DISPUTE ITEMS FOUND ===');
+                addMessage("I couldn't find any analysis data. Please analyze your reports first before starting the dispute process.", 'bot');
+                return;
+            }
+
+            debugLog('handleStartDispute', 'CALLING_DISPLAY_INTERFACE', { itemCount: analysisData.extractedItems.length });
+            displayCategoryFilterInterface(analysisData);
+
+            debugLog('handleStartDispute', 'COMPLETED');
+        }
     </script>
 </body>
 
