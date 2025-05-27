@@ -1,44 +1,31 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { ghlSyncMiddleware } from '../middleware/ghlSyncMiddleware.js';
 
 export const authController = {
     async register(req, res) {
         try {
-            const { name, email, phone, password } = req.body;
+            const { name, email, password, phone, company, ...otherData } = req.body;
             
-            // Validate input
-            if (!name || !email || !phone || !password) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'All fields are required' 
-                });
-            }
-
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'Invalid email format' 
-                });
-            }
-
-            // Password validation
-            if (password.length < 6) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'Password must be at least 6 characters long' 
-                });
-            }
-
+            console.log('🔍 Registration started for:', email);
+            
+            // Get CosmosService from app.locals
             const cosmosService = req.app.locals.cosmosService;
-            
-            // Check if user already exists
+            if (!cosmosService) {
+                console.error('❌ CosmosService not available');
+                return res.status(503).json({
+                    success: false,
+                    message: 'Database service not available'
+                });
+            }
+
+            // Check if user already exists using the service directly
             const existingUser = await cosmosService.getUserByEmail(email);
             if (existingUser) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'User with this email already exists' 
+                console.log('❌ User already exists:', email);
+                return res.status(400).json({
+                    success: false,
+                    message: 'User already exists with this email'
                 });
             }
 
@@ -46,46 +33,91 @@ export const authController = {
             const saltRounds = 12;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-            // Create user document
-            const userData = {
+            // Create user document directly
+            const userDocument = {
+                id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'user',
                 name: name.trim(),
                 email: email.toLowerCase().trim(),
-                phone: phone.trim(),
                 password: hashedPassword,
+                phone: phone ? phone.trim() : '',
+                company: company ? company.trim() : '',
+                ghlContactId: null,
+                ghlSyncStatus: 'pending',
                 createdAt: new Date().toISOString(),
-                isActive: true,
-                role: 'user'
+                updatedAt: new Date().toISOString()
             };
 
+            console.log('💾 Saving user to database...');
             // Save user to CosmosDB
-            const newUser = await cosmosService.createUser(userData);
+            const savedUser = await cosmosService.createDocument(userDocument, 'user');
+            console.log('✅ User saved to database:', savedUser.id);
+
+            // **NEW: Sync to GoHighLevel CRM with detailed debugging**
+            console.log('🔄 Starting GHL sync for user:', savedUser.email);
+            
+            const ghlResult = await ghlSyncMiddleware.syncNewUser({
+                id: savedUser.id,
+                name: savedUser.name,
+                email: savedUser.email,
+                phone: savedUser.phone,
+                company: savedUser.company,
+                ...otherData
+            });
+
+            console.log('📊 GHL sync result:', JSON.stringify(ghlResult, null, 2));
+
+            // Update user record with GHL contact ID if successful
+            if (ghlResult.success && ghlResult.ghlContactId) {
+                console.log('✅ GHL sync successful, updating user record...');
+                await cosmosService.updateDocument(savedUser.id, 'user', {
+                    ghlContactId: ghlResult.ghlContactId,
+                    ghlSyncStatus: 'synced',
+                    updatedAt: new Date().toISOString()
+                });
+                console.log('✅ User record updated with GHL contact ID:', ghlResult.ghlContactId);
+            } else if (!ghlResult.success) {
+                console.log('❌ GHL sync failed, updating status...');
+                await cosmosService.updateDocument(savedUser.id, 'user', {
+                    ghlSyncStatus: 'failed',
+                    updatedAt: new Date().toISOString()
+                });
+                console.log('❌ GHL sync error:', ghlResult.error);
+            }
 
             // Generate JWT token
             const token = jwt.sign(
                 { 
-                    userId: newUser.id, 
-                    email: newUser.email,
-                    role: newUser.role 
+                    userId: savedUser.id,
+                    email: savedUser.email 
                 },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: '24h' }
             );
 
             // Remove password from response
-            const { password: _, ...userResponse } = newUser;
+            const { password: _, ...userResponse } = savedUser;
+
+            console.log('🎉 Registration completed for:', email);
 
             res.status(201).json({
                 success: true,
                 message: 'User registered successfully',
                 user: userResponse,
-                token: token
+                token,
+                ghlSync: {
+                    success: ghlResult.success,
+                    action: ghlResult.action || 'attempted',
+                    error: ghlResult.error || null
+                }
             });
 
         } catch (error) {
-            console.error('Registration error:', error);
-            res.status(500).json({ 
-                success: false, 
-                error: 'Registration failed. Please try again.' 
+            console.error('❌ Registration error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Registration failed',
+                error: error.message
             });
         }
     },

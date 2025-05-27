@@ -45,7 +45,6 @@ export class GoHighLevelConfig {
             }
 
             const response = await this.client.get(`/locations/${this.locationId}`);
-            console.log('GoHighLevel connection test successful');
             return {
                 success: true,
                 location: response.data

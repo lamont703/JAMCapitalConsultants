@@ -59,15 +59,21 @@ async function initializeApp() {
         // Make cosmosService available globally
         app.locals.cosmosService = cosmosService;
         
-        // Try to initialize GoHighLevel service (now it should work!)
+        // Try to initialize GoHighLevel service
         try {
+            console.log('🔄 Initializing GHL Service...');
             const ghlService = new GoHighLevelService();
             await ghlService.initialize();
-            console.log('GoHighLevel service initialized successfully');
+            console.log('GoHighLevel initialized successfully');
+            
+            // Make GHL service available both ways
             app.locals.ghlService = ghlService;
+            global.ghlService = ghlService;
+            
         } catch (ghlError) {
             console.warn('GoHighLevel initialization failed (continuing without GHL):', ghlError.message);
             app.locals.ghlService = null;
+            global.ghlService = null;
         }
         
     } catch (error) {
