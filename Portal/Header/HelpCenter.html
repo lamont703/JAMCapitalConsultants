@@ -115,48 +115,60 @@
 
         .help-faq-item {
             margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .help-faq-item:last-child {
-            border-bottom: none;
             margin-bottom: 0;
-            padding-bottom: 0;
         }
 
         .help-faq-question {
-            font-weight: 500;
-            color: #1a2b3c;
-            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 15px 20px;
+            background: #fff;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s;
+            margin-bottom: 2px;
+            border-radius: 6px 6px 0 0;
         }
 
         .help-faq-question:hover {
-            color: #09ccfc;
+            background: #f8f9fa;
+            border-color: #09ccfc;
         }
 
-        .help-faq-question i {
-            transition: transform 0.3s;
-            color: #09ccfc;
+        .help-faq-question.active {
+            background: #f0f9ff;
+            border-color: #09ccfc;
+            border-radius: 6px 6px 0 0;
         }
 
         .help-faq-question.active i {
             transform: rotate(180deg);
         }
 
+        .help-faq-question i {
+            transition: transform 0.3s ease;
+            color: #09ccfc;
+        }
+
         .help-faq-answer {
-            padding: 0 0 10px;
-            color: #6c7a89;
-            display: none;
-            line-height: 1.6;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.3s ease-out;
+            padding: 0 20px;
+            background: #f8f9fa;
+            border-left: 3px solid transparent;
         }
 
         .help-faq-answer.active {
-            display: block;
+            padding: 15px 20px;
+            border-left-color: #09ccfc;
         }
 
         .help-contact-section {
@@ -571,271 +583,338 @@
             // FAQ data
             const faqData = [
                 {
-                    question: "How long does the credit repair process take?",
-                    answer: "The credit repair process varies for each individual. Simple disputes might be resolved in 30-45 days, while more complex situations can take 3-6 months or longer. Your dashboard will show estimated timelines based on your specific situation."
+                    id: 'faq-1',
+                    question: 'How do I reset my password?',
+                    answer: 'To reset your password, click on the "Forgot Password" link on the login page. Enter your email address and follow the instructions sent to your email.'
                 },
                 {
-                    question: "How do I know which items to dispute on my credit report?",
-                    answer: "JAM Engine analyzes your credit report and highlights potential errors or discrepancies. Items that are inaccurate, outdated, unverifiable, or improperly reported are good candidates for disputes. Your credit specialist can also provide personalized recommendations."
+                    id: 'faq-2',
+                    question: 'How can I update my profile information?',
+                    answer: 'You can update your profile information by going to Settings > Profile. Make your changes and click "Save Changes" to update your information.'
                 },
                 {
-                    question: "Can I upload my existing credit reports?",
-                    answer: "Yes! You can upload existing credit reports in the Documents section. This helps us analyze your credit history and identify potential dispute opportunities more quickly."
+                    id: 'faq-3',
+                    question: 'How do I upload documents?',
+                    answer: 'To upload documents, navigate to the Documents section and click the "Upload" button. Select your files and they will be processed automatically.'
                 },
                 {
-                    question: "How often should I check my credit report?",
-                    answer: "We recommend checking your credit report at least once every 3 months during the active repair process. JAM Engine will automatically track changes and notify you of important updates."
+                    id: 'faq-4',
+                    question: 'What file formats are supported?',
+                    answer: 'We support PDF, DOC, DOCX, JPG, PNG, and TXT file formats. Files must be under 10MB in size.'
                 },
                 {
-                    question: "What happens after I submit a dispute?",
-                    answer: "After submission, the credit bureau has 30 days to investigate (45 days in some cases). They'll contact the creditor to verify the information. You can track the status of each dispute in your Disputes Dashboard."
-                },
-                {
-                    question: "Is my personal information secure?",
-                    answer: "Yes, JAM Engine uses bank-level encryption to protect your data. All documents and personal information are stored securely, and we never share your information with unauthorized third parties."
-                },
-                {
-                    question: "Can I cancel my subscription at any time?",
-                    answer: "Yes, you can cancel your subscription at any time from the Settings > Subscription section. Your access will continue until the end of your current billing period."
-                },
-                {
-                    question: "How do I know if my credit score is improving?",
-                    answer: "JAM Engine tracks your credit score over time and displays this information in graph form on your dashboard. You'll also receive notifications when significant changes occur."
+                    id: 'faq-5',
+                    question: 'How do I contact support?',
+                    answer: 'You can contact our support team through the contact form below, or email us directly at support@example.com. We typically respond within 24 hours.'
                 }
             ];
 
-            // Initialize the module
-            function init(containerId) {
-                const container = document.getElementById(containerId);
-                if (!container) return false;
+            // Initialize the module - Enhanced with debugging
+            function init(container) {
+                console.log('HelpCenter init called with container:', container);
+                console.log('Container type:', typeof container);
+                console.log('Is container a DOM element?', container instanceof Element);
+                console.log('Container has querySelector?', typeof container.querySelector === 'function');
+                console.log('isInitialized:', isInitialized);
 
-                console.log(`Initializing Help Center Module in container: ${containerId}`);
+                if (!container || typeof container !== 'object' || !container.querySelector) {
+                    console.error('Invalid container provided to HelpCenter init:', container);
+                    return false;
+                }
 
-                // Insert the widget HTML
-                container.innerHTML = `
-                    <div class="help-container">
-                        <div class="help-header">
-                            <h2 class="help-title">JAM Engine Help Center</h2>
-                            <p class="help-subtitle">Find answers to common questions and learn how to get the most out of JAM Engine</p>
-                        </div>
-                        
-                        <div class="help-search-container">
-                            <input type="text" class="help-search-input" placeholder="Search for help topics..." id="help-search-input">
-                            <i class="fas fa-search help-search-icon"></i>
-                        </div>
-                        
-                        <div class="help-main-content">
-                            <!-- Categories Section -->
-                            <div class="help-categories">
-                                <div class="help-category" data-article="getting-started">
-                                    <div class="help-category-icon"><i class="fas fa-rocket"></i></div>
-                                    <h3 class="help-category-title">Getting Started</h3>
-                                    <p class="help-category-description">Learn the basics of JAM Engine and how to set up your account</p>
-                                </div>
-                                
-                                <div class="help-category" data-article="credit-report">
-                                    <div class="help-category-icon"><i class="fas fa-file-alt"></i></div>
-                                    <h3 class="help-category-title">Credit Reports</h3>
-                                    <p class="help-category-description">Understanding your credit report and score</p>
-                                </div>
-                                
-                                <div class="help-category" data-article="dispute-process">
-                                    <div class="help-category-icon"><i class="fas fa-gavel"></i></div>
-                                    <h3 class="help-category-title">Disputes</h3>
-                                    <p class="help-category-description">How to create and manage credit disputes</p>
-                                </div>
-                                
-                                <div class="help-category" data-article="document-upload">
-                                    <div class="help-category-icon"><i class="fas fa-upload"></i></div>
-                                    <h3 class="help-category-title">Documents</h3>
-                                    <p class="help-category-description">Uploading and managing your documents</p>
-                                </div>
+                if (isInitialized) {
+                    console.log('Help Center module already initialized, re-rendering');
+                    try {
+                        renderHelpCenter(container);
+                        attachEventListeners(container);
+                        console.log('Re-rendering completed successfully');
+                        return true;
+                    } catch (error) {
+                        console.error('Error during re-rendering:', error);
+                        return false;
+                    }
+                }
+
+                console.log('Initializing Help Center module for first time...');
+
+                try {
+                    console.log('About to call renderHelpCenter...');
+                    renderHelpCenter(container);
+                    console.log('renderHelpCenter completed');
+
+                    console.log('About to call attachEventListeners...');
+                    attachEventListeners(container);
+                    console.log('attachEventListeners completed');
+
+                    isInitialized = true;
+                    console.log('Help Center module initialized successfully');
+                    return true;
+                } catch (error) {
+                    console.error('Error during Help Center initialization:', error);
+                    console.error('Error stack:', error.stack);
+                    return false;
+                }
+            }
+
+            // Enhanced renderHelpCenter with debugging
+            function renderHelpCenter(container) {
+                console.log('renderHelpCenter called with container:', container);
+
+                try {
+                    console.log('Setting container innerHTML...');
+                    container.innerHTML = `
+                        <div class="help-container">
+                            <!-- Header section -->
+                            <div class="help-header">
+                                <h1 class="help-title">Help Center</h1>
+                                <p class="help-subtitle">Find answers to your questions and get the help you need</p>
                             </div>
-                            
-                            <!-- FAQ Section -->
-                            <div class="help-faq-section">
-                                <h3 class="help-faq-title">Frequently Asked Questions</h3>
-                                <div class="help-faq-list">
-                                    ${faqData.map((faq, index) => `
-                                        <div class="help-faq-item">
-                                            <div class="help-faq-question" data-faq="${index}">
-                                                ${faq.question}
-                                                <i class="fas fa-chevron-down"></i>
+
+                            <!-- Search section -->
+                            <div class="help-search-container">
+                                <input type="text" class="help-search-input" placeholder="Search for help articles, FAQs, or topics...">
+                                <i class="fas fa-search help-search-icon"></i>
+                            </div>
+
+                            <!-- Main content -->
+                            <div class="help-main-content">
+                                <!-- Categories -->
+                                <div class="help-categories">
+                                    ${helpArticles.map(article => `
+                                        <div class="help-category" data-article="${article.id}">
+                                            <div class="help-category-icon">
+                                                <i class="fas fa-file-alt"></i>
                                             </div>
-                                            <div class="help-faq-answer" id="help-faq-answer-${index}">
-                                                ${faq.answer}
-                                            </div>
+                                            <div class="help-category-title">${article.title}</div>
+                                            <div class="help-category-description">${article.content.substring(0, 100)}...</div>
                                         </div>
                                     `).join('')}
                                 </div>
+
+                                <!-- FAQ Section -->
+                                <div class="help-faq-section">
+                                    <h2 class="help-faq-title">Frequently Asked Questions</h2>
+                                    <div class="help-faq-list">
+                                        ${faqData.map((faq, index) => `
+                                            <div class="help-faq-item">
+                                                <div class="help-faq-question" data-faq="${faq.id}">
+                                                    <span>${faq.question}</span>
+                                                    <i class="fas fa-chevron-down"></i>
+                                                </div>
+                                                <div class="help-faq-answer" data-faq="${faq.id}">
+                                                    ${faq.answer}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <!-- Contact Section -->
-                            <div class="help-contact-section">
-                                <h3 class="help-contact-title">Need More Help?</h3>
-                                <p class="help-contact-description">Our support team is available to assist you with any questions or issues you may have.</p>
+
+                            <!-- Article Container (Hidden by default) -->
+                            <div class="help-article-container">
+                                <div class="help-article-header">
+                                    <button class="help-back-button">
+                                        <i class="fas fa-arrow-left"></i> Back to Help Center
+                                    </button>
+                                    <h2 class="help-article-title"></h2>
+                                </div>
                                 
-                                <div class="help-contact-options">
-                                    <div class="help-contact-option">
-                                        <div class="help-contact-icon"><i class="fas fa-envelope"></i></div>
-                                        <div class="help-contact-label">Email Support</div>
-                                        <div class="help-contact-value">support@jamengine.com</div>
-                                        <a href="mailto:support@jamengine.com" class="help-button">Send Email</a>
-                                    </div>
-                                    
-                                    <div class="help-contact-option">
-                                        <div class="help-contact-icon"><i class="fas fa-phone"></i></div>
-                                        <div class="help-contact-label">Phone Support</div>
-                                        <div class="help-contact-value">1-800-JAM-HELP</div>
-                                        <a href="tel:1-800-526-4357" class="help-button">Call Now</a>
+                                <div class="help-article-content"></div>
+                                
+                                <div class="help-article-helpful">
+                                    <div class="help-article-helpful-title">Was this article helpful?</div>
+                                    <div class="help-article-helpful-buttons">
+                                        <button class="help-article-helpful-button" data-value="yes">
+                                            <i class="fas fa-thumbs-up"></i> Yes
+                                        </button>
+                                        <button class="help-article-helpful-button" data-value="no">
+                                            <i class="fas fa-thumbs-down"></i> No
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Article View (Hidden by default) -->
-                        <div class="help-article-container">
-                            <div class="help-article-header">
-                                <button class="help-back-button">
-                                    <i class="fas fa-arrow-left"></i> Back to Help Center
-                                </button>
-                                <h2 class="help-article-title"></h2>
-                            </div>
                             
-                            <div class="help-article-content"></div>
-                            
-                            <div class="help-article-helpful">
-                                <div class="help-article-helpful-title">Was this article helpful?</div>
-                                <div class="help-article-helpful-buttons">
-                                    <button class="help-article-helpful-button" data-value="yes">
-                                        <i class="fas fa-thumbs-up"></i> Yes
-                                    </button>
-                                    <button class="help-article-helpful-button" data-value="no">
-                                        <i class="fas fa-thumbs-down"></i> No
-                                    </button>
-                                </div>
+                            <!-- Search Results (Hidden by default) -->
+                            <div class="help-search-results">
+                                <h3 class="help-search-results-title">Search Results</h3>
+                                <div class="help-search-results-list"></div>
                             </div>
                         </div>
-                        
-                        <!-- Search Results (Hidden by default) -->
-                        <div class="help-search-results">
-                            <h3 class="help-search-results-title">Search Results</h3>
-                            <div class="help-search-results-list"></div>
-                        </div>
-                    </div>
-                `;
+                    `;
+                    console.log('Container innerHTML set successfully');
+                    console.log('helpArticles available?', typeof helpArticles !== 'undefined');
+                    console.log('faqData available?', typeof faqData !== 'undefined');
 
-                // Set up event listeners
-                setupEventListeners(container);
-
-                isInitialized = true;
-                return true;
+                } catch (error) {
+                    console.error('Error in renderHelpCenter:', error);
+                    throw error;
+                }
             }
 
-            // Set up event listeners
-            function setupEventListeners(container) {
-                // Category click
-                const categories = container.querySelectorAll('.help-category');
-                categories.forEach(category => {
-                    category.addEventListener('click', function () {
-                        const articleId = this.getAttribute('data-article');
-                        showArticle(articleId, container);
-                    });
-                });
+            // Enhanced attachEventListeners with debugging
+            function attachEventListeners(container) {
+                console.log('attachEventListeners called with container:', container);
 
-                // FAQ click
-                const faqQuestions = container.querySelectorAll('.help-faq-question');
-                faqQuestions.forEach(question => {
-                    question.addEventListener('click', function () {
-                        const faqIndex = this.getAttribute('data-faq');
-                        toggleFAQ(faqIndex, container);
-                    });
-                });
+                try {
+                    // Search functionality
+                    const searchInput = container.querySelector('.help-search-input');
+                    console.log('Search input found:', !!searchInput);
 
-                // Back button
-                const backButton = container.querySelector('.help-back-button');
-                if (backButton) {
-                    backButton.addEventListener('click', function () {
-                        hideArticle(container);
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function () {
+                            const query = this.value.trim();
+                            if (query.length > 2) {
+                                performSearch(query, container);
+                            } else if (query.length === 0) {
+                                hideSearchResults(container);
+                            }
+                        });
+
+                        searchInput.addEventListener('keypress', function (e) {
+                            if (e.key === 'Enter') {
+                                const query = this.value.trim();
+                                if (query) {
+                                    performSearch(query, container);
+                                }
+                            }
+                        });
+                    }
+
+                    // Category clicks
+                    const categories = container.querySelectorAll('.help-category');
+                    console.log('Categories found:', categories.length);
+
+                    categories.forEach(category => {
+                        category.addEventListener('click', function () {
+                            const categoryName = this.getAttribute('data-article');
+                            if (categoryName) {
+                                showArticle(categoryName, container);
+                            }
+                        });
                     });
+
+                    // FAQ toggle functionality
+                    const faqQuestions = container.querySelectorAll('.help-faq-question');
+                    console.log('FAQ questions found:', faqQuestions.length);
+
+                    faqQuestions.forEach(question => {
+                        question.addEventListener('click', function () {
+                            const faqId = this.getAttribute('data-faq');
+                            if (faqId) {
+                                toggleFAQ(faqId, container);
+                            }
+                        });
+                    });
+
+                    // Back button from article view
+                    const backButton = container.querySelector('.help-back-button');
+                    console.log('Back button found:', !!backButton);
+
+                    if (backButton) {
+                        backButton.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            console.log('Back button clicked');
+                            hideArticle(container);
+                        });
+                    }
+
+                    console.log('All event listeners attached successfully');
+
+                } catch (error) {
+                    console.error('Error in attachEventListeners:', error);
+                    throw error;
                 }
-
-                // Search
-                const searchInput = container.querySelector('#help-search-input');
-                if (searchInput) {
-                    searchInput.addEventListener('input', function () {
-                        searchQuery = this.value.trim();
-                        if (searchQuery.length >= 3) {
-                            performSearch(searchQuery, container);
-                        } else if (searchQuery.length === 0) {
-                            hideSearchResults(container);
-                        }
-                    });
-
-                    searchInput.addEventListener('keypress', function (e) {
-                        if (e.key === 'Enter' && searchQuery.length >= 3) {
-                            performSearch(searchQuery, container);
-                        }
-                    });
-                }
-
-                // Helpful buttons
-                const helpfulButtons = container.querySelectorAll('.help-article-helpful-button');
-                helpfulButtons.forEach(button => {
-                    button.addEventListener('click', function () {
-                        const value = this.getAttribute('data-value');
-                        submitFeedback(activeArticleId, value, container);
-                    });
-                });
             }
 
             // Show article
             function showArticle(articleId, container) {
+                console.log('Showing article:', articleId);
+
                 const article = helpArticles.find(a => a.id === articleId);
-                if (!article) return;
+                if (!article) {
+                    console.error('Article not found:', articleId);
+                    return;
+                }
 
                 activeArticleId = articleId;
 
-                // Update article content
-                container.querySelector('.help-article-title').textContent = article.title;
-                container.querySelector('.help-article-content').innerHTML = article.content;
+                const articleContainer = container.querySelector('.help-article-container');
+                const articleContent = container.querySelector('.help-article-content');
 
-                // Show article container, hide main content and search results
+                articleContent.innerHTML = `
+                    <h1 class="help-article-title">${article.title}</h1>
+                    <div class="help-article-meta">
+                        <span class="help-article-category">${article.category}</span>
+                        <span class="help-article-date">Last updated: ${article.lastUpdated}</span>
+                    </div>
+                    <div class="help-article-body">${article.content}</div>
+                `;
+
+                // Hide main content and search results
                 container.querySelector('.help-main-content').style.display = 'none';
                 container.querySelector('.help-search-results').classList.remove('active');
-                container.querySelector('.help-article-container').classList.add('active');
 
-                // Reset helpful buttons
-                const helpfulButtons = container.querySelectorAll('.help-article-helpful-button');
-                helpfulButtons.forEach(button => button.classList.remove('active'));
+                // Show article container
+                articleContainer.classList.add('active');
+
+                // Re-attach the back button listener (in case it was lost)
+                const backButton = container.querySelector('.help-back-button');
+                if (backButton) {
+                    // Remove existing listeners to prevent duplicates
+                    const newBackButton = backButton.cloneNode(true);
+                    backButton.parentNode.replaceChild(newBackButton, backButton);
+
+                    newBackButton.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        console.log('Article back button clicked from showArticle');
+                        hideArticle(container);
+                    });
+                }
             }
 
             // Hide article
             function hideArticle(container) {
-                activeArticleId = null;
-
-                // Hide article container, show main content
-                container.querySelector('.help-main-content').style.display = 'block';
+                console.log('Hiding article, returning to main help center');
                 container.querySelector('.help-article-container').classList.remove('active');
+                container.querySelector('.help-main-content').style.display = 'block';
+                container.querySelector('.help-search-results').classList.remove('active');
+                activeArticleId = null;
             }
 
             // Toggle FAQ
-            function toggleFAQ(faqIndex, container) {
-                const faqQuestion = container.querySelector(`.help-faq-question[data-faq="${faqIndex}"]`);
-                const faqAnswer = container.querySelector(`.help-faq-answer[data-faq="${faqIndex}"]`);
+            function toggleFAQ(faqId, container) {
+                console.log('Toggling FAQ:', faqId);
 
-                if (!faqQuestion || !faqAnswer) return;
+                const faqQuestion = container.querySelector(`.help-faq-question[data-faq="${faqId}"]`);
+                const faqAnswer = container.querySelector(`.help-faq-answer[data-faq="${faqId}"]`);
 
-                const isActive = faqQuestion.classList.contains('active');
+                if (!faqQuestion || !faqAnswer) {
+                    console.error('FAQ elements not found for ID:', faqId);
+                    return;
+                }
 
-                // Close all FAQs
-                container.querySelectorAll('.help-faq-question').forEach(q => q.classList.remove('active'));
-                container.querySelectorAll('.help-faq-answer').forEach(a => a.style.display = 'none');
+                const isCurrentlyActive = faqAnswer.classList.contains('active');
 
-                // Toggle current FAQ
-                if (!isActive) {
+                // Close all FAQs first
+                container.querySelectorAll('.help-faq-question').forEach(q => {
+                    q.classList.remove('active');
+                });
+                container.querySelectorAll('.help-faq-answer').forEach(a => {
+                    a.classList.remove('active');
+                    a.style.maxHeight = '0';
+                });
+
+                // If this FAQ wasn't active, open it
+                if (!isCurrentlyActive) {
                     faqQuestion.classList.add('active');
-                    faqAnswer.style.display = 'block';
+                    faqAnswer.classList.add('active');
+
+                    // Use scrollHeight for dynamic height
+                    faqAnswer.style.maxHeight = faqAnswer.scrollHeight + 20 + 'px'; // +20 for padding
+
+                    console.log('Opened FAQ:', faqId, 'ScrollHeight:', faqAnswer.scrollHeight);
+                } else {
+                    console.log('Closed FAQ:', faqId);
                 }
             }
 
@@ -933,8 +1012,16 @@
 
             // Hide search results
             function hideSearchResults(container) {
+                console.log('Hiding search results, returning to main help center');
                 container.querySelector('.help-search-results').classList.remove('active');
                 container.querySelector('.help-main-content').style.display = 'block';
+                container.querySelector('.help-article-container').classList.remove('active');
+
+                // Clear search input
+                const searchInput = container.querySelector('.help-search-input');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
             }
 
             // Submit feedback

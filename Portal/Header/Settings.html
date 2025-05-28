@@ -322,7 +322,7 @@
                         throw new Error('No authentication token found');
                     }
 
-                    const response = await fetch('/api/settings/profile', {
+                    const response = await fetch('http://localhost:3000/api/settings/profile', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -347,7 +347,19 @@
 
             // Render settings with real user data
             function renderSettings(container, activeTab) {
-                if (!userData) return;
+                console.log('renderSettings called with:', { container, activeTab, userData });
+
+                if (!userData) {
+                    console.error('No userData available for rendering');
+                    return;
+                }
+
+                if (!container) {
+                    console.error('No container provided for rendering');
+                    return;
+                }
+
+                console.log('Rendering settings HTML...');
 
                 container.innerHTML = `
                     <div class="settings-container">
@@ -520,6 +532,8 @@
                         </div>
                     </div>
                 `;
+
+                console.log('Settings HTML rendered successfully');
             }
 
             // Save profile information
@@ -531,7 +545,7 @@
                     const company = container.querySelector('#settings-company').value;
 
                     const token = localStorage.getItem('authToken');
-                    const response = await fetch('/api/settings/profile', {
+                    const response = await fetch('http://localhost:3000/api/settings/profile', {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -573,7 +587,7 @@
                     }
 
                     const token = localStorage.getItem('authToken');
-                    const response = await fetch('/api/settings/password', {
+                    const response = await fetch('http://localhost:3000/api/settings/password', {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -612,7 +626,7 @@
                     }
 
                     const token = localStorage.getItem('authToken');
-                    const response = await fetch('/api/settings/security-question', {
+                    const response = await fetch('http://localhost:3000/api/settings/security-question', {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -652,7 +666,7 @@
                     const pushNotifications = container.querySelector('#settings-push-notifications').checked;
 
                     const token = localStorage.getItem('authToken');
-                    const response = await fetch('/api/settings/notifications', {
+                    const response = await fetch('http://localhost:3000/api/settings/notifications', {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -690,7 +704,7 @@
                     }
 
                     const token = localStorage.getItem('authToken');
-                    const response = await fetch('/api/settings/account', {
+                    const response = await fetch('http://localhost:3000/api/settings/account', {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`,

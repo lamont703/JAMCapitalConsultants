@@ -8,6 +8,7 @@ import { CosmosService } from './services/cosmosService.js';
 import authRoutes from './routes/authRoutes.js';
 import { GoHighLevelService } from './services/ghlService.js';
 import ghlRoutes from './routes/ghlRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
 
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
@@ -41,6 +42,7 @@ app.use('/api/chat', chatRoutesModule);
 app.use('/api/chatGptService', chatRoutesModule);
 app.use('/api/auth', authRoutes);
 app.use('/api/ghl', ghlRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Serve the frontend
 app.get('*', (req, res) => {

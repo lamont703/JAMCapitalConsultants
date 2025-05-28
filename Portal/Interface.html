@@ -424,8 +424,8 @@
     </div>
 
     <script>
-        
-        
+
+
         // Function to load the header component
         function loadHeaderComponent() {
             // Show loading indicator
@@ -1526,7 +1526,7 @@
                     window.jamSettings.reset();
                 }
 
-                const success = window.jamSettings.init(containerId);
+                const success = window.jamSettings.init(container);
                 if (!success) {
                     console.error('Failed to initialize Settings module');
                     container.innerHTML = `
@@ -1548,7 +1548,7 @@
                 const handler = function () {
                     console.log('Settings module loaded event received');
                     if (window.jamSettings) {
-                        const success = window.jamSettings.init(containerId);
+                        const success = window.jamSettings.init(container);
                         if (!success) {
                             console.error('Failed to initialize Settings module after load');
                             container.innerHTML = `
@@ -1616,6 +1616,8 @@
             // Check if HelpCenterModule is available
             if (window.jamHelpCenter) {
                 console.log('Help Center module already loaded, initializing');
+                console.log('jamHelpCenter object:', window.jamHelpCenter);
+                console.log('Container element:', container);
 
                 // If force reload is requested, reset the module's initialization state
                 if (forceReload && typeof window.jamHelpCenter.reset === 'function') {
@@ -1623,39 +1625,62 @@
                     window.jamHelpCenter.reset();
                 }
 
-                const success = window.jamHelpCenter.init(containerId);
-                if (!success) {
-                    console.error('Failed to initialize Help Center module');
+                // Pass the container DOM element, not the containerId string
+                try {
+                    const success = window.jamHelpCenter.init(container);
+                    console.log('Init function returned:', success);
+                    if (!success) {
+                        console.error('Failed to initialize Help Center module');
+                        container.innerHTML = `
+                            <div class="interface-error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Failed to initialize Help Center component
+                            </div>
+                        `;
+                    } else {
+                        console.log('Help Center module initialized successfully');
+                    }
+                } catch (error) {
+                    console.error('Error during Help Center initialization:', error);
                     container.innerHTML = `
                         <div class="interface-error-message">
                             <i class="fas fa-exclamation-triangle"></i>
-                            Failed to initialize Help Center component
+                            Error initializing Help Center: ${error.message}
                         </div>
                     `;
-                } else {
-                    console.log('Help Center module initialized successfully');
                 }
             } else {
                 console.log('Help Center module not loaded, loading script');
                 // Load the script
                 const script = document.createElement('script');
-                script.src = 'HelpCenter.html';
+                script.src = 'Header/HelpCenter.html';
 
                 // Create a one-time event handler
                 const handler = function () {
                     console.log('Help Center module loaded event received');
                     if (window.jamHelpCenter) {
-                        const success = window.jamHelpCenter.init(containerId);
-                        if (!success) {
-                            console.error('Failed to initialize Help Center module after load');
+                        try {
+                            // Pass the container DOM element, not the containerId string
+                            const success = window.jamHelpCenter.init(container);
+                            if (!success) {
+                                console.error('Failed to initialize Help Center module after load');
+                                container.innerHTML = `
+                                    <div class="interface-error-message">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Failed to initialize Help Center component
+                                    </div>
+                                `;
+                            } else {
+                                console.log('Help Center module initialized successfully after load');
+                            }
+                        } catch (error) {
+                            console.error('Error during Help Center initialization after load:', error);
                             container.innerHTML = `
                                 <div class="interface-error-message">
                                     <i class="fas fa-exclamation-triangle"></i>
-                                    Failed to initialize Help Center component
+                                    Error initializing Help Center: ${error.message}
                                 </div>
                             `;
-                        } else {
-                            console.log('Help Center module initialized successfully after load');
                         }
                     }
                     // Remove the event listener to prevent duplicate handlers
