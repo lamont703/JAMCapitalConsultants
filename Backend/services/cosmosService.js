@@ -201,4 +201,23 @@ export class CosmosService {
 
         return await this.createDocument(document, 'user_activity');
     }
+
+    async getUserByResetToken(resetToken) {
+        try {
+            await this.ensureInitialized();
+            
+            const query = {
+                query: "SELECT * FROM c WHERE c.type = 'user' AND c.resetToken = @resetToken",
+                parameters: [
+                    { name: "@resetToken", value: resetToken }
+                ]
+            };
+
+            const { resources } = await this.container.items.query(query).fetchAll();
+            return resources.length > 0 ? resources[0] : null;
+        } catch (error) {
+            console.error('Error finding user by reset token:', error);
+            throw error;
+        }
+    }
 }

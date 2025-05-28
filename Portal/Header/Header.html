@@ -325,19 +325,75 @@
 
             // Update header with user data
             function updateHeaderWithUserData() {
-                document.getElementById('header-userName').textContent = userData.name;
-                document.getElementById('header-userMenuName').textContent = userData.name;
-                document.getElementById('header-userMenuEmail').textContent = userData.email;
-                document.getElementById('header-userAvatar').textContent = userData.initials;
-                document.getElementById('header-clientStatus').textContent = userData.status;
+                console.log('🔄 Updating header with user data...');
 
-                const notificationBadge = document.getElementById('header-notificationBadge');
-                if (userData.notifications > 0) {
-                    notificationBadge.textContent = userData.notifications;
-                    notificationBadge.style.display = 'flex';
-                } else {
-                    notificationBadge.style.display = 'none';
+                // Get user data from localStorage
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                console.log('📊 User data from localStorage:', userData);
+
+                // Check if user is logged in
+                if (!userData || !userData.email) {
+                    console.log('❌ No user data found, showing login state');
+                    showLoginState();
+                    return;
                 }
+
+                // Update user info elements with real data
+                const userNameElement = document.getElementById('userName');
+                const userEmailElement = document.getElementById('userEmail');
+                const userCompanyElement = document.getElementById('userCompany');
+                const userPhoneElement = document.getElementById('userPhone');
+
+                // Update name (fallback to email if no name)
+                if (userNameElement) {
+                    userNameElement.textContent = userData.name || userData.email.split('@')[0] || 'User';
+                }
+
+                // Update email
+                if (userEmailElement) {
+                    userEmailElement.textContent = userData.email || '';
+                }
+
+                // Update company (show if available)
+                if (userCompanyElement) {
+                    if (userData.company) {
+                        userCompanyElement.textContent = userData.company;
+                        userCompanyElement.style.display = 'block';
+                    } else {
+                        userCompanyElement.style.display = 'none';
+                    }
+                }
+
+                // Update phone (show if available)
+                if (userPhoneElement) {
+                    if (userData.phone) {
+                        userPhoneElement.textContent = userData.phone;
+                        userPhoneElement.style.display = 'block';
+                    } else {
+                        userPhoneElement.style.display = 'none';
+                    }
+                }
+
+                // Show user menu and hide login button
+                showUserMenu();
+
+                console.log('✅ Header updated with user data');
+            }
+
+            function showUserMenu() {
+                const loginButton = document.getElementById('loginButton');
+                const userMenu = document.getElementById('userMenu');
+
+                if (loginButton) loginButton.style.display = 'none';
+                if (userMenu) userMenu.style.display = 'block';
+            }
+
+            function showLoginState() {
+                const loginButton = document.getElementById('loginButton');
+                const userMenu = document.getElementById('userMenu');
+
+                if (loginButton) loginButton.style.display = 'block';
+                if (userMenu) userMenu.style.display = 'none';
             }
 
             // Toggle user menu
@@ -375,124 +431,20 @@
             }
 
             function handleLogout() {
-                console.log('=== LOGOUT INITIATED ===');
-                console.log('Current authToken exists:', !!localStorage.getItem('authToken'));
+                console.log('🔄 Logging out user...');
 
-                // Show loading state if there's a logout button
-                const logoutButton = document.getElementById('header-logoutButton');
-                if (logoutButton) {
-                    logoutButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
-                    logoutButton.disabled = true;
-                }
+                // Clear localStorage
+                localStorage.removeItem('userData');
+                localStorage.removeItem('authToken');
 
-                // Get the auth token for the logout request
-                const authToken = localStorage.getItem('authToken');
+                // Update header to show login state
+                showLoginState();
 
-                // Make logout request to backend (optional but recommended)
-                if (authToken) {
-                    console.log('Making logout API call...');
+                // Redirect to home page
+                window.location.href = '/';
 
-                    fetch('http://localhost:3000/api/auth/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${authToken}`
-                        }
-                    })
-                        .then(response => {
-                            console.log('Logout API response status:', response.status);
-                            console.log('Logout API response ok:', response.ok);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Server logout response:', data);
-                            performClientSideLogout();
-                        })
-                        .catch(error => {
-                            console.error('Logout request failed:', error);
-                            console.log('Proceeding with client-side cleanup anyway...');
-                            performClientSideLogout();
-                        });
-                } else {
-                    console.log('No token found, proceeding with client-side cleanup...');
-                    performClientSideLogout();
-                }
+                console.log('✅ User logged out successfully');
             }
-
-            function performClientSideLogout() {
-                console.log('=== PERFORMING CLIENT-SIDE LOGOUT ===');
-
-                try {
-                    // Log before clearing
-                    console.log('Before clearing - authToken exists:', !!localStorage.getItem('authToken'));
-                    console.log('Before clearing - userData exists:', !!localStorage.getItem('userData'));
-
-                    // Clear all authentication data from localStorage
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('userData');
-                    localStorage.removeItem('currentAnalysisData');
-                    localStorage.removeItem('userPreferences');
-
-                    // Clear sessionStorage as well
-                    sessionStorage.clear();
-
-                    // Clear any cookies if you're using them
-                    document.cookie.split(";").forEach(function (c) {
-                        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                    });
-
-                    // Log after clearing
-                    console.log('After clearing - authToken exists:', !!localStorage.getItem('authToken'));
-                    console.log('After clearing - userData exists:', !!localStorage.getItem('userData'));
-
-                    // Track logout event for analytics
-                    if (typeof analytics !== 'undefined') {
-                        analytics.track('UserLogout', {
-                            timestamp: new Date().toISOString(),
-                            method: 'manual'
-                        });
-                    }
-
-                    console.log('Client-side logout completed');
-                    console.log('Redirecting to login page...');
-
-                    // Redirect to login page
-                    window.location.href = 'https://jamcapitalconsultants.com/login';
-
-                } catch (error) {
-                    console.error('Error during client-side logout:', error);
-                    // Force redirect even if there's an error
-                    window.location.href = 'https://jamcapitalconsultants.com/login';
-                }
-            }
-
-            // Optional: Add automatic logout on token expiration
-            function checkTokenExpiration() {
-                const authToken = localStorage.getItem('authToken');
-
-                if (authToken) {
-                    try {
-                        // Decode JWT to check expiration (basic check - don't rely on this for security)
-                        const payload = JSON.parse(atob(authToken.split('.')[1]));
-                        const currentTime = Date.now() / 1000;
-
-                        if (payload.exp && payload.exp < currentTime) {
-                            console.log('Token expired, logging out automatically');
-                            handleLogout();
-                        }
-                    } catch (error) {
-                        console.error('Error checking token expiration:', error);
-                        // If we can't decode the token, it's probably invalid
-                        handleLogout();
-                    }
-                }
-            }
-
-            // Check token expiration every 5 minutes
-            setInterval(checkTokenExpiration, 5 * 60 * 1000);
-
-            // Check immediately when page loads
-            document.addEventListener('DOMContentLoaded', checkTokenExpiration);
 
             // Initialize header
             function init(containerId) {
@@ -781,6 +733,13 @@
                 return result;
             };
         }
+
+        // Also call when localStorage changes (for cross-tab updates)
+        window.addEventListener('storage', function (e) {
+            if (e.key === 'userData') {
+                updateHeaderWithUserData();
+            }
+        });
     </script>
 </body>
 

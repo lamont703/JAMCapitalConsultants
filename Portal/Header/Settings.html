@@ -281,294 +281,240 @@
     <script>
         // Settings Module
         const SettingsModule = (function () {
-            // Private variables
             let isInitialized = false;
-            let activeTab = 'profile';
-            let userData = {
-                firstName: 'John',
-                lastName: 'Doe',
-                email: 'john.doe@example.com',
-                phone: '(555) 123-4567',
-                address: '123 Main St',
-                city: 'Anytown',
-                state: 'CA',
-                zipCode: '12345',
-                timezone: 'America/Los_Angeles',
-                language: 'en',
-                notifications: {
-                    email: true,
-                    sms: true,
-                    disputes: true,
-                    creditReport: true,
-                    promotions: false
-                },
-                security: {
-                    twoFactorAuth: false,
-                    sessionTimeout: 30
-                }
-            };
+            let userData = null;
 
             // Initialize the module
-            function init(containerId) {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error(`Container ${containerId} not found`);
-                    return false;
+            function init(container, activeTab = 'profile') {
+                if (isInitialized) {
+                    console.log('Settings module already initialized');
+                    return true;
                 }
 
-                console.log(`Initializing Settings Module in container: ${containerId}`);
+                console.log('Initializing Settings module...');
 
-                // Render the settings UI
-                renderSettingsUI(container);
+                // Load user data first
+                loadUserData().then(() => {
+                    renderSettings(container, activeTab);
+                    attachEventListeners(container);
+                    isInitialized = true;
+                    console.log('Settings module initialized successfully');
+                }).catch(error => {
+                    console.error('Failed to load user data:', error);
+                    if (container && typeof container === 'object') {
+                        container.innerHTML = `
+                            <div class="settings-error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Failed to load user settings. Please refresh the page.</span>
+                            </div>
+                        `;
+                    }
+                });
 
-                // Set up event listeners
-                setupEventListeners(container);
-
-                isInitialized = true;
                 return true;
             }
 
-            // Render the settings UI
-            function renderSettingsUI(container) {
+            // Load user data from API
+            async function loadUserData() {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    if (!token) {
+                        throw new Error('No authentication token found');
+                    }
+
+                    const response = await fetch('/api/settings/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        userData = data.user;
+                        // Update localStorage with fresh data
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                    } else {
+                        throw new Error(data.error || 'Failed to load user data');
+                    }
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                    throw error;
+                }
+            }
+
+            // Render settings with real user data
+            function renderSettings(container, activeTab) {
+                if (!userData) return;
+
                 container.innerHTML = `
                     <div class="settings-container">
                         <div class="settings-header">
-                            <h2 class="settings-title">Account Settings</h2>
-                            <p class="settings-subtitle">Manage your account preferences and personal information</p>
+                            <h1 class="settings-title">Account Settings</h1>
+                            <p class="settings-subtitle">Manage your account preferences and security settings</p>
                         </div>
 
                         <div class="settings-tabs">
-                            <div class="settings-tab ${activeTab === 'profile' ? 'active' : ''}" data-tab="profile">
+                            <button class="settings-tab ${activeTab === 'profile' ? 'active' : ''}" data-tab="profile">
                                 <i class="fas fa-user"></i> Profile
-                            </div>
-                            <div class="settings-tab ${activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
+                            </button>
+                            <button class="settings-tab ${activeTab === 'security' ? 'active' : ''}" data-tab="security">
+                                <i class="fas fa-shield-alt"></i> Security
+                            </button>
+                            <button class="settings-tab ${activeTab === 'notifications' ? 'active' : ''}" data-tab="notifications">
                                 <i class="fas fa-bell"></i> Notifications
-                            </div>
-                            <div class="settings-tab ${activeTab === 'security' ? 'active' : ''}" data-tab="security">
-                                <i class="fas fa-lock"></i> Security
-                            </div>
-                            <div class="settings-tab ${activeTab === 'preferences' ? 'active' : ''}" data-tab="preferences">
-                                <i class="fas fa-cog"></i> Preferences
-                            </div>
+                            </button>
+                            <button class="settings-tab ${activeTab === 'account' ? 'active' : ''}" data-tab="account">
+                                <i class="fas fa-cog"></i> Account
+                            </button>
                         </div>
 
-                        <!-- Profile Tab Content -->
-                        <div id="settings-profile-tab" class="settings-tab-content ${activeTab === 'profile' ? 'active' : ''}">
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-user-circle"></i> Personal Information</h3>
-                                
-                                <div class="settings-avatar-container">
-                                    <div class="settings-avatar">${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}</div>
-                                    <div class="settings-upload-btn" id="settings-upload-avatar">Upload Photo</div>
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-first-name">First Name</label>
-                                    <input type="text" id="settings-first-name" class="settings-input" value="${userData.firstName}">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-last-name">Last Name</label>
-                                    <input type="text" id="settings-last-name" class="settings-input" value="${userData.lastName}">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-email">Email Address</label>
-                                    <input type="email" id="settings-email" class="settings-input" value="${userData.email}">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-phone">Phone Number</label>
-                                    <input type="tel" id="settings-phone" class="settings-input" value="${userData.phone}">
-                                </div>
-                            </div>
-                            
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-home"></i> Address Information</h3>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-address">Street Address</label>
-                                    <input type="text" id="settings-address" class="settings-input" value="${userData.address}">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-city">City</label>
-                                    <input type="text" id="settings-city" class="settings-input" value="${userData.city}">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-state">State</label>
-                                    <input type="text" id="settings-state" class="settings-input" value="${userData.state}">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-zip">ZIP Code</label>
-                                    <input type="text" id="settings-zip" class="settings-input" value="${userData.zipCode}">
-                                </div>
-                                
-                                <div class="settings-buttons-row">
-                                    <button class="settings-button" id="settings-save-profile">Save Changes</button>
+                        <div class="settings-content">
+                            <!-- Profile Tab -->
+                            <div id="settings-profile-tab" class="settings-tab-content ${activeTab === 'profile' ? 'active' : ''}">
+                                <div class="settings-section">
+                                    <h3 class="settings-section-title"><i class="fas fa-user"></i> Personal Information</h3>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-name">Full Name</label>
+                                        <input type="text" id="settings-name" class="settings-input" value="${userData.name || ''}">
+                                    </div>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-email">Email Address</label>
+                                        <input type="email" id="settings-email" class="settings-input" value="${userData.email || ''}">
+                                    </div>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-phone">Phone Number</label>
+                                        <input type="tel" id="settings-phone" class="settings-input" value="${userData.phone || ''}">
+                                    </div>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-company">Company</label>
+                                        <input type="text" id="settings-company" class="settings-input" value="${userData.company || ''}">
+                                    </div>
+                                    
+                                    <div class="settings-buttons-row">
+                                        <button class="settings-button" onclick="jamSettings.saveProfile(this.closest('.settings-container'))">Save Changes</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Notifications Tab Content -->
-                        <div id="settings-notifications-tab" class="settings-tab-content ${activeTab === 'notifications' ? 'active' : ''}">
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-bell"></i> Notification Preferences</h3>
-                                
-                                <div class="settings-notification-item">
-                                    <div>
-                                        <strong>Email Notifications</strong>
-                                        <p>Receive updates via email</p>
+                            <!-- Security Tab -->
+                            <div id="settings-security-tab" class="settings-tab-content ${activeTab === 'security' ? 'active' : ''}">
+                                <div class="settings-section">
+                                    <h3 class="settings-section-title"><i class="fas fa-lock"></i> Change Password</h3>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-current-password">Current Password</label>
+                                        <input type="password" id="settings-current-password" class="settings-input">
                                     </div>
-                                    <label class="settings-toggle">
-                                        <input type="checkbox" id="settings-email-notifications" ${userData.notifications.email ? 'checked' : ''}>
-                                        <span class="settings-toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="settings-notification-item">
-                                    <div>
-                                        <strong>SMS Notifications</strong>
-                                        <p>Receive updates via text message</p>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-new-password">New Password</label>
+                                        <input type="password" id="settings-new-password" class="settings-input">
                                     </div>
-                                    <label class="settings-toggle">
-                                        <input type="checkbox" id="settings-sms-notifications" ${userData.notifications.sms ? 'checked' : ''}>
-                                        <span class="settings-toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="settings-notification-item">
-                                    <div>
-                                        <strong>Dispute Updates</strong>
-                                        <p>Get notified about dispute status changes</p>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-confirm-password">Confirm New Password</label>
+                                        <input type="password" id="settings-confirm-password" class="settings-input">
                                     </div>
-                                    <label class="settings-toggle">
-                                        <input type="checkbox" id="settings-dispute-notifications" ${userData.notifications.disputes ? 'checked' : ''}>
-                                        <span class="settings-toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="settings-notification-item">
-                                    <div>
-                                        <strong>Credit Report Updates</strong>
-                                        <p>Get notified about changes to your credit report</p>
+                                    
+                                    <div class="settings-buttons-row">
+                                        <button class="settings-button" onclick="jamSettings.changePassword(this.closest('.settings-container'))">Update Password</button>
                                     </div>
-                                    <label class="settings-toggle">
-                                        <input type="checkbox" id="settings-credit-notifications" ${userData.notifications.creditReport ? 'checked' : ''}>
-                                        <span class="settings-toggle-slider"></span>
-                                    </label>
                                 </div>
-                                
-                                <div class="settings-notification-item">
-                                    <div>
-                                        <strong>Promotional Emails</strong>
-                                        <p>Receive special offers and promotions</p>
-                                    </div>
-                                    <label class="settings-toggle">
-                                        <input type="checkbox" id="settings-promo-notifications" ${userData.notifications.promotions ? 'checked' : ''}>
-                                        <span class="settings-toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="settings-buttons-row">
-                                    <button class="settings-button" id="settings-save-notifications">Save Preferences</button>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Security Tab Content -->
-                        <div id="settings-security-tab" class="settings-tab-content ${activeTab === 'security' ? 'active' : ''}">
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-lock"></i> Password</h3>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-current-password">Current Password</label>
-                                    <input type="password" id="settings-current-password" class="settings-input">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-new-password">New Password</label>
-                                    <input type="password" id="settings-new-password" class="settings-input">
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-confirm-password">Confirm New Password</label>
-                                    <input type="password" id="settings-confirm-password" class="settings-input">
-                                </div>
-                                
-                                <div class="settings-buttons-row">
-                                    <button class="settings-button" id="settings-change-password">Update Password</button>
-                                </div>
-                            </div>
-                            
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-shield-alt"></i> Security Settings</h3>
-                                
-                                <div class="settings-notification-item">
-                                    <div>
-                                        <strong>Two-Factor Authentication</strong>
-                                        <p>Add an extra layer of security to your account</p>
+                                <div class="settings-section">
+                                    <h3 class="settings-section-title"><i class="fas fa-question-circle"></i> Security Question</h3>
+                                    <p style="margin-bottom: 15px; color: #666;">Current Question: ${getSecurityQuestionText(userData.securityQuestion)}</p>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-security-password">Current Password (required to change)</label>
+                                        <input type="password" id="settings-security-password" class="settings-input">
                                     </div>
-                                    <label class="settings-toggle">
-                                        <input type="checkbox" id="settings-two-factor" ${userData.security.twoFactorAuth ? 'checked' : ''}>
-                                        <span class="settings-toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-session-timeout">Session Timeout (minutes)</label>
-                                    <select id="settings-session-timeout" class="settings-select">
-                                        <option value="15" ${userData.security.sessionTimeout === 15 ? 'selected' : ''}>15 minutes</option>
-                                        <option value="30" ${userData.security.sessionTimeout === 30 ? 'selected' : ''}>30 minutes</option>
-                                        <option value="60" ${userData.security.sessionTimeout === 60 ? 'selected' : ''}>1 hour</option>
-                                        <option value="120" ${userData.security.sessionTimeout === 120 ? 'selected' : ''}>2 hours</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="settings-buttons-row">
-                                    <button class="settings-button" id="settings-save-security">Save Security Settings</button>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-new-security-question">New Security Question</label>
+                                        <select id="settings-new-security-question" class="settings-select">
+                                            <option value="">Select a Security Question</option>
+                                            <option value="mother_maiden_name">What is your mother's maiden name?</option>
+                                            <option value="first_pet_name">What was the name of your first pet?</option>
+                                            <option value="childhood_street">What street did you grow up on?</option>
+                                            <option value="first_school">What was the name of your elementary school?</option>
+                                            <option value="favorite_teacher">What was your favorite teacher's last name?</option>
+                                            <option value="first_car">What was the make of your first car?</option>
+                                            <option value="birth_city">In what city were you born?</option>
+                                            <option value="childhood_friend">What was your childhood best friend's name?</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-new-security-answer">New Security Answer</label>
+                                        <input type="text" id="settings-new-security-answer" class="settings-input">
+                                    </div>
+                                    
+                                    <div class="settings-buttons-row">
+                                        <button class="settings-button" onclick="jamSettings.updateSecurityQuestion(this.closest('.settings-container'))">Update Security Question</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Preferences Tab Content -->
-                        <div id="settings-preferences-tab" class="settings-tab-content ${activeTab === 'preferences' ? 'active' : ''}">
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-globe"></i> Regional Settings</h3>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-language">Language</label>
-                                    <select id="settings-language" class="settings-select">
-                                        <option value="en" ${userData.language === 'en' ? 'selected' : ''}>English</option>
-                                        <option value="es" ${userData.language === 'es' ? 'selected' : ''}>Spanish</option>
-                                        <option value="fr" ${userData.language === 'fr' ? 'selected' : ''}>French</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="settings-form-group">
-                                    <label class="settings-label" for="settings-timezone">Time Zone</label>
-                                    <select id="settings-timezone" class="settings-select">
-                                        <option value="America/New_York" ${userData.timezone === 'America/New_York' ? 'selected' : ''}>Eastern Time (ET)</option>
-                                        <option value="America/Chicago" ${userData.timezone === 'America/Chicago' ? 'selected' : ''}>Central Time (CT)</option>
-                                        <option value="America/Denver" ${userData.timezone === 'America/Denver' ? 'selected' : ''}>Mountain Time (MT)</option>
-                                        <option value="America/Los_Angeles" ${userData.timezone === 'America/Los_Angeles' ? 'selected' : ''}>Pacific Time (PT)</option>
-                                        <option value="America/Anchorage" ${userData.timezone === 'America/Anchorage' ? 'selected' : ''}>Alaska Time (AKT)</option>
-                                        <option value="Pacific/Honolulu" ${userData.timezone === 'Pacific/Honolulu' ? 'selected' : ''}>Hawaii Time (HT)</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="settings-buttons-row">
-                                    <button class="settings-button" id="settings-save-preferences">Save Preferences</button>
+                            <!-- Notifications Tab -->
+                            <div id="settings-notifications-tab" class="settings-tab-content ${activeTab === 'notifications' ? 'active' : ''}">
+                                <div class="settings-section">
+                                    <h3 class="settings-section-title"><i class="fas fa-bell"></i> Notification Preferences</h3>
+                                    
+                                    <div class="settings-checkbox-group">
+                                        <input type="checkbox" id="settings-email-notifications" class="settings-checkbox" ${userData.notifications?.email !== false ? 'checked' : ''}>
+                                        <label for="settings-email-notifications">Email Notifications</label>
+                                    </div>
+                                    
+                                    <div class="settings-checkbox-group">
+                                        <input type="checkbox" id="settings-sms-notifications" class="settings-checkbox" ${userData.notifications?.sms === true ? 'checked' : ''}>
+                                        <label for="settings-sms-notifications">SMS Notifications</label>
+                                    </div>
+                                    
+                                    <div class="settings-checkbox-group">
+                                        <input type="checkbox" id="settings-push-notifications" class="settings-checkbox" ${userData.notifications?.push !== false ? 'checked' : ''}>
+                                        <label for="settings-push-notifications">Push Notifications</label>
+                                    </div>
+                                    
+                                    <div class="settings-buttons-row">
+                                        <button class="settings-button" onclick="jamSettings.saveNotifications(this.closest('.settings-container'))">Save Preferences</button>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="settings-section">
-                                <h3 class="settings-section-title"><i class="fas fa-trash-alt"></i> Account Management</h3>
-                                <p>Permanently delete your account and all associated data.</p>
-                                <div class="settings-buttons-row">
-                                    <button class="settings-button settings-button-danger" id="settings-delete-account">Delete Account</button>
+
+                            <!-- Account Tab -->
+                            <div id="settings-account-tab" class="settings-tab-content ${activeTab === 'account' ? 'active' : ''}">
+                                <div class="settings-section">
+                                    <h3 class="settings-section-title"><i class="fas fa-info-circle"></i> Account Information</h3>
+                                    <p><strong>Account Created:</strong> ${new Date(userData.createdAt).toLocaleDateString()}</p>
+                                    <p><strong>Last Updated:</strong> ${new Date(userData.updatedAt).toLocaleDateString()}</p>
+                                    <p><strong>Account Status:</strong> ${userData.isActive ? 'Active' : 'Inactive'}</p>
+                                </div>
+
+                                <div class="settings-section">
+                                    <h3 class="settings-section-title"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                                    <p style="color: #e74c3c; margin-bottom: 15px;">Once you delete your account, there is no going back. Please be certain.</p>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-delete-password">Enter your password to confirm</label>
+                                        <input type="password" id="settings-delete-password" class="settings-input">
+                                    </div>
+                                    
+                                    <div class="settings-form-group">
+                                        <label class="settings-label" for="settings-delete-confirm">Type "DELETE" to confirm</label>
+                                        <input type="text" id="settings-delete-confirm" class="settings-input" placeholder="DELETE">
+                                    </div>
+                                    
+                                    <div class="settings-buttons-row">
+                                        <button class="settings-button settings-button-danger" onclick="jamSettings.deleteAccount(this.closest('.settings-container'))">Delete Account</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -576,230 +522,246 @@
                 `;
             }
 
-            // Set up event listeners
-            function setupEventListeners(container) {
-                // Tab switching
-                const tabs = container.querySelectorAll('.settings-tab');
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const tabName = tab.dataset.tab;
-                        switchTab(tabName, container);
+            // Save profile information
+            async function saveProfile(container) {
+                try {
+                    const name = container.querySelector('#settings-name').value;
+                    const email = container.querySelector('#settings-email').value;
+                    const phone = container.querySelector('#settings-phone').value;
+                    const company = container.querySelector('#settings-company').value;
+
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/settings/profile', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name, email, phone, company })
                     });
-                });
 
-                // Save profile button
-                const saveProfileBtn = container.querySelector('#settings-save-profile');
-                if (saveProfileBtn) {
-                    saveProfileBtn.addEventListener('click', () => {
-                        saveProfileData(container);
-                    });
-                }
+                    const data = await response.json();
 
-                // Save notifications button
-                const saveNotificationsBtn = container.querySelector('#settings-save-notifications');
-                if (saveNotificationsBtn) {
-                    saveNotificationsBtn.addEventListener('click', () => {
-                        saveNotificationSettings(container);
-                    });
-                }
-
-                // Change password button
-                const changePasswordBtn = container.querySelector('#settings-change-password');
-                if (changePasswordBtn) {
-                    changePasswordBtn.addEventListener('click', () => {
-                        changePassword(container);
-                    });
-                }
-
-                // Save security settings button
-                const saveSecurityBtn = container.querySelector('#settings-save-security');
-                if (saveSecurityBtn) {
-                    saveSecurityBtn.addEventListener('click', () => {
-                        saveSecuritySettings(container);
-                    });
-                }
-
-                // Save preferences button
-                const savePreferencesBtn = container.querySelector('#settings-save-preferences');
-                if (savePreferencesBtn) {
-                    savePreferencesBtn.addEventListener('click', () => {
-                        savePreferences(container);
-                    });
-                }
-
-                // Delete account button
-                const deleteAccountBtn = container.querySelector('#settings-delete-account');
-                if (deleteAccountBtn) {
-                    deleteAccountBtn.addEventListener('click', () => {
-                        confirmDeleteAccount(container);
-                    });
-                }
-
-                // Upload avatar button
-                const uploadAvatarBtn = container.querySelector('#settings-upload-avatar');
-                if (uploadAvatarBtn) {
-                    uploadAvatarBtn.addEventListener('click', () => {
-                        // In a real implementation, this would open a file picker
-                        alert('This would open a file picker in a real implementation.');
-                    });
-                }
-            }
-
-            // Switch between tabs
-            function switchTab(tabName, container) {
-                activeTab = tabName;
-
-                // Update tab buttons
-                const tabs = container.querySelectorAll('.settings-tab');
-                tabs.forEach(tab => {
-                    if (tab.dataset.tab === tabName) {
-                        tab.classList.add('active');
+                    if (data.success) {
+                        userData = data.user;
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        showSuccessMessage(container, 'Profile updated successfully!');
                     } else {
-                        tab.classList.remove('active');
+                        showErrorMessage(container, data.error || 'Failed to update profile');
                     }
-                });
-
-                // Update tab content
-                const tabContents = container.querySelectorAll('.settings-tab-content');
-                tabContents.forEach(content => {
-                    if (content.id === `settings-${tabName}-tab`) {
-                        content.classList.add('active');
-                    } else {
-                        content.classList.remove('active');
-                    }
-                });
-            }
-
-            // Save profile data
-            function saveProfileData(container) {
-                // Get form values
-                const firstName = container.querySelector('#settings-first-name').value;
-                const lastName = container.querySelector('#settings-last-name').value;
-                const email = container.querySelector('#settings-email').value;
-                const phone = container.querySelector('#settings-phone').value;
-                const address = container.querySelector('#settings-address').value;
-                const city = container.querySelector('#settings-city').value;
-                const state = container.querySelector('#settings-state').value;
-                const zipCode = container.querySelector('#settings-zip').value;
-
-                // Update user data
-                userData.firstName = firstName;
-                userData.lastName = lastName;
-                userData.email = email;
-                userData.phone = phone;
-                userData.address = address;
-                userData.city = city;
-                userData.state = state;
-                userData.zipCode = zipCode;
-
-                // In a real app, you would send this data to the server
-
-                // Show success message
-                showSuccessMessage(container, 'Profile updated successfully!');
-            }
-
-            // Save notification settings
-            function saveNotificationSettings(container) {
-                // Get toggle values
-                const emailNotifications = container.querySelector('#settings-email-notifications').checked;
-                const smsNotifications = container.querySelector('#settings-sms-notifications').checked;
-                const disputeNotifications = container.querySelector('#settings-dispute-notifications').checked;
-                const creditNotifications = container.querySelector('#settings-credit-notifications').checked;
-                const promoNotifications = container.querySelector('#settings-promo-notifications').checked;
-
-                // Update user data
-                userData.notifications.email = emailNotifications;
-                userData.notifications.sms = smsNotifications;
-                userData.notifications.disputes = disputeNotifications;
-                userData.notifications.creditReport = creditNotifications;
-                userData.notifications.promotions = promoNotifications;
-
-                // In a real app, you would send this data to the server
-
-                // Show success message
-                showSuccessMessage(container, 'Notification preferences updated successfully!');
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    showErrorMessage(container, 'Network error. Please try again.');
+                }
             }
 
             // Change password
-            function changePassword(container) {
-                // Get password values
-                const currentPassword = container.querySelector('#settings-current-password').value;
-                const newPassword = container.querySelector('#settings-new-password').value;
-                const confirmPassword = container.querySelector('#settings-confirm-password').value;
+            async function changePassword(container) {
+                try {
+                    const currentPassword = container.querySelector('#settings-current-password').value;
+                    const newPassword = container.querySelector('#settings-new-password').value;
+                    const confirmPassword = container.querySelector('#settings-confirm-password').value;
 
-                // Validate passwords
-                if (!currentPassword) {
-                    showErrorMessage(container, 'Please enter your current password.');
-                    return;
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        showErrorMessage(container, 'Please fill in all password fields.');
+                        return;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        showErrorMessage(container, 'New passwords do not match.');
+                        return;
+                    }
+
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/settings/password', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ currentPassword, newPassword })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Clear password fields
+                        container.querySelector('#settings-current-password').value = '';
+                        container.querySelector('#settings-new-password').value = '';
+                        container.querySelector('#settings-confirm-password').value = '';
+                        showSuccessMessage(container, 'Password updated successfully!');
+                    } else {
+                        showErrorMessage(container, data.error || 'Failed to update password');
+                    }
+                } catch (error) {
+                    console.error('Error changing password:', error);
+                    showErrorMessage(container, 'Network error. Please try again.');
                 }
-
-                if (!newPassword) {
-                    showErrorMessage(container, 'Please enter a new password.');
-                    return;
-                }
-
-                if (newPassword !== confirmPassword) {
-                    showErrorMessage(container, 'New passwords do not match.');
-                    return;
-                }
-
-                // In a real app, you would validate the current password and update the password on the server
-
-                // Clear password fields
-                container.querySelector('#settings-current-password').value = '';
-                container.querySelector('#settings-new-password').value = '';
-                container.querySelector('#settings-confirm-password').value = '';
-
-                // Show success message
-                showSuccessMessage(container, 'Password updated successfully!');
             }
 
-            // Save security settings
-            function saveSecuritySettings(container) {
-                // Get security settings
-                const twoFactorAuth = container.querySelector('#settings-two-factor').checked;
-                const sessionTimeout = parseInt(container.querySelector('#settings-session-timeout').value);
+            // Update security question
+            async function updateSecurityQuestion(container) {
+                try {
+                    const currentPassword = container.querySelector('#settings-security-password').value;
+                    const securityQuestion = container.querySelector('#settings-new-security-question').value;
+                    const securityAnswer = container.querySelector('#settings-new-security-answer').value;
 
-                // Update user data
-                userData.security.twoFactorAuth = twoFactorAuth;
-                userData.security.sessionTimeout = sessionTimeout;
+                    if (!currentPassword || !securityQuestion || !securityAnswer) {
+                        showErrorMessage(container, 'Please fill in all fields.');
+                        return;
+                    }
 
-                // In a real app, you would send this data to the server
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/settings/security-question', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ currentPassword, securityQuestion, securityAnswer })
+                    });
 
-                // Show success message
-                showSuccessMessage(container, 'Security settings updated successfully!');
-            }
+                    const data = await response.json();
 
-            // Save preferences
-            function savePreferences(container) {
-                // Get preference values
-                const language = container.querySelector('#settings-language').value;
-                const timezone = container.querySelector('#settings-timezone').value;
+                    if (data.success) {
+                        // Clear fields
+                        container.querySelector('#settings-security-password').value = '';
+                        container.querySelector('#settings-new-security-question').value = '';
+                        container.querySelector('#settings-new-security-answer').value = '';
 
-                // Update user data
-                userData.language = language;
-                userData.timezone = timezone;
+                        // Reload user data to show updated question
+                        await loadUserData();
+                        renderSettings(container, 'security');
+                        attachEventListeners(container);
 
-                // In a real app, you would send this data to the server
-
-                // Show success message
-                showSuccessMessage(container, 'Preferences updated successfully!');
-            }
-
-            // Confirm account deletion
-            function confirmDeleteAccount(container) {
-                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                    // In a real app, you would send a request to delete the account
-                    alert('Account deletion request submitted. You will receive a confirmation email.');
+                        showSuccessMessage(container, 'Security question updated successfully!');
+                    } else {
+                        showErrorMessage(container, data.error || 'Failed to update security question');
+                    }
+                } catch (error) {
+                    console.error('Error updating security question:', error);
+                    showErrorMessage(container, 'Network error. Please try again.');
                 }
+            }
+
+            // Save notification preferences
+            async function saveNotifications(container) {
+                try {
+                    const emailNotifications = container.querySelector('#settings-email-notifications').checked;
+                    const smsNotifications = container.querySelector('#settings-sms-notifications').checked;
+                    const pushNotifications = container.querySelector('#settings-push-notifications').checked;
+
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/settings/notifications', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ emailNotifications, smsNotifications, pushNotifications })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showSuccessMessage(container, 'Notification preferences updated successfully!');
+                    } else {
+                        showErrorMessage(container, data.error || 'Failed to update preferences');
+                    }
+                } catch (error) {
+                    console.error('Error updating notifications:', error);
+                    showErrorMessage(container, 'Network error. Please try again.');
+                }
+            }
+
+            // Delete account
+            async function deleteAccount(container) {
+                try {
+                    const password = container.querySelector('#settings-delete-password').value;
+                    const confirmDelete = container.querySelector('#settings-delete-confirm').value;
+
+                    if (!password || confirmDelete !== 'DELETE') {
+                        showErrorMessage(container, 'Please enter your password and type "DELETE" to confirm.');
+                        return;
+                    }
+
+                    if (!confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
+                        return;
+                    }
+
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/settings/account', {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ password, confirmDelete })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert('Your account has been deleted. You will be logged out.');
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userData');
+                        window.location.href = '/login';
+                    } else {
+                        showErrorMessage(container, data.error || 'Failed to delete account');
+                    }
+                } catch (error) {
+                    console.error('Error deleting account:', error);
+                    showErrorMessage(container, 'Network error. Please try again.');
+                }
+            }
+
+            // Helper function to get security question text
+            function getSecurityQuestionText(questionKey) {
+                const questions = {
+                    'mother_maiden_name': "What is your mother's maiden name?",
+                    'first_pet_name': "What was the name of your first pet?",
+                    'childhood_street': "What street did you grow up on?",
+                    'first_school': "What was the name of your elementary school?",
+                    'favorite_teacher': "What was your favorite teacher's last name?",
+                    'first_car': "What was the make of your first car?",
+                    'birth_city': "In what city were you born?",
+                    'childhood_friend': "What was your childhood best friend's name?"
+                };
+
+                return questions[questionKey] || "Security Question";
+            }
+
+            // Attach event listeners
+            function attachEventListeners(container) {
+                // Tab switching
+                const tabs = container.querySelectorAll('.settings-tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function () {
+                        const targetTab = this.getAttribute('data-tab');
+                        switchTab(container, targetTab);
+                    });
+                });
+            }
+
+            // Switch between tabs
+            function switchTab(container, targetTab) {
+                // Update tab buttons
+                container.querySelectorAll('.settings-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                container.querySelector(`[data-tab="${targetTab}"]`).classList.add('active');
+
+                // Update tab content
+                container.querySelectorAll('.settings-tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                container.querySelector(`#settings-${targetTab}-tab`).classList.add('active');
             }
 
             // Show success message
             function showSuccessMessage(container, message) {
-                // Remove any existing messages
                 removeMessages(container);
 
-                // Create success message element
                 const successMessage = document.createElement('div');
                 successMessage.className = 'settings-success-message';
                 successMessage.innerHTML = `
@@ -807,12 +769,10 @@
                     <span>${message}</span>
                 `;
 
-                // Insert at the top of the active tab content
                 const activeTabContent = container.querySelector('.settings-tab-content.active');
                 if (activeTabContent) {
                     activeTabContent.insertBefore(successMessage, activeTabContent.firstChild);
 
-                    // Auto-hide after 5 seconds
                     setTimeout(() => {
                         successMessage.remove();
                     }, 5000);
@@ -821,10 +781,8 @@
 
             // Show error message
             function showErrorMessage(container, message) {
-                // Remove any existing messages
                 removeMessages(container);
 
-                // Create error message element
                 const errorMessage = document.createElement('div');
                 errorMessage.className = 'settings-error-message';
                 errorMessage.innerHTML = `
@@ -832,12 +790,10 @@
                     <span>${message}</span>
                 `;
 
-                // Insert at the top of the active tab content
                 const activeTabContent = container.querySelector('.settings-tab-content.active');
                 if (activeTabContent) {
                     activeTabContent.insertBefore(errorMessage, activeTabContent.firstChild);
 
-                    // Auto-hide after 5 seconds
                     setTimeout(() => {
                         errorMessage.remove();
                     }, 5000);
@@ -850,26 +806,27 @@
                 messages.forEach(message => message.remove());
             }
 
-            // Reset initialization state (for reloading)
+            // Reset initialization state
             function reset() {
                 isInitialized = false;
+                userData = null;
                 return true;
             }
 
             // Public API
             return {
                 init: init,
-                reset: reset
+                reset: reset,
+                saveProfile: saveProfile,
+                changePassword: changePassword,
+                updateSecurityQuestion: updateSecurityQuestion,
+                saveNotifications: saveNotifications,
+                deleteAccount: deleteAccount
             };
         })();
 
         // Expose the module globally
         window.jamSettings = SettingsModule;
-
-        // Signal that the module is loaded
-        if (window.dispatchEvent) {
-            window.dispatchEvent(new CustomEvent('settingsModuleLoaded'));
-        }
     </script>
 </body>
 

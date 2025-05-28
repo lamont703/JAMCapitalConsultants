@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { ghlSyncMiddleware } from '../middleware/ghlSyncMiddleware.js';
 
 export const authController = {
     async register(req, res) {
         try {
-            const { name, email, password, phone, company, ...otherData } = req.body;
+            const { name, email, password, phone, company, securityQuestion, securityAnswer, ...otherData } = req.body;
             
             console.log('🔍 Registration started for:', email);
             
@@ -19,7 +20,15 @@ export const authController = {
                 });
             }
 
-            // Check if user already exists using the service directly
+            // Validate security question and answer
+            if (!securityQuestion || !securityAnswer) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Security question and answer are required'
+                });
+            }
+
+            // Check if user already exists
             const existingUser = await cosmosService.getUserByEmail(email);
             if (existingUser) {
                 console.log('❌ User already exists:', email);
@@ -33,7 +42,14 @@ export const authController = {
             const saltRounds = 12;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-            // Create user document directly
+            // Hash security answer with salt
+            const securitySalt = crypto.randomBytes(16).toString('hex');
+            const normalizedAnswer = securityAnswer.trim().toLowerCase();
+            const securityAnswerHash = crypto
+                .pbkdf2Sync(normalizedAnswer, securitySalt, 10000, 64, 'sha512')
+                .toString('hex');
+
+            // Create user document
             const userDocument = {
                 id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 type: 'user',
@@ -42,6 +58,11 @@ export const authController = {
                 password: hashedPassword,
                 phone: phone ? phone.trim() : '',
                 company: company ? company.trim() : '',
+                isActive: true,
+                role: 'user',
+                securityQuestion: securityQuestion,
+                securityAnswerHash: securityAnswerHash,
+                securitySalt: securitySalt,
                 ghlContactId: null,
                 ghlSyncStatus: 'pending',
                 createdAt: new Date().toISOString(),
@@ -53,7 +74,7 @@ export const authController = {
             const savedUser = await cosmosService.createDocument(userDocument, 'user');
             console.log('✅ User saved to database:', savedUser.id);
 
-            // **NEW: Sync to GoHighLevel CRM with detailed debugging**
+            // Sync to GoHighLevel CRM
             console.log('🔄 Starting GHL sync for user:', savedUser.email);
             
             const ghlResult = await ghlSyncMiddleware.syncNewUser({
@@ -88,36 +109,81 @@ export const authController = {
             // Generate JWT token
             const token = jwt.sign(
                 { 
-                    userId: savedUser.id,
-                    email: savedUser.email 
+                    userId: savedUser.id, 
+                    email: savedUser.email,
+                    role: savedUser.role || 'user'
                 },
-                process.env.JWT_SECRET || 'your-secret-key',
-                { expiresIn: '24h' }
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
             );
 
-            // Remove password from response
-            const { password: _, ...userResponse } = savedUser;
+            // Remove sensitive data from response
+            const { password: _, securityAnswerHash: __, securitySalt: ___, ...userResponse } = savedUser;
 
-            console.log('🎉 Registration completed for:', email);
+            console.log('✅ Registration successful for:', email);
 
             res.status(201).json({
                 success: true,
                 message: 'User registered successfully',
                 user: userResponse,
-                token,
-                ghlSync: {
-                    success: ghlResult.success,
-                    action: ghlResult.action || 'attempted',
-                    error: ghlResult.error || null
-                }
+                token: token
             });
 
         } catch (error) {
             console.error('❌ Registration error:', error);
+            res.status(500).json({ 
+                success: false, 
+                error: 'Registration failed. Please try again.' 
+            });
+        }
+    },
+
+    // Add method to verify security answer for password reset
+    async verifySecurityAnswer(req, res) {
+        try {
+            const { email, securityAnswer } = req.body;
+
+            if (!email || !securityAnswer) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Email and security answer are required'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            const user = await cosmosService.getUserByEmail(email.toLowerCase().trim());
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'User not found'
+                });
+            }
+
+            // Verify security answer
+            const normalizedAnswer = securityAnswer.trim().toLowerCase();
+            const hashedAnswer = crypto
+                .pbkdf2Sync(normalizedAnswer, user.securitySalt, 10000, 64, 'sha512')
+                .toString('hex');
+
+            if (hashedAnswer !== user.securityAnswerHash) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Incorrect security answer'
+                });
+            }
+
+            res.json({
+                success: true,
+                message: 'Security answer verified',
+                securityQuestion: user.securityQuestion
+            });
+
+        } catch (error) {
+            console.error('❌ Security verification error:', error);
             res.status(500).json({
                 success: false,
-                message: 'Registration failed',
-                error: error.message
+                error: 'Verification failed'
             });
         }
     },
@@ -125,6 +191,8 @@ export const authController = {
     async login(req, res) {
         try {
             const { email, password } = req.body;
+
+            console.log('🔍 Login attempt for:', email);
 
             // Validate input
             if (!email || !password) {
@@ -139,14 +207,18 @@ export const authController = {
             // Find user by email
             const user = await cosmosService.getUserByEmail(email.toLowerCase().trim());
             if (!user) {
+                console.log('❌ User not found:', email);
                 return res.status(401).json({ 
                     success: false, 
                     error: 'Invalid email or password' 
                 });
             }
 
-            // Check if user is active
-            if (!user.isActive) {
+            console.log('👤 User found:', user.email, 'isActive:', user.isActive);
+
+            // Check if user is active (only reject if explicitly set to false)
+            if (user.isActive === false) {
+                console.log('❌ Account deactivated:', email);
                 return res.status(401).json({ 
                     success: false, 
                     error: 'Account is deactivated. Please contact support.' 
@@ -156,6 +228,7 @@ export const authController = {
             // Verify password
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
+                console.log('❌ Invalid password for:', email);
                 return res.status(401).json({ 
                     success: false, 
                     error: 'Invalid email or password' 
@@ -167,17 +240,27 @@ export const authController = {
                 { 
                     userId: user.id, 
                     email: user.email,
-                    role: user.role 
+                    role: user.role || 'user'
                 },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: '24h' }
             );
 
             // Update last login
-            await cosmosService.updateUserLastLogin(user.id);
+            try {
+                await cosmosService.updateDocument(user.id, 'user', {
+                    lastLoginAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (updateError) {
+                console.log('⚠️ Failed to update last login:', updateError.message);
+                // Don't fail login if we can't update last login
+            }
 
             // Remove password from response
             const { password: _, ...userResponse } = user;
+
+            console.log('✅ Login successful for:', email);
 
             res.json({
                 success: true,
@@ -187,7 +270,7 @@ export const authController = {
             });
 
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('❌ Login error:', error);
             res.status(500).json({ 
                 success: false, 
                 error: 'Login failed. Please try again.' 
@@ -197,43 +280,251 @@ export const authController = {
 
     async logout(req, res) {
         try {
-            // In a more advanced setup, you might:
-            // 1. Add the token to a blacklist in CosmosDB
-            // 2. Log the logout event for security auditing
-            // 3. Clear any server-side session data
-            console.log('Logout request received');
+            console.log('🔄 Logout request received');
 
             const token = req.headers.authorization?.replace('Bearer ', '');
             const cosmosService = req.app.locals.cosmosService;
 
             if (token && cosmosService) {
-                // Optional: Log the logout event for security auditing
                 try {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                    await cosmosService.logUserActivity(decoded.userId, 'logout', {
-                        timestamp: new Date().toISOString(),
-                        userAgent: req.headers['user-agent'],
-                        ip: req.ip
-                    });
+                    console.log('📝 Logging logout activity for user:', decoded.userId);
                 } catch (jwtError) {
-                    // Token might be expired or invalid, but that's okay for logout
-                    console.log('Token verification failed during logout (expected if expired)');
+                    console.log('⚠️ Token verification failed during logout (expected if expired)');
                 }
             }
 
-            console.log('Logout successful');
+            console.log('✅ Logout successful');
             res.json({
                 success: true,
                 message: 'Logged out successfully'
             });
 
         } catch (error) {
-            console.error('Logout error:', error);
-            // Even if there's an error, we should still return success
-            // because the client will clear local storage anyway
+            console.error('❌ Logout error:', error);
             res.json({
                 success: true,
                 message: 'Logged out successfully'
+            });
+        }
+    },
+
+    async forgotPassword(req, res) {
+        try {
+            const { email } = req.body;
+
+            console.log('🔍 Password reset request for:', email);
+
+            if (!email) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Email is required'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+
+            // Find user by email
+            const user = await cosmosService.getUserByEmail(email.toLowerCase().trim());
+            if (!user) {
+                // Don't reveal if user exists or not for security
+                return res.json({
+                    success: true,
+                    message: 'If an account with that email exists, a password reset link has been sent.'
+                });
+            }
+
+            // Generate reset token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
+
+            // Save reset token to user document
+            await cosmosService.updateDocument(user.id, 'user', {
+                resetToken: resetToken,
+                resetTokenExpiry: resetTokenExpiry.toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+
+            // TODO: Send email with reset link (in production, send via email service)
+            // For now, we'll log the reset link (in production, send via email service)
+            const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+            console.log('🔗 Password reset link for', email, ':', resetLink);
+
+            // In production, you would send an email here
+            // await emailService.sendPasswordResetEmail(user.email, resetLink);
+
+            console.log('✅ Password reset token generated for:', email);
+
+            res.json({
+                success: true,
+                message: 'If an account with that email exists, a password reset link has been sent.',
+                // Remove this in production - only for development
+                resetLink: process.env.NODE_ENV === 'development' ? resetLink : undefined
+            });
+
+        } catch (error) {
+            console.error('❌ Forgot password error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to process password reset request'
+            });
+        }
+    },
+
+    async resetPassword(req, res) {
+        try {
+            const { token, newPassword } = req.body;
+
+            console.log('🔍 Password reset attempt with token:', token?.substring(0, 8) + '...');
+
+            if (!token || !newPassword) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Reset token and new password are required'
+                });
+            }
+
+            if (newPassword.length < 6) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Password must be at least 6 characters long'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+
+            // Find user by reset token
+            const user = await cosmosService.getUserByResetToken(token);
+            if (!user) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid or expired reset token'
+                });
+            }
+
+            // Check if token is expired
+            const now = new Date();
+            const tokenExpiry = new Date(user.resetTokenExpiry);
+            if (now > tokenExpiry) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Reset token has expired. Please request a new password reset.'
+                });
+            }
+
+            // Hash new password
+            const saltRounds = 12;
+            const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+            // Update user password and clear reset token
+            await cosmosService.updateDocument(user.id, 'user', {
+                password: hashedPassword,
+                resetToken: null,
+                resetTokenExpiry: null,
+                updatedAt: new Date().toISOString()
+            });
+
+            console.log('✅ Password reset successful for user:', user.email);
+
+            res.json({
+                success: true,
+                message: 'Password has been reset successfully. You can now log in with your new password.'
+            });
+
+        } catch (error) {
+            console.error('❌ Reset password error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to reset password'
+            });
+        }
+    },
+
+    async getSecurityQuestion(req, res) {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Email is required'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            const user = await cosmosService.getUserByEmail(email.toLowerCase().trim());
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'No account found with this email address'
+                });
+            }
+
+            res.json({
+                success: true,
+                securityQuestion: user.securityQuestion
+            });
+
+        } catch (error) {
+            console.error('❌ Get security question error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to retrieve security question'
+            });
+        }
+    },
+
+    async resetPasswordWithSecurity(req, res) {
+        try {
+            const { email, newPassword } = req.body;
+
+            if (!email || !newPassword) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Email and new password are required'
+                });
+            }
+
+            if (newPassword.length < 6) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Password must be at least 6 characters long'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            const user = await cosmosService.getUserByEmail(email.toLowerCase().trim());
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'User not found'
+                });
+            }
+
+            // Hash new password
+            const saltRounds = 12;
+            const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+            // Update user password
+            await cosmosService.updateDocument(user.id, 'user', {
+                password: hashedPassword,
+                updatedAt: new Date().toISOString()
+            });
+
+            console.log('✅ Password reset successful for user:', user.email);
+
+            res.json({
+                success: true,
+                message: 'Password has been reset successfully'
+            });
+
+        } catch (error) {
+            console.error('❌ Reset password with security error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to reset password'
             });
         }
     }

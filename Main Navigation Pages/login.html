@@ -367,7 +367,7 @@
             </div>
 
             <!-- Login Form -->
-            <div class="form-container active" id="loginForm">
+            <div id="login" class="tab-content active">
                 <h1 class="login-title">Welcome Back</h1>
                 <p class="login-subtitle">Log in to access your credit repair dashboard</p>
 
@@ -383,7 +383,9 @@
                     </div>
 
                     <button type="submit" class="login-button">Log In to Dashboard</button>
-                    <a href="#forgot-password" class="forgot-password">Forgot your password?</a>
+                    <div class="forgot-password-link" style="text-align: center; margin-top: 15px;">
+                        <a href="#" onclick="showForgotPasswordForm(); return false;">Forgot your password?</a>
+                    </div>
                 </form>
             </div>
 
@@ -415,8 +417,91 @@
                             required>
                     </div>
 
+                    <!-- Security Question Section -->
+                    <div class="input-group">
+                        <i class="fas fa-question-circle"></i>
+                        <select class="login-input" id="register-security-question" required>
+                            <option value="">Select a Security Question</option>
+                            <option value="mother_maiden_name">What is your mother's maiden name?</option>
+                            <option value="first_pet_name">What was the name of your first pet?</option>
+                            <option value="childhood_street">What street did you grow up on?</option>
+                            <option value="first_school">What was the name of your elementary school?</option>
+                            <option value="favorite_teacher">What was your favorite teacher's last name?</option>
+                            <option value="first_car">What was the make of your first car?</option>
+                            <option value="birth_city">In what city were you born?</option>
+                            <option value="childhood_friend">What was your childhood best friend's name?</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-shield-alt"></i>
+                        <input type="text" class="login-input" id="register-security-answer"
+                            placeholder="Security Answer" required>
+                        <small class="security-hint">This will help verify your identity if you forget your
+                            password</small>
+                    </div>
+
                     <button type="submit" class="login-button register-button">Create Account</button>
                 </form>
+            </div>
+
+            <!-- Forgot Password Form -->
+            <div id="forgot-password-form" class="form-container" style="display: none;">
+                <h1 class="login-title">Reset Your Password</h1>
+                <p class="login-subtitle">Enter your email and answer your security question to reset your password.</p>
+
+                <!-- Step 1: Email Input -->
+                <div id="forgot-step-1" class="forgot-step">
+                    <form class="login-form" onsubmit="handleEmailVerification(event)">
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" class="login-input" id="forgot-email" placeholder="Email Address"
+                                required>
+                        </div>
+
+                        <button type="submit" class="login-button">Continue</button>
+                        <button type="button" class="login-button" onclick="showLoginForm()"
+                            style="background-color: #6c757d; margin-top: 0.5rem;">Back to Login</button>
+                    </form>
+                </div>
+
+                <!-- Step 2: Security Question -->
+                <div id="forgot-step-2" class="forgot-step" style="display: none;">
+                    <form class="login-form" onsubmit="handleSecurityVerification(event)">
+                        <div class="security-question-display">
+                            <h3 id="security-question-text">Security Question will appear here</h3>
+                        </div>
+
+                        <div class="input-group">
+                            <i class="fas fa-shield-alt"></i>
+                            <input type="text" class="login-input" id="security-answer" placeholder="Your Answer"
+                                required>
+                        </div>
+
+                        <button type="submit" class="login-button">Verify Answer</button>
+                        <button type="button" class="login-button" onclick="resetForgotPasswordForm()"
+                            style="background-color: #6c757d; margin-top: 0.5rem;">Start Over</button>
+                    </form>
+                </div>
+
+                <!-- Step 3: New Password -->
+                <div id="forgot-step-3" class="forgot-step" style="display: none;">
+                    <form class="login-form" onsubmit="handlePasswordReset(event)">
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="login-input" id="new-password" placeholder="New Password"
+                                required minlength="6">
+                        </div>
+
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="login-input" id="confirm-password"
+                                placeholder="Confirm New Password" required minlength="6">
+                        </div>
+
+                        <button type="submit" class="login-button">Reset Password</button>
+                    </form>
+                </div>
             </div>
 
             <div class="login-divider">
@@ -439,23 +524,39 @@
         document.addEventListener('DOMContentLoaded', function () {
             const loginTab = document.getElementById('loginTab');
             const registerTab = document.getElementById('registerTab');
-            const loginForm = document.getElementById('loginForm');
+            const loginForm = document.getElementById('login');
             const registerForm = document.getElementById('registerForm');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
 
             loginTab.addEventListener('click', function () {
                 loginTab.classList.add('active');
                 registerTab.classList.remove('active');
                 loginForm.classList.add('active');
+                loginForm.style.display = 'block';
                 registerForm.classList.remove('active');
+                registerForm.style.display = 'none';
+                if (forgotPasswordForm) {
+                    forgotPasswordForm.classList.remove('active');
+                    forgotPasswordForm.style.display = 'none';
+                }
             });
 
             registerTab.addEventListener('click', function () {
                 registerTab.classList.add('active');
                 loginTab.classList.remove('active');
                 registerForm.classList.add('active');
+                registerForm.style.display = 'block';
                 loginForm.classList.remove('active');
+                loginForm.style.display = 'none';
+                if (forgotPasswordForm) {
+                    forgotPasswordForm.classList.remove('active');
+                    forgotPasswordForm.style.display = 'none';
+                }
             });
         });
+
+        // Store email for the password reset process
+        let forgotPasswordEmail = '';
 
         async function handleLogin(event) {
             event.preventDefault();
@@ -525,24 +626,25 @@
             const email = document.getElementById('register-email').value;
             const phone = document.getElementById('register-phone').value;
             const password = document.getElementById('register-password').value;
+            const securityQuestion = document.getElementById('register-security-question').value;
+            const securityAnswer = document.getElementById('register-security-answer').value;
             const button = event.target.querySelector('button');
 
             // Basic validation
-            if (!name || !email || !phone || !password) {
+            if (!name || !email || !phone || !password || !securityQuestion || !securityAnswer) {
                 showError('Please fill in all fields');
-                return;
-            }
-
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showError('Please enter a valid email address');
                 return;
             }
 
             // Password validation
             if (password.length < 6) {
                 showError('Password must be at least 6 characters long');
+                return;
+            }
+
+            // Security answer validation
+            if (securityAnswer.trim().length < 2) {
+                showError('Security answer must be at least 2 characters long');
                 return;
             }
 
@@ -556,7 +658,14 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name, email, phone, password })
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        phone,
+                        password,
+                        securityQuestion,
+                        securityAnswer: securityAnswer.trim().toLowerCase() // Normalize for consistency
+                    })
                 });
 
                 const data = await response.json();
@@ -569,9 +678,7 @@
                     // Track successful registration
                     if (typeof analytics !== 'undefined') {
                         analytics.track('RegistrationSuccess', {
-                            name: name,
                             email: email,
-                            phone: phone,
                             timestamp: new Date().toISOString()
                         });
                     }
@@ -585,15 +692,265 @@
                     }, 1000);
 
                 } else {
-                    showError(data.error || 'Registration failed');
+                    showError(data.message || 'Registration failed');
                     resetButton(button, 'Create Account');
                 }
 
             } catch (error) {
                 console.error('Registration error:', error);
-                showError('Network error. Please check your connection and try again.');
+                showError('Network error. Please try again.');
                 resetButton(button, 'Create Account');
             }
+        }
+
+        function showForgotPasswordForm() {
+            // Hide the login and register forms
+            const loginForm = document.getElementById('login');
+            const registerForm = document.getElementById('registerForm');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
+
+            // Hide login and register
+            if (loginForm) {
+                loginForm.classList.remove('active');
+                loginForm.style.display = 'none';
+            }
+            if (registerForm) {
+                registerForm.classList.remove('active');
+                registerForm.style.display = 'none';
+            }
+
+            // Show forgot password form
+            if (forgotPasswordForm) {
+                forgotPasswordForm.classList.add('active');
+                forgotPasswordForm.style.display = 'block';
+            }
+
+            // Update tab styling
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+            console.log('Showing forgot password form');
+        }
+
+        function showLoginForm() {
+            // Show the login form and hide others
+            const loginForm = document.getElementById('login');
+            const registerForm = document.getElementById('registerForm');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
+            const loginTab = document.getElementById('loginTab');
+
+            // Show login form
+            if (loginForm) {
+                loginForm.classList.add('active');
+                loginForm.style.display = 'block';
+            }
+
+            // Hide register and forgot password forms
+            if (registerForm) {
+                registerForm.classList.remove('active');
+                registerForm.style.display = 'none';
+            }
+            if (forgotPasswordForm) {
+                forgotPasswordForm.classList.remove('active');
+                forgotPasswordForm.style.display = 'none';
+            }
+
+            // Update tab styling
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            if (loginTab) loginTab.classList.add('active');
+
+            console.log('Showing login form');
+        }
+
+        async function handleEmailVerification(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('forgot-email').value;
+            const button = event.target.querySelector('button[type="submit"]');
+
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+
+            // Show loading state
+            button.innerHTML = 'Verifying...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/get-security-question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store email for later use
+                    forgotPasswordEmail = email;
+
+                    // Display security question
+                    const questionText = getSecurityQuestionText(data.securityQuestion);
+                    document.getElementById('security-question-text').textContent = questionText;
+
+                    // Show step 2
+                    document.getElementById('forgot-step-1').style.display = 'none';
+                    document.getElementById('forgot-step-2').style.display = 'block';
+
+                } else {
+                    showError(data.error || 'Email not found');
+                }
+
+            } catch (error) {
+                console.error('Email verification error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                button.innerHTML = 'Continue';
+                button.disabled = false;
+            }
+        }
+
+        async function handleSecurityVerification(event) {
+            event.preventDefault();
+
+            const securityAnswer = document.getElementById('security-answer').value;
+            const button = event.target.querySelector('button[type="submit"]');
+
+            if (!securityAnswer) {
+                showError('Please enter your security answer');
+                return;
+            }
+
+            // Show loading state
+            button.innerHTML = 'Verifying...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/verify-security-answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: forgotPasswordEmail,
+                        securityAnswer: securityAnswer.trim()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show step 3 (new password form)
+                    document.getElementById('forgot-step-2').style.display = 'none';
+                    document.getElementById('forgot-step-3').style.display = 'block';
+
+                } else {
+                    showError(data.error || 'Incorrect security answer');
+                }
+
+            } catch (error) {
+                console.error('Security verification error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                button.innerHTML = 'Verify Answer';
+                button.disabled = false;
+            }
+        }
+
+        async function handlePasswordReset(event) {
+            event.preventDefault();
+
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const button = event.target.querySelector('button[type="submit"]');
+
+            // Validation
+            if (!newPassword || !confirmPassword) {
+                showError('Please fill in both password fields');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+
+            // Show loading state
+            button.innerHTML = 'Resetting...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/reset-password-with-security', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: forgotPasswordEmail,
+                        newPassword: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('Password reset successfully! You can now log in with your new password.');
+
+                    // Reset form and show login
+                    setTimeout(() => {
+                        resetForgotPasswordForm();
+                        showLoginForm();
+                    }, 2000);
+
+                } else {
+                    showError(data.error || 'Failed to reset password');
+                }
+
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                button.innerHTML = 'Reset Password';
+                button.disabled = false;
+            }
+        }
+
+        function resetForgotPasswordForm() {
+            // Clear all inputs
+            document.getElementById('forgot-email').value = '';
+            document.getElementById('security-answer').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+
+            // Reset to step 1
+            document.getElementById('forgot-step-1').style.display = 'block';
+            document.getElementById('forgot-step-2').style.display = 'none';
+            document.getElementById('forgot-step-3').style.display = 'none';
+
+            // Clear stored email
+            forgotPasswordEmail = '';
+        }
+
+        function getSecurityQuestionText(questionKey) {
+            const questions = {
+                'mother_maiden_name': "What is your mother's maiden name?",
+                'first_pet_name': "What was the name of your first pet?",
+                'childhood_street': "What street did you grow up on?",
+                'first_school': "What was the name of your elementary school?",
+                'favorite_teacher': "What was your favorite teacher's last name?",
+                'first_car': "What was the make of your first car?",
+                'birth_city': "In what city were you born?",
+                'childhood_friend': "What was your childhood best friend's name?"
+            };
+
+            return questions[questionKey] || "Security Question";
         }
 
         // Helper functions
