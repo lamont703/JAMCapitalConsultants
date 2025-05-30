@@ -51,20 +51,40 @@
             margin: 0 auto;
         }
 
+        /* Current Plan Status */
+        .current-plan-status {
+            background: linear-gradient(135deg, #e6f9ff 0%, #f0f9ff 100%);
+            border: 2px solid #09ccfc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #09ccfc;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge i {
+            margin-right: 0.5rem;
+        }
+
         /* Free Plan Card Styles */
         .free-plan-card {
-            border: 1px solid #dee2e6;
+            border: 2px solid #09ccfc;
             border-radius: 10px;
             overflow: hidden;
             transition: all 0.3s ease;
             max-width: 800px;
             margin: 0 auto;
             background: white;
-        }
-
-        .free-plan-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .free-plan-header {
@@ -82,9 +102,10 @@
         }
 
         .free-plan-price {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            color: #28a745;
         }
 
         .free-plan-price-period {
@@ -101,143 +122,121 @@
         }
 
         .free-plan-body {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
+            padding: 2rem;
         }
 
         .free-plan-description {
             margin-bottom: 1.5rem;
             font-size: 1.1rem;
             color: #6c757d;
+            text-align: center;
         }
 
         .free-plan-features {
             list-style-type: none;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
         }
 
         .free-plan-feature {
             display: flex;
-            margin-bottom: 1rem;
-            align-items: flex-start;
+            align-items: center;
+            padding: 0.5rem;
         }
 
         .free-plan-feature i {
-            color: #09ccfc;
+            color: #28a745;
             margin-right: 0.75rem;
             font-size: 1.1rem;
-            margin-top: 0.2rem;
+            min-width: 20px;
         }
 
-        .free-plan-cta {
-            margin-top: auto;
+        .free-plan-feature span {
+            color: #495057;
+        }
+
+        /* Upgrade Section */
+        .upgrade-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
             text-align: center;
         }
 
-        .free-select-btn {
-            background-color: #09ccfc;
+        .upgrade-title {
+            color: #495057;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .upgrade-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .upgrade-btn {
+            background: #09ccfc;
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
-            max-width: 250px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .free-select-btn:hover {
-            background-color: #08b7e4;
+        .upgrade-btn:hover {
+            background: #0bb3e6;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(9, 204, 252, 0.3);
         }
 
-        /* Modal Styles */
-        .free-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .free-modal-content {
-            background-color: white;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .free-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6c757d;
-        }
-
-        .free-modal-header {
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .free-modal-title {
-            font-size: 1.5rem;
-            color: #09ccfc;
-        }
-
-        .free-modal-body {
-            margin-bottom: 1rem;
-        }
-
-        .free-form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .free-form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .free-form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .free-modal-actions {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .free-error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 0.75rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .free-error-message i {
+        .upgrade-btn i {
             margin-right: 0.5rem;
-            font-size: 1.1rem;
+        }
+
+        .upgrade-btn.secondary {
+            background: #6c757d;
+        }
+
+        .upgrade-btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Usage Stats */
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .usage-stat {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .usage-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .usage-stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
         }
 
         /* Responsive adjustments */
@@ -246,279 +245,200 @@
                 max-width: 100%;
             }
 
-            .free-modal-content {
-                width: 95%;
-                padding: 1rem;
+            .upgrade-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .upgrade-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .free-plan-features {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- No visible content here - everything is loaded via JavaScript -->
-
     <script>
-        // Create the FreePlanModule
         const FreePlanModule = (function () {
             let isInitialized = false;
-            let selectedOption = null;
 
-            // Try to restore state immediately when module is defined
-            try {
-                const savedState = sessionStorage.getItem('jamFreePlanState');
-                if (savedState) {
-                    const parsedState = JSON.parse(savedState);
-                    console.log('Restored Free Plan state during module definition', parsedState);
+            // HTML template for the Free plan status
+            const freePlanHTML = `
+                <div class="free-container">
+                    <div class="free-header">
+                        <h2 class="free-title">Your Current Plan</h2>
+                        <p class="free-subtitle">You're currently on our Free Plan. Explore what's included and discover upgrade options to accelerate your credit repair journey.</p>
+                    </div>
 
-                    if (parsedState.selectedOption) {
-                        selectedOption = parsedState.selectedOption;
-                    }
-                    if (parsedState.isInitialized) {
-                        isInitialized = parsedState.isInitialized;
-                    }
-                }
-            } catch (e) {
-                console.error('Error restoring Free Plan state during definition:', e);
-            }
+                    <div class="current-plan-status">
+                        <div class="status-badge">
+                            <i class="fas fa-check-circle"></i>
+                            Active Free Plan
+                        </div>
+                        <h3>Welcome to JAM Credit Solutions!</h3>
+                        <p>Your free account gives you access to essential credit monitoring and basic tools.</p>
+                    </div>
 
-            function init(containerId) {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error(`Container ${containerId} not found`);
-                    return false;
-                }
-
-                console.log('Initializing Free Plan Module, isInitialized:', isInitialized, 'selectedOption:', selectedOption);
-
-                // Insert the widget HTML
-                container.innerHTML = `
                     <div class="free-plan-card">
                         <div class="free-plan-header">
                             <h3 class="free-plan-name">Free Plan</h3>
                             <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
-                            <div class="free-plan-target">Perfect for getting started</div>
+                            <p class="free-plan-target">Perfect for getting started with credit monitoring</p>
                         </div>
+
                         <div class="free-plan-body">
-                            <div class="free-plan-description">
-                                Start your credit repair journey with our essential free tools and resources.
+                            <p class="free-plan-description">
+                                Your free plan includes essential credit monitoring tools to help you stay informed about your credit status.
+                            </p>
+
+                            <div class="usage-stats">
+                                <div class="usage-stat">
+                                    <div class="usage-stat-number">3</div>
+                                    <div class="usage-stat-label">Credit Reports</div>
+                                </div>
+                                <div class="usage-stat">
+                                    <div class="usage-stat-number">∞</div>
+                                    <div class="usage-stat-label">Score Monitoring</div>
+                                </div>
+                                <div class="usage-stat">
+                                    <div class="usage-stat-number">5</div>
+                                    <div class="usage-stat-label">Educational Resources</div>
+                                </div>
                             </div>
+
                             <ul class="free-plan-features">
-                                <li class="free-plan-feature"><i class="fas fa-check"></i> Dispute Letter Library</li>
-                                <li class="free-plan-feature"><i class="fas fa-check"></i> Credit Repair eBook</li>
-                                <li class="free-plan-feature"><i class="fas fa-check"></i> Email Support</li>
-                                <li class="free-plan-feature"><i class="fas fa-check"></i> Basic Credit Tools</li>
-                                <li class="free-plan-feature"><i class="fas fa-check"></i> Credit Repair Strategy Guide</li>
+                                <li class="free-plan-feature">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Basic credit score monitoring</span>
+                                </li>
+                                <li class="free-plan-feature">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Monthly credit report access</span>
+                                </li>
+                                <li class="free-plan-feature">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Credit education resources</span>
+                                </li>
+                                <li class="free-plan-feature">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Account alerts and notifications</span>
+                                </li>
+                                <li class="free-plan-feature">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Basic financial tips</span>
+                                </li>
+                                <li class="free-plan-feature">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Community forum access</span>
+                                </li>
                             </ul>
-                            <div class="free-plan-cta">
-                                <button id="free-select-btn" class="free-select-btn">Get Started Free</button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div id="free-modal" class="free-modal">
-                        <div class="free-modal-content">
-                            <span class="free-modal-close">&times;</span>
-                            <div class="free-modal-header">
-                                <h3 class="free-modal-title">Create Your Free Account</h3>
-                            </div>
-                            <div class="free-modal-body">
-                                <div class="free-form-group">
-                                    <label for="free-email">Email Address</label>
-                                    <input type="email" id="free-email" placeholder="your@email.com" required>
-                                </div>
-                                <div class="free-form-group">
-                                    <label for="free-password">Create Password</label>
-                                    <input type="password" id="free-password" placeholder="Minimum 8 characters" required>
-                                </div>
-                                <div class="free-modal-actions">
-                                    <button class="free-select-btn">Create Free Account</button>
+                            <div class="upgrade-section">
+                                <h4 class="upgrade-title">Ready to accelerate your credit repair?</h4>
+                                <div class="upgrade-options">
+                                    <button class="upgrade-btn" id="upgrade-to-diy">
+                                        <i class="fas fa-tools"></i>
+                                        Upgrade to DIY Plan - $79/mo
+                                    </button>
+                                    <button class="upgrade-btn" id="upgrade-to-full">
+                                        <i class="fas fa-user-tie"></i>
+                                        Upgrade to Full Service - $149/mo
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
 
-                // If we already have a selected option, show the success state
-                if (selectedOption === 'free') {
-                    const freePlanCard = container.querySelector('.free-plan-card');
-                    if (freePlanCard) {
-                        freePlanCard.innerHTML = `
-                            <div class="free-plan-header">
-                                <h3 class="free-plan-name">Free Plan</h3>
-                                <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
-                            </div>
-                            <div class="free-plan-body" style="text-align: center;">
-                                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 15px;"></i>
-                                <h3 style="margin-bottom: 10px;">Account Created!</h3>
-                                <p>Thank you for signing up. Check your email for login instructions.</p>
-                                <div class="free-plan-cta" style="margin-top: 20px;">
-                                    <button class="free-select-btn" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
-                                </div>
-                            </div>
-                        `;
-                    }
+            // Initialize the module
+            function init(containerId) {
+                console.log('🚀 Initializing Free Plan Module...');
+
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`❌ Container ${containerId} not found`);
+                    return false;
                 }
 
-                // Set up event listeners
-                setupEventListeners(container);
+                try {
+                    // Render the free plan HTML
+                    container.innerHTML = freePlanHTML;
+                    console.log('✅ Free Plan HTML rendered');
 
-                // Mark as initialized
-                isInitialized = true;
+                    // Setup event listeners
+                    setupEventListeners(container);
 
-                // Save state
-                saveState();
+                    isInitialized = true;
+                    console.log('✅ Free Plan Module initialized successfully');
+                    return true;
 
-                return true;
+                } catch (error) {
+                    console.error('❌ Error initializing Free Plan Module:', error);
+                    return false;
+                }
             }
 
+            // Setup event listeners
             function setupEventListeners(container) {
-                // Get Started button
-                const selectBtn = container.querySelector('#free-select-btn');
-                if (selectBtn) {
-                    selectBtn.addEventListener('click', function () {
-                        openModal(container);
-                    });
-                }
+                // DIY Plan upgrade button
+                const diyUpgradeBtn = container.querySelector('#upgrade-to-diy');
+                if (diyUpgradeBtn) {
+                    diyUpgradeBtn.addEventListener('click', function () {
+                        console.log('DIY Plan upgrade clicked');
 
-                // Modal close button
-                const closeBtn = container.querySelector('.free-modal-close');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', function () {
-                        closeModal(container);
-                    });
-                }
+                        // Scroll to DIY plan section if it exists
+                        const diyPlanContainer = document.getElementById('diy-plan-container');
+                        if (diyPlanContainer) {
+                            diyPlanContainer.scrollIntoView({ behavior: 'smooth' });
 
-                // Close modal when clicking outside
-                const modal = container.querySelector('.free-modal');
-                if (modal) {
-                    modal.addEventListener('click', function (event) {
-                        if (event.target === modal) {
-                            closeModal(container);
+                            // Trigger DIY plan modal if available
+                            if (window.jamDIYPlan && typeof window.jamDIYPlan.openModal === 'function') {
+                                setTimeout(() => {
+                                    window.jamDIYPlan.openModal();
+                                }, 500);
+                            }
+                        } else {
+                            // If DIY plan not visible, show message or redirect
+                            alert('DIY Plan information will be available soon. Please contact support for immediate upgrade.');
                         }
                     });
                 }
 
-                // Form submission
-                const submitBtn = container.querySelector('.free-modal-actions .free-select-btn');
-                if (submitBtn) {
-                    submitBtn.addEventListener('click', function (event) {
-                        event.preventDefault();
-                        processSignup(container);
+                // Full Service upgrade button
+                const fullUpgradeBtn = container.querySelector('#upgrade-to-full');
+                if (fullUpgradeBtn) {
+                    fullUpgradeBtn.addEventListener('click', function () {
+                        console.log('Full Service upgrade clicked');
+
+                        // Scroll to Full Service plan section if it exists
+                        const fullPlanContainer = document.getElementById('fullservice-plan-container');
+                        if (fullPlanContainer) {
+                            fullPlanContainer.scrollIntoView({ behavior: 'smooth' });
+
+                            // Trigger Full Service plan modal if available
+                            if (window.jamFullServicePlan && typeof window.jamFullServicePlan.openModal === 'function') {
+                                setTimeout(() => {
+                                    window.jamFullServicePlan.openModal();
+                                }, 500);
+                            }
+                        } else {
+                            // If Full Service plan not visible, show message or redirect
+                            alert('Full Service Plan information will be available soon. Please contact support for immediate upgrade.');
+                        }
                     });
                 }
             }
 
-            function openModal(container) {
-                const modal = container.querySelector('.free-modal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                }
-            }
-
-            function closeModal(container) {
-                const modal = container.querySelector('.free-modal');
-                if (modal) {
-                    modal.style.display = 'none';
-                }
-            }
-
-            function processSignup(container) {
-                const email = container.querySelector('#free-email').value;
-                const password = container.querySelector('#free-password').value;
-                const modalBody = container.querySelector('.free-modal-body');
-
-                // Basic validation
-                if (!email || !password) {
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'free-error-message';
-                    errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all required fields.';
-
-                    // Remove any existing error messages
-                    const existingError = modalBody.querySelector('.free-error-message');
-                    if (existingError) {
-                        existingError.remove();
-                    }
-
-                    // Insert error before the actions div
-                    const actionsDiv = modalBody.querySelector('.free-modal-actions');
-                    modalBody.insertBefore(errorMsg, actionsDiv);
-                    return;
-                }
-
-                console.log('Processing free signup for:', email);
-
-                // Show loading state
-                const submitBtn = container.querySelector('.free-modal-actions .free-select-btn');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Creating Account...';
-                submitBtn.disabled = true;
-
-                // Simulate API call
-                setTimeout(() => {
-                    // Reset button
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-
-                    // Close modal
-                    closeModal(container);
-
-                    // Show success message
-                    const freePlanCard = container.querySelector('.free-plan-card');
-                    if (freePlanCard) {
-                        freePlanCard.innerHTML = `
-                            <div class="free-plan-header">
-                                <h3 class="free-plan-name">Free Plan</h3>
-                                <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
-                            </div>
-                            <div class="free-plan-body" style="text-align: center;">
-                                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 15px;"></i>
-                                <h3 style="margin-bottom: 10px;">Account Created!</h3>
-                                <p>Thank you for signing up. Check your email for login instructions.</p>
-                                <div class="free-plan-cta" style="margin-top: 20px;">
-                                    <button class="free-select-btn" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    // Store selected option
-                    selectedOption = 'free';
-
-                    // Trigger event for tracking
-                    if (typeof window.dispatchEvent === 'function') {
-                        window.dispatchEvent(new CustomEvent('freePlanSelected', {
-                            detail: { plan: 'free', email: email }
-                        }));
-                    }
-
-                    // Save the updated state
-                    saveState();
-                }, 1500);
-            }
-
-            // Add this function to save state to sessionStorage
-            function saveState() {
-                try {
-                    const state = {
-                        selectedOption: selectedOption,
-                        isInitialized: isInitialized
-                    };
-                    sessionStorage.setItem('jamFreePlanState', JSON.stringify(state));
-                    console.log('Saved Free Plan state to session storage', state);
-                } catch (e) {
-                    console.error('Error saving Free Plan state:', e);
-                }
-            }
-
-            // Update your reset function to clear session storage
+            // Reset function
             function reset() {
                 isInitialized = false;
-                selectedOption = null;
-                try {
-                    sessionStorage.removeItem('jamFreePlanState');
-                } catch (e) {
-                    console.error('Error clearing Free Plan state:', e);
-                }
+                console.log('Free Plan Module reset');
                 return true;
             }
 
@@ -526,20 +446,17 @@
             return {
                 init: init,
                 reset: reset,
-                openModal: openModal,
-                closeModal: closeModal,
-                getSelectedOption: function () {
-                    return selectedOption;
+                isInitialized: function () {
+                    return isInitialized;
                 }
             };
         })();
 
-        // Make sure the module is properly exposed globally
+        // Expose the module globally
         window.jamFreePlan = FreePlanModule;
 
         // Add a more robust reload mechanism
         window.addEventListener('pageshow', function (event) {
-            // pageshow fires when the page is shown, including from bfcache
             if (event.persisted) {
                 console.log('Page was restored from bfcache, reinitializing FreePlan module');
                 const container = document.getElementById('free-plan-container');
@@ -556,22 +473,14 @@
             if (container && window.jamFreePlan) {
                 console.log('Found Free Plan container, initializing');
                 window.jamFreePlan.init('free-plan-container');
-            } else if (window.jamFreePlan) {
-                // If loaded directly, create a container
-                console.log('FreePlan.html loaded directly, creating container');
-                const newContainer = document.createElement('div');
-                newContainer.id = 'free-plan-container';
-                document.body.appendChild(newContainer);
-                window.jamFreePlan.init('free-plan-container');
             }
         });
 
         // Signal that the module is loaded
-            if (window.dispatchEvent) {
-                window.dispatchEvent(new CustomEvent('jamFreePlanLoaded'));
-                console.log('FreePlan module loaded and event dispatched');
-            }
-
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamFreePlanLoaded'));
+            console.log('FreePlan module loaded and event dispatched');
+        }
     </script>
 </body>
 

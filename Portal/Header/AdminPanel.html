@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+        }
+
+        /* Admin Panel Container */
+        .admin-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #09ccfc;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+
+        /* Admin Tabs */
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .admin-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .admin-tab:hover {
+            color: #09ccfc;
+            background: #f8f9fa;
+        }
+
+        .admin-tab.active {
+            color: #09ccfc;
+            border-bottom-color: #09ccfc;
+            background: #f8f9fa;
+        }
+
+        .admin-tab i {
+            margin-right: 0.5rem;
+        }
+
+        /* Tab Content */
+        .admin-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .admin-tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Styles */
+        .admin-form {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #09ccfc;
+            box-shadow: 0 0 0 2px rgba(9, 204, 252, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .admin-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-btn-primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .admin-btn-primary:hover {
+            background: #08b8e8;
+            transform: translateY(-2px);
+        }
+
+        .admin-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .admin-btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .admin-btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .admin-btn-success:hover {
+            background: #218838;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed #09ccfc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            background: #e9ecef;
+            border-color: #08b8e8;
+        }
+
+        .file-upload-area.dragover {
+            background: #e6f9ff;
+            border-color: #08b8e8;
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: #09ccfc;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* User Search */
+        .user-search {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .user-search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ced4da;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-search-result {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .user-search-result:hover {
+            background: #f8f9fa;
+        }
+
+        .user-search-result:last-child {
+            border-bottom: none;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-sent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Recent Activity */
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .activity-icon.notification {
+            background: #09ccfc;
+        }
+
+        .activity-icon.dispute {
+            background: #ffc107;
+        }
+
+        .activity-icon.report {
+            background: #28a745;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            color: #6c757d;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* Success/Error Messages */
+        .admin-message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .admin-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .admin-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .admin-message.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 1rem;
+                margin: 10px;
+            }
+
+            .admin-tabs {
+                flex-wrap: wrap;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const AdminPanelModule = (function () {
+            let isInitialized = false;
+            let currentTab = 'notifications';
+            let currentContainer = null;
+
+            // Mock data for demonstration
+            const mockUsers = [
+                { id: 1, name: 'John Doe', email: 'john@example.com' },
+                { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+                { id: 3, name: 'Mike Johnson', email: 'mike@example.com' },
+                { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com' }
+            ];
+
+            let recentActivity = [
+                { type: 'notification', title: 'Notification Sent', description: 'Sent to John Doe', time: '2 minutes ago' },
+                { type: 'dispute', title: 'Dispute Updated', description: 'Experian status changed', time: '5 minutes ago' },
+                { type: 'upload', title: 'Report Uploaded', description: 'Credit report for Jane Smith', time: '10 minutes ago' }
+            ];
+
+            // HTML template for the admin panel
+            const adminPanelHTML = `
+                <div class="admin-container">
+                    <div class="admin-header">
+                        <h2 class="admin-title">Admin Panel</h2>
+                        <p class="admin-subtitle">Manage user notifications, dispute updates, and credit reports</p>
+                    </div>
+
+                    <div class="admin-message success" id="admin-success-message">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="success-text"></span>
+                    </div>
+
+                    <div class="admin-message error" id="admin-error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="error-text"></span>
+                    </div>
+
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" data-tab="notifications">
+                            <i class="fas fa-bell"></i>
+                            Send Notifications
+                        </button>
+                        <button class="admin-tab" data-tab="disputes">
+                            <i class="fas fa-gavel"></i>
+                            Dispute Updates
+                        </button>
+                        <button class="admin-tab" data-tab="reports">
+                            <i class="fas fa-file-pdf"></i>
+                            Upload Reports
+                        </button>
+                        <button class="admin-tab" data-tab="activity">
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </button>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div class="admin-tab-content active" id="notifications-content">
+                        <form class="admin-form" id="notification-form">
+                            <div class="form-group">
+                                <label class="form-label">Select User</label>
+                                <div class="user-search">
+                                    <input type="text" class="form-input" id="user-search-notifications" placeholder="Search users by name or email...">
+                                    <div class="user-search-results" id="user-search-results-notifications"></div>
+                                </div>
+                                <input type="hidden" id="selected-user-notifications">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Notification Type</label>
+                                <select class="form-select" id="notification-type">
+                                    <option value="general">General Notification</option>
+                                    <option value="welcome">Welcome Message</option>
+                                    <option value="reminder">Payment Reminder</option>
+                                    <option value="update">Account Update</option>
+                                    <option value="promotion">Promotion</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Subject</label>
+                                <input type="text" class="form-input" id="notification-subject" placeholder="Enter notification subject">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Message</label>
+                                <textarea class="form-textarea" id="notification-message" placeholder="Enter your message here..."></textarea>
+                            </div>
+                            <button type="submit" class="admin-btn admin-btn-primary">
+                                <i class="fas fa-paper-plane"></i>
+                                Send Notification
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Disputes Tab -->
+                    <div class="admin-tab-content" id="disputes-content">
+                        <form class="admin-form" id="dispute-form">
+                            <div class="form-group">
+                                <label class="form-label">Select User</label>
+                                <div class="user-search">
+                                    <input type="text" class="form-input" id="user-search-disputes" placeholder="Search users by name or email...">
+                                    <div class="user-search-results" id="user-search-results-disputes"></div>
+                                </div>
+                                <input type="hidden" id="selected-user-disputes">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Credit Bureau</label>
+                                    <select class="form-select" id="credit-bureau">
+                                        <option value="equifax">Equifax</option>
+                                        <option value="experian">Experian</option>
+                                        <option value="transunion">TransUnion</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Dispute Status</label>
+                                    <select class="form-select" id="dispute-status">
+                                        <option value="submitted">Submitted</option>
+                                        <option value="in-progress">In Progress</option>
+                                        <option value="resolved">Resolved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Dispute Item</label>
+                                <input type="text" class="form-input" id="dispute-item" placeholder="e.g., Late payment on ABC Credit Card">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Update Notes</label>
+                                <textarea class="form-textarea" id="dispute-notes" placeholder="Enter update details..."></textarea>
+                            </div>
+                            <button type="submit" class="admin-btn admin-btn-success">
+                                <i class="fas fa-save"></i>
+                                Update Dispute
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div class="admin-tab-content" id="reports-content">
+                        <form class="admin-form" id="report-form">
+                            <div class="form-group">
+                                <label class="form-label">Select User</label>
+                                <div class="user-search">
+                                    <input type="text" class="form-input" id="user-search-reports" placeholder="Search users by name or email...">
+                                    <div class="user-search-results" id="user-search-results-reports"></div>
+                                </div>
+                                <input type="hidden" id="selected-user-reports">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Report Type</label>
+                                    <select class="form-select" id="report-type">
+                                        <option value="full">Full Credit Report</option>
+                                        <option value="summary">Credit Summary</option>
+                                        <option value="dispute-results">Dispute Results</option>
+                                        <option value="monitoring">Monitoring Report</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Report Date</label>
+                                    <input type="date" class="form-input" id="report-date">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Upload PDF Report</label>
+                                <div class="file-upload-area" id="file-upload-area">
+                                    <div class="file-upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="file-upload-text">Click to upload or drag and drop</div>
+                                    <div class="file-upload-hint">PDF files only, max 10MB</div>
+                                    <input type="file" class="file-input" id="report-file" accept=".pdf">
+                                </div>
+                                <div id="file-info" style="margin-top: 1rem; display: none;">
+                                    <i class="fas fa-file-pdf" style="color: #dc3545;"></i>
+                                    <span id="file-name"></span>
+                                    <button type="button" class="admin-btn admin-btn-secondary" id="remove-file" style="margin-left: 1rem; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                        <i class="fas fa-times"></i>
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Report Notes</label>
+                                <textarea class="form-textarea" id="report-notes" placeholder="Add any notes about this report..."></textarea>
+                            </div>
+                            <button type="submit" class="admin-btn admin-btn-primary">
+                                <i class="fas fa-upload"></i>
+                                Upload Report
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Activity Tab -->
+                    <div class="admin-tab-content" id="activity-content">
+                        <div class="activity-list" id="activity-list">
+                            <!-- Activity items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Initialize the module
+            function init(containerIdOrElement) {
+                console.log('🚀 Initializing Admin Panel Module...');
+                console.log('🚀 Container parameter:', containerIdOrElement);
+                console.log('🚀 Container type:', typeof containerIdOrElement);
+
+                let container;
+
+                // Handle both string ID and DOM element
+                if (typeof containerIdOrElement === 'string') {
+                    console.log('🚀 Container is string ID, finding element');
+                    container = document.getElementById(containerIdOrElement);
+                } else if (containerIdOrElement && containerIdOrElement.nodeType === 1) {
+                    console.log('🚀 Container is DOM element, using directly');
+                    container = containerIdOrElement;
+                } else {
+                    console.error('❌ Invalid container parameter:', containerIdOrElement);
+                    return false;
+                }
+
+                if (!container) {
+                    console.error('❌ Container not found');
+                    return false;
+                }
+
+                console.log('✅ Container found:', container);
+                console.log('✅ Container ID:', container.id);
+
+                // Store the container reference for use in other functions
+                currentContainer = container;
+
+                // Clear any existing content
+                container.innerHTML = '';
+
+                // Create the admin panel HTML
+                container.innerHTML = adminPanelHTML;
+
+                // Set up event listeners and initialize the module
+                setupEventListeners();
+                loadNotifications();
+                loadRecentActivity();
+
+                isInitialized = true;
+                console.log('✅ Admin Panel Module initialized successfully');
+                return true;
+            }
+
+            // Setup event listeners
+            function setupEventListeners() {
+                console.log('🔧 Setting up Admin Panel event listeners');
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for setupEventListeners');
+                    return;
+                }
+
+                // Tab switching
+                const tabButtons = currentContainer.querySelectorAll('.admin-tab');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const tabId = this.getAttribute('data-tab');
+                        switchTab(tabId);
+                    });
+                });
+
+                // User search functionality
+                const userSearch = currentContainer.querySelector('#user-search');
+                if (userSearch) {
+                    userSearch.addEventListener('input', function () {
+                        const searchTerm = this.value.toLowerCase();
+                        const filteredUsers = mockUsers.filter(user =>
+                            user.name.toLowerCase().includes(searchTerm) ||
+                            user.email.toLowerCase().includes(searchTerm)
+                        );
+                        displayUsers(filteredUsers);
+                    });
+                }
+
+                // Form submissions
+                const notificationForm = currentContainer.querySelector('#notification-form');
+                if (notificationForm) {
+                    notificationForm.addEventListener('submit', handleNotificationSubmit);
+                }
+
+                const disputeForm = currentContainer.querySelector('#dispute-form');
+                if (disputeForm) {
+                    disputeForm.addEventListener('submit', handleDisputeSubmit);
+                }
+
+                const reportForm = currentContainer.querySelector('#report-form');
+                if (reportForm) {
+                    reportForm.addEventListener('submit', handleReportSubmit);
+                }
+            }
+
+            // Switch tabs
+            function switchTab(tabId) {
+                console.log('🔧 Switching to admin tab:', tabId);
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for switchTab');
+                    return;
+                }
+
+                console.log('🔧 Current container:', currentContainer);
+                console.log('🔧 Current container ID:', currentContainer.id);
+
+                // Find tab buttons and content containers with CORRECT selectors
+                const tabButtons = currentContainer.querySelectorAll('.admin-tab');
+                const tabContents = currentContainer.querySelectorAll('.admin-tab-content');
+
+                console.log('🔧 Found tab buttons:', tabButtons.length);
+                console.log('🔧 Tab buttons:', Array.from(tabButtons).map(btn => ({
+                    id: btn.id,
+                    dataset: btn.dataset,
+                    text: btn.textContent.trim()
+                })));
+
+                console.log('🔧 Found tab content containers:', tabContents.length);
+                console.log('🔧 Tab contents:', Array.from(tabContents).map(content => ({
+                    id: content.id,
+                    classes: content.className
+                })));
+
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(button => {
+                    button.classList.remove('active');
+                    console.log('🔧 Removed active from button:', button.dataset.tab);
+                });
+
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    console.log('🔧 Removed active from content:', content.id);
+                });
+
+                // Add active class to selected button and content with CORRECT selectors
+                const activeButton = currentContainer.querySelector(`[data-tab="${tabId}"]`);
+                const activeContent = currentContainer.querySelector(`#${tabId}-content`);
+
+                console.log('🔧 Active button found:', !!activeButton, activeButton);
+                console.log('🔧 Active content found:', !!activeContent, activeContent);
+
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                    console.log('🔧 Added active to button:', tabId);
+                } else {
+                    console.error('🔧 Button not found for tab:', tabId);
+                }
+
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                    console.log('🔧 Added active to content:', tabId);
+                    console.log('🔧 Content should now be visible');
+                } else {
+                    console.error('🔧 Content container not found for tab:', tabId);
+                    console.log('🔧 Looking for:', `#${tabId}-content`);
+                    console.log('🔧 Available content containers:', Array.from(currentContainer.querySelectorAll('.admin-tab-content')).map(c => c.id));
+                }
+
+                // Load content for the active tab (if needed)
+                console.log('🔧 Loading content for tab:', tabId);
+                if (tabId === 'notifications') {
+                    loadNotifications();
+                } else if (tabId === 'disputes') {
+                    loadDisputes();
+                } else if (tabId === 'reports') {
+                    loadReports();
+                } else if (tabId === 'activity') {
+                    loadRecentActivity();
+                }
+
+                currentTab = tabId;
+            }
+
+            // Initialize user search functionality
+            function initializeUserSearch() {
+                console.log('🔍 Initializing user search functionality');
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for initializeUserSearch');
+                    return;
+                }
+
+                // Fix: Use querySelector instead of getElementById
+                const userSearchInputs = currentContainer.querySelectorAll('.user-search-input');
+
+                userSearchInputs.forEach(input => {
+                    if (!input) return;
+
+                    input.addEventListener('input', function () {
+                        const searchTerm = this.value.toLowerCase().trim();
+                        console.log('🔍 User search term:', searchTerm);
+
+                        if (searchTerm.length === 0) {
+                            displayUsers([]);
+                            return;
+                        }
+
+                        // Filter users based on search term
+                        const filteredUsers = mockUsers.filter(user =>
+                            user.name.toLowerCase().includes(searchTerm) ||
+                            user.email.toLowerCase().includes(searchTerm)
+                        );
+
+                        console.log('🔍 Filtered users:', filteredUsers);
+                        displayUsers(filteredUsers);
+                    });
+                });
+
+                console.log('✅ User search functionality initialized');
+            }
+
+            // Handle user search
+            function handleUserSearch(query, resultsContainer, inputId) {
+                if (query.length < 2) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+
+                const filteredUsers = mockUsers.filter(user =>
+                    user.name.toLowerCase().includes(query.toLowerCase()) ||
+                    user.email.toLowerCase().includes(query.toLowerCase())
+                );
+
+                if (filteredUsers.length === 0) {
+                    resultsContainer.innerHTML = '<div class="user-search-result">No users found</div>';
+                } else {
+                    resultsContainer.innerHTML = filteredUsers.map(user =>
+                        `<div class="user-search-result" data-user-id="${user.id}" data-user-name="${user.name}" data-user-email="${user.email}">
+                            <strong>${user.name}</strong><br>
+                            <small>${user.email}</small>
+                        </div>`
+                    ).join('');
+
+                    // Add click handlers to results
+                    resultsContainer.querySelectorAll('.user-search-result').forEach(result => {
+                        result.addEventListener('click', function () {
+                            const userId = this.dataset.userId;
+                            const userName = this.dataset.userName;
+                            const userEmail = this.dataset.userEmail;
+
+                            // Update input and hidden field
+                            const input = currentContainer.querySelector(`#${inputId}`);
+                            const hiddenInput = currentContainer.querySelector(`#selected-${inputId.replace('user-search', 'user')}`);
+
+                            input.value = `${userName} (${userEmail})`;
+                            hiddenInput.value = userId;
+
+                            resultsContainer.style.display = 'none';
+                        });
+                    });
+                }
+
+                resultsContainer.style.display = 'block';
+            }
+
+            // Initialize file upload
+            function initializeFileUpload() {
+                const uploadArea = currentContainer.querySelector('#file-upload-area');
+                const fileInput = currentContainer.querySelector('#report-file');
+                const fileInfo = currentContainer.querySelector('#file-info');
+                const fileName = currentContainer.querySelector('#file-name');
+                const removeBtn = currentContainer.querySelector('#remove-file');
+
+                // Click to upload
+                uploadArea.addEventListener('click', () => fileInput.click());
+
+                // Drag and drop
+                uploadArea.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', function (e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+
+                uploadArea.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        handleFileSelect(files[0]);
+                    }
+                });
+
+                // File input change
+                fileInput.addEventListener('change', function () {
+                    if (this.files.length > 0) {
+                        handleFileSelect(this.files[0]);
+                    }
+                });
+
+                // Remove file
+                removeBtn.addEventListener('click', function () {
+                    fileInput.value = '';
+                    fileInfo.style.display = 'none';
+                    uploadArea.style.display = 'block';
+                });
+
+                function handleFileSelect(file) {
+                    if (file.type !== 'application/pdf') {
+                        showMessage('error', 'Please select a PDF file only.');
+                        return;
+                    }
+
+                    if (file.size > 10 * 1024 * 1024) { // 10MB
+                        showMessage('error', 'File size must be less than 10MB.');
+                        return;
+                    }
+
+                    fileName.textContent = file.name;
+                    fileInfo.style.display = 'block';
+                    uploadArea.style.display = 'none';
+                }
+            }
+
+            // Load recent activity
+            function loadRecentActivity() {
+                const activityList = currentContainer.querySelector('#activity-list');
+                if (!activityList) return;
+
+                activityList.innerHTML = recentActivity.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon ${activity.type}">
+                            <i class="fas fa-${getActivityIcon(activity.type)}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-description">${activity.description}</div>
+                        </div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                `).join('');
+            }
+
+            // Handle notification form submission
+            function handleNotificationSubmit(e) {
+                e.preventDefault();
+                console.log('📤 Handling notification submission');
+
+                // Fix: Use querySelector instead of getElementById
+                const typeElement = currentContainer.querySelector('#notification-type');
+                const messageElement = currentContainer.querySelector('#notification-message');
+
+                if (!typeElement || !messageElement) {
+                    showMessage('error', 'Form elements not found.');
+                    return;
+                }
+
+                const type = typeElement.value;
+                const message = messageElement.value;
+
+                if (!type || !message) {
+                    showMessage('error', 'Please fill in all fields.');
+                    return;
+                }
+
+                // Simulate sending notification
+                setTimeout(() => {
+                    showMessage('success', 'Notification sent successfully!');
+                    e.target.reset();
+
+                    // Add to recent activity
+                    addToRecentActivity('notification', 'Notification Sent', `${type} notification sent`, 'Just now');
+                }, 1000);
+            }
+
+            // Handle dispute form submission
+            function handleDisputeSubmit(e) {
+                e.preventDefault();
+
+                // Fix: Use querySelector instead of getElementById
+                const userId = currentContainer.querySelector('#selected-user-disputes')?.value;
+                const bureau = currentContainer.querySelector('#credit-bureau')?.value;
+                const status = currentContainer.querySelector('#dispute-status')?.value;
+                const item = currentContainer.querySelector('#dispute-item')?.value;
+                const notes = currentContainer.querySelector('#dispute-notes')?.value;
+
+                if (!userId || !item || !notes) {
+                    showMessage('error', 'Please fill in all required fields.');
+                    return;
+                }
+
+                // Simulate API call
+                setTimeout(() => {
+                    showMessage('success', 'Dispute status updated successfully!');
+                    e.target.reset();
+
+                    // Add to recent activity
+                    const userName = mockUsers.find(u => u.id == userId)?.name || 'Unknown User';
+                    addToRecentActivity('dispute', 'Dispute Updated', `${item} status changed to ${status} for ${userName}`, 'Just now');
+                }, 1000);
+            }
+
+            // Handle report form submission
+            function handleReportSubmit(e) {
+                e.preventDefault();
+
+                const userId = currentContainer.querySelector('#selected-user-reports')?.value;
+                const reportType = currentContainer.querySelector('#report-type')?.value;
+                const reportDate = currentContainer.querySelector('#report-date')?.value;
+                const file = currentContainer.querySelector('#report-file')?.files[0];
+                const notes = currentContainer.querySelector('#report-notes')?.value;
+
+                if (!userId || !file || !reportDate) {
+                    showMessage('error', 'Please fill in all required fields and select a file.');
+                    return;
+                }
+
+                // Simulate file upload
+                setTimeout(() => {
+                    showMessage('success', 'Credit report uploaded successfully!');
+                    e.target.reset();
+                    currentContainer.querySelector('#file-info').style.display = 'none';
+                    currentContainer.querySelector('#file-upload-area').style.display = 'block';
+
+                    // Add to recent activity
+                    const userName = mockUsers.find(u => u.id == userId)?.name || 'Unknown User';
+                    addToRecentActivity('report', 'Credit Report Uploaded', `New ${reportType} uploaded for ${userName}`, 'Just now');
+                }, 2000);
+            }
+
+            // Show success/error messages
+            function showMessage(type, text) {
+                const messageElement = currentContainer.querySelector(`#admin-${type}-message`);
+                const textElement = currentContainer.querySelector(`#${type}-text`);
+
+                if (messageElement && textElement) {
+                    textElement.textContent = text;
+                    messageElement.classList.add('show');
+
+                    setTimeout(() => {
+                        messageElement.classList.remove('show');
+                    }, 5000);
+                }
+            }
+
+            // Add to recent activity
+            function addToRecentActivity(type, title, description, time) {
+                recentActivity.unshift({ type, title, description, time });
+                if (recentActivity.length > 10) {
+                    recentActivity.pop();
+                }
+                loadRecentActivity();
+            }
+
+            // Reset function
+            function reset() {
+                isInitialized = false;
+                currentTab = 'notifications';
+                currentContainer = null;
+                console.log('Admin Panel Module reset');
+                return true;
+            }
+
+            // Add the missing loadNotifications function
+            function loadNotifications() {
+                console.log('📢 Notifications tab activated - content should already be visible');
+                // The content is already in the HTML, no need to create it dynamically
+            }
+
+            // Also add the missing displayUsers function that's referenced in setupEventListeners
+            function displayUsers(users) {
+                console.log('👥 Displaying users:', users);
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for displayUsers');
+                    return;
+                }
+
+                // Fix: Use querySelector instead of getElementById
+                const userSearchResults = currentContainer.querySelector('#user-search-results');
+                if (userSearchResults && users) {
+                    const resultsHTML = users.map(user => `
+                        <div class="user-search-result" data-user-id="${user.id}">
+                            <span class="user-name">${user.name}</span>
+                            <span class="user-email">${user.email}</span>
+                        </div>
+                    `).join('');
+
+                    userSearchResults.innerHTML = resultsHTML;
+                    userSearchResults.style.display = users.length > 0 ? 'block' : 'none';
+                }
+            }
+
+            // Add the missing getActivityIcon function
+            function getActivityIcon(type) {
+                const icons = {
+                    'notification': 'fas fa-bell',
+                    'dispute': 'fas fa-gavel',
+                    'upload': 'fas fa-upload',
+                    'report': 'fas fa-file-pdf',
+                    'user': 'fas fa-user',
+                    'system': 'fas fa-cog',
+                    'default': 'fas fa-info-circle'
+                };
+
+                return icons[type] || icons['default'];
+            }
+
+            // Also remove the loadDisputes function since the content already exists in the HTML
+            // The content containers are already created in the adminPanelHTML, we just need to show/hide them
+            function loadDisputes() {
+                console.log('📋 Disputes tab activated - content should already be visible');
+                // The content is already in the HTML, no need to create it dynamically
+            }
+
+            function loadReports() {
+                console.log('📄 Reports tab activated - content should already be visible');
+                // The content is already in the HTML, no need to create it dynamically
+            }
+
+            function loadAdminSettings() {
+                console.log('⚙️ Loading admin settings content');
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for loadAdminSettings');
+                    return;
+                }
+
+                const settingsContent = currentContainer.querySelector('#admin-tab-settings');
+                if (settingsContent) {
+                    settingsContent.innerHTML = `
+                        <div class="admin-content-header">
+                            <h3>Admin Settings</h3>
+                            <p>Configure system settings and preferences</p>
+                        </div>
+                        <div class="admin-settings-container">
+                            <div class="settings-section">
+                                <h4>System Configuration</h4>
+                                <div class="setting-item">
+                                    <label>Maintenance Mode</label>
+                                    <input type="checkbox" id="maintenance-mode">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Auto-backup Frequency</label>
+                                    <select id="backup-frequency">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="settings-section">
+                                <h4>Notification Settings</h4>
+                                <div class="setting-item">
+                                    <label>Email Notifications</label>
+                                    <input type="checkbox" id="email-notifications" checked>
+                                </div>
+                                <div class="setting-item">
+                                    <label>SMS Notifications</label>
+                                    <input type="checkbox" id="sms-notifications">
+                                </div>
+                            </div>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary">Save Settings</button>
+                                <button class="btn btn-secondary">Reset to Defaults</button>
+                            </div>
+                        </div>
+                    `;
+                    console.log('✅ Admin settings content loaded');
+                } else {
+                    console.error('❌ Admin settings content container not found');
+                }
+            }
+
+            function loadGenericTabContent(tabId) {
+                console.log('📄 Loading generic content for tab:', tabId);
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for loadGenericTabContent');
+                    return;
+                }
+
+                const tabContent = currentContainer.querySelector(`#admin-tab-${tabId}`);
+                if (tabContent) {
+                    tabContent.innerHTML = `
+                        <div class="admin-content-header">
+                            <h3>${tabId.charAt(0).toUpperCase() + tabId.slice(1)}</h3>
+                            <p>Content for ${tabId} tab</p>
+                        </div>
+                        <div class="admin-generic-content">
+                            <p>This section is under development. Content for the ${tabId} tab will be available soon.</p>
+                        </div>
+                    `;
+                    console.log(`✅ Generic content loaded for ${tabId} tab`);
+                } else {
+                    console.error(`❌ Content container not found for tab: ${tabId}`);
+                }
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                isInitialized: function () {
+                    return isInitialized;
+                }
+            };
+        })();
+
+        // Expose the module globally
+        window.jamAdminPanel = AdminPanelModule;
+
+        // Add a more robust reload mechanism
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                console.log('Page was restored from bfcache, reinitializing Admin Panel module');
+                const container = document.getElementById('admin-panel-container');
+                if (container && window.jamAdminPanel) {
+                    window.jamAdminPanel.init('admin-panel-container');
+                }
+            }
+        });
+
+        // Auto-initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM content loaded, checking for Admin Panel container');
+            const container = document.getElementById('interface-admin-panel-content');
+            if (container && window.jamAdminPanel) {
+                console.log('Found Admin Panel container, initializing');
+                window.jamAdminPanel.init('interface-admin-panel-content');
+            }
+        });
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamAdminPanelLoaded'));
+            console.log('Admin Panel module loaded and event dispatched');
+        }
+    </script>
+</body>
+
+</html>

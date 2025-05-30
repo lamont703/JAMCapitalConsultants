@@ -308,6 +308,207 @@
                 font-size: 1rem;
             }
         }
+
+        /* Payment iframe styles */
+        .full-payment-info {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .full-payment-iframe-container {
+            margin: 1rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .full-payment-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .full-payment-footer p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .full-payment-footer i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .full-cancel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .full-cancel-btn:hover {
+            background: #5a6268;
+        }
+
+        /* Success message styles */
+        .full-success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .full-success-message h4 {
+            color: #28a745;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .full-success-message p {
+            margin-bottom: 1rem;
+            color: #6c757d;
+        }
+
+        /* Modal responsiveness for iframe */
+        @media (max-width: 768px) {
+            .full-payment-iframe-container iframe {
+                height: 500px;
+            }
+
+            .full-modal-content {
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        }
+
+        /* Enhanced modal styles */
+        .plan-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .plan-summary h4 {
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .price-display span {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .plan-features-summary {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .plan-features-summary li {
+            padding: 0.3rem 0;
+            color: #495057;
+        }
+
+        .plan-features-summary i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .payment-security {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-security p {
+            color: #6c757d;
+            margin: 0.3rem 0;
+        }
+
+        .payment-security i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .payment-action-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .payment-note {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .guarantee-text {
+            color: #28a745;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .guarantee-text i {
+            margin-right: 0.5rem;
+        }
+
+        .popup-blocked-message,
+        .payment-status-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .popup-blocked-message ol {
+            text-align: left;
+            max-width: 400px;
+            margin: 1rem auto;
+        }
+
+        .payment-options,
+        .status-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .payment-options a {
+            text-decoration: none;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+
+            .payment-options,
+            .status-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .payment-options button,
+            .status-options button {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
     </style>
 </head>
 
@@ -317,14 +518,14 @@
         const FullServicePlanModule = (function () {
             let isInitialized = false;
             let isModalOpen = false;
-            
+
             // Try to restore state immediately when module is defined
             try {
                 const savedState = sessionStorage.getItem('jamFullServicePlanState');
                 if (savedState) {
                     const parsedState = JSON.parse(savedState);
                     console.log('Restored Full Service Plan state during module definition', parsedState);
-                    
+
                     if (parsedState.isInitialized) {
                         isInitialized = parsedState.isInitialized;
                     }
@@ -447,10 +648,10 @@
 
                 // Mark as initialized
                 isInitialized = true;
-                
+
                 // Save state
                 saveState();
-                
+
                 return true;
             }
 
@@ -490,36 +691,234 @@
                 }
             }
 
-            // Open the modal with payment form
+            // Show the modal with payment options - New Window approach
             function openModal() {
                 const modal = document.getElementById('full-modal');
-                const modalContent = document.getElementById('full-modal-content');
-                const paymentFormContainer = document.getElementById('full-payment-form-container');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    isModalOpen = true;
 
-                if (!modal || !modalContent || !paymentFormContainer) return;
+                    const modalContent = modal.querySelector('.full-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="full-modal-header">
+                                <h3>Complete Your Full-Service Plan Purchase</h3>
+                                <span class="full-modal-close" id="full-modal-close">&times;</span>
+                            </div>
+                            <div class="full-modal-body">
+                                <div class="full-payment-info">
+                                    <div class="plan-summary">
+                                        <h4>Full-Service Credit Repair Plan</h4>
+                                        <div class="price-display">$149<span>/month</span></div>
+                                        <ul class="plan-features-summary">
+                                            <li><i class="fas fa-check"></i> Personal Credit Advisor</li>
+                                            <li><i class="fas fa-check"></i> Unlimited Disputes</li>
+                                            <li><i class="fas fa-check"></i> Credit Monitoring</li>
+                                            <li><i class="fas fa-check"></i> 24/7 Support</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="payment-security">
+                                        <p><i class="fas fa-shield-alt"></i> Secure payment processing</p>
+                                        <p><i class="fas fa-lock"></i> 256-bit SSL encryption</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-action-container">
+                                    <button class="full-submit-btn" id="proceed-to-payment">
+                                        <i class="fas fa-credit-card"></i>
+                                        Proceed to Secure Payment
+                                    </button>
+                                    <p class="payment-note">You'll be redirected to our secure payment processor</p>
+                                </div>
+                                
+                                <div class="full-payment-footer">
+                                    <p class="guarantee-text">
+                                        <i class="fas fa-medal"></i> 
+                                        30-day money-back guarantee
+                                    </p>
+                                    <button class="full-cancel-btn" id="full-cancel-payment">Cancel</button>
+                                </div>
+                            </div>
+                        `;
 
-                // Clone the payment form into the modal
-                modalContent.innerHTML = '';
-                modalContent.appendChild(paymentFormContainer.cloneNode(true));
+                        setupModalEventListeners();
+                    }
 
-                // Show the payment form
-                modalContent.querySelector('#full-payment-form-container').style.display = 'block';
+                    saveState();
+                }
+            }
 
-                // Set up event listeners for the cloned form
-                const paymentForm = modalContent.querySelector('#full-payment-form');
-                if (paymentForm) {
-                    paymentForm.addEventListener('submit', function (e) {
-                        e.preventDefault();
-                        processPayment(modalContent);
+            // Enhanced modal event listeners
+            function setupModalEventListeners() {
+                // Close button
+                const closeBtn = document.getElementById('full-modal-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
+
+                // Cancel button
+                const cancelBtn = document.getElementById('full-cancel-payment');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', closeModal);
+                }
+
+                // Proceed to payment button
+                const proceedBtn = document.getElementById('proceed-to-payment');
+                if (proceedBtn) {
+                    proceedBtn.addEventListener('click', function () {
+                        // Show loading state
+                        proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening secure payment...';
+                        proceedBtn.disabled = true;
+
+                        // Open payment in new window
+                        const paymentWindow = window.open(
+                            'https://link.fastpaydirect.com/payment-link/6820e345082a6fd7e3ee6652',
+                            'payment',
+                            'width=800,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
+                        );
+
+                        // Check if popup was blocked
+                        if (!paymentWindow || paymentWindow.closed || typeof paymentWindow.closed == 'undefined') {
+                            // Popup blocked, show alternative
+                            showPopupBlockedMessage();
+                        } else {
+                            // Monitor the payment window
+                            monitorPaymentWindow(paymentWindow);
+                        }
                     });
                 }
 
-                // Show the modal
-                modal.style.display = 'flex';
-                isModalOpen = true;
-                
-                // Save state
-                saveState();
+                // Close modal when clicking outside
+                const modal = document.getElementById('full-modal');
+                if (modal) {
+                    modal.addEventListener('click', function (e) {
+                        if (e.target === modal) {
+                            closeModal();
+                        }
+                    });
+                }
+            }
+
+            // Handle popup blocked scenario
+            function showPopupBlockedMessage() {
+                const modal = document.getElementById('full-modal');
+                if (modal) {
+                    const modalContent = modal.querySelector('.full-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="full-modal-header">
+                                <h3>Complete Your Payment</h3>
+                                <span class="full-modal-close" id="full-modal-close">&times;</span>
+                            </div>
+                            <div class="full-modal-body">
+                                <div class="popup-blocked-message">
+                                    <i class="fas fa-exclamation-triangle" style="color: #ffc107; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <h4>Popup Blocked</h4>
+                                    <p>Your browser blocked the payment window. Please:</p>
+                                    <ol>
+                                        <li>Allow popups for this site, or</li>
+                                        <li>Click the button below to open payment in a new tab</li>
+                                    </ol>
+                                    
+                                    <div class="payment-options">
+                                        <a href="https://link.fastpaydirect.com/payment-link/6820e345082a6fd7e3ee6652" 
+                                           target="_blank" 
+                                           class="full-submit-btn">
+                                            <i class="fas fa-external-link-alt"></i>
+                                            Open Payment in New Tab
+                                        </a>
+                                        <button class="full-cancel-btn" id="try-again-btn">Try Again</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add event listeners
+                        const closeBtn = document.getElementById('full-modal-close');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', closeModal);
+                        }
+
+                        const tryAgainBtn = document.getElementById('try-again-btn');
+                        if (tryAgainBtn) {
+                            tryAgainBtn.addEventListener('click', function () {
+                                openModal(); // Restart the process
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Monitor payment window for completion
+            function monitorPaymentWindow(paymentWindow) {
+                const checkClosed = setInterval(function () {
+                    if (paymentWindow.closed) {
+                        clearInterval(checkClosed);
+
+                        // Show completion message
+                        showPaymentCompletionMessage();
+                    }
+                }, 1000);
+
+                // Also close our modal since user is in payment flow
+                closeModal();
+            }
+
+            // Show payment completion message
+            function showPaymentCompletionMessage() {
+                const modal = document.getElementById('full-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+
+                    const modalContent = modal.querySelector('.full-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="full-modal-header">
+                                <h3>Payment Status</h3>
+                                <span class="full-modal-close" id="full-modal-close">&times;</span>
+                            </div>
+                            <div class="full-modal-body">
+                                <div class="payment-status-message">
+                                    <i class="fas fa-info-circle" style="color: #09ccfc; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <h4>Payment Window Closed</h4>
+                                    <p>If you completed your payment, you should receive a confirmation email shortly.</p>
+                                    <p>If you didn't complete the payment, you can try again anytime.</p>
+                                    
+                                    <div class="status-options">
+                                        <button class="full-submit-btn" id="payment-completed-btn">
+                                            <i class="fas fa-check"></i>
+                                            I Completed Payment
+                                        </button>
+                                        <button class="full-cancel-btn" id="try-payment-again-btn">
+                                            Try Payment Again
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add event listeners
+                        const closeBtn = document.getElementById('full-modal-close');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', closeModal);
+                        }
+
+                        const completedBtn = document.getElementById('payment-completed-btn');
+                        if (completedBtn) {
+                            completedBtn.addEventListener('click', function () {
+                                showPaymentSuccess();
+                            });
+                        }
+
+                        const tryAgainBtn = document.getElementById('try-payment-again-btn');
+                        if (tryAgainBtn) {
+                            tryAgainBtn.addEventListener('click', function () {
+                                openModal(); // Restart the process
+                            });
+                        }
+                    }
+                }
             }
 
             // Close the modal
@@ -528,7 +927,7 @@
                 if (modal) {
                     modal.style.display = 'none';
                     isModalOpen = false;
-                    
+
                     // Save state
                     saveState();
                 }
@@ -579,7 +978,49 @@
                     }
                 }, 2000);
             }
-            
+
+            // Show payment success message
+            function showPaymentSuccess() {
+                const modal = document.getElementById('full-modal');
+                if (modal) {
+                    const modalContent = modal.querySelector('.full-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="full-modal-header">
+                                <h3>Payment Successful!</h3>
+                                <span class="full-modal-close" id="full-modal-close">&times;</span>
+                            </div>
+                            <div class="full-modal-body">
+                                <div class="full-success-message">
+                                    <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <h4>Thank you for your purchase!</h4>
+                                    <p>Your Full-Service Credit Repair Plan is now active.</p>
+                                    <p>A credit advisor will contact you within 24 hours to get started on your credit repair journey.</p>
+                                    <p>You should receive a confirmation email shortly.</p>
+                                    <button class="full-submit-btn" id="full-close-success-btn">Continue to Dashboard</button>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add event listener to close button
+                        const closeBtn = document.getElementById('full-close-success-btn');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', function () {
+                                closeModal();
+                                // Optionally redirect to dashboard or refresh page
+                                // window.location.reload();
+                            });
+                        }
+
+                        // Add event listener to X button
+                        const xCloseBtn = document.getElementById('full-modal-close');
+                        if (xCloseBtn) {
+                            xCloseBtn.addEventListener('click', closeModal);
+                        }
+                    }
+                }
+            }
+
             // Save state to sessionStorage
             function saveState() {
                 try {
@@ -632,9 +1073,9 @@
 
         // Expose the module globally
         window.jamFullServicePlan = FullServicePlanModule;
-        
+
         // Add a more robust reload mechanism
-        window.addEventListener('pageshow', function(event) {
+        window.addEventListener('pageshow', function (event) {
             // pageshow fires when the page is shown, including from bfcache
             if (event.persisted) {
                 console.log('Page was restored from bfcache, reinitializing Full Service Plan module');
@@ -644,9 +1085,9 @@
                 }
             }
         });
-        
+
         // Auto-initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('DOM content loaded, checking for Full Service plan container');
             const container = document.getElementById('fullservice-plan-container');
             if (container && window.jamFullServicePlan) {

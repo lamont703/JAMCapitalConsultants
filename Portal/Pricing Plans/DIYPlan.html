@@ -23,108 +23,160 @@
             padding: 20px;
         }
 
-        /* DIY Plan Card Styles */
-        .diy-plan-card {
+        /* DIY Container Styles */
+        .diy-container {
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .diy-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .diy-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .diy-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* DIY Plan Card */
+        .diy-plan-card {
+            border: 2px solid #09ccfc;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .diy-plan-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .diy-plan-header {
-            background-color: #e6f9ff;
             padding: 1.5rem;
+            background: #e6f9ff;
             text-align: center;
-            border-bottom: 1px solid #dee2e6;
         }
 
         .diy-plan-name {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #09ccfc;
             margin-bottom: 0.5rem;
         }
 
         .diy-plan-price {
-            font-size: 2rem;
+            font-size: 3rem;
             font-weight: 700;
             color: #343a40;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
 
-        .diy-plan-price-period {
-            font-size: 1rem;
-            font-weight: normal;
+        .diy-plan-price span {
+            font-size: 1.2rem;
             color: #6c757d;
         }
 
         .diy-plan-target {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #6c757d;
             font-style: italic;
         }
 
         .diy-plan-body {
-            padding: 1.5rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+            padding: 2rem;
         }
 
         .diy-plan-description {
-            margin-bottom: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
             color: #6c757d;
+            font-size: 1.1rem;
         }
 
         .diy-plan-features {
             list-style: none;
-            margin-bottom: 1.5rem;
-            flex-grow: 1;
+            margin-bottom: 2rem;
         }
 
         .diy-plan-feature {
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            padding: 0.5rem 0;
         }
 
         .diy-plan-feature i {
             color: #09ccfc;
-            margin-right: 0.5rem;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            width: 20px;
+        }
+
+        .diy-plan-feature span {
             font-size: 1rem;
+            color: #495057;
         }
 
         .diy-plan-cta {
-            margin-top: auto;
+            text-align: center;
+            margin-top: 2rem;
         }
 
         .diy-select-btn {
-            background-color: #09ccfc;
+            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
             font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
         }
 
         .diy-select-btn:hover {
-            background-color: #08b5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.4);
         }
 
-        /* DIY Plan Modal Styles */
+        .diy-guarantee {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .diy-guarantee i {
+            color: #28a745;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .diy-guarantee-text {
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
         .diy-modal {
             display: none;
             position: fixed;
@@ -136,33 +188,32 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .diy-modal-content {
             background-color: white;
-            border-radius: 10px;
+            border-radius: 12px;
             max-width: 600px;
-            width: 90%;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .diy-modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #dee2e6;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #e6f9ff;
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
         }
 
-        .diy-modal-title {
+        .diy-modal-header h3 {
+            color: #09ccfc;
             font-size: 1.5rem;
             font-weight: 700;
-            color: #09ccfc;
-            margin: 0;
         }
 
         .diy-modal-close {
@@ -171,267 +222,322 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: #6c757d;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .diy-modal-close:hover {
-            color: #343a40;
+            color: #495057;
         }
 
         .diy-modal-body {
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
-        .diy-plan-details {
-            margin-bottom: 2rem;
-        }
-
-        .diy-plan-price {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #343a40;
-            margin-bottom: 1rem;
-        }
-
-        .diy-plan-description {
-            margin-bottom: 1.5rem;
-            color: #6c757d;
-        }
-
-        .diy-plan-features {
-            list-style: none;
-            margin-bottom: 2rem;
-        }
-
-        .diy-plan-features li {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .diy-plan-features i {
-            color: #28a745;
-            margin-right: 0.5rem;
-            margin-top: 0.3rem;
-        }
-
-        .diy-payment-options {
-            margin-bottom: 1.5rem;
-        }
-
-        .diy-payment-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .diy-payment-plans {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .diy-payment-plan {
-            flex: 1 0 200px;
-            border: 1px solid #dee2e6;
+        /* Plan summary styles */
+        .plan-summary {
+            background: #f8f9fa;
             border-radius: 8px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
 
-        .diy-payment-plan:hover {
-            border-color: #09ccfc;
-            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
-        }
-
-        .diy-payment-plan.selected {
-            border-color: #09ccfc;
-            background-color: #e6f9ff;
-        }
-
-        .diy-payment-plan-name {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .diy-payment-plan-price {
-            font-size: 1.2rem;
-            font-weight: 700;
+        .plan-summary h4 {
             color: #09ccfc;
             margin-bottom: 0.5rem;
+            font-size: 1.3rem;
         }
 
-        .diy-payment-plan-details {
-            font-size: 0.9rem;
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .price-display span {
+            font-size: 1rem;
             color: #6c757d;
         }
 
-        .diy-checkout-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background-color: #09ccfc;
+        .plan-features-summary {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .plan-features-summary li {
+            padding: 0.3rem 0;
+            color: #495057;
+        }
+
+        .plan-features-summary i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .payment-security {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-security p {
+            color: #6c757d;
+            margin: 0.3rem 0;
+        }
+
+        .payment-security i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .payment-action-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .payment-note {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .diy-submit-btn {
+            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            padding: 1rem 2rem;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
         }
 
-        .diy-checkout-btn:hover {
-            background-color: #08b6e2;
+        .diy-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.4);
         }
 
-        .diy-guarantee {
-            display: flex;
-            align-items: center;
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: #f8f9fa;
+        .diy-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .diy-cancel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
             border-radius: 5px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
         }
 
-        .diy-guarantee i {
-            font-size: 2rem;
+        .diy-cancel-btn:hover {
+            background: #5a6268;
+        }
+
+        .diy-payment-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .guarantee-text {
             color: #28a745;
-            margin-right: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
         }
 
-        .diy-guarantee-text {
-            font-size: 0.9rem;
+        .guarantee-text i {
+            margin-right: 0.5rem;
         }
 
-        .diy-guarantee-text strong {
-            display: block;
-            margin-bottom: 0.3rem;
+        /* Popup blocked and status message styles */
+        .popup-blocked-message,
+        .payment-status-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .popup-blocked-message ol {
+            text-align: left;
+            max-width: 400px;
+            margin: 1rem auto;
+        }
+
+        .payment-options,
+        .status-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .payment-options a {
+            text-decoration: none;
+        }
+
+        /* Success message styles */
+        .diy-success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .diy-success-message h4 {
+            color: #28a745;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .diy-success-message p {
+            margin-bottom: 1rem;
+            color: #6c757d;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .diy-container {
+                padding: 1rem;
+            }
+
+            .diy-title {
+                font-size: 1.5rem;
+            }
+
+            .diy-plan-price {
+                font-size: 2.5rem;
+            }
+
+            .diy-modal-content {
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .payment-options,
+            .status-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .payment-options button,
+            .status-options button {
+                width: 100%;
+                max-width: 250px;
+            }
         }
     </style>
 </head>
 
 <body>
     <script>
-        // Self-executing function to create the module
         const DIYPlanModule = (function () {
             let initialized = false;
-            let selectedPlan = 'monthly'; // Default to monthly plan
+            let isModalOpen = false;
 
-            // Payment links for different plans
-            const PAYMENT_LINKS = {
-                monthly: 'https://checkout.jamcreditrepair.com/diy-monthly',
-                quarterly: 'https://checkout.jamcreditrepair.com/diy-quarterly',
-                annual: 'https://checkout.jamcreditrepair.com/diy-annual'
-            };
+            // Payment link for DIY Plan
+            const PAYMENT_LINK = 'https://link.fastpaydirect.com/payment-link/6837d070edf79f9332afaf20';
 
-            // Try to restore state immediately when module is defined
-            try {
-                const savedState = sessionStorage.getItem('jamDIYPlanState');
-                if (savedState) {
-                    const parsedState = JSON.parse(savedState);
-                    console.log('Restored DIY Plan state during module definition', parsedState);
+            // HTML template for the DIY plan
+            const diyPlanHTML = `
+                <div class="diy-container">
+                    <div class="diy-header">
+                        <h2 class="diy-title">DIY Credit Repair Plan</h2>
+                        <p class="diy-subtitle">Take control of your credit repair journey with our powerful self-service tools and comprehensive resources.</p>
+                    </div>
 
-                    if (parsedState.selectedPlan) {
-                        selectedPlan = parsedState.selectedPlan;
-                    }
-                    if (parsedState.initialized) {
-                        initialized = parsedState.initialized;
-                    }
-                }
-            } catch (e) {
-                console.error('Error restoring DIY Plan state during definition:', e);
-            }
+                    <div class="diy-plan-card">
+                        <div class="diy-plan-header">
+                            <h3 class="diy-plan-name">DIY Plan</h3>
+                            <div class="diy-plan-price">$79<span>/month</span></div>
+                            <p class="diy-plan-target">Perfect for self-motivated individuals</p>
+                        </div>
 
+                        <div class="diy-plan-body">
+                            <p class="diy-plan-description">
+                                Empower yourself with professional-grade credit repair tools and step-by-step guidance to improve your credit score on your own timeline.
+                            </p>
+
+                            <ul class="diy-plan-features">
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-robot"></i>
+                                    <span>Full access to JAM Dispute Bot</span>
+                                </li>
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Generate custom dispute letters</span>
+                                </li>
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Track dispute progress & results</span>
+                                </li>
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Credit score monitoring & alerts</span>
+                                </li>
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-book"></i>
+                                    <span>Self-guided credit repair education</span>
+                                </li>
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-tools"></i>
+                                    <span>Professional dispute templates</span>
+                                </li>
+                                <li class="diy-plan-feature">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Automated follow-up reminders</span>
+                                </li>
+                            </ul>
+
+                            <div class="diy-plan-cta">
+                                <button class="diy-select-btn" id="diy-select-btn">Get Started Now</button>
+                            </div>
+
+                            <div class="diy-guarantee">
+                                <i class="fas fa-medal"></i>
+                                <div class="diy-guarantee-text">
+                                    <strong>30-Day Money-Back Guarantee</strong><br>
+                                    If you're not satisfied with our service within the first 30 days, we'll refund your payment in full.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div id="diy-modal" class="diy-modal">
+                        <div class="diy-modal-content">
+                            <!-- Modal content will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Initialize the DIY plan module
             function init(containerId) {
+                console.log('Initializing DIY Plan module...');
+
                 const container = document.getElementById(containerId);
                 if (!container) {
                     console.error(`Container ${containerId} not found`);
                     return false;
                 }
 
-                console.log('Initializing DIY Plan Module, initialized:', initialized, 'selectedPlan:', selectedPlan);
-
-                // Create the modal structure
-                container.innerHTML = `
-                    <div class="diy-plan-card">
-                        <div class="diy-plan-header">
-                            <h3 class="diy-plan-name">DIY Plan</h3>
-                            <div class="diy-plan-price">$49-$79<span class="diy-plan-price-period">/month</span></div>
-                            <div class="diy-plan-target">Perfect for self-starters</div>
-                        </div>
-                        <div class="diy-plan-body">
-                            <div class="diy-plan-description">
-                                Take control of your credit repair journey with our powerful self-service tools.
-                            </div>
-                            <ul class="diy-plan-features">
-                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Full access to JAM Dispute Bot</li>
-                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Generate custom dispute letters</li>
-                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Track dispute progress</li>
-                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Credit score monitoring</li>
-                                <li class="diy-plan-feature"><i class="fas fa-check-circle"></i> Self-guided credit repair</li>
-                            </ul>
-                            <div class="diy-plan-cta">
-                                <button class="diy-select-btn" id="diy-select-btn">Start JAM Engine</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="diy-modal" class="diy-modal">
-                        <div class="diy-modal-content">
-                            <div class="diy-modal-header">
-                                <h3 class="diy-modal-title">DIY Plan - Take Control of Your Credit</h3>
-                                <button class="diy-modal-close">&times;</button>
-                            </div>
-                            <div class="diy-modal-body">
-                                <div class="diy-plan-details">
-                                    <div class="diy-plan-price">$49-$79<span style="font-size: 1rem; font-weight: normal; color: #6c757d;">/month</span></div>
-                                    <div class="diy-plan-description">
-                                        Take control of your credit repair journey with our powerful self-service tools.
-                                    </div>
-                                    <ul class="diy-plan-features">
-                                        <li><i class="fas fa-check-circle"></i> Full access to JAM Dispute Bot</li>
-                                        <li><i class="fas fa-check-circle"></i> Generate custom dispute letters</li>
-                                        <li><i class="fas fa-check-circle"></i> Track dispute progress</li>
-                                        <li><i class="fas fa-check-circle"></i> Credit score monitoring</li>
-                                        <li><i class="fas fa-check-circle"></i> Self-guided credit repair</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="diy-payment-options">
-                                    <h4 class="diy-payment-title">Choose Your Payment Plan</h4>
-                                    <div class="diy-payment-plans">
-                                        <div class="diy-payment-plan ${selectedPlan === 'monthly' ? 'selected' : ''}" data-plan="monthly">
-                                            <div class="diy-payment-plan-name">Monthly</div>
-                                            <div class="diy-payment-plan-price">$79/month</div>
-                                            <div class="diy-payment-plan-details">Pay month-to-month</div>
-                                        </div>
-                                        <div class="diy-payment-plan ${selectedPlan === 'quarterly' ? 'selected' : ''}" data-plan="quarterly">
-                                            <div class="diy-payment-plan-name">Quarterly</div>
-                                            <div class="diy-payment-plan-price">$59/month</div>
-                                            <div class="diy-payment-plan-details">$177 billed every 3 months</div>
-                                        </div>
-                                        <div class="diy-payment-plan ${selectedPlan === 'annual' ? 'selected' : ''}" data-plan="annual">
-                                            <div class="diy-payment-plan-name">Annual</div>
-                                            <div class="diy-payment-plan-price">$49/month</div>
-                                            <div class="diy-payment-plan-details">$588 billed annually (Save $360)</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <button id="diy-checkout-btn" class="diy-checkout-btn">Complete Purchase</button>
-                                
-                                <div class="diy-guarantee">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <div class="diy-guarantee-text">
-                                        <strong>100% Money-Back Guarantee</strong>
-                                        If you're not satisfied with our service within the first 30 days, we'll refund your payment in full.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                // Insert the HTML
+                container.innerHTML = diyPlanHTML;
 
                 // Set up event listeners
                 setupEventListeners(container);
@@ -442,10 +548,11 @@
                 // Save state
                 saveState();
 
+                console.log('DIY Plan module initialized successfully');
                 return true;
             }
 
-            // Set up event listeners for the modal
+            // Set up event listeners
             function setupEventListeners(container) {
                 // Select button
                 const selectBtn = container.querySelector('#diy-select-btn');
@@ -453,11 +560,12 @@
                     selectBtn.addEventListener('click', openModal);
                 }
 
-                // Close button
-                const closeBtn = container.querySelector('.diy-modal-close');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', closeModal);
-                }
+                // Close button (will be added dynamically)
+                container.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('diy-modal-close')) {
+                        closeModal();
+                    }
+                });
 
                 // Close when clicking outside the modal content
                 const modal = container.querySelector('#diy-modal');
@@ -468,45 +576,268 @@
                         }
                     });
                 }
+            }
 
-                // Payment plan selection
-                const paymentPlans = container.querySelectorAll('.diy-payment-plan');
-                paymentPlans.forEach(plan => {
-                    plan.addEventListener('click', function () {
-                        // Remove selected class from all plans
-                        paymentPlans.forEach(p => p.classList.remove('selected'));
+            // Show the modal with payment options
+            function openModal() {
+                const modal = document.getElementById('diy-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    isModalOpen = true;
 
-                        // Add selected class to clicked plan
-                        this.classList.add('selected');
+                    const modalContent = modal.querySelector('.diy-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="diy-modal-header">
+                                <h3>Complete Your DIY Plan Purchase</h3>
+                                <span class="diy-modal-close">&times;</span>
+                            </div>
+                            <div class="diy-modal-body">
+                                <div class="diy-payment-info">
+                                    <div class="plan-summary">
+                                        <h4>DIY Credit Repair Plan</h4>
+                                        <div class="price-display">$79<span>/month</span></div>
+                                        <ul class="plan-features-summary">
+                                            <li><i class="fas fa-check"></i> JAM Dispute Bot Access</li>
+                                            <li><i class="fas fa-check"></i> Custom Dispute Letters</li>
+                                            <li><i class="fas fa-check"></i> Progress Tracking</li>
+                                            <li><i class="fas fa-check"></i> Credit Monitoring</li>
+                                            <li><i class="fas fa-check"></i> Self-Guided Tools</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="payment-security">
+                                        <p><i class="fas fa-shield-alt"></i> Secure payment processing</p>
+                                        <p><i class="fas fa-lock"></i> 256-bit SSL encryption</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-action-container">
+                                    <button class="diy-submit-btn" id="proceed-to-payment">
+                                        <i class="fas fa-credit-card"></i>
+                                        Proceed to Secure Payment
+                                    </button>
+                                    <p class="payment-note">You'll be redirected to our secure payment processor</p>
+                                </div>
+                                
+                                <div class="diy-payment-footer">
+                                    <p class="guarantee-text">
+                                        <i class="fas fa-medal"></i> 
+                                        30-day money-back guarantee
+                                    </p>
+                                    <button class="diy-cancel-btn" id="diy-cancel-payment">Cancel</button>
+                                </div>
+                            </div>
+                        `;
 
-                        // Update selected plan
-                        selectedPlan = this.dataset.plan;
+                        setupModalEventListeners();
+                    }
 
-                        // Save state after selection
-                        saveState();
-                    });
-                });
+                    saveState();
+                }
+            }
 
-                // Checkout button
-                const checkoutBtn = container.querySelector('#diy-checkout-btn');
-                if (checkoutBtn) {
-                    checkoutBtn.addEventListener('click', function () {
-                        // Redirect to payment link based on selected plan
-                        const paymentLink = PAYMENT_LINKS[selectedPlan];
-                        if (paymentLink) {
-                            window.open(paymentLink, '_blank');
+            // Setup modal event listeners
+            function setupModalEventListeners() {
+                // Close button
+                const closeBtn = document.getElementById('diy-modal-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
+
+                // Cancel button
+                const cancelBtn = document.getElementById('diy-cancel-payment');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', closeModal);
+                }
+
+                // Proceed to payment button
+                const proceedBtn = document.getElementById('proceed-to-payment');
+                if (proceedBtn) {
+                    proceedBtn.addEventListener('click', function () {
+                        // Show loading state
+                        proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening secure payment...';
+                        proceedBtn.disabled = true;
+
+                        // Open payment in new window
+                        const paymentWindow = window.open(
+                            PAYMENT_LINK,
+                            'payment',
+                            'width=800,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
+                        );
+
+                        // Check if popup was blocked
+                        if (!paymentWindow || paymentWindow.closed || typeof paymentWindow.closed == 'undefined') {
+                            // Popup blocked, show alternative
+                            showPopupBlockedMessage();
                         } else {
-                            console.error('Payment link not found for plan:', selectedPlan);
+                            // Monitor the payment window
+                            monitorPaymentWindow(paymentWindow);
                         }
                     });
                 }
             }
 
-            // Open the modal
-            function openModal() {
+            // Handle popup blocked scenario
+            function showPopupBlockedMessage() {
+                const modal = document.getElementById('diy-modal');
+                if (modal) {
+                    const modalContent = modal.querySelector('.diy-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="diy-modal-header">
+                                <h3>Complete Your Payment</h3>
+                                <span class="diy-modal-close">&times;</span>
+                            </div>
+                            <div class="diy-modal-body">
+                                <div class="popup-blocked-message">
+                                    <i class="fas fa-exclamation-triangle" style="color: #ffc107; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <h4>Popup Blocked</h4>
+                                    <p>Your browser blocked the payment window. Please:</p>
+                                    <ol>
+                                        <li>Allow popups for this site, or</li>
+                                        <li>Click the button below to open payment in a new tab</li>
+                                    </ol>
+                                    
+                                    <div class="payment-options">
+                                        <a href="${PAYMENT_LINK}" 
+                                           target="_blank" 
+                                           class="diy-submit-btn">
+                                            <i class="fas fa-external-link-alt"></i>
+                                            Open Payment in New Tab
+                                        </a>
+                                        <button class="diy-cancel-btn" id="try-again-btn">Try Again</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add event listeners
+                        const closeBtn = document.querySelector('.diy-modal-close');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', closeModal);
+                        }
+
+                        const tryAgainBtn = document.getElementById('try-again-btn');
+                        if (tryAgainBtn) {
+                            tryAgainBtn.addEventListener('click', function () {
+                                openModal(); // Restart the process
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Monitor payment window for completion
+            function monitorPaymentWindow(paymentWindow) {
+                const checkClosed = setInterval(function () {
+                    if (paymentWindow.closed) {
+                        clearInterval(checkClosed);
+
+                        // Show completion message
+                        showPaymentCompletionMessage();
+                    }
+                }, 1000);
+
+                // Also close our modal since user is in payment flow
+                closeModal();
+            }
+
+            // Show payment completion message
+            function showPaymentCompletionMessage() {
                 const modal = document.getElementById('diy-modal');
                 if (modal) {
                     modal.style.display = 'flex';
+
+                    const modalContent = modal.querySelector('.diy-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="diy-modal-header">
+                                <h3>Payment Status</h3>
+                                <span class="diy-modal-close">&times;</span>
+                            </div>
+                            <div class="diy-modal-body">
+                                <div class="payment-status-message">
+                                    <i class="fas fa-info-circle" style="color: #09ccfc; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <h4>Payment Window Closed</h4>
+                                    <p>If you completed your payment, you should receive a confirmation email shortly.</p>
+                                    <p>If you didn't complete the payment, you can try again anytime.</p>
+                                    
+                                    <div class="status-options">
+                                        <button class="diy-submit-btn" id="payment-completed-btn">
+                                            <i class="fas fa-check"></i>
+                                            I Completed Payment
+                                        </button>
+                                        <button class="diy-cancel-btn" id="try-payment-again-btn">
+                                            Try Payment Again
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add event listeners
+                        const closeBtn = document.querySelector('.diy-modal-close');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', closeModal);
+                        }
+
+                        const completedBtn = document.getElementById('payment-completed-btn');
+                        if (completedBtn) {
+                            completedBtn.addEventListener('click', function () {
+                                showPaymentSuccess();
+                            });
+                        }
+
+                        const tryAgainBtn = document.getElementById('try-payment-again-btn');
+                        if (tryAgainBtn) {
+                            tryAgainBtn.addEventListener('click', function () {
+                                openModal(); // Restart the process
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Show payment success message
+            function showPaymentSuccess() {
+                const modal = document.getElementById('diy-modal');
+                if (modal) {
+                    const modalContent = modal.querySelector('.diy-modal-content');
+                    if (modalContent) {
+                        modalContent.innerHTML = `
+                            <div class="diy-modal-header">
+                                <h3>Payment Successful!</h3>
+                                <span class="diy-modal-close">&times;</span>
+                            </div>
+                            <div class="diy-modal-body">
+                                <div class="diy-success-message">
+                                    <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <h4>Thank you for your purchase!</h4>
+                                    <p>Your DIY Credit Repair Plan is now active.</p>
+                                    <p>You now have access to all DIY tools including the JAM Dispute Bot, custom letter generator, and progress tracking.</p>
+                                    <p>You should receive a confirmation email with login instructions shortly.</p>
+                                    <button class="diy-submit-btn" id="diy-close-success-btn">Continue to Dashboard</button>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add event listener to close button
+                        const closeBtn = document.getElementById('diy-close-success-btn');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', function () {
+                                closeModal();
+                                // Optionally redirect to dashboard or refresh page
+                                // window.location.reload();
+                            });
+                        }
+
+                        // Add event listener to X button
+                        const xCloseBtn = document.querySelector('.diy-modal-close');
+                        if (xCloseBtn) {
+                            xCloseBtn.addEventListener('click', closeModal);
+                        }
+                    }
                 }
             }
 
@@ -515,15 +846,17 @@
                 const modal = document.getElementById('diy-modal');
                 if (modal) {
                     modal.style.display = 'none';
+                    isModalOpen = false;
+                    saveState();
                 }
             }
 
-            // Add this function to save state to sessionStorage
+            // Save state to sessionStorage
             function saveState() {
                 try {
                     const state = {
-                        selectedPlan: selectedPlan,
-                        initialized: initialized
+                        initialized: initialized,
+                        isModalOpen: isModalOpen
                     };
                     sessionStorage.setItem('jamDIYPlanState', JSON.stringify(state));
                     console.log('Saved DIY Plan state to session storage', state);
@@ -535,6 +868,7 @@
             // Reset initialization state (for reloading)
             function reset() {
                 initialized = false;
+                isModalOpen = false;
                 try {
                     sessionStorage.removeItem('jamDIYPlanState');
                 } catch (e) {
@@ -543,22 +877,31 @@
                 return true;
             }
 
-            // Get the selected plan
-            function getSelectedPlan() {
-                return selectedPlan;
-            }
-
             // Public API
             return {
                 init: init,
-                openModal: openModal,
-                closeModal: closeModal,
+                openModal: function () {
+                    if (initialized) {
+                        openModal();
+                        return true;
+                    }
+                    return false;
+                },
+                closeModal: function () {
+                    if (initialized && isModalOpen) {
+                        closeModal();
+                        return true;
+                    }
+                    return false;
+                },
                 reset: reset,
-                getSelectedPlan: getSelectedPlan
+                isModalOpen: function () {
+                    return isModalOpen;
+                }
             };
         })();
 
-        // Expose the module globally - FIXED
+        // Expose the module globally
         window.jamDIYPlan = DIYPlanModule;
 
         // Add a more robust reload mechanism

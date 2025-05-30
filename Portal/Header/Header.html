@@ -327,57 +327,146 @@
             function updateHeaderWithUserData() {
                 console.log('🔄 Updating header with user data...');
 
-                // Get user data from localStorage
-                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                console.log('📊 User data from localStorage:', userData);
-
-                // Check if user is logged in
-                if (!userData || !userData.email) {
-                    console.log('❌ No user data found, showing login state');
+                // Get user data from localStorage with error handling
+                let userData = {};
+                try {
+                    const storedData = localStorage.getItem('userData');
+                    if (storedData) {
+                        userData = JSON.parse(storedData);
+                        console.log('📊 User data from localStorage:', userData);
+                    } else {
+                        console.log('ℹ️ No userData found in localStorage');
+                    }
+                } catch (error) {
+                    console.error('❌ Error parsing userData from localStorage:', error);
                     showLoginState();
                     return;
                 }
 
-                // Update user info elements with real data
-                const userNameElement = document.getElementById('userName');
-                const userEmailElement = document.getElementById('userEmail');
-                const userCompanyElement = document.getElementById('userCompany');
-                const userPhoneElement = document.getElementById('userPhone');
-
-                // Update name (fallback to email if no name)
-                if (userNameElement) {
-                    userNameElement.textContent = userData.name || userData.email.split('@')[0] || 'User';
+                // Check if user is logged in
+                if (!userData || !userData.email) {
+                    console.log('❌ No valid user data found, showing login state');
+                    showLoginState();
+                    return;
                 }
 
-                // Update email
-                if (userEmailElement) {
-                    userEmailElement.textContent = userData.email || '';
-                }
+                // Wait for DOM elements to be available
+                setTimeout(() => {
+                    // Get the display name
+                    const displayName = userData.firstName && userData.lastName
+                        ? `${userData.firstName} ${userData.lastName}`
+                        : userData.name || userData.firstName || userData.lastName || userData.email.split('@')[0] || 'User';
 
-                // Update company (show if available)
-                if (userCompanyElement) {
-                    if (userData.company) {
-                        userCompanyElement.textContent = userData.company;
-                        userCompanyElement.style.display = 'block';
+                    // Update header user name (in the trigger area)
+                    const headerUserName = document.getElementById('header-userName');
+                    if (headerUserName) {
+                        headerUserName.textContent = displayName;
+                        console.log('📝 Updated header-userName:', displayName);
                     } else {
-                        userCompanyElement.style.display = 'none';
+                        console.log('⚠️ header-userName element not found');
                     }
-                }
 
-                // Update phone (show if available)
-                if (userPhoneElement) {
-                    if (userData.phone) {
-                        userPhoneElement.textContent = userData.phone;
-                        userPhoneElement.style.display = 'block';
+                    // Update user menu name (in the dropdown)
+                    const headerUserMenuName = document.getElementById('header-userMenuName');
+                    if (headerUserMenuName) {
+                        headerUserMenuName.textContent = displayName;
+                        console.log('📝 Updated header-userMenuName:', displayName);
                     } else {
-                        userPhoneElement.style.display = 'none';
+                        console.log('⚠️ header-userMenuName element not found');
                     }
-                }
 
-                // Show user menu and hide login button
-                showUserMenu();
+                    // Update user menu email (in the dropdown)
+                    const headerUserMenuEmail = document.getElementById('header-userMenuEmail');
+                    if (headerUserMenuEmail) {
+                        headerUserMenuEmail.textContent = userData.email;
+                        console.log('📧 Updated header-userMenuEmail:', userData.email);
+                    } else {
+                        console.log('⚠️ header-userMenuEmail element not found');
+                    }
 
-                console.log('✅ Header updated with user data');
+                    // Update user avatar/initials
+                    const headerUserAvatar = document.getElementById('header-userAvatar');
+                    if (headerUserAvatar) {
+                        if (userData.profilePicture) {
+                            // If user has a profile picture, show it
+                            headerUserAvatar.innerHTML = `<img src="${userData.profilePicture}" alt="Profile Picture" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                        } else {
+                            // Show initials if no profile picture
+                            const firstName = userData.firstName || userData.name?.split(' ')[0] || userData.email.split('@')[0];
+                            const lastName = userData.lastName || userData.name?.split(' ')[1] || '';
+                            const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
+                            headerUserAvatar.textContent = initials;
+                            console.log('👤 Updated user initials:', initials);
+                        }
+                    } else {
+                        console.log('⚠️ header-userAvatar element not found');
+                    }
+
+                    // Update client status if available
+                    const headerClientStatus = document.getElementById('header-clientStatus');
+                    if (headerClientStatus) {
+                        const status = userData.status || userData.accountStatus || 'Active Client';
+                        headerClientStatus.textContent = status;
+                        console.log('📊 Updated client status:', status);
+                    }
+
+                    // Update any additional user info elements (for backward compatibility)
+                    const userNameElement = document.getElementById('userName');
+                    const userEmailElement = document.getElementById('userEmail');
+                    const userCompanyElement = document.getElementById('userCompany');
+                    const userPhoneElement = document.getElementById('userPhone');
+
+                    if (userNameElement) {
+                        userNameElement.textContent = displayName;
+                    }
+
+                    if (userEmailElement) {
+                        userEmailElement.textContent = userData.email || '';
+                    }
+
+                    if (userCompanyElement) {
+                        if (userData.company) {
+                            userCompanyElement.textContent = userData.company;
+                            userCompanyElement.style.display = 'block';
+                            console.log('🏢 Updated user company:', userData.company);
+                        } else {
+                            userCompanyElement.style.display = 'none';
+                        }
+                    }
+
+                    if (userPhoneElement) {
+                        if (userData.phone) {
+                            userPhoneElement.textContent = userData.phone;
+                            userPhoneElement.style.display = 'block';
+                            console.log('📞 Updated user phone:', userData.phone);
+                        } else {
+                            userPhoneElement.style.display = 'none';
+                        }
+                    }
+
+                    // Update notification count if available
+                    const notificationBadge = document.querySelector('.header-notification-badge');
+                    if (notificationBadge && userData.notifications !== undefined) {
+                        if (userData.notifications > 0) {
+                            notificationBadge.textContent = userData.notifications > 99 ? '99+' : userData.notifications;
+                            notificationBadge.style.display = 'block';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                        console.log('🔔 Updated notification count:', userData.notifications);
+                    }
+
+                    // Show user menu and hide login button
+                    showUserMenu();
+
+                    console.log('✅ Header updated with user data successfully');
+
+                }, 100); // Small delay to ensure DOM elements are ready
+
+                // Dispatch event for other components that might need user data
+                window.dispatchEvent(new CustomEvent('userDataUpdated', {
+                    detail: userData
+                }));
             }
 
             function showUserMenu() {
@@ -467,21 +556,24 @@
                                 <div class="header-user-menu-trigger" id="header-userMenuTrigger">
                                     <div class="header-user-avatar" id="header-userAvatar">JS</div>
                                     <div class="header-user-info">
-                                        <span class="header-user-name" id="header-userName">John Smith</span>
+                                        <span class="header-user-name" id="header-userName"></span>
                                         <span class="header-user-status" id="header-clientStatus">Active Client</span>
                                     </div>
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
                                 <div class="header-user-menu" id="header-userMenu">
                                     <div class="header-user-menu-header">
-                                        <div class="header-user-menu-name" id="header-userMenuName">John Smith</div>
-                                        <div class="header-user-menu-email" id="header-userMenuEmail">john.smith@example.com</div>
+                                        <div class="header-user-menu-name" id="header-userMenuName"></div>
+                                        <div class="header-user-menu-email" id="header-userMenuEmail"></div>
                                     </div>
                                     <a href="#settings" class="header-user-menu-item">
                                         <i class="fas fa-cog"></i> Account Settings
                                     </a>
                                     <a href="#help" class="header-user-menu-item">
                                         <i class="fas fa-question-circle"></i> Help Center
+                                    </a>
+                                    <a href="#admin-panel" class="header-user-menu-item">
+                                        <i class="fas fa-cog"></i> Admin Panel
                                     </a>
                                     <a href="#" class="header-user-menu-item header-logout-item" id="header-logoutButton">
                                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -496,21 +588,91 @@
                 updateHeaderWithUserData();
                 setupUserMenu();
                 setupLogout();
+                setupEventListeners();
 
                 // Signal that initialization is complete
                 return true;
             }
 
-            // Public API
+            // Function to update notification count
+            function updateNotificationCount(count) {
+                console.log('🔔 Updating notification count:', count);
+
+                const notificationBadge = document.getElementById('header-notificationBadge');
+                if (notificationBadge) {
+                    if (count > 0) {
+                        notificationBadge.textContent = count > 99 ? '99+' : count;
+                        notificationBadge.style.display = 'block';
+                    } else {
+                        notificationBadge.style.display = 'none';
+                    }
+                    console.log('✅ Notification badge updated');
+                }
+
+                // Also update userData in localStorage
+                try {
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    userData.notifications = count;
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                } catch (error) {
+                    console.error('Error updating notification count in localStorage:', error);
+                }
+            }
+
+            // Listen for messages from other modules to update notification count
+            window.addEventListener('message', function (e) {
+                if (e.data && e.data.type === 'updateNotifications') {
+                    updateNotificationCount(e.data.count);
+                }
+            });
+
+            // Listen for custom events to update notifications
+            window.addEventListener('notificationCountChanged', function (e) {
+                if (e.detail && typeof e.detail.count === 'number') {
+                    updateNotificationCount(e.detail.count);
+                }
+            });
+
+            // Public API - Enhanced with notification management
             return {
                 init: init,
                 updateUserData: function (newData) {
-                    Object.assign(userData, newData);
+                    console.log('📝 Updating user data programmatically:', newData);
+
+                    // Get existing data
+                    let existingData = {};
+                    try {
+                        const stored = localStorage.getItem('userData');
+                        if (stored) {
+                            existingData = JSON.parse(stored);
+                        }
+                    } catch (error) {
+                        console.error('Error reading existing user data:', error);
+                    }
+
+                    // Merge new data with existing
+                    const updatedData = Object.assign(existingData, newData);
+
+                    // Save to localStorage
+                    localStorage.setItem('userData', JSON.stringify(updatedData));
+
+                    // Update header display
                     updateHeaderWithUserData();
                 },
                 setNotifications: function (count) {
-                    userData.notifications = count;
+                    updateNotificationCount(count);
+                },
+                refreshUserData: function () {
                     updateHeaderWithUserData();
+                },
+                openMessages: function () {
+                    // Programmatic way to open messages
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-messages'
+                        }, '*');
+                    }
                 }
             };
         })();
@@ -523,216 +685,233 @@
             window.dispatchEvent(new CustomEvent('dashboardHeaderLoaded'));
         }
 
-        // Add this to the setupEventListeners function in dashboardHeader.html
-        function setupEventListeners() {
-            console.log('Setting up event listeners in dashboardHeader.html');
+        // Clean up the Header.html - remove duplicates and fix all button handlers
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DashboardHeader DOM loaded, setting up all buttons');
 
-            // Your existing event listeners...
+            // Notification bell click handler
+            const notificationIcon = document.querySelector('.header-notification-icon');
+            if (notificationIcon) {
+                console.log('Notification icon found, attaching click listener');
 
-            // Help Center button click handler (as a backup)
+                notificationIcon.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('Notification bell clicked!');
+
+                    // Send message to parent window to load Messages tab
+                    if (window.parent && window.parent !== window) {
+                        console.log('Sending message to parent to load Messages tab');
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-messages'
+                        }, '*');
+                    } else {
+                        console.log('No parent window detected, trying direct tab activation');
+                        // If we're not in an iframe, try to activate the tab directly
+                        const messagesTab = document.getElementById('interface-messages');
+                        if (messagesTab) {
+                            // Hide all tabs
+                            document.querySelectorAll('.interface-tab').forEach(tab => {
+                                tab.classList.remove('active');
+                            });
+
+                            // Show messages tab
+                            messagesTab.classList.add('active');
+
+                            // Load messages module if available
+                            if (typeof loadMessagesModule === 'function') {
+                                loadMessagesModule('interface-messages-content', true);
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.log('⚠️ Notification icon not found');
+            }
+
+            // Admin Panel button click handler
+            const adminPanelButton = document.querySelector('.header-user-menu-item[href="#admin-panel"]');
+            if (adminPanelButton) {
+                console.log('🔧 Admin Panel button found in DOMContentLoaded:', adminPanelButton);
+
+                adminPanelButton.addEventListener('click', function (e) {
+                    console.log('🔧 Admin Panel button clicked from DOMContentLoaded!');
+                    e.preventDefault();
+
+                    console.log('🔧 Checking if we have a parent window...');
+                    console.log('🔧 window.parent:', window.parent);
+                    console.log('🔧 window.parent !== window:', window.parent !== window);
+
+                    // Always try to load in the Interface first
+                    console.log('🔧 Attempting to load Admin Panel in Interface...');
+
+                    // Check if we're in the same window as the Interface
+                    const interfaceContainer = document.getElementById('interface-admin-panel-content');
+                    if (interfaceContainer) {
+                        console.log('🔧 Found Interface admin panel container, loading directly');
+
+                        // First activate the tab
+                        const adminPanelTab = document.getElementById('interface-admin-panel');
+                        if (adminPanelTab) {
+                            console.log('🔧 Found admin panel tab, activating it');
+                            // Hide all tabs
+                            document.querySelectorAll('.interface-tab').forEach(tab => {
+                                tab.classList.remove('active');
+                            });
+                            // Show admin panel tab
+                            adminPanelTab.classList.add('active');
+                            console.log('🔧 Admin panel tab activated');
+                        } else {
+                            console.error('🔧 Admin panel tab not found');
+                            console.log('🔧 Available tabs:', Array.from(document.querySelectorAll('.interface-tab')).map(tab => tab.id));
+                        }
+
+                        // Then load the module
+                        if (typeof loadAdminPanelModule === 'function') {
+                            console.log('🔧 loadAdminPanelModule function found, calling it');
+                            loadAdminPanelModule('interface-admin-panel-content', true);
+                        } else {
+                            console.error('🔧 loadAdminPanelModule function not found');
+                            console.log('🔧 Available functions:', Object.getOwnPropertyNames(window).filter(name => name.includes('admin') || name.includes('Admin')));
+                        }
+                    } else if (window.parent && window.parent !== window) {
+                        console.log('🔧 Sending loadTab message to parent window for admin-panel');
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-admin-panel'
+                        }, '*');
+                        console.log('🔧 Message sent successfully');
+                    } else {
+                        console.log('🔧 No Interface container found and no parent window');
+                        console.error('🔧 Admin Panel is not available. Please make sure you are on the main dashboard.');
+                        alert('Admin Panel is not available. Please make sure you are on the main dashboard.');
+                    }
+
+                    // Close the user menu if it's open
+                    const userMenu = document.querySelector('.header-user-menu');
+                    if (userMenu) {
+                        console.log('🔧 Closing user menu');
+                        userMenu.classList.remove('active');
+                    }
+                });
+            } else {
+                console.log('🔧 Admin Panel button NOT found in DOMContentLoaded');
+                console.log('🔧 Available menu items:', Array.from(document.querySelectorAll('.header-user-menu-item')).map(item => item.getAttribute('href')));
+            }
+
+            // Help Center button click handler
             const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
             if (helpCenterButton) {
-                console.log('Help Center button found in setupEventListeners');
+                console.log('🆘 Help Center button found in DOMContentLoaded:', helpCenterButton);
 
                 helpCenterButton.addEventListener('click', function (e) {
-                    console.log('Help Center button clicked from setupEventListeners!');
+                    console.log('🆘 Help Center button clicked from DOMContentLoaded!');
+                    e.preventDefault();
+
+                    console.log('🆘 Checking if we have a parent window...');
+                    console.log('🆘 window.parent:', window.parent);
+                    console.log('🆘 window.parent !== window:', window.parent !== window);
+
+                    // Always try to load in the Interface first
+                    console.log('🆘 Attempting to load Help Center in Interface...');
+
+                    // Check if we're in the same window as the Interface
+                    const interfaceContainer = document.getElementById('interface-help-center-content');
+                    if (interfaceContainer) {
+                        console.log('🆘 Found Interface help center container, loading directly');
+
+                        // First activate the tab
+                        const helpCenterTab = document.getElementById('interface-help-center');
+                        if (helpCenterTab) {
+                            console.log('🆘 Found help center tab, activating it');
+                            // Hide all tabs
+                            document.querySelectorAll('.interface-tab').forEach(tab => {
+                                tab.classList.remove('active');
+                            });
+                            // Show help center tab
+                            helpCenterTab.classList.add('active');
+                            console.log('🆘 Help center tab activated');
+                        } else {
+                            console.error('🆘 Help center tab not found');
+                            console.log('🆘 Available tabs:', Array.from(document.querySelectorAll('.interface-tab')).map(tab => tab.id));
+                        }
+
+                        // Then load the module
+                        if (typeof loadHelpCenterModule === 'function') {
+                            console.log('🆘 loadHelpCenterModule function found, calling it');
+                            loadHelpCenterModule('interface-help-center-content', true);
+                        } else {
+                            console.error('🆘 loadHelpCenterModule function not found');
+                            console.log('🆘 Available functions:', Object.getOwnPropertyNames(window).filter(name => name.includes('help') || name.includes('Help')));
+                        }
+                    } else if (window.parent && window.parent !== window) {
+                        console.log('🆘 Sending loadTab message to parent window for help-center');
+                        window.parent.postMessage({
+                            type: 'loadTab',
+                            tabId: 'interface-help-center'
+                        }, '*');
+                        console.log('🆘 Message sent successfully');
+                    } else {
+                        console.log('🆘 No Interface container found and no parent window');
+                        console.error('🆘 Help Center is not available. Please make sure you are on the main dashboard.');
+                        alert('Help Center is not available. Please make sure you are on the main dashboard.');
+                    }
+
+                    // Close the user menu if it's open
+                    const userMenu = document.querySelector('.header-user-menu');
+                    if (userMenu) {
+                        console.log('🆘 Closing user menu');
+                        userMenu.classList.remove('active');
+                    }
+                });
+            } else {
+                console.log('🆘 Help Center button NOT found in DOMContentLoaded');
+                console.log('🆘 Available menu items:', Array.from(document.querySelectorAll('.header-user-menu-item')).map(item => item.getAttribute('href')));
+            }
+
+            // Settings button click handler
+            const settingsButton = document.querySelector('.header-user-menu-item[href="#settings"]');
+            if (settingsButton) {
+                console.log('Settings button found in DOMContentLoaded');
+
+                settingsButton.addEventListener('click', function (e) {
+                    console.log('Settings button clicked from DOMContentLoaded!');
                     e.preventDefault();
 
                     // Send message to parent window
                     if (window.parent && window.parent !== window) {
                         window.parent.postMessage({
                             type: 'loadTab',
-                            tabId: 'interface-help-center'
-                        }, '*');
-                    }
-                });
-            }
-        }
-
-        // Make sure this code is executed when the DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('DashboardHeader DOM loaded, setting up Help Center button');
-
-            // Direct approach - find the button and attach the listener
-            const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
-
-            if (helpCenterButton) {
-                console.log('Help Center button found by selector:', helpCenterButton);
-
-                helpCenterButton.addEventListener('click', function (e) {
-                    console.log('Help Center button clicked!');
-                    e.preventDefault();
-
-                    // Try to communicate with parent window
-                    if (window.parent && window.parent !== window) {
-                        console.log('Sending message to parent window to load Help Center tab');
-                        window.parent.postMessage({
-                            type: 'loadTab',
-                            tabId: 'interface-help-center'
-                        }, '*');
-                    } else {
-                        console.log('No parent window detected, trying direct tab activation');
-
-                        // Direct tab activation if not in iframe
-                        const helpCenterTab = document.getElementById('interface-help-center');
-                        if (helpCenterTab) {
-                            // Hide all tabs
-                            document.querySelectorAll('.interface-tab').forEach(tab => {
-                                tab.classList.remove('active');
-                            });
-
-                            // Show help center tab
-                            helpCenterTab.classList.add('active');
-
-                            // Try to load the module
-                            if (typeof loadHelpCenterModule === 'function') {
-                                loadHelpCenterModule('interface-help-center-content', true);
-                            }
-                        }
-                    }
-                });
-            } else {
-                // If the selector didn't work, try a more general approach
-                console.log('Help Center button not found by specific selector, trying alternative approach');
-
-                // Try to find by text content
-                const allMenuItems = document.querySelectorAll('.header-user-menu-item');
-                console.log('Found menu items:', allMenuItems.length);
-
-                allMenuItems.forEach(item => {
-                    if (item.textContent.includes('Help Center')) {
-                        console.log('Found Help Center button by text content:', item);
-
-                        item.addEventListener('click', function (e) {
-                            console.log('Help Center button clicked (found by text)!');
-                            e.preventDefault();
-
-                            // Send message to parent window
-                            if (window.parent && window.parent !== window) {
-                                window.parent.postMessage({
-                                    type: 'loadTab',
-                                    tabId: 'interface-help-center'
-                                }, '*');
-                            }
-                        });
-                    }
-                });
-            }
-
-            // Account Settings button click handler
-            const accountSettingsButton = document.querySelector('.header-user-menu-item[href="#settings"]');
-
-            if (accountSettingsButton) {
-                console.log('Account Settings button found by selector:', accountSettingsButton);
-
-                accountSettingsButton.addEventListener('click', function (e) {
-                    console.log('Account Settings button clicked!');
-                    e.preventDefault();
-
-                    // Try to communicate with parent window
-                    if (window.parent && window.parent !== window) {
-                        console.log('Sending message to parent window to load Settings tab');
-                        window.parent.postMessage({
-                            type: 'loadTab',
                             tabId: 'interface-settings'
                         }, '*');
                     } else {
-                        console.log('No parent window detected, trying direct tab activation');
+                        // Try direct loading
+                        const interfaceContainer = document.getElementById('interface-settings-content');
+                        if (interfaceContainer) {
+                            // Activate settings tab
+                            const settingsTab = document.getElementById('interface-settings');
+                            if (settingsTab) {
+                                document.querySelectorAll('.interface-tab').forEach(tab => {
+                                    tab.classList.remove('active');
+                                });
+                                settingsTab.classList.add('active');
+                            }
 
-                        // Direct tab activation if not in iframe
-                        const settingsTab = document.getElementById('interface-settings');
-                        if (settingsTab) {
-                            // Hide all tabs
-                            document.querySelectorAll('.interface-tab').forEach(tab => {
-                                tab.classList.remove('active');
-                            });
-
-                            // Show settings tab
-                            settingsTab.classList.add('active');
-
-                            // Try to load the module
+                            // Load settings module if available
                             if (typeof loadSettingsModule === 'function') {
                                 loadSettingsModule('interface-settings-content', true);
                             }
                         }
                     }
 
-                    // Close the user menu if it's open
+                    // Close the user menu
                     const userMenu = document.querySelector('.header-user-menu');
                     if (userMenu) {
                         userMenu.classList.remove('active');
                     }
                 });
-            } else {
-                // If the selector didn't work, try a more general approach
-                console.log('Account Settings button not found by specific selector, trying alternative approach');
-
-                // Try to find by text content
-                const allMenuItems = document.querySelectorAll('.header-user-menu-item');
-
-                allMenuItems.forEach(item => {
-                    if (item.textContent.includes('Account Settings')) {
-                        console.log('Found Account Settings button by text content:', item);
-
-                        item.addEventListener('click', function (e) {
-                            console.log('Account Settings button clicked (found by text)!');
-                            e.preventDefault();
-
-                            // Send message to parent window
-                            if (window.parent && window.parent !== window) {
-                                window.parent.postMessage({
-                                    type: 'loadTab',
-                                    tabId: 'interface-settings'
-                                }, '*');
-                            }
-
-                            // Close the user menu if it's open
-                            const userMenu = document.querySelector('.header-user-menu');
-                            if (userMenu) {
-                                userMenu.classList.remove('active');
-                            }
-                        });
-                    }
-                });
             }
         });
-
-        // Also make sure the setupEventListeners function is called
-        function setupEventListeners() {
-            console.log('Setting up event listeners in dashboardHeader.html');
-
-            // Your existing event listeners...
-
-            // Help Center button click handler (as a backup)
-            const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
-            if (helpCenterButton) {
-                console.log('Help Center button found in setupEventListeners');
-
-                helpCenterButton.addEventListener('click', function (e) {
-                    console.log('Help Center button clicked from setupEventListeners!');
-                    e.preventDefault();
-
-                    // Send message to parent window
-                    if (window.parent && window.parent !== window) {
-                        window.parent.postMessage({
-                            type: 'loadTab',
-                            tabId: 'interface-help-center'
-                        }, '*');
-                    }
-                });
-            }
-        }
-
-        // Make sure setupEventListeners is called
-        if (typeof HeaderModule !== 'undefined' && HeaderModule.init) {
-            console.log('HeaderModule found, making sure setupEventListeners is called');
-            const originalInit = HeaderModule.init;
-            HeaderModule.init = function (containerId) {
-                const result = originalInit(containerId);
-                setupEventListeners();
-                return result;
-            };
-        }
 
         // Also call when localStorage changes (for cross-tab updates)
         window.addEventListener('storage', function (e) {
@@ -740,6 +919,35 @@
                 updateHeaderWithUserData();
             }
         });
+
+        // Add this debugging function to check if the Admin Panel button exists
+        function debugAdminPanelButton() {
+            console.log('🔧 Debugging Admin Panel button...');
+
+            // Check all possible selectors
+            const byHref = document.querySelector('.header-user-menu-item[href="#admin-panel"]');
+            const byId = document.getElementById('adminPanelMenuItem');
+            const allMenuItems = document.querySelectorAll('.header-user-menu-item');
+
+            console.log('🔧 Admin Panel button by href selector:', byHref);
+            console.log('🔧 Admin Panel button by ID:', byId);
+            console.log('🔧 All menu items:', Array.from(allMenuItems).map(item => ({
+                href: item.getAttribute('href'),
+                id: item.id,
+                text: item.textContent.trim()
+            })));
+
+            // Check if the user menu container exists
+            const userMenu = document.querySelector('.header-user-menu');
+            console.log('🔧 User menu container:', userMenu);
+
+            if (userMenu) {
+                console.log('🔧 User menu HTML:', userMenu.innerHTML);
+            }
+        }
+
+        // Call this debugging function after a delay to ensure DOM is ready
+        setTimeout(debugAdminPanelButton, 2000);
     </script>
 </body>
 

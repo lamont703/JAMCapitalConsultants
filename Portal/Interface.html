@@ -419,6 +419,18 @@
                         <!-- Help Center content will be loaded here -->
                     </div>
                 </div>
+
+                <!-- Admin Panel Tab -->
+                <div id="interface-admin-panel" class="interface-tab">
+                    <div class="interface-tab-header">
+                        <h2 class="interface-tab-title">Admin Panel</h2>
+                        <p class="interface-tab-subtitle">Manage user notifications, dispute updates, and credit reports
+                        </p>
+                    </div>
+                    <div id="interface-admin-panel-content" class="interface-tab-content">
+                        <!-- Admin Panel module will load here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -593,6 +605,22 @@
                 case 'interface-pricing':
                     // Always force reload the Pricing Tiers module
                     loadPricingTiersModule('interface-pricing-widget', true); // Force reload
+                    break;
+
+                case 'interface-admin-panel':
+                    console.log('Loading Admin Panel tab');
+                    // Activate the admin panel tab
+                    document.querySelectorAll('.interface-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+
+                    const adminPanelTab = document.getElementById('interface-admin-panel');
+                    if (adminPanelTab) {
+                        adminPanelTab.classList.add('active');
+                        loadAdminPanelModule('interface-admin-panel-content', true);
+                    } else {
+                        console.error('Admin Panel tab not found');
+                    }
                     break;
 
                 default:
@@ -1516,9 +1544,9 @@
                 </div>
             `;
 
-            // Check if SettingsModule is available
+            // Check if SettingsModule is available via global variable
             if (window.jamSettings) {
-                console.log('Settings module already loaded, initializing');
+                console.log('Settings module found in global variable, initializing');
 
                 // If force reload is requested, reset the module's initialization state
                 if (forceReload && typeof window.jamSettings.reset === 'function') {
@@ -1539,50 +1567,13 @@
                     console.log('Settings module initialized successfully');
                 }
             } else {
-                console.log('Settings module not loaded, loading script');
-                // Load the script
-                const script = document.createElement('script');
-                script.src = 'Settings.html';
-
-                // Create a one-time event handler
-                const handler = function () {
-                    console.log('Settings module loaded event received');
-                    if (window.jamSettings) {
-                        const success = window.jamSettings.init(container);
-                        if (!success) {
-                            console.error('Failed to initialize Settings module after load');
-                            container.innerHTML = `
-                                <div class="interface-error-message">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Failed to initialize Settings component
-                                </div>
-                            `;
-                        } else {
-                            console.log('Settings module initialized successfully after load');
-                        }
-                    }
-                    // Remove the event listener to prevent duplicate handlers
-                    window.removeEventListener('settingsModuleLoaded', handler);
-                };
-
-                // Add the event listener
-                window.addEventListener('settingsModuleLoaded', handler);
-
-                // Append the script to load it
-                document.body.appendChild(script);
-
-                // Set a timeout in case the module doesn't load
-                setTimeout(() => {
-                    if (!window.jamSettings) {
-                        console.error('Settings module not found after timeout');
-                        container.innerHTML = `
-                            <div class="interface-error-message">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Settings module not found after timeout
-                            </div>
-                        `;
-                    }
-                }, 10000);
+                console.error('Settings module not found in global variable');
+                container.innerHTML = `
+                    <div class="interface-error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Settings module not available
+                    </div>
+                `;
             }
         }
 
@@ -1613,11 +1604,9 @@
                 </div>
             `;
 
-            // Check if HelpCenterModule is available
+            // Check if HelpCenterModule is available via global variable
             if (window.jamHelpCenter) {
-                console.log('Help Center module already loaded, initializing');
-                console.log('jamHelpCenter object:', window.jamHelpCenter);
-                console.log('Container element:', container);
+                console.log('Help Center module found in global variable, initializing');
 
                 // If force reload is requested, reset the module's initialization state
                 if (forceReload && typeof window.jamHelpCenter.reset === 'function') {
@@ -1625,86 +1614,26 @@
                     window.jamHelpCenter.reset();
                 }
 
-                // Pass the container DOM element, not the containerId string
-                try {
-                    const success = window.jamHelpCenter.init(container);
-                    console.log('Init function returned:', success);
-                    if (!success) {
-                        console.error('Failed to initialize Help Center module');
-                        container.innerHTML = `
-                            <div class="interface-error-message">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Failed to initialize Help Center component
-                            </div>
-                        `;
-                    } else {
-                        console.log('Help Center module initialized successfully');
-                    }
-                } catch (error) {
-                    console.error('Error during Help Center initialization:', error);
+                const success = window.jamHelpCenter.init(container);
+                if (!success) {
+                    console.error('Failed to initialize Help Center module');
                     container.innerHTML = `
                         <div class="interface-error-message">
                             <i class="fas fa-exclamation-triangle"></i>
-                            Error initializing Help Center: ${error.message}
+                            Failed to initialize Help Center component
                         </div>
                     `;
+                } else {
+                    console.log('Help Center module initialized successfully');
                 }
             } else {
-                console.log('Help Center module not loaded, loading script');
-                // Load the script
-                const script = document.createElement('script');
-                script.src = 'Header/HelpCenter.html';
-
-                // Create a one-time event handler
-                const handler = function () {
-                    console.log('Help Center module loaded event received');
-                    if (window.jamHelpCenter) {
-                        try {
-                            // Pass the container DOM element, not the containerId string
-                            const success = window.jamHelpCenter.init(container);
-                            if (!success) {
-                                console.error('Failed to initialize Help Center module after load');
-                                container.innerHTML = `
-                                    <div class="interface-error-message">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        Failed to initialize Help Center component
-                                    </div>
-                                `;
-                            } else {
-                                console.log('Help Center module initialized successfully after load');
-                            }
-                        } catch (error) {
-                            console.error('Error during Help Center initialization after load:', error);
-                            container.innerHTML = `
-                                <div class="interface-error-message">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Error initializing Help Center: ${error.message}
-                                </div>
-                            `;
-                        }
-                    }
-                    // Remove the event listener to prevent duplicate handlers
-                    window.removeEventListener('helpCenterModuleLoaded', handler);
-                };
-
-                // Add the event listener
-                window.addEventListener('helpCenterModuleLoaded', handler);
-
-                // Append the script to load it
-                document.body.appendChild(script);
-
-                // Set a timeout in case the module doesn't load
-                setTimeout(() => {
-                    if (!window.jamHelpCenter) {
-                        console.error('Help Center module not found after timeout');
-                        container.innerHTML = `
-                            <div class="interface-error-message">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Help Center module not found after timeout
-                            </div>
-                        `;
-                    }
-                }, 10000);
+                console.error('Help Center module not found in global variable');
+                container.innerHTML = `
+                    <div class="interface-error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Help Center module not available
+                    </div>
+                `;
             }
         }
 
@@ -1714,6 +1643,77 @@
             // If we're currently on the help center tab, initialize it
             if (document.querySelector('.interface-tab.active')?.id === 'interface-help-center') {
                 loadHelpCenterModule('interface-help-center-content', true);
+            }
+        });
+
+        // Function to load the AdminPanelModule with enhanced debugging
+        function loadAdminPanelModule(containerId, forceReload = false) {
+            console.log('🔧 loadAdminPanelModule called with:', containerId, forceReload);
+
+            const container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+
+            if (!container) {
+                console.error('🔧 Admin Panel container not found:', containerId);
+                console.log('🔧 Available containers:', Array.from(document.querySelectorAll('[id*="admin"]')).map(el => el.id));
+                return;
+            }
+
+            console.log('🔧 Admin Panel container found:', container);
+
+            // Show loading indicator
+            container.innerHTML = `
+                <div class="interface-widget-loading">
+                    <div class="interface-loading-spinner"></div>
+                    <span>Loading admin panel...</span>
+                </div>
+            `;
+
+            console.log('🔧 Loading indicator shown');
+
+            // Check if module is already loaded via global variable
+            if (window.jamAdminPanel) {
+                console.log('🔧 Admin Panel module found in global variable, initializing directly');
+
+                // If force reload is requested, reset the module's initialization state
+                if (forceReload && typeof window.jamAdminPanel.reset === 'function') {
+                    console.log('🔧 Resetting Admin Panel module initialization state');
+                    window.jamAdminPanel.reset();
+                }
+
+                // Pass the container ID as string, not the DOM element
+                const containerIdString = typeof containerId === 'string' ? containerId : container.id;
+                console.log('🔧 Calling jamAdminPanel.init with container ID:', containerIdString);
+                const success = window.jamAdminPanel.init(containerIdString);
+                console.log('🔧 jamAdminPanel.init result:', success);
+
+                if (!success) {
+                    console.error('🔧 Failed to initialize Admin Panel module');
+                    container.innerHTML = `
+                        <div class="interface-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to initialize Admin Panel module
+                        </div>
+                    `;
+                } else {
+                    console.log('🔧 Admin Panel module initialized successfully');
+                }
+            } else {
+                console.error('🔧 Admin Panel module not found in global variable');
+                container.innerHTML = `
+                    <div class="interface-error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Admin Panel module not available
+                    </div>
+                `;
+            }
+        }
+
+        // Listen for when the AdminPanelModule is loaded
+        window.addEventListener('jamAdminPanelLoaded', function () {
+            console.log('AdminPanelModule loaded event received');
+            // If we're currently on the admin panel tab, initialize it
+            if (document.querySelector('.interface-tab.active')?.id === 'interface-admin-panel') {
+                loadAdminPanelModule('interface-admin-panel-content', true);
             }
         });
 
@@ -1743,17 +1743,19 @@
             }
         });
 
-        // Update your existing message event listener to handle Settings tab
+        // Enhanced message event listener with detailed debugging
         window.addEventListener('message', function (e) {
-            console.log('Message received in dashboardInterface:', e.data);
+            console.log('📨 Message received in dashboardInterface:', e.data);
+            console.log('📨 Message origin:', e.origin);
+            console.log('📨 Message source:', e.source);
 
             if (e.data && e.data.type === 'loadTab') {
-                console.log(`Request to load tab: ${e.data.tabId}`);
+                console.log(`📨 Request to load tab: ${e.data.tabId}`);
 
                 // Activate the requested tab
                 const tab = document.getElementById(e.data.tabId);
                 if (tab) {
-                    console.log(`Tab ${e.data.tabId} found, activating`);
+                    console.log(`📨 Tab ${e.data.tabId} found, activating`);
 
                     // Hide all tabs
                     document.querySelectorAll('.interface-tab').forEach(tab => {
@@ -1762,16 +1764,46 @@
 
                     // Show requested tab
                     tab.classList.add('active');
+                    console.log(`📨 Tab ${e.data.tabId} activated`);
 
                     // Load the appropriate module based on tab ID
-                    if (e.data.tabId === 'interface-help-center') {
+                    if (e.data.tabId === 'interface-messages') {
+                        console.log('📨 Loading Messages module');
+                        loadMessagesModule('interface-messages-content', true);
+                        // Clear notification count when messages are opened
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'updateNotifications',
+                                count: 0
+                            }, '*');
+                        }
+                    } else if (e.data.tabId === 'interface-help-center') {
+                        console.log('📨 Loading Help Center module');
                         loadHelpCenterModule('interface-help-center-content', true);
                     } else if (e.data.tabId === 'interface-settings') {
+                        console.log('📨 Loading Settings module');
                         loadSettingsModule('interface-settings-content', true);
+                    } else if (e.data.tabId === 'interface-admin-panel') {
+                        console.log('📨 Loading Admin Panel module');
+                        console.log('📨 Checking if admin panel container exists...');
+                        const adminContainer = document.getElementById('interface-admin-panel-content');
+                        console.log('📨 Admin panel container:', adminContainer);
+
+                        if (adminContainer) {
+                            console.log('📨 Admin panel container found, loading module');
+                            loadAdminPanelModule('interface-admin-panel-content', true);
+                        } else {
+                            console.error('📨 Admin panel container NOT found!');
+                        }
+                    } else {
+                        console.log(`📨 Unknown tab ID: ${e.data.tabId}`);
                     }
                 } else {
-                    console.error(`Tab ${e.data.tabId} not found`);
+                    console.error(`📨 Tab ${e.data.tabId} NOT found in DOM!`);
+                    console.log('📨 Available tabs:', Array.from(document.querySelectorAll('.interface-tab')).map(t => t.id));
                 }
+            } else {
+                console.log('📨 Message ignored - not a loadTab message');
             }
         });
     </script>
