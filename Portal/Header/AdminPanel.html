@@ -249,7 +249,6 @@
         /* User Search */
         .user-search {
             position: relative;
-            margin-bottom: 1rem;
         }
 
         .user-search-results {
@@ -258,9 +257,9 @@
             left: 0;
             right: 0;
             background: white;
-            border: 1px solid #ced4da;
-            border-top: none;
-            border-radius: 0 0 5px 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             max-height: 200px;
             overflow-y: auto;
             z-index: 1000;
@@ -268,17 +267,65 @@
         }
 
         .user-search-result {
-            padding: 0.75rem;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
             cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .user-search-result:hover {
-            background: #f8f9fa;
+            background-color: #f5f5f5;
         }
 
         .user-search-result:last-child {
             border-bottom: none;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-email {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .user-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .user-status.active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .user-status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .user-status.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-search-no-results {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
         }
 
         /* Status Indicators */
@@ -436,10 +483,11 @@
 
             // Mock data for demonstration
             const mockUsers = [
-                { id: 1, name: 'John Doe', email: 'john@example.com' },
-                { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-                { id: 3, name: 'Mike Johnson', email: 'mike@example.com' },
-                { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com' }
+                { id: '1', name: 'John Doe', email: 'john.doe@email.com', status: 'active' },
+                { id: '2', name: 'Jane Smith', email: 'jane.smith@email.com', status: 'active' },
+                { id: '3', name: 'Mike Johnson', email: 'mike.johnson@email.com', status: 'pending' },
+                { id: '4', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', status: 'active' },
+                { id: '5', name: 'David Brown', email: 'david.brown@email.com', status: 'inactive' }
             ];
 
             let recentActivity = [
@@ -452,36 +500,33 @@
             const adminPanelHTML = `
                 <div class="admin-container">
                     <div class="admin-header">
-                        <h2 class="admin-title">Admin Panel</h2>
-                        <p class="admin-subtitle">Manage user notifications, dispute updates, and credit reports</p>
+                        <h2><i class="fas fa-cog"></i> Admin Panel</h2>
+                        <p>Manage users, send notifications, and handle disputes</p>
                     </div>
 
-                    <div class="admin-message success" id="admin-success-message">
+                    <!-- Success/Error Messages -->
+                    <div id="admin-success-message" class="admin-message success" style="display: none;">
                         <i class="fas fa-check-circle"></i>
                         <span id="success-text"></span>
                     </div>
-
-                    <div class="admin-message error" id="admin-error-message">
+                    <div id="admin-error-message" class="admin-message error" style="display: none;">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span id="error-text"></span>
                     </div>
 
+                    <!-- Admin Tabs -->
                     <div class="admin-tabs">
                         <button class="admin-tab active" data-tab="notifications">
-                            <i class="fas fa-bell"></i>
-                            Send Notifications
+                            <i class="fas fa-bell"></i> Send Notifications
                         </button>
                         <button class="admin-tab" data-tab="disputes">
-                            <i class="fas fa-gavel"></i>
-                            Dispute Updates
+                            <i class="fas fa-gavel"></i> Dispute Updates
                         </button>
                         <button class="admin-tab" data-tab="reports">
-                            <i class="fas fa-file-pdf"></i>
-                            Upload Reports
+                            <i class="fas fa-file-pdf"></i> Upload Reports
                         </button>
                         <button class="admin-tab" data-tab="activity">
-                            <i class="fas fa-history"></i>
-                            Recent Activity
+                            <i class="fas fa-chart-line"></i> Recent Activity
                         </button>
                     </div>
 
@@ -489,30 +534,31 @@
                     <div class="admin-tab-content active" id="notifications-content">
                         <form class="admin-form" id="notification-form">
                             <div class="form-group">
-                                <label class="form-label">Select User</label>
-                                <div class="user-search">
-                                    <input type="text" class="form-input" id="user-search-notifications" placeholder="Search users by name or email...">
-                                    <div class="user-search-results" id="user-search-results-notifications"></div>
-                                </div>
-                                <input type="hidden" id="selected-user-notifications">
+                                <label class="form-label">User Email</label>
+                                <input type="email" class="form-input" id="user-email-notifications" 
+                                       placeholder="Enter user's email address..." required>
+                                <small class="form-hint">Enter the email address of the user you want to send a notification to</small>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Notification Type</label>
-                                <select class="form-select" id="notification-type">
-                                    <option value="general">General Notification</option>
-                                    <option value="welcome">Welcome Message</option>
-                                    <option value="reminder">Payment Reminder</option>
-                                    <option value="update">Account Update</option>
-                                    <option value="promotion">Promotion</option>
+                                <select class="form-select" id="notification-type" required>
+                                    <option value="">Select notification type</option>
+                                    <option value="credit-report">Credit Report Update</option>
+                                    <option value="account">Account Notification</option>
+                                    <option value="dispute">Dispute Update</option>
+                                    <option value="general">General Announcement</option>
+                                    <option value="security">Security Alert</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Subject</label>
-                                <input type="text" class="form-input" id="notification-subject" placeholder="Enter notification subject">
+                                <input type="text" class="form-input" id="notification-subject" 
+                                       placeholder="Enter notification subject..." required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Message</label>
-                                <textarea class="form-textarea" id="notification-message" placeholder="Enter your message here..."></textarea>
+                                <textarea class="form-textarea" id="notification-message" 
+                                          placeholder="Enter your message here..." rows="4" required></textarea>
                             </div>
                             <button type="submit" class="admin-btn admin-btn-primary">
                                 <i class="fas fa-paper-plane"></i>
@@ -525,12 +571,9 @@
                     <div class="admin-tab-content" id="disputes-content">
                         <form class="admin-form" id="dispute-form">
                             <div class="form-group">
-                                <label class="form-label">Select User</label>
-                                <div class="user-search">
-                                    <input type="text" class="form-input" id="user-search-disputes" placeholder="Search users by name or email...">
-                                    <div class="user-search-results" id="user-search-results-disputes"></div>
-                                </div>
-                                <input type="hidden" id="selected-user-disputes">
+                                <label class="form-label">User Email</label>
+                                <input type="email" class="form-input" id="user-email-disputes" 
+                                       placeholder="Enter user's email address..." required>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -570,12 +613,9 @@
                     <div class="admin-tab-content" id="reports-content">
                         <form class="admin-form" id="report-form">
                             <div class="form-group">
-                                <label class="form-label">Select User</label>
-                                <div class="user-search">
-                                    <input type="text" class="form-input" id="user-search-reports" placeholder="Search users by name or email...">
-                                    <div class="user-search-results" id="user-search-results-reports"></div>
-                                </div>
-                                <input type="hidden" id="selected-user-reports">
+                                <label class="form-label">User Email</label>
+                                <input type="email" class="form-input" id="user-email-reports" 
+                                       placeholder="Enter user's email address..." required>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -689,41 +729,42 @@
 
                 // Tab switching
                 const tabButtons = currentContainer.querySelectorAll('.admin-tab');
+                console.log('🔧 Found tab buttons:', tabButtons.length);
+
                 tabButtons.forEach(button => {
                     button.addEventListener('click', function () {
                         const tabId = this.getAttribute('data-tab');
+                        console.log('🔧 Tab clicked:', tabId);
                         switchTab(tabId);
                     });
                 });
 
-                // User search functionality
-                const userSearch = currentContainer.querySelector('#user-search');
-                if (userSearch) {
-                    userSearch.addEventListener('input', function () {
-                        const searchTerm = this.value.toLowerCase();
-                        const filteredUsers = mockUsers.filter(user =>
-                            user.name.toLowerCase().includes(searchTerm) ||
-                            user.email.toLowerCase().includes(searchTerm)
-                        );
-                        displayUsers(filteredUsers);
-                    });
-                }
-
-                // Form submissions
+                // Form submissions with error handling
                 const notificationForm = currentContainer.querySelector('#notification-form');
                 if (notificationForm) {
+                    console.log('📤 Setting up notification form listener');
                     notificationForm.addEventListener('submit', handleNotificationSubmit);
+                } else {
+                    console.log('⚠️ Notification form not found');
                 }
 
                 const disputeForm = currentContainer.querySelector('#dispute-form');
                 if (disputeForm) {
+                    console.log('⚖️ Setting up dispute form listener');
                     disputeForm.addEventListener('submit', handleDisputeSubmit);
+                } else {
+                    console.log('⚠️ Dispute form not found');
                 }
 
                 const reportForm = currentContainer.querySelector('#report-form');
                 if (reportForm) {
+                    console.log('📄 Setting up report form listener');
                     reportForm.addEventListener('submit', handleReportSubmit);
+                } else {
+                    console.log('⚠️ Report form not found');
                 }
+
+                console.log('✅ All event listeners set up successfully');
             }
 
             // Switch tabs
@@ -735,43 +776,28 @@
                     return;
                 }
 
-                console.log('🔧 Current container:', currentContainer);
-                console.log('🔧 Current container ID:', currentContainer.id);
-
                 // Find tab buttons and content containers with CORRECT selectors
                 const tabButtons = currentContainer.querySelectorAll('.admin-tab');
                 const tabContents = currentContainer.querySelectorAll('.admin-tab-content');
 
                 console.log('🔧 Found tab buttons:', tabButtons.length);
-                console.log('🔧 Tab buttons:', Array.from(tabButtons).map(btn => ({
-                    id: btn.id,
-                    dataset: btn.dataset,
-                    text: btn.textContent.trim()
-                })));
-
                 console.log('🔧 Found tab content containers:', tabContents.length);
-                console.log('🔧 Tab contents:', Array.from(tabContents).map(content => ({
-                    id: content.id,
-                    classes: content.className
-                })));
 
                 // Remove active class from all buttons and contents
                 tabButtons.forEach(button => {
                     button.classList.remove('active');
-                    console.log('🔧 Removed active from button:', button.dataset.tab);
                 });
 
                 tabContents.forEach(content => {
                     content.classList.remove('active');
-                    console.log('🔧 Removed active from content:', content.id);
                 });
 
-                // Add active class to selected button and content with CORRECT selectors
+                // Add active class to selected button and content
                 const activeButton = currentContainer.querySelector(`[data-tab="${tabId}"]`);
                 const activeContent = currentContainer.querySelector(`#${tabId}-content`);
 
-                console.log('🔧 Active button found:', !!activeButton, activeButton);
-                console.log('🔧 Active content found:', !!activeContent, activeContent);
+                console.log('🔧 Active button found:', !!activeButton);
+                console.log('🔧 Active content found:', !!activeContent);
 
                 if (activeButton) {
                     activeButton.classList.add('active');
@@ -783,17 +809,15 @@
                 if (activeContent) {
                     activeContent.classList.add('active');
                     console.log('🔧 Added active to content:', tabId);
-                    console.log('🔧 Content should now be visible');
                 } else {
                     console.error('🔧 Content container not found for tab:', tabId);
-                    console.log('🔧 Looking for:', `#${tabId}-content`);
-                    console.log('🔧 Available content containers:', Array.from(currentContainer.querySelectorAll('.admin-tab-content')).map(c => c.id));
                 }
 
-                // Load content for the active tab (if needed)
+                // Load content for the active tab
                 console.log('🔧 Loading content for tab:', tabId);
                 if (tabId === 'notifications') {
-                    loadNotifications();
+                    // Content already exists, just ensure user search is initialized
+                    initializeNotificationUserSearch();
                 } else if (tabId === 'disputes') {
                     loadDisputes();
                 } else if (tabId === 'reports') {
@@ -952,13 +976,39 @@
 
             // Load recent activity
             function loadRecentActivity() {
+                console.log('📊 Loading recent activity');
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for loadRecentActivity');
+                    return;
+                }
+
                 const activityList = currentContainer.querySelector('#activity-list');
-                if (!activityList) return;
+                if (!activityList) {
+                    console.error('❌ Activity list container not found');
+                    return;
+                }
+
+                if (recentActivity.length === 0) {
+                    activityList.innerHTML = `
+                        <div class="activity-item">
+                            <div class="activity-icon system">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">No Recent Activity</div>
+                                <div class="activity-description">No admin activities have been recorded yet.</div>
+                            </div>
+                            <div class="activity-time">-</div>
+                        </div>
+                    `;
+                    return;
+                }
 
                 activityList.innerHTML = recentActivity.map(activity => `
                     <div class="activity-item">
                         <div class="activity-icon ${activity.type}">
-                            <i class="fas fa-${getActivityIcon(activity.type)}"></i>
+                            <i class="${getActivityIcon(activity.type)}"></i>
                         </div>
                         <div class="activity-content">
                             <div class="activity-title">${activity.title}</div>
@@ -967,6 +1017,8 @@
                         <div class="activity-time">${activity.time}</div>
                     </div>
                 `).join('');
+
+                console.log('✅ Recent activity loaded successfully');
             }
 
             // Handle notification form submission
@@ -974,110 +1026,157 @@
                 e.preventDefault();
                 console.log('📤 Handling notification submission');
 
-                // Fix: Use querySelector instead of getElementById
+                // Get form elements - updated to use email input instead of user selection
+                const userEmailElement = currentContainer.querySelector('#user-email-notifications');
                 const typeElement = currentContainer.querySelector('#notification-type');
+                const subjectElement = currentContainer.querySelector('#notification-subject');
                 const messageElement = currentContainer.querySelector('#notification-message');
 
-                if (!typeElement || !messageElement) {
+                if (!userEmailElement || !typeElement || !messageElement || !subjectElement) {
                     showMessage('error', 'Form elements not found.');
                     return;
                 }
 
+                const userEmail = userEmailElement.value.trim();
                 const type = typeElement.value;
-                const message = messageElement.value;
+                const subject = subjectElement.value.trim();
+                const message = messageElement.value.trim();
 
-                if (!type || !message) {
-                    showMessage('error', 'Please fill in all fields.');
+                // Validation
+                if (!userEmail) {
+                    showMessage('error', 'Please enter a user email address.');
                     return;
                 }
 
-                // Simulate sending notification
-                setTimeout(() => {
-                    showMessage('success', 'Notification sent successfully!');
-                    e.target.reset();
-
-                    // Add to recent activity
-                    addToRecentActivity('notification', 'Notification Sent', `${type} notification sent`, 'Just now');
-                }, 1000);
-            }
-
-            // Handle dispute form submission
-            function handleDisputeSubmit(e) {
-                e.preventDefault();
-
-                // Fix: Use querySelector instead of getElementById
-                const userId = currentContainer.querySelector('#selected-user-disputes')?.value;
-                const bureau = currentContainer.querySelector('#credit-bureau')?.value;
-                const status = currentContainer.querySelector('#dispute-status')?.value;
-                const item = currentContainer.querySelector('#dispute-item')?.value;
-                const notes = currentContainer.querySelector('#dispute-notes')?.value;
-
-                if (!userId || !item || !notes) {
-                    showMessage('error', 'Please fill in all required fields.');
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userEmail)) {
+                    showMessage('error', 'Please enter a valid email address.');
                     return;
                 }
 
-                // Simulate API call
-                setTimeout(() => {
-                    showMessage('success', 'Dispute status updated successfully!');
-                    e.target.reset();
-
-                    // Add to recent activity
-                    const userName = mockUsers.find(u => u.id == userId)?.name || 'Unknown User';
-                    addToRecentActivity('dispute', 'Dispute Updated', `${item} status changed to ${status} for ${userName}`, 'Just now');
-                }, 1000);
-            }
-
-            // Handle report form submission
-            function handleReportSubmit(e) {
-                e.preventDefault();
-
-                const userId = currentContainer.querySelector('#selected-user-reports')?.value;
-                const reportType = currentContainer.querySelector('#report-type')?.value;
-                const reportDate = currentContainer.querySelector('#report-date')?.value;
-                const file = currentContainer.querySelector('#report-file')?.files[0];
-                const notes = currentContainer.querySelector('#report-notes')?.value;
-
-                if (!userId || !file || !reportDate) {
-                    showMessage('error', 'Please fill in all required fields and select a file.');
+                if (!type || !subject || !message) {
+                    showMessage('error', 'Please fill in all fields (type, subject, and message).');
                     return;
                 }
 
-                // Simulate file upload
-                setTimeout(() => {
-                    showMessage('success', 'Credit report uploaded successfully!');
-                    e.target.reset();
-                    currentContainer.querySelector('#file-info').style.display = 'none';
-                    currentContainer.querySelector('#file-upload-area').style.display = 'block';
+                // Show loading state
+                const submitButton = currentContainer.querySelector('#notification-form button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                submitButton.disabled = true;
 
-                    // Add to recent activity
-                    const userName = mockUsers.find(u => u.id == userId)?.name || 'Unknown User';
-                    addToRecentActivity('report', 'Credit Report Uploaded', `New ${reportType} uploaded for ${userName}`, 'Just now');
-                }, 2000);
+                console.log('📤 Sending notification to email:', userEmail);
+
+                // Create notification data - let backend handle user verification
+                const notificationData = {
+                    userEmail: userEmail,
+                    type: type,
+                    subject: subject,
+                    message: message,
+                    timestamp: new Date().toISOString(),
+                    adminId: 'current-admin', // Replace with actual admin ID
+                    status: 'pending'
+                };
+
+                // Send notification to backend for processing and user verification
+                sendNotificationToUser(notificationData)
+                    .then(response => {
+                        console.log('✅ Notification sent successfully:', response);
+
+                        if (response.userFound) {
+                            showMessage('success', `Notification sent successfully to ${userEmail}`);
+
+                            // Reset form
+                            e.target.reset();
+
+                            // Add to recent activity
+                            addToRecentActivity('notification', 'Notification Sent',
+                                `${type} notification sent to ${userEmail}`, 'Just now');
+                        } else {
+                            showMessage('error', `User with email ${userEmail} not found in the system.`);
+                        }
+
+                        // Update notification count in header if available
+                        updateNotificationCount();
+                    })
+                    .catch(error => {
+                        console.error('❌ Error sending notification:', error);
+                        showMessage('error', `Failed to send notification: ${error.message}`);
+                    })
+                    .finally(() => {
+                        resetSubmitButton(submitButton, originalButtonText);
+                    });
             }
 
-            // Show success/error messages
-            function showMessage(type, text) {
-                const messageElement = currentContainer.querySelector(`#admin-${type}-message`);
-                const textElement = currentContainer.querySelector(`#${type}-text`);
+            // Function to send notification to backend
+            async function sendNotificationToUser(notificationData) {
+                console.log('🌐 Sending notification to backend for processing:', notificationData);
 
-                if (messageElement && textElement) {
-                    textElement.textContent = text;
-                    messageElement.classList.add('show');
+                try {
+                    const response = await fetch('/api/admin/send-notification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        },
+                        body: JSON.stringify(notificationData)
+                    });
 
-                    setTimeout(() => {
-                        messageElement.classList.remove('show');
-                    }, 5000);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('🌐 Backend response:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('🌐 Network error:', error);
+
+                    // Fallback: Store locally for later processing
+                    console.log('📱 Storing notification locally as fallback');
+                    const notificationId = generateNotificationId();
+                    const localNotification = { ...notificationData, id: notificationId };
+
+                    let localNotifications = JSON.parse(localStorage.getItem('localNotifications') || '[]');
+                    localNotifications.push(localNotification);
+                    localStorage.setItem('localNotifications', JSON.stringify(localNotifications));
+
+                    return {
+                        success: true,
+                        message: 'Notification queued for delivery when connection is restored',
+                        id: notificationId,
+                        stored_locally: true,
+                        userFound: true // Assume true for offline storage
+                    };
                 }
             }
 
-            // Add to recent activity
-            function addToRecentActivity(type, title, description, time) {
-                recentActivity.unshift({ type, title, description, time });
-                if (recentActivity.length > 10) {
-                    recentActivity.pop();
+            // Helper functions
+            function resetSubmitButton(button, originalText) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+
+            function generateNotificationId() {
+                return 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            function getAuthToken() {
+                // Replace with your actual auth token retrieval logic
+                return localStorage.getItem('adminAuthToken') || 'demo-token';
+            }
+
+            function updateNotificationCount() {
+                // Update notification count in header if available
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'updateNotifications',
+                        action: 'increment'
+                    }, '*');
                 }
-                loadRecentActivity();
             }
 
             // Reset function
@@ -1222,6 +1321,357 @@
                     console.log(`✅ Generic content loaded for ${tabId} tab`);
                 } else {
                     console.error(`❌ Content container not found for tab: ${tabId}`);
+                }
+            }
+
+            // Handle dispute form submission
+            function handleDisputeSubmit(e) {
+                e.preventDefault();
+                console.log('⚖️ Handling dispute submission');
+
+                // Get form elements
+                const selectedUserElement = currentContainer.querySelector('#selected-user-disputes');
+                const statusElement = currentContainer.querySelector('#dispute-status');
+                const responseElement = currentContainer.querySelector('#dispute-response');
+
+                if (!statusElement || !responseElement) {
+                    showMessage('error', 'Form elements not found.');
+                    return;
+                }
+
+                const selectedUserId = selectedUserElement ? selectedUserElement.value : '';
+                const status = statusElement.value;
+                const response = responseElement.value.trim();
+
+                // Validation
+                if (!selectedUserId) {
+                    showMessage('error', 'Please select a user to send the dispute update to.');
+                    return;
+                }
+
+                if (!status || !response) {
+                    showMessage('error', 'Please fill in all fields (status and response).');
+                    return;
+                }
+
+                // Show loading state
+                const submitButton = currentContainer.querySelector('#dispute-form button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                submitButton.disabled = true;
+
+                // Find the selected user
+                const selectedUser = mockUsers.find(user => user.id === selectedUserId);
+                if (!selectedUser) {
+                    showMessage('error', 'Selected user not found.');
+                    resetSubmitButton(submitButton, originalButtonText);
+                    return;
+                }
+
+                console.log('⚖️ Sending dispute update to user:', selectedUser.email);
+
+                // Create dispute data
+                const disputeData = {
+                    userId: selectedUserId,
+                    userEmail: selectedUser.email,
+                    userName: selectedUser.name,
+                    status: status,
+                    response: response,
+                    timestamp: new Date().toISOString(),
+                    adminId: 'current-admin',
+                    type: 'dispute_update'
+                };
+
+                // Send dispute update
+                sendDisputeUpdate(disputeData)
+                    .then(response => {
+                        console.log('✅ Dispute update sent successfully:', response);
+                        showMessage('success', `Dispute update sent successfully to ${selectedUser.name} (${selectedUser.email})`);
+
+                        // Reset form
+                        e.target.reset();
+                        selectedUserElement.value = '';
+
+                        // Clear user search
+                        const userSearchInput = currentContainer.querySelector('#user-search-disputes');
+                        if (userSearchInput) {
+                            userSearchInput.value = '';
+                        }
+                        const userSearchResults = currentContainer.querySelector('#user-search-results-disputes');
+                        if (userSearchResults) {
+                            userSearchResults.innerHTML = '';
+                            userSearchResults.style.display = 'none';
+                        }
+
+                        // Add to recent activity
+                        addToRecentActivity('dispute', 'Dispute Update Sent',
+                            `Status updated to "${status}" for ${selectedUser.name}`, 'Just now');
+                    })
+                    .catch(error => {
+                        console.error('❌ Error sending dispute update:', error);
+                        showMessage('error', `Failed to send dispute update: ${error.message}`);
+                    })
+                    .finally(() => {
+                        resetSubmitButton(submitButton, originalButtonText);
+                    });
+            }
+
+            // Handle report form submission
+            function handleReportSubmit(e) {
+                e.preventDefault();
+                console.log('📄 Handling report submission');
+
+                // Get form elements
+                const selectedUserElement = currentContainer.querySelector('#selected-user-reports');
+                const reportTypeElement = currentContainer.querySelector('#report-type');
+                const fileInput = currentContainer.querySelector('#report-file');
+
+                if (!reportTypeElement) {
+                    showMessage('error', 'Form elements not found.');
+                    return;
+                }
+
+                const selectedUserId = selectedUserElement ? selectedUserElement.value : '';
+                const reportType = reportTypeElement.value;
+                const file = fileInput ? fileInput.files[0] : null;
+
+                // Validation
+                if (!selectedUserId) {
+                    showMessage('error', 'Please select a user to send the report to.');
+                    return;
+                }
+
+                if (!reportType) {
+                    showMessage('error', 'Please select a report type.');
+                    return;
+                }
+
+                if (!file) {
+                    showMessage('error', 'Please select a file to upload.');
+                    return;
+                }
+
+                // Show loading state
+                const submitButton = currentContainer.querySelector('#report-form button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                submitButton.disabled = true;
+
+                // Find the selected user
+                const selectedUser = mockUsers.find(user => user.id === selectedUserId);
+                if (!selectedUser) {
+                    showMessage('error', 'Selected user not found.');
+                    resetSubmitButton(submitButton, originalButtonText);
+                    return;
+                }
+
+                console.log('📄 Uploading report for user:', selectedUser.email);
+
+                // Create report data
+                const reportData = {
+                    userId: selectedUserId,
+                    userEmail: selectedUser.email,
+                    userName: selectedUser.name,
+                    reportType: reportType,
+                    fileName: file.name,
+                    fileSize: file.size,
+                    timestamp: new Date().toISOString(),
+                    adminId: 'current-admin'
+                };
+
+                // Upload report
+                uploadReportForUser(reportData, file)
+                    .then(response => {
+                        console.log('✅ Report uploaded successfully:', response);
+                        showMessage('success', `Report uploaded successfully for ${selectedUser.name} (${selectedUser.email})`);
+
+                        // Reset form
+                        e.target.reset();
+                        selectedUserElement.value = '';
+
+                        // Clear user search
+                        const userSearchInput = currentContainer.querySelector('#user-search-reports');
+                        if (userSearchInput) {
+                            userSearchInput.value = '';
+                        }
+                        const userSearchResults = currentContainer.querySelector('#user-search-results-reports');
+                        if (userSearchResults) {
+                            userSearchResults.innerHTML = '';
+                            userSearchResults.style.display = 'none';
+                        }
+
+                        // Clear file upload area
+                        const fileUploadArea = currentContainer.querySelector('#file-upload-area');
+                        if (fileUploadArea) {
+                            fileUploadArea.classList.remove('file-selected');
+                        }
+                        const fileInfo = currentContainer.querySelector('#file-info');
+                        if (fileInfo) {
+                            fileInfo.innerHTML = '';
+                        }
+
+                        // Add to recent activity
+                        addToRecentActivity('upload', 'Report Uploaded',
+                            `${reportType} report uploaded for ${selectedUser.name}`, 'Just now');
+                    })
+                    .catch(error => {
+                        console.error('❌ Error uploading report:', error);
+                        showMessage('error', `Failed to upload report: ${error.message}`);
+                    })
+                    .finally(() => {
+                        resetSubmitButton(submitButton, originalButtonText);
+                    });
+            }
+
+            // Function to send dispute update to backend
+            async function sendDisputeUpdate(disputeData) {
+                console.log('🌐 Sending dispute update to backend:', disputeData);
+
+                try {
+                    const response = await fetch('/api/admin/send-dispute-update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        },
+                        body: JSON.stringify(disputeData)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('🌐 Backend response:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('🌐 Network error:', error);
+
+                    // Fallback: Store locally
+                    console.log('📱 Storing dispute update locally as fallback');
+                    const disputeId = generateNotificationId();
+                    const localDispute = { ...disputeData, id: disputeId };
+
+                    let localDisputes = JSON.parse(localStorage.getItem('localDisputes') || '[]');
+                    localDisputes.push(localDispute);
+                    localStorage.setItem('localDisputes', JSON.stringify(localDisputes));
+
+                    return {
+                        success: true,
+                        message: 'Dispute update queued for delivery',
+                        id: disputeId,
+                        stored_locally: true
+                    };
+                }
+            }
+
+            // Function to upload report for user
+            async function uploadReportForUser(reportData, file) {
+                console.log('🌐 Uploading report to backend:', reportData);
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('reportData', JSON.stringify(reportData));
+
+                    const response = await fetch('/api/admin/upload-report', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('🌐 Backend response:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('🌐 Network error:', error);
+
+                    // Fallback: Store locally (without actual file for demo)
+                    console.log('📱 Storing report info locally as fallback');
+                    const reportId = generateNotificationId();
+                    const localReport = { ...reportData, id: reportId };
+
+                    let localReports = JSON.parse(localStorage.getItem('localReports') || '[]');
+                    localReports.push(localReport);
+                    localStorage.setItem('localReports', JSON.stringify(localReports));
+
+                    return {
+                        success: true,
+                        message: 'Report upload queued for processing',
+                        id: reportId,
+                        stored_locally: true
+                    };
+                }
+            }
+
+            // Function to show success/error messages
+            function showMessage(type, message) {
+                console.log(`📢 Showing ${type} message:`, message);
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for showMessage');
+                    return;
+                }
+
+                const successElement = currentContainer.querySelector('#admin-success-message');
+                const errorElement = currentContainer.querySelector('#admin-error-message');
+                const successText = currentContainer.querySelector('#success-text');
+                const errorText = currentContainer.querySelector('#error-text');
+
+                // Hide both messages first
+                if (successElement) successElement.style.display = 'none';
+                if (errorElement) errorElement.style.display = 'none';
+
+                if (type === 'success' && successElement && successText) {
+                    successText.textContent = message;
+                    successElement.style.display = 'block';
+
+                    // Auto-hide success message after 5 seconds
+                    setTimeout(() => {
+                        successElement.style.display = 'none';
+                    }, 5000);
+
+                } else if (type === 'error' && errorElement && errorText) {
+                    errorText.textContent = message;
+                    errorElement.style.display = 'block';
+
+                    // Auto-hide error message after 8 seconds
+                    setTimeout(() => {
+                        errorElement.style.display = 'none';
+                    }, 8000);
+                }
+            }
+
+            // Function to add activity to recent activity list
+            function addToRecentActivity(type, title, description, time) {
+                console.log('📊 Adding to recent activity:', { type, title, description, time });
+
+                // Add to the beginning of the array
+                recentActivity.unshift({
+                    type: type,
+                    title: title,
+                    description: description,
+                    time: time
+                });
+
+                // Keep only the last 10 activities
+                if (recentActivity.length > 10) {
+                    recentActivity = recentActivity.slice(0, 10);
+                }
+
+                // Update the activity display if we're on the activity tab
+                if (currentTab === 'activity') {
+                    loadRecentActivity();
                 }
             }
 

@@ -12,6 +12,7 @@ import settingsRoutes from './routes/settingsRoutes.js';
 
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +36,7 @@ if (!fs.existsSync(chunksDir)) {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../Frontend')));
 
 // Use routes
@@ -43,6 +45,7 @@ app.use('/api/chatGptService', chatRoutesModule);
 app.use('/api/auth', authRoutes);
 app.use('/api/ghl', ghlRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Serve the frontend
 app.get('*', (req, res) => {
@@ -88,4 +91,13 @@ async function initializeApp() {
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await initializeApp();
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+    console.error('Global error handler:', error);
+    res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+    });
 });
