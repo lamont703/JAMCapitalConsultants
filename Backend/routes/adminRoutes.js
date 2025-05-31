@@ -1,5 +1,12 @@
 import express from 'express';
+import multer from 'multer';
 
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB limit
+    }
+});
 
 // Add debugging for imports
 console.log('🔧 Loading adminRoutes...');
@@ -17,7 +24,7 @@ try {
 try {
     authMiddleware = (await import('../middleware/authMiddleware.js')).default;
     console.log('🔧 authMiddleware imported:', !!authMiddleware);
-    console.log('🔧 authMiddleware.authenticateToken:', typeof authMiddleware?.authenticateToken);
+    console.log('🔧 authMiddleware.authenticateToken:', typeof authMiddleware?.verifyToken);
 } catch (error) {
     console.error('❌ Error importing authMiddleware:', error);
 }
@@ -36,8 +43,8 @@ const router = express.Router();
 console.log('🔧 Setting up admin routes...');
 
 // Check if all middleware functions exist
-if (!authMiddleware?.verifyToken) {
-    console.error('❌ authMiddleware.verifyToken is undefined!');
+if (!authMiddleware?.authenticateToken) {
+    console.error('❌ authMiddleware.authenticateToken is undefined!');
 }
 if (!adminMiddleware?.requireAdmin) {
     console.error('❌ adminMiddleware.requireAdmin is undefined!');
@@ -45,22 +52,23 @@ if (!adminMiddleware?.requireAdmin) {
 
 // Admin notification routes
 router.post('/send-notification', 
-    authMiddleware?.verifyToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.verifyToken'); next(); }), 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
     adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }), 
     adminController.sendNotification
 );
 console.log('✅ /send-notification route registered');
 
 router.post('/send-dispute-update', 
-    authMiddleware?.verifyToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.verifyToken'); next(); }), 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
     adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }), 
     adminController.sendDisputeUpdate
 );
 console.log('✅ /send-dispute-update route registered');
 
 router.post('/upload-report', 
-    authMiddleware?.verifyToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.verifyToken'); next(); }), 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
     adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }), 
+    upload.single('file'),
     adminController.uploadReport
 );
 console.log('✅ /upload-report route registered');

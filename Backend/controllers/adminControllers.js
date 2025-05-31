@@ -1,4 +1,5 @@
 import NotificationSchema from '../models/Notifications.js';
+import AzureBlobService from '../services/azureBlobService.js';
 
 // Add debugging to see if the module loads
 console.log('🔧 Loading adminController module...');
@@ -161,17 +162,117 @@ const adminController = {
     async uploadReport(req, res) {
         try {
             console.log('📄 Admin report upload request received');
+            console.log('📄 File info:', req.file);
+            console.log('📄 Report data:', req.body.reportData);
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No file uploaded'
+                });
+            }
+
+            const reportData = JSON.parse(req.body.reportData);
+            const { userEmail, reportType, userName } = reportData;
+            const adminId = req.user.id;
+            const cosmosService = req.app.locals.cosmosService;
+
+            // Verify user exists
+            console.log('🔍 Verifying user exists:', userEmail);
+            const user = await cosmosService.getUserByEmail(userEmail);
             
+            if (!user) {
+                console.log(`❌ User not found: ${userEmail}`);
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found in the system',
+                    userFound: false
+                });
+            }
+
+            console.log(`✅ User found: ${user.name || user.firstName} (${user.email})`);
+
+            // Initialize Azure Blob Service
+            const blobService = new AzureBlobService();
+            await blobService.initialize();
+
+            // Generate unique filename
+            const fileName = blobService.generateFileName(
+                req.file.originalname,
+                userEmail,
+                reportType
+            );
+
+            // Upload file to Azure Blob Storage
+            const uploadResult = await blobService.uploadFile(req.file, fileName, {
+                userEmail: userEmail,
+                reportType: reportType,
+                uploadedBy: adminId,
+                uploadDate: new Date().toISOString()
+            });
+
+            // Create report document for CosmosDB
+            const reportDocument = {
+                id: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'report',
+                userId: user.id,
+                userEmail: user.email,
+                userName: user.name || user.firstName,
+                reportType: reportType,
+                fileName: req.file.originalname,
+                storedFileName: fileName,
+                fileUrl: uploadResult.url,
+                fileSize: req.file.size,
+                adminId: adminId,
+                status: 'uploaded',
+                timestamp: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            // Save report info to CosmosDB
+            await cosmosService.createDocument(reportDocument);
+            console.log('💾 Report document saved to database:', reportDocument.id);
+
+            // Create notification for user about new report
+            const reportNotification = NotificationSchema.createNotificationDocument({
+                userId: user.id,
+                userEmail: user.email,
+                userName: user.name || user.firstName,
+                notificationType: 'credit-report',
+                subject: `New ${reportType} Report Available`,
+                message: `A new ${reportType} report has been uploaded to your account. You can view it in your dashboard.`,
+                adminId: adminId,
+                status: 'sent',
+                metadata: {
+                    reportId: reportDocument.id,
+                    reportType: reportType,
+                    fileName: req.file.originalname
+                }
+            });
+
+            await cosmosService.createDocument(reportNotification);
+            console.log('💾 Report notification saved to database:', reportNotification.id);
+
             res.status(200).json({
                 success: true,
-                message: 'Report uploaded successfully'
+                message: 'Report uploaded successfully',
+                userFound: true,
+                reportId: reportDocument.id,
+                fileName: req.file.originalname,
+                fileUrl: uploadResult.url,
+                recipient: {
+                    name: user.name || user.firstName,
+                    email: user.email
+                }
             });
 
         } catch (error) {
             console.error('❌ Error uploading report:', error);
             res.status(500).json({
                 success: false,
-                message: 'Internal server error while uploading report'
+                message: 'Internal server error while uploading report',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
     }

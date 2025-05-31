@@ -13,6 +13,7 @@ import settingsRoutes from './routes/settingsRoutes.js';
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
 import adminRoutes from './routes/adminRoutes.js';
+import AzureBlobService from './services/azureBlobService.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -80,6 +81,12 @@ async function initializeApp() {
             app.locals.ghlService = null;
             global.ghlService = null;
         }
+        
+        // Initialize Azure Blob Storage
+        const azureBlobService = new AzureBlobService();
+        await azureBlobService.initialize();
+        app.locals.azureBlobService = azureBlobService;
+        console.log('✅ Azure Blob Storage service initialized');
         
     } catch (error) {
         console.error('Failed to initialize core services:', error);
