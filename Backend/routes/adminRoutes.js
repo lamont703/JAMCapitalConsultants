@@ -73,4 +73,20 @@ router.post('/upload-report',
 );
 console.log('✅ /upload-report route registered');
 
+// Save activity
+router.post('/save-activity', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
+    adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }), 
+    adminController.saveActivity
+);
+
+// Get activity
+router.get('/get-activity', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
+    adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }), 
+    adminController.getActivity
+);
+
+console.log('✅ Activity routes registered');
+
 export default router; 

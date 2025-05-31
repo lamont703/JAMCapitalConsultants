@@ -275,6 +275,97 @@ const adminController = {
                 error: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
+    },
+
+    // Save admin activity
+    async saveActivity(req, res) {
+        try {
+            console.log('📊 Saving admin activity:', req.body);
+            
+            const activityData = req.body;
+            const adminId = req.user.id;
+            const cosmosService = req.app.locals.cosmosService;
+            
+            // Create activity document
+            const activityDocument = {
+                id: activityData.id || `activity_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'admin-activity',
+                activityType: activityData.type,
+                title: activityData.title,
+                description: activityData.description,
+                adminId: adminId,
+                timestamp: activityData.timestamp || new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                metadata: activityData.metadata || {}
+            };
+            
+            console.log('💾 Saving activity document:', activityDocument);
+            
+            // Save to database
+            await cosmosService.createDocument(activityDocument);
+            console.log('✅ Activity saved to database:', activityDocument.id);
+            
+            res.status(200).json({
+                success: true,
+                message: 'Activity saved successfully',
+                activityId: activityDocument.id
+            });
+            
+        } catch (error) {
+            console.error('❌ Error saving activity:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to save activity',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
+        }
+    },
+
+    // Get admin activity
+    async getActivity(req, res) {
+        try {
+            console.log('📊 Loading admin activity');
+            
+            const adminId = req.user.id;
+            const cosmosService = req.app.locals.cosmosService;
+            
+            // Fix: Use the correct query format for cosmosService
+            const querySpec = "SELECT * FROM c WHERE c.type = 'admin-activity' AND c.adminId = @adminId ORDER BY c.timestamp DESC";
+            const parameters = [
+                { name: "@adminId", value: adminId }
+            ];
+            
+            console.log('🔍 Executing query:', querySpec);
+            console.log('🔍 With parameters:', parameters);
+            
+            // Use the correct method call format
+            const activities = await cosmosService.queryDocuments(querySpec, parameters);
+            console.log('✅ Activities loaded from database:', activities.length);
+            
+            // Transform for frontend
+            const transformedActivities = activities.map(activity => ({
+                id: activity.id,
+                type: activity.activityType,
+                title: activity.title,
+                description: activity.description,
+                timestamp: activity.timestamp,
+                time: activity.timestamp // For backward compatibility
+            }));
+            
+            res.status(200).json({
+                success: true,
+                activities: transformedActivities,
+                count: transformedActivities.length
+            });
+            
+        } catch (error) {
+            console.error('❌ Error loading activity:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to load activity',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
+        }
     }
 };
 
