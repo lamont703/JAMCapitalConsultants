@@ -412,8 +412,74 @@
                 }
             }
 
+            // Function to fetch user notifications from the API
+            async function fetchUserNotifications() {
+                try {
+                    console.log('📨 Fetching user notifications from API...');
+
+                    // Get user ID from userData object in localStorage
+                    let userId = localStorage.getItem('userId') || localStorage.getItem('user_id');
+
+                    if (!userId) {
+                        // Try to get it from userData object
+                        const userData = localStorage.getItem('userData');
+                        if (userData) {
+                            try {
+                                const parsedUserData = JSON.parse(userData);
+                                userId = parsedUserData.id;
+                                console.log('🔍 Found user ID in userData:', userId);
+                            } catch (error) {
+                                console.error('Error parsing userData:', error);
+                            }
+                        }
+                    }
+
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId) {
+                        console.warn('⚠️ No user ID found in localStorage');
+                        return null;
+                    }
+
+                    if (!authToken || authToken === 'demo-token') {
+                        console.warn('⚠️ No valid auth token found');
+                        return null;
+                    }
+
+                    console.log('🔍 Making API request for user:', userId);
+
+                    const response = await fetch(`http://localhost:3000/api/admin/get-user-notifications/${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success && Array.isArray(data.messages)) {
+                        console.log('✅ Successfully fetched notifications from API:', data.messages.length);
+                        return data.messages;
+                    } else {
+                        throw new Error('Invalid API response format');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error fetching user notifications:', error);
+                    return null;
+                }
+            }
+
             // Initialize the module
-            function init(containerId) {
+            async function init(containerId) {
                 const container = document.getElementById(containerId);
                 if (!container) {
                     console.error(`Container ${containerId} not found`);
@@ -428,8 +494,16 @@
 
                 console.log('Initializing Messages Module');
 
-                // Load messages (in a real app, this would be an API call)
-                messages = [...sampleMessages];
+                // Try to fetch notifications from API, fallback to sample messages
+                const apiMessages = await fetchUserNotifications();
+
+                if (apiMessages && apiMessages.length > 0) {
+                    console.log('📨 Using notifications from API');
+                    messages = apiMessages;
+                } else {
+                    console.log('📨 Using sample messages as fallback');
+                    messages = [...sampleMessages];
+                }
 
                 // Render the initial UI
                 renderMessagesUI(container);
@@ -444,6 +518,8 @@
 
             // Render the messages UI
             function renderMessagesUI(container) {
+                console.log('🎨 Rendering messages UI with', messages.length, 'messages');
+
                 // Create the messages container
                 const messagesContainer = document.createElement('div');
                 messagesContainer.className = 'messages-container';
@@ -517,51 +593,196 @@
                 // Clear the container and append the messages UI
                 container.innerHTML = '';
                 container.appendChild(messagesContainer);
+
+                // After rendering, automatically attach click handlers
+                setTimeout(() => {
+                    attachMessageClickHandlers(container);
+                }, 100); // Small delay to ensure DOM is updated
             }
 
             // Set up event listeners
             function setupEventListeners(container) {
-                // Message item click
-                container.addEventListener('click', function (e) {
-                    const messageItem = e.target.closest('.message-item');
-                    if (messageItem) {
-                        const messageId = parseInt(messageItem.dataset.id);
-                        openMessage(messageId, container);
-                    }
-                });
+                console.log('🔧 Setting up event listeners for Messages module');
 
-                // Filter buttons click
-                container.addEventListener('click', function (e) {
-                    const filterBtn = e.target.closest('.filter-btn');
-                    if (filterBtn) {
-                        const filter = filterBtn.dataset.filter;
-                        setFilter(filter, container);
-                    }
-                });
-
-                // Search input
-                const searchInput = container.querySelector('#message-search');
+                // Search functionality
+                const searchInput = container.querySelector('.messages-search input');
                 if (searchInput) {
+                    console.log('✅ Search input found, adding event listener');
                     searchInput.addEventListener('input', function (e) {
-                        searchMessages(e.target.value, container);
+                        console.log('🔍 Search input changed:', e.target.value);
+                        filterMessages(e.target.value);
                     });
+                } else {
+                    console.error('❌ Search input not found');
                 }
 
-                // Message detail action buttons
-                container.addEventListener('click', function (e) {
-                    const actionBtn = e.target.closest('.message-detail-action');
-                    if (actionBtn) {
-                        const action = actionBtn.dataset.action;
+                // Filter buttons
+                const filterButtons = container.querySelectorAll('.messages-filter-btn');
+                console.log('🔧 Found filter buttons:', filterButtons.length);
 
-                        if (action === 'back') {
-                            closeMessageDetail(container);
-                        } else if (action === 'mark-read' || action === 'mark-unread') {
-                            toggleReadStatus(activeMessageId, container);
-                        } else if (action === 'delete') {
-                            deleteMessage(activeMessageId, container);
-                        }
-                    }
+                filterButtons.forEach(button => {
+                    console.log('✅ Adding click listener to filter button:', button.textContent);
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const filter = this.dataset.filter;
+                        console.log('🔘 Filter button clicked:', filter);
+                        setFilter(filter, container);
+                    });
                 });
+
+                // Message item clicks - This is the key part for clicking messages
+                const messagesList = container.querySelector('.messages-list');
+                if (messagesList) {
+                    console.log('✅ Messages list found, adding click delegation');
+
+                    messagesList.addEventListener('click', function (e) {
+                        console.log('🖱️ Click detected on messages list');
+                        console.log('🖱️ Click target:', e.target);
+                        console.log('🖱️ Click target classes:', e.target.className);
+
+                        // Find the message item (could be clicked on child element)
+                        const messageItem = e.target.closest('.message-item');
+                        console.log('🖱️ Found message item:', messageItem);
+
+                        if (messageItem) {
+                            const messageId = messageItem.dataset.id;
+                            console.log('📨 Message clicked - ID:', messageId);
+                            console.log('📨 Message item dataset:', messageItem.dataset);
+
+                            // Mark as read
+                            markAsRead(messageId);
+
+                            // Show message details
+                            showMessageDetails(messageId, container);
+                        } else {
+                            console.log('❌ No message item found in click path');
+                        }
+                    });
+                } else {
+                    console.error('❌ Messages list not found for event delegation');
+                }
+
+                // Compose button
+                const composeBtn = container.querySelector('.messages-compose-btn');
+                if (composeBtn) {
+                    console.log('✅ Compose button found, adding event listener');
+                    composeBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        console.log('✉️ Compose button clicked');
+                        showComposeModal(container);
+                    });
+                } else {
+                    console.log('⚠️ Compose button not found');
+                }
+
+                console.log('🔧 Event listeners setup complete');
+            }
+
+            // Mark message as read
+            function markAsRead(messageId) {
+                console.log('✅ Marking message as read:', messageId);
+
+                const message = messages.find(m => m.id == messageId);
+                if (message) {
+                    message.read = true;
+                    console.log('✅ Message marked as read in local array');
+
+                    // Update the UI to reflect read status
+                    const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.classList.remove('unread');
+                        messageElement.classList.add('read');
+                        console.log('✅ Message UI updated to read status');
+                    }
+
+                    // TODO: Send API call to backend to mark as read in database
+                    // This would be something like:
+                    // updateMessageReadStatus(messageId, true);
+                } else {
+                    console.error('❌ Message not found for marking as read:', messageId);
+                }
+            }
+
+            // Show message details
+            function showMessageDetails(messageId, container) {
+                console.log('📖 showMessageDetails called with ID:', messageId);
+                console.log('📖 Available messages:', messages.length);
+
+                const message = messages.find(m => m.id == messageId);
+                console.log('📖 Found message:', message);
+
+                if (!message) {
+                    console.error('❌ Message not found with ID:', messageId);
+                    return;
+                }
+
+                // Look for the existing message detail panel
+                let detailsPanel = container.querySelector('.message-detail');
+                console.log('📖 Looking for message detail panel:', detailsPanel);
+
+                if (!detailsPanel) {
+                    console.log('📖 Message detail panel not found, checking for alternative selectors');
+                    detailsPanel = container.querySelector('#message-detail') ||
+                        container.querySelector('.message-details') ||
+                        container.querySelector('[class*="detail"]');
+                    console.log('📖 Alternative detail panel found:', detailsPanel);
+                }
+
+                if (!detailsPanel) {
+                    console.error('❌ No message details panel found in container');
+                    console.log('📖 Available elements in container:', container.querySelectorAll('*'));
+                    return;
+                }
+
+                console.log('📖 Updating details panel with message data');
+
+                // Update the detail panel content
+                detailsPanel.innerHTML = `
+        <div class="message-detail-header">
+            <button class="message-detail-back" onclick="closeMessageDetail()">
+                <i class="fas fa-arrow-left"></i> Back to Messages
+            </button>
+            <div class="message-detail-actions">
+                <button class="message-detail-action" data-action="mark-unread" onclick="toggleReadStatus('${messageId}')">
+                    <i class="fas fa-envelope"></i> Mark as unread
+                </button>
+                <button class="message-detail-action" data-action="delete" onclick="deleteMessage('${messageId}')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        <div class="message-detail-info">
+            <div class="message-detail-avatar">${message.avatar}</div>
+            <div>
+                <div class="message-detail-sender">${message.sender}</div>
+                <div class="message-detail-time">${new Date(message.time).toLocaleString()}</div>
+            </div>
+        </div>
+        <div class="message-detail-subject">
+            <h2>${message.subject}</h2>
+        </div>
+        <div class="message-detail-body">
+            ${message.body.replace(/\n/g, '<br>')}
+        </div>
+    `;
+
+                // Show the detail panel by adding the active class
+                detailsPanel.classList.add('active');
+                console.log('📖 Added active class to detail panel');
+
+                // Hide the messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    messagesList.style.display = 'none';
+                    console.log('📖 Hidden messages list');
+                } else {
+                    console.log('⚠️ Messages list not found to hide');
+                }
+
+                // Set the active message ID
+                activeMessageId = messageId;
+
+                console.log('📖 Message details updated and displayed successfully');
             }
 
             // Open a message
@@ -624,70 +845,142 @@
                 }
             }
 
-            // Close message detail view
-            function closeMessageDetail(container) {
-                // Hide message detail
-                const messageDetail = container.querySelector('#message-detail');
-                if (messageDetail) {
-                    messageDetail.classList.remove('active');
+            // Close message detail function - make it globally accessible
+            window.closeMessageDetail = function () {
+                console.log('🔙 Closing message detail');
+
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (!container) {
+                    console.error('❌ Container not found for closing message detail');
+                    return;
                 }
 
-                // Show messages list
+                const messageDetail = container.querySelector('.message-detail');
+                if (messageDetail) {
+                    messageDetail.classList.remove('active');
+                    console.log('📖 Removed active class from detail panel');
+                }
+
                 const messagesList = container.querySelector('#messages-list');
                 if (messagesList) {
                     messagesList.style.display = 'block';
+                    console.log('📖 Showed messages list');
                 }
 
-                // Clear active message
                 activeMessageId = null;
-            }
+                console.log('🔙 Message detail closed successfully');
+            };
 
-            // Toggle read status
-            function toggleReadStatus(messageId, container) {
-                const message = messages.find(msg => msg.id === messageId);
-                if (!message) return;
+            // Toggle read status - also make it globally accessible
+            window.toggleReadStatus = function (messageId) {
+                console.log('🔄 Toggle read status for message:', messageId);
+                const message = messages.find(m => m.id == messageId);
+                if (message) {
+                    message.read = !message.read;
+                    console.log('✅ Message read status toggled to:', message.read);
 
-                // Toggle read status
-                message.read = !message.read;
-
-                // Update UI
-                if (activeMessageId === messageId) {
-                    // If we're in detail view, update the button
-                    const actionBtn = container.querySelector(`.message-detail-action[data-action="${message.read ? 'mark-read' : 'mark-unread'}"]`);
-                    if (actionBtn) {
-                        actionBtn.dataset.action = message.read ? 'mark-unread' : 'mark-read';
-                        actionBtn.innerHTML = `
-                            <i class="fas ${message.read ? 'fa-envelope' : 'fa-envelope-open'}"></i> 
-                            ${message.read ? 'Mark as unread' : 'Mark as read'}
-                        `;
+                    // Update the UI
+                    const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                    if (container) {
+                        // Re-render the message details to update the button
+                        showMessageDetails(messageId, container);
                     }
                 }
+            };
 
-                // Update list item
-                const messageItem = container.querySelector(`.message-item[data-id="${messageId}"]`);
-                if (messageItem) {
-                    if (message.read) {
-                        messageItem.classList.remove('unread');
+            // Delete a message - also make it globally accessible
+            window.deleteMessage = function (messageId) {
+                console.log('🗑️ Delete message:', messageId);
+                if (confirm('Are you sure you want to delete this message?')) {
+                    // First, try to delete from the backend
+                    deleteMessageFromBackend(messageId)
+                        .then(success => {
+                            if (success) {
+                                console.log('✅ Message deleted from backend successfully');
+
+                                // Remove from local array
+                                const index = messages.findIndex(m => m.id == messageId);
+                                if (index > -1) {
+                                    messages.splice(index, 1);
+                                    console.log('✅ Message deleted from local array');
+
+                                    // Close the detail view and go back to list
+                                    window.closeMessageDetail();
+
+                                    // Re-render the messages list AND re-attach event handlers
+                                    const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                                    if (container) {
+                                        renderMessagesUI(container);
+                                        // Re-attach click handlers after re-rendering
+                                        attachMessageClickHandlers(container);
+                                    }
+                                }
+                            } else {
+                                console.error('❌ Failed to delete message from backend');
+                                alert('Failed to delete message. Please try again.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('❌ Error deleting message from backend:', error);
+                            alert('Error deleting message. Please try again.');
+                        });
+                }
+            };
+
+            // Function to delete message from backend
+            async function deleteMessageFromBackend(messageId) {
+                try {
+                    console.log('🌐 Deleting message from backend:', messageId);
+
+                    // Get user ID and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId) {
+                        console.error('❌ No user ID found for deleting message');
+                        return false;
+                    }
+
+                    if (!authToken) {
+                        console.error('❌ No auth token found for deleting message');
+                        return false;
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/admin/delete-notification`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            notificationId: messageId,
+                            userId: userId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        console.log('✅ Message deleted from backend successfully');
+                        return true;
                     } else {
-                        messageItem.classList.add('unread');
+                        console.error('❌ Backend returned failure:', data.message);
+                        return false;
                     }
+
+                } catch (error) {
+                    console.error('❌ Error deleting message from backend:', error);
+                    return false;
                 }
-
-                // In a real app, you would send an API request to update read status
-            }
-
-            // Delete a message
-            function deleteMessage(messageId, container) {
-                // Remove from messages array
-                messages = messages.filter(msg => msg.id !== messageId);
-
-                // Close detail view if open
-                closeMessageDetail(container);
-
-                // Re-render messages list
-                renderMessagesUI(container);
-
-                // In a real app, you would send an API request to delete the message
             }
 
             // Search messages
@@ -761,6 +1054,50 @@
                 isInitialized = false;
                 activeMessageId = null;
                 return true;
+            }
+
+            // Function to attach click handlers to messages
+            function attachMessageClickHandlers(container) {
+                console.log('🔗 Attaching message click handlers');
+
+                const messagesList = container.querySelector('#messages-list');
+                if (!messagesList) {
+                    console.error('❌ Messages list not found for attaching handlers');
+                    return;
+                }
+
+                // Remove any existing event listeners to prevent duplicates
+                const existingHandler = messagesList.getAttribute('data-handler-attached');
+                if (existingHandler) {
+                    messagesList.removeEventListener('click', window.messagesClickHandler);
+                }
+
+                // Create and store the click handler function
+                window.messagesClickHandler = function (event) {
+                    console.log('🖱️ Click detected on messages list');
+                    console.log('🖱️ Click target:', event.target);
+                    console.log('🖱️ Click target classes:', event.target.className);
+
+                    // Find the closest message item
+                    const messageItem = event.target.closest('.message-item');
+                    console.log('🖱️ Found message item:', messageItem);
+
+                    if (messageItem && messageItem.dataset.id) {
+                        const messageId = messageItem.dataset.id;
+                        console.log('📨 Message clicked - ID:', messageId);
+                        console.log('📨 Message item dataset:', messageItem.dataset);
+
+                        // Mark as read and show details
+                        markAsRead(messageId);
+                        showMessageDetails(messageId, container);
+                    }
+                };
+
+                // Attach the event listener
+                messagesList.addEventListener('click', window.messagesClickHandler);
+                messagesList.setAttribute('data-handler-attached', 'true');
+
+                console.log('✅ Message click handlers attached successfully');
             }
 
             // Public API

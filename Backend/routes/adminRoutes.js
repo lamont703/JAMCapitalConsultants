@@ -87,6 +87,18 @@ router.get('/get-activity',
     adminController.getActivity
 );
 
+// Get notifications for a specific user
+router.get('/get-user-notifications/:userId', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
+    adminController.getUserNotifications
+);
+
+// Delete notification
+router.delete('/delete-notification', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
+    adminController.deleteNotification
+);
+
 console.log('✅ Activity routes registered');
 
 export default router; 

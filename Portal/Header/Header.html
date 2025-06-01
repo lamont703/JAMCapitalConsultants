@@ -333,7 +333,7 @@
                     const storedData = localStorage.getItem('userData');
                     if (storedData) {
                         userData = JSON.parse(storedData);
-                        console.log('📊 User data from localStorage:', userData);
+                        //console.log('📊 User data from localStorage:', userData);
                     } else {
                         console.log('ℹ️ No userData found in localStorage');
                     }
@@ -361,7 +361,7 @@
                     const headerUserName = document.getElementById('header-userName');
                     if (headerUserName) {
                         headerUserName.textContent = displayName;
-                        console.log('📝 Updated header-userName:', displayName);
+                        //console.log('📝 Updated header-userName:', displayName);
                     } else {
                         console.log('⚠️ header-userName element not found');
                     }
@@ -370,7 +370,7 @@
                     const headerUserMenuName = document.getElementById('header-userMenuName');
                     if (headerUserMenuName) {
                         headerUserMenuName.textContent = displayName;
-                        console.log('📝 Updated header-userMenuName:', displayName);
+                        //console.log('📝 Updated header-userMenuName:', displayName);
                     } else {
                         console.log('⚠️ header-userMenuName element not found');
                     }
@@ -379,7 +379,7 @@
                     const headerUserMenuEmail = document.getElementById('header-userMenuEmail');
                     if (headerUserMenuEmail) {
                         headerUserMenuEmail.textContent = userData.email;
-                        console.log('📧 Updated header-userMenuEmail:', userData.email);
+                        //console.log('📧 Updated header-userMenuEmail:', userData.email);
                     } else {
                         console.log('⚠️ header-userMenuEmail element not found');
                     }
@@ -942,7 +942,7 @@
             console.log('🔧 User menu container:', userMenu);
 
             if (userMenu) {
-                console.log('🔧 User menu HTML:', userMenu.innerHTML);
+                //console.log('🔧 User menu HTML:', userMenu.innerHTML);
             }
         }
 

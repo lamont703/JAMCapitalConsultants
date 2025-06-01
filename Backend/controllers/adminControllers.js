@@ -366,6 +366,141 @@ const adminController = {
                 error: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
+    },
+
+    // Get notifications for a specific user
+    async getUserNotifications(req, res) {
+        try {
+            console.log('📨 Getting notifications for user:', req.params.userId);
+            
+            const cosmosService = req.app.locals.cosmosService;
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            // Use the same format as the working admin activity query
+            const querySpec = "SELECT * FROM c WHERE c.type = 'notification' AND c.userId = @userId ORDER BY c.timestamp DESC";
+            const parameters = [
+                { name: "@userId", value: req.params.userId }
+            ];
+            
+            console.log('🔍 Executing query:', querySpec);
+            console.log('🔍 With parameters:', parameters);
+            
+            // Use the same method call format as the working admin activity query
+            const notifications = await cosmosService.queryDocuments(querySpec, parameters);
+            console.log('✅ Notifications loaded from database:', notifications.length);
+            
+            // Transform notifications to match MessagesModule format
+            const messages = notifications.map(notification => ({
+                id: notification.id,
+                sender: notification.senderName || 'JAM Credit Solutions',
+                avatar: notification.senderName ? notification.senderName.charAt(0).toUpperCase() : 'J',
+                subject: notification.subject,
+                body: notification.message,
+                time: new Date(notification.timestamp),
+                read: notification.read || false,
+                type: notification.notificationType || 'general'
+            }));
+
+            res.json({
+                success: true,
+                messages: messages
+            });
+
+        } catch (error) {
+            console.error('❌ Error getting user notifications:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to get notifications',
+                error: error.message
+            });
+        }
+    },
+
+    // Delete notification
+    async deleteNotification(req, res) {
+        try {
+            const { notificationId, userId } = req.body;
+            console.log('🗑️ Deleting notification:', notificationId, 'for user:', userId);
+            
+            const cosmosService = req.app.locals.cosmosService;
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            // First, let's get the exact notification document to see its structure
+            const querySpec = "SELECT * FROM c WHERE c.id = @notificationId AND c.userId = @userId AND c.type = 'notification'";
+            const parameters = [
+                { name: "@notificationId", value: notificationId },
+                { name: "@userId", value: userId }
+            ];
+            
+            console.log('🔍 Searching for notification with query:', querySpec);
+            console.log('🔍 Parameters:', parameters);
+            
+            const notifications = await cosmosService.queryDocuments(querySpec, parameters);
+            
+            if (notifications.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Notification not found or does not belong to user'
+                });
+            }
+
+            console.log('✅ Notification found:', JSON.stringify(notifications[0], null, 2));
+            const notification = notifications[0];
+
+            // The key fix: Use the document's ID as the partition key
+            // Based on your CosmosDB setup, it appears the partition key is the document ID itself
+            console.log('🔑 Using document ID as partition key:', notificationId);
+            console.log('🗑️ Attempting to delete document with ID:', notificationId);
+
+            try {
+                // Use the document ID as both the ID and partition key
+                const deleteResult = await cosmosService.deleteDocument(notificationId, notificationId);
+                console.log('✅ Delete result:', deleteResult);
+                
+            } catch (deleteError) {
+                console.error('❌ Delete failed with document ID as partition key:', deleteError.message);
+                
+                // Try with no partition key (for containers without partition key)
+                try {
+                    console.log('🔄 Trying delete without partition key...');
+                    const deleteResult2 = await cosmosService.deleteDocument(notificationId);
+                    console.log('✅ Delete successful without partition key');
+                    
+                } catch (secondError) {
+                    console.error('❌ Second delete attempt failed:', secondError.message);
+                    
+                    // Try with type as partition key
+                    try {
+                        console.log('🔄 Trying with type as partition key...');
+                        const deleteResult3 = await cosmosService.deleteDocument(notificationId, 'notification');
+                        console.log('✅ Delete successful with type as partition key');
+                        
+                    } catch (thirdError) {
+                        console.error('❌ All delete attempts failed');
+                        throw deleteError; // Throw the original error
+                    }
+                }
+            }
+            
+            console.log('✅ Notification deleted successfully');
+            
+            res.json({
+                success: true,
+                message: 'Notification deleted successfully'
+            });
+
+        } catch (error) {
+            console.error('❌ Error deleting notification:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to delete notification',
+                error: error.message
+            });
+        }
     }
 };
 
