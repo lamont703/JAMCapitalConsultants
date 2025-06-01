@@ -206,23 +206,34 @@
 
         /* File Upload */
         .file-upload-area {
-            border: 2px dashed #09ccfc;
+            position: relative !important;
+            cursor: pointer !important;
+            user-select: none !important;
+            border: 2px dashed #ddd;
             border-radius: 8px;
             padding: 2rem;
             text-align: center;
-            background: #f8f9fa;
             transition: all 0.3s ease;
-            cursor: pointer;
+            background-color: #f8f9fa;
         }
 
         .file-upload-area:hover {
-            background: #e9ecef;
-            border-color: #08b8e8;
+            border-color: #007bff;
+            background-color: #e3f2fd;
         }
 
-        .file-upload-area.dragover {
-            background: #e6f9ff;
-            border-color: #08b8e8;
+        .file-upload-area.drag-over {
+            border-color: #28a745;
+            background-color: #d4edda;
+            transform: scale(1.02);
+        }
+
+        .file-upload-icon,
+        .file-upload-text,
+        .file-upload-hint {
+            pointer-events: none;
+            position: relative;
+            z-index: 5;
         }
 
         .file-upload-icon {
@@ -243,7 +254,14 @@
         }
 
         .file-input {
-            display: none;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            opacity: 0 !important;
+            cursor: pointer !important;
+            z-index: 10 !important;
         }
 
         /* User Search */
@@ -572,39 +590,25 @@
                         <form class="admin-form" id="dispute-form">
                             <div class="form-group">
                                 <label class="form-label">User Email</label>
-                                <input type="email" class="form-input" id="user-email-disputes" 
+                                <input type="email" class="form-input" id="disputeUserEmail" 
                                        placeholder="Enter user's email address..." required>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Credit Bureau</label>
-                                    <select class="form-select" id="credit-bureau">
-                                        <option value="equifax">Equifax</option>
-                                        <option value="experian">Experian</option>
-                                        <option value="transunion">TransUnion</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Dispute Status</label>
-                                    <select class="form-select" id="dispute-status">
-                                        <option value="submitted">Submitted</option>
-                                        <option value="in-progress">In Progress</option>
-                                        <option value="resolved">Resolved</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Dispute Status</label>
+                                <select class="form-select" id="disputeStatus">
+                                    <option value="under_review">Under Review</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="denied">Denied</option>
+                                    <option value="pending_documentation">Pending Documentation</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Dispute Item</label>
-                                <input type="text" class="form-input" id="dispute-item" placeholder="e.g., Late payment on ABC Credit Card">
+                                <label class="form-label">Response Message</label>
+                                <textarea class="form-textarea" id="disputeResponse" placeholder="Enter your response to the user..." rows="4" required></textarea>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Update Notes</label>
-                                <textarea class="form-textarea" id="dispute-notes" placeholder="Enter update details..."></textarea>
-                            </div>
-                            <button type="submit" class="admin-btn admin-btn-success">
-                                <i class="fas fa-save"></i>
-                                Update Dispute
+                            <button type="submit" class="admin-btn admin-btn-primary" id="disputeSubmitBtn">
+                                Send Dispute Update
                             </button>
                         </form>
                     </div>
@@ -739,30 +743,28 @@
                     });
                 });
 
-                // Form submissions with error handling
+                // Form submissions
                 const notificationForm = currentContainer.querySelector('#notification-form');
                 if (notificationForm) {
-                    console.log('📤 Setting up notification form listener');
+                    console.log('🔧 Setting up notification form listener');
                     notificationForm.addEventListener('submit', handleNotificationSubmit);
-                } else {
-                    console.log('⚠️ Notification form not found');
                 }
 
                 const disputeForm = currentContainer.querySelector('#dispute-form');
                 if (disputeForm) {
-                    console.log('⚖️ Setting up dispute form listener');
+                    console.log('🔧 Setting up dispute form listener');
                     disputeForm.addEventListener('submit', handleDisputeSubmit);
-                } else {
-                    console.log('⚠️ Dispute form not found');
                 }
 
                 const reportForm = currentContainer.querySelector('#report-form');
                 if (reportForm) {
-                    console.log('📄 Setting up report form listener');
+                    console.log('🔧 Setting up report form listener');
                     reportForm.addEventListener('submit', handleReportSubmit);
-                } else {
-                    console.log('⚠️ Report form not found');
                 }
+
+                // Initialize file upload functionality
+                console.log('🔧 Initializing file upload');
+                initializeFileUpload();
 
                 console.log('✅ All event listeners set up successfully');
             }
@@ -911,114 +913,303 @@
                 resultsContainer.style.display = 'block';
             }
 
-            // Initialize file upload
+            // Update the initializeFileUpload function with more detailed debugging
             function initializeFileUpload() {
-                const uploadArea = currentContainer.querySelector('#file-upload-area');
-                const fileInput = currentContainer.querySelector('#report-file');
-                const fileInfo = currentContainer.querySelector('#file-info');
-                const fileName = currentContainer.querySelector('#file-name');
-                const removeBtn = currentContainer.querySelector('#remove-file');
+                console.log('🔧 Initializing file upload functionality');
 
-                // Click to upload
-                uploadArea.addEventListener('click', () => fileInput.click());
+                const fileUploadArea = document.getElementById('file-upload-area');
+                const fileInput = document.getElementById('report-file');
+                const fileInfo = document.getElementById('file-info');
+                const fileName = document.getElementById('file-name');
+                const removeFileBtn = document.getElementById('remove-file');
 
-                // Drag and drop
-                uploadArea.addEventListener('dragover', function (e) {
-                    e.preventDefault();
-                    this.classList.add('dragover');
+                console.log('🔍 File upload elements found:');
+                console.log('  - fileUploadArea:', !!fileUploadArea);
+                console.log('  - fileInput:', !!fileInput);
+                console.log('  - fileInfo:', !!fileInfo);
+                console.log('  - fileName:', !!fileName);
+                console.log('  - removeFileBtn:', !!removeFileBtn);
+
+                if (!fileUploadArea || !fileInput) {
+                    console.error('❌ Required file upload elements not found');
+                    return;
+                }
+
+                // SOLUTION: Make the file input cover the entire upload area but remain invisible
+                fileInput.style.position = 'absolute';
+                fileInput.style.top = '0';
+                fileInput.style.left = '0';
+                fileInput.style.width = '100%';
+                fileInput.style.height = '100%';
+                fileInput.style.opacity = '0';
+                fileInput.style.cursor = 'pointer';
+                fileInput.style.zIndex = '10';
+
+                // Make the upload area position relative so the absolute positioning works
+                fileUploadArea.style.position = 'relative';
+
+                // Remove the click handler from the upload area since the file input will handle it
+                console.log('✅ File input positioned over upload area for direct clicking');
+
+                // File input change handler
+                fileInput.addEventListener('change', function (e) {
+                    console.log('📁 File input changed - detailed info:');
+                    console.log('  - Event target:', e.target);
+                    console.log('  - Files length:', e.target.files.length);
+                    if (e.target.files.length > 0) {
+                        console.log('  - First file name:', e.target.files[0].name);
+                        console.log('  - First file type:', e.target.files[0].type);
+                        console.log('  - First file size:', e.target.files[0].size);
+                        handleFileSelection(e.target.files[0]);
+                    }
                 });
 
-                uploadArea.addEventListener('dragleave', function (e) {
+                // Drag and drop handlers on the upload area
+                fileUploadArea.addEventListener('dragover', function (e) {
+                    console.log('📁 Drag over detected');
                     e.preventDefault();
-                    this.classList.remove('dragover');
+                    e.stopPropagation();
+                    fileUploadArea.classList.add('drag-over');
                 });
 
-                uploadArea.addEventListener('drop', function (e) {
+                fileUploadArea.addEventListener('dragleave', function (e) {
+                    console.log('📁 Drag leave detected');
                     e.preventDefault();
-                    this.classList.remove('dragover');
+                    e.stopPropagation();
+                    fileUploadArea.classList.remove('drag-over');
+                });
+
+                fileUploadArea.addEventListener('drop', function (e) {
+                    console.log('📁 File drop detected');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileUploadArea.classList.remove('drag-over');
 
                     const files = e.dataTransfer.files;
                     if (files.length > 0) {
-                        handleFileSelect(files[0]);
+                        console.log('📁 Files dropped:', files.length);
+                        handleFileSelection(files[0]);
+
+                        // Manually set the file input files for form submission
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(files[0]);
+                        fileInput.files = dataTransfer.files;
                     }
                 });
 
-                // File input change
-                fileInput.addEventListener('change', function () {
-                    if (this.files.length > 0) {
-                        handleFileSelect(this.files[0]);
-                    }
-                });
+                // Remove file handler
+                if (removeFileBtn) {
+                    removeFileBtn.addEventListener('click', function (e) {
+                        console.log('📁 Remove file clicked');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        clearFileSelection();
+                    });
+                }
 
-                // Remove file
-                removeBtn.addEventListener('click', function () {
-                    fileInput.value = '';
-                    fileInfo.style.display = 'none';
-                    uploadArea.style.display = 'block';
-                });
+                console.log('✅ File upload initialization complete - file input now directly clickable');
+            }
 
-                function handleFileSelect(file) {
-                    if (file.type !== 'application/pdf') {
-                        showMessage('error', 'Please select a PDF file only.');
-                        return;
-                    }
+            // Update the handleFileSelection function with debugging
+            function handleFileSelection(file) {
+                console.log('📁 Processing file selection:', file ? file.name : 'no file');
 
-                    if (file.size > 10 * 1024 * 1024) { // 10MB
-                        showMessage('error', 'File size must be less than 10MB.');
-                        return;
-                    }
+                if (!file) {
+                    console.error('❌ No file provided to handleFileSelection');
+                    return;
+                }
 
+                const fileInfo = document.getElementById('file-info');
+                const fileName = document.getElementById('file-name');
+                const fileInput = document.getElementById('report-file');
+
+                console.log('🔍 File info elements:');
+                console.log('  - fileInfo:', !!fileInfo);
+                console.log('  - fileName:', !!fileName);
+                console.log('  - fileInput:', !!fileInput);
+
+                // Validate file type
+                console.log('📁 File type:', file.type);
+                console.log('📁 File size:', file.size, 'bytes');
+
+                if (file.type !== 'application/pdf') {
+                    console.error('❌ Invalid file type:', file.type);
+                    showMessage('error', 'Please select a PDF file only.');
+                    clearFileSelection();
+                    return;
+                }
+
+                // Check file size (10MB limit)
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    console.error('❌ File too large:', file.size, 'bytes');
+                    showMessage('error', 'File size must be less than 10MB.');
+                    clearFileSelection();
+                    return;
+                }
+
+                // Update UI to show selected file
+                if (fileName) {
                     fileName.textContent = file.name;
+                    console.log('✅ File name updated in UI');
+                }
+
+                if (fileInfo) {
                     fileInfo.style.display = 'block';
-                    uploadArea.style.display = 'none';
+                    console.log('✅ File info shown');
+                }
+
+                // If we're using the drag/drop, we need to manually set the file input
+                if (fileInput && fileInput.files.length === 0) {
+                    console.log('📁 Setting file input manually for drag/drop');
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
+                }
+
+                console.log('✅ File selection processed successfully');
+            }
+
+            // Add function to clear file selection
+            function clearFileSelection() {
+                console.log('📁 Clearing file selection');
+
+                const fileInput = document.getElementById('report-file');
+                const fileInfo = document.getElementById('file-info');
+                const fileName = document.getElementById('file-name');
+
+                if (fileInput) {
+                    fileInput.value = '';
+                    console.log('✅ File input cleared');
+                }
+
+                if (fileInfo) {
+                    fileInfo.style.display = 'none';
+                    console.log('✅ File info hidden');
+                }
+
+                if (fileName) {
+                    fileName.textContent = '';
+                    console.log('✅ File name cleared');
                 }
             }
 
             // Load recent activity
-            function loadRecentActivity() {
+            async function loadRecentActivity() {
                 console.log('📊 Loading recent activity');
 
-                if (!currentContainer) {
-                    console.error('❌ No container reference available for loadRecentActivity');
+                const activityContainer = currentContainer.querySelector('#activity-list');
+                if (!activityContainer) {
+                    console.error('❌ Activity container not found');
                     return;
                 }
 
-                const activityList = currentContainer.querySelector('#activity-list');
-                if (!activityList) {
-                    console.error('❌ Activity list container not found');
+                try {
+                    // Try to load from database first
+                    const databaseActivity = await loadActivityFromDatabase();
+
+                    if (databaseActivity && databaseActivity.length > 0) {
+                        console.log('✅ Loaded activity from database:', databaseActivity.length, 'items');
+                        displayActivity(databaseActivity, activityContainer);
+                        return;
+                    }
+
+                    // Fallback to localStorage
+                    console.log('📱 Falling back to localStorage activity');
+                    const localActivity = JSON.parse(localStorage.getItem('recentActivity') || '[]');
+                    displayActivity(localActivity, activityContainer);
+
+                } catch (error) {
+                    console.error('❌ Error loading recent activity:', error);
+
+                    // Final fallback to localStorage
+                    const localActivity = JSON.parse(localStorage.getItem('recentActivity') || '[]');
+                    displayActivity(localActivity, activityContainer);
+                }
+            }
+
+            // New function to load activity from database
+            async function loadActivityFromDatabase() {
+                console.log('💾 Loading activity from database');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/admin/get-activity', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ Activity loaded from database:', result);
+                    return result.activities || [];
+
+                } catch (error) {
+                    console.error('❌ Error loading activity from database:', error);
+                    return null;
+                }
+            }
+
+            // Helper function to display activity
+            function displayActivity(activities, container) {
+                if (!activities || activities.length === 0) {
+                    container.innerHTML = '<div class="no-activity">No recent activity</div>';
                     return;
                 }
 
-                if (recentActivity.length === 0) {
-                    activityList.innerHTML = `
-                        <div class="activity-item">
-                            <div class="activity-icon system">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">No Recent Activity</div>
-                                <div class="activity-description">No admin activities have been recorded yet.</div>
-                            </div>
-                            <div class="activity-time">-</div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                activityList.innerHTML = recentActivity.map(activity => `
+                container.innerHTML = activities.map(activity => `
                     <div class="activity-item">
-                        <div class="activity-icon ${activity.type}">
-                            <i class="${getActivityIcon(activity.type)}"></i>
+                        <div class="activity-icon">
+                            ${getActivityIcon(activity.type)}
                         </div>
                         <div class="activity-content">
                             <div class="activity-title">${activity.title}</div>
                             <div class="activity-description">${activity.description}</div>
+                            <div class="activity-time">${formatActivityTime(activity.timestamp || activity.time)}</div>
                         </div>
-                        <div class="activity-time">${activity.time}</div>
                     </div>
                 `).join('');
+            }
 
-                console.log('✅ Recent activity loaded successfully');
+            // Helper function to get activity icon
+            function getActivityIcon(type) {
+                const icons = {
+                    'notification': '<i class="fas fa-bell"></i>',
+                    'dispute': '<i class="fas fa-gavel"></i>',
+                    'report': '<i class="fas fa-file-pdf"></i>',
+                    'user': '<i class="fas fa-user"></i>',
+                    'system': '<i class="fas fa-cog"></i>'
+                };
+                return icons[type] || '<i class="fas fa-info-circle"></i>';
+            }
+
+            // Helper function to format activity time
+            function formatActivityTime(timestamp) {
+                if (!timestamp) return 'Unknown time';
+
+                if (timestamp === 'Just now') return timestamp;
+
+                try {
+                    const date = new Date(timestamp);
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMs / 3600000);
+                    const diffDays = Math.floor(diffMs / 86400000);
+
+                    if (diffMins < 1) return 'Just now';
+                    if (diffMins < 60) return `${diffMins} minutes ago`;
+                    if (diffHours < 24) return `${diffHours} hours ago`;
+                    if (diffDays < 7) return `${diffDays} days ago`;
+
+                    return date.toLocaleDateString();
+                } catch (error) {
+                    return timestamp;
+                }
             }
 
             // Handle notification form submission
@@ -1091,8 +1282,12 @@
                             e.target.reset();
 
                             // Add to recent activity
-                            addToRecentActivity('notification', 'Notification Sent',
-                                `${type} notification sent to ${userEmail}`, 'Just now');
+                            addToRecentActivity({
+                                type: 'notification',
+                                title: 'Notification Sent',
+                                description: `${type} notification sent to ${userEmail}`,
+                                time: 'Just now'
+                            });
                         } else {
                             showMessage('error', `User with email ${userEmail} not found in the system.`);
                         }
@@ -1114,7 +1309,7 @@
                 console.log('🌐 Sending notification to backend for processing:', notificationData);
 
                 try {
-                    const response = await fetch('/api/admin/send-notification', {
+                    const response = await fetch('http://localhost:3000/api/admin/send-notification', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1165,8 +1360,21 @@
             }
 
             function getAuthToken() {
-                // Replace with your actual auth token retrieval logic
-                return localStorage.getItem('adminAuthToken') || 'demo-token';
+                // Try multiple storage locations
+                let token = localStorage.getItem('authToken') ||
+                    localStorage.getItem('token') ||
+                    sessionStorage.getItem('authToken') ||
+                    sessionStorage.getItem('token');
+
+                console.log('🔍 Retrieved token from storage:', token ? `${token.substring(0, 20)}...` : 'null');
+
+                if (!token || token === 'demo-token') {
+                    console.log('❌ No valid token found, user needs to login');
+                    // Redirect to login or show login modal
+                    return null;
+                }
+
+                return token;
             }
 
             function updateNotificationCount() {
@@ -1216,21 +1424,6 @@
                     userSearchResults.innerHTML = resultsHTML;
                     userSearchResults.style.display = users.length > 0 ? 'block' : 'none';
                 }
-            }
-
-            // Add the missing getActivityIcon function
-            function getActivityIcon(type) {
-                const icons = {
-                    'notification': 'fas fa-bell',
-                    'dispute': 'fas fa-gavel',
-                    'upload': 'fas fa-upload',
-                    'report': 'fas fa-file-pdf',
-                    'user': 'fas fa-user',
-                    'system': 'fas fa-cog',
-                    'default': 'fas fa-info-circle'
-                };
-
-                return icons[type] || icons['default'];
             }
 
             // Also remove the loadDisputes function since the content already exists in the HTML
@@ -1324,120 +1517,155 @@
                 }
             }
 
-            // Handle dispute form submission
-            function handleDisputeSubmit(e) {
-                e.preventDefault();
+            // Function to handle dispute form submission
+            function handleDisputeSubmit(event) {
+                event.preventDefault();
                 console.log('⚖️ Handling dispute submission');
 
-                // Get form elements
-                const selectedUserElement = currentContainer.querySelector('#selected-user-disputes');
-                const statusElement = currentContainer.querySelector('#dispute-status');
-                const responseElement = currentContainer.querySelector('#dispute-response');
+                // Get form elements with better error handling
+                const userEmailInput = document.getElementById('disputeUserEmail') || document.querySelector('input[name="disputeUserEmail"]');
+                const statusSelect = document.getElementById('disputeStatus') || document.querySelector('select[name="disputeStatus"]');
+                const responseTextarea = document.getElementById('disputeResponse') || document.querySelector('textarea[name="disputeResponse"]');
+                const submitButton = event.target.querySelector('button[type="submit"]') || document.getElementById('disputeSubmitBtn');
 
-                if (!statusElement || !responseElement) {
-                    showMessage('error', 'Form elements not found.');
+                // Debug: Log what we found
+                console.log('🔍 Form elements found:');
+                console.log('  - userEmailInput:', !!userEmailInput);
+                console.log('  - statusSelect:', !!statusSelect);
+                console.log('  - responseTextarea:', !!responseTextarea);
+                console.log('  - submitButton:', !!submitButton);
+
+                // Check if all required elements exist
+                if (!userEmailInput || !statusSelect || !responseTextarea) {
+                    console.error('❌ Missing form elements:');
+                    console.error('  - userEmailInput:', !!userEmailInput);
+                    console.error('  - statusSelect:', !!statusSelect);
+                    console.error('  - responseTextarea:', !!responseTextarea);
+
+                    showMessage('error', 'Form elements not found. Please refresh the page and try again.');
                     return;
                 }
 
-                const selectedUserId = selectedUserElement ? selectedUserElement.value : '';
-                const status = statusElement.value;
-                const response = responseElement.value.trim();
+                // Get form values
+                const userEmail = userEmailInput.value.trim();
+                const status = statusSelect.value;
+                const response = responseTextarea.value.trim();
 
-                // Validation
-                if (!selectedUserId) {
-                    showMessage('error', 'Please select a user to send the dispute update to.');
+                console.log('📝 Form values:', { userEmail, status, response });
+
+                // Validate form data
+                if (!userEmail || !status || !response) {
+                    showMessage('error', 'Please fill in all required fields.');
                     return;
                 }
 
-                if (!status || !response) {
-                    showMessage('error', 'Please fill in all fields (status and response).');
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userEmail)) {
+                    showMessage('error', 'Please enter a valid email address.');
                     return;
                 }
 
-                // Show loading state
-                const submitButton = currentContainer.querySelector('#dispute-form button[type="submit"]');
-                const originalButtonText = submitButton.innerHTML;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-                submitButton.disabled = true;
-
-                // Find the selected user
-                const selectedUser = mockUsers.find(user => user.id === selectedUserId);
-                if (!selectedUser) {
-                    showMessage('error', 'Selected user not found.');
-                    resetSubmitButton(submitButton, originalButtonText);
-                    return;
-                }
-
-                console.log('⚖️ Sending dispute update to user:', selectedUser.email);
-
-                // Create dispute data
+                // Prepare dispute data
                 const disputeData = {
-                    userId: selectedUserId,
-                    userEmail: selectedUser.email,
-                    userName: selectedUser.name,
+                    userEmail: userEmail,
                     status: status,
                     response: response,
-                    timestamp: new Date().toISOString(),
-                    adminId: 'current-admin',
-                    type: 'dispute_update'
+                    timestamp: new Date().toISOString()
                 };
 
-                // Send dispute update
-                sendDisputeUpdate(disputeData)
-                    .then(response => {
-                        console.log('✅ Dispute update sent successfully:', response);
-                        showMessage('success', `Dispute update sent successfully to ${selectedUser.name} (${selectedUser.email})`);
+                // Disable submit button and show loading state
+                if (submitButton) {
+                    const originalButtonText = submitButton.textContent;
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Sending Update...';
 
-                        // Reset form
-                        e.target.reset();
-                        selectedUserElement.value = '';
+                    // Send dispute update
+                    sendDisputeUpdate(disputeData)
+                        .then(result => {
+                            if (result.success) {
+                                showMessage('success', `Dispute update sent successfully to ${userEmail}`);
 
-                        // Clear user search
-                        const userSearchInput = currentContainer.querySelector('#user-search-disputes');
-                        if (userSearchInput) {
-                            userSearchInput.value = '';
-                        }
-                        const userSearchResults = currentContainer.querySelector('#user-search-results-disputes');
-                        if (userSearchResults) {
-                            userSearchResults.innerHTML = '';
-                            userSearchResults.style.display = 'none';
-                        }
+                                // Clear form
+                                userEmailInput.value = '';
+                                statusSelect.value = '';
+                                responseTextarea.value = '';
 
-                        // Add to recent activity
-                        addToRecentActivity('dispute', 'Dispute Update Sent',
-                            `Status updated to "${status}" for ${selectedUser.name}`, 'Just now');
-                    })
-                    .catch(error => {
-                        console.error('❌ Error sending dispute update:', error);
-                        showMessage('error', `Failed to send dispute update: ${error.message}`);
-                    })
-                    .finally(() => {
-                        resetSubmitButton(submitButton, originalButtonText);
-                    });
+                                // Add to recent activity
+                                addToRecentActivity({
+                                    type: 'dispute',
+                                    title: 'Dispute Update Sent',
+                                    description: `${status} update sent to ${userEmail}`,
+                                    time: 'Just now'
+                                });
+                            } else {
+                                showMessage('error', result.message || 'Failed to send dispute update');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('❌ Error sending dispute update:', error);
+                            showMessage('error', `Failed to send dispute update: ${error.message}`);
+                        })
+                        .finally(() => {
+                            // Reset submit button
+                            if (submitButton) {
+                                submitButton.disabled = false;
+                                submitButton.textContent = originalButtonText;
+                            }
+                        });
+                }
             }
 
             // Handle report form submission
-            function handleReportSubmit(e) {
-                e.preventDefault();
+            function handleReportSubmit(event) {
+                event.preventDefault();
                 console.log('📄 Handling report submission');
 
-                // Get form elements
-                const selectedUserElement = currentContainer.querySelector('#selected-user-reports');
-                const reportTypeElement = currentContainer.querySelector('#report-type');
-                const fileInput = currentContainer.querySelector('#report-file');
+                // Get form elements with the CORRECT IDs that actually exist
+                const userEmailInput = document.getElementById('user-email-reports');
+                const reportTypeSelect = document.getElementById('report-type');
+                const fileInput = document.getElementById('report-file');
+                const reportDateInput = document.getElementById('report-date');
+                const reportNotesTextarea = document.getElementById('report-notes');
+                const submitButton = event.target.querySelector('button[type="submit"]');
 
-                if (!reportTypeElement) {
-                    showMessage('error', 'Form elements not found.');
+                // Debug: Check if elements exist
+                console.log('🔍 Form elements found:');
+                console.log('  - userEmailInput:', !!userEmailInput);
+                console.log('  - reportTypeSelect:', !!reportTypeSelect);
+                console.log('  - fileInput:', !!fileInput);
+                console.log('  - reportDateInput:', !!reportDateInput);
+                console.log('  - reportNotesTextarea:', !!reportNotesTextarea);
+
+                if (!userEmailInput || !reportTypeSelect || !fileInput) {
+                    console.error('❌ Required form elements not found');
+                    showMessage('error', 'Form elements not found. Please refresh the page.');
                     return;
                 }
 
-                const selectedUserId = selectedUserElement ? selectedUserElement.value : '';
-                const reportType = reportTypeElement.value;
-                const file = fileInput ? fileInput.files[0] : null;
+                const userEmail = userEmailInput.value.trim();
+                const reportType = reportTypeSelect.value;
+                const file = fileInput.files[0];
+                const reportDate = reportDateInput ? reportDateInput.value : '';
+                const reportNotes = reportNotesTextarea ? reportNotesTextarea.value.trim() : '';
 
-                // Validation
-                if (!selectedUserId) {
-                    showMessage('error', 'Please select a user to send the report to.');
+                console.log('📋 Form values:');
+                console.log('  - userEmail:', userEmail);
+                console.log('  - reportType:', reportType);
+                console.log('  - file:', file ? file.name : 'No file selected');
+                console.log('  - reportDate:', reportDate);
+                console.log('  - reportNotes:', reportNotes);
+
+                // Validate form
+                if (!userEmail) {
+                    showMessage('error', 'Please enter a user email.');
+                    return;
+                }
+
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userEmail)) {
+                    showMessage('error', 'Please enter a valid email address.');
                     return;
                 }
 
@@ -1447,79 +1675,79 @@
                 }
 
                 if (!file) {
-                    showMessage('error', 'Please select a file to upload.');
+                    showMessage('error', 'Please select a PDF file to upload.');
                     return;
                 }
 
-                // Show loading state
-                const submitButton = currentContainer.querySelector('#report-form button[type="submit"]');
-                const originalButtonText = submitButton.innerHTML;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-                submitButton.disabled = true;
-
-                // Find the selected user
-                const selectedUser = mockUsers.find(user => user.id === selectedUserId);
-                if (!selectedUser) {
-                    showMessage('error', 'Selected user not found.');
-                    resetSubmitButton(submitButton, originalButtonText);
+                // Validate file type
+                if (file.type !== 'application/pdf') {
+                    showMessage('error', 'Please select a PDF file.');
+                    fileInput.value = ''; // Clear the input
+                    clearFileSelection();
                     return;
                 }
 
-                console.log('📄 Uploading report for user:', selectedUser.email);
+                // Validate file size (10MB limit)
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    showMessage('error', 'File size must be less than 10MB.');
+                    return;
+                }
+
+                console.log('📄 Uploading report for user:', userEmail);
 
                 // Create report data
                 const reportData = {
-                    userId: selectedUserId,
-                    userEmail: selectedUser.email,
-                    userName: selectedUser.name,
+                    userEmail: userEmail,
+                    userName: userEmail.split('@')[0], // Extract name from email as fallback
                     reportType: reportType,
                     fileName: file.name,
                     fileSize: file.size,
+                    reportDate: reportDate,
+                    reportNotes: reportNotes,
                     timestamp: new Date().toISOString(),
                     adminId: 'current-admin'
                 };
 
+                // Disable submit button
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Uploading...';
+
                 // Upload report
                 uploadReportForUser(reportData, file)
-                    .then(response => {
-                        console.log('✅ Report uploaded successfully:', response);
-                        showMessage('success', `Report uploaded successfully for ${selectedUser.name} (${selectedUser.email})`);
+                    .then(result => {
+                        if (result.success) {
+                            showMessage('success', `Report uploaded successfully for ${userEmail}`);
 
-                        // Reset form
-                        e.target.reset();
-                        selectedUserElement.value = '';
+                            // Clear form
+                            userEmailInput.value = '';
+                            reportTypeSelect.value = '';
+                            fileInput.value = '';
+                            if (reportDateInput) reportDateInput.value = '';
+                            if (reportNotesTextarea) reportNotesTextarea.value = '';
 
-                        // Clear user search
-                        const userSearchInput = currentContainer.querySelector('#user-search-reports');
-                        if (userSearchInput) {
-                            userSearchInput.value = '';
-                        }
-                        const userSearchResults = currentContainer.querySelector('#user-search-results-reports');
-                        if (userSearchResults) {
-                            userSearchResults.innerHTML = '';
-                            userSearchResults.style.display = 'none';
-                        }
+                            // Clear the file info display
+                            clearFileSelection();
 
-                        // Clear file upload area
-                        const fileUploadArea = currentContainer.querySelector('#file-upload-area');
-                        if (fileUploadArea) {
-                            fileUploadArea.classList.remove('file-selected');
+                            // Add to recent activity
+                            addToRecentActivity({
+                                type: 'report',
+                                title: 'Report Uploaded',
+                                description: `${reportType} report uploaded for ${userEmail}`,
+                                time: 'Just now'
+                            });
+                        } else {
+                            showMessage('error', result.message || 'Failed to upload report');
                         }
-                        const fileInfo = currentContainer.querySelector('#file-info');
-                        if (fileInfo) {
-                            fileInfo.innerHTML = '';
-                        }
-
-                        // Add to recent activity
-                        addToRecentActivity('upload', 'Report Uploaded',
-                            `${reportType} report uploaded for ${selectedUser.name}`, 'Just now');
                     })
                     .catch(error => {
                         console.error('❌ Error uploading report:', error);
                         showMessage('error', `Failed to upload report: ${error.message}`);
                     })
                     .finally(() => {
-                        resetSubmitButton(submitButton, originalButtonText);
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
                     });
             }
 
@@ -1528,7 +1756,7 @@
                 console.log('🌐 Sending dispute update to backend:', disputeData);
 
                 try {
-                    const response = await fetch('/api/admin/send-dispute-update', {
+                    const response = await fetch('http://localhost:3000/api/admin/send-dispute-update', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1570,13 +1798,27 @@
             // Function to upload report for user
             async function uploadReportForUser(reportData, file) {
                 console.log('🌐 Uploading report to backend:', reportData);
+                console.log('🌐 File details:', {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                });
 
                 try {
                     const formData = new FormData();
                     formData.append('file', file);
                     formData.append('reportData', JSON.stringify(reportData));
 
-                    const response = await fetch('/api/admin/upload-report', {
+                    // Debug: Log what we're sending
+                    console.log('🌐 FormData contents:');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(`  - ${key}:`, value instanceof File ? `File(${value.name})` : value);
+                    }
+
+                    console.log('🌐 Making request to:', 'http://localhost:3000/api/admin/upload-report');
+                    console.log('🌐 Auth token:', getAuthToken() ? 'Present' : 'Missing');
+
+                    const response = await fetch('http://localhost:3000/api/admin/upload-report', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${getAuthToken()}`
@@ -1584,9 +1826,13 @@
                         body: formData
                     });
 
+                    console.log('🌐 Response status:', response.status);
+                    console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
+
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                        const errorText = await response.text();
+                        console.error('🌐 Error response:', errorText);
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
                     }
 
                     const result = await response.json();
@@ -1653,25 +1899,69 @@
             }
 
             // Function to add activity to recent activity list
-            function addToRecentActivity(type, title, description, time) {
-                console.log('📊 Adding to recent activity:', { type, title, description, time });
+            async function addToRecentActivity(activity) {
+                console.log('📊 Adding to recent activity:', activity);
 
-                // Add to the beginning of the array
-                recentActivity.unshift({
-                    type: type,
-                    title: title,
-                    description: description,
-                    time: time
-                });
+                try {
+                    // Add to local storage (for immediate UI update)
+                    let recentActivity = JSON.parse(localStorage.getItem('recentActivity') || '[]');
 
-                // Keep only the last 10 activities
-                if (recentActivity.length > 10) {
-                    recentActivity = recentActivity.slice(0, 10);
+                    // Add timestamp and ID if not present
+                    const activityWithMetadata = {
+                        id: `activity_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        ...activity,
+                        timestamp: new Date().toISOString(),
+                        adminId: 'current-admin' // You might want to get this from auth
+                    };
+
+                    recentActivity.unshift(activityWithMetadata);
+
+                    // Keep only last 50 activities in localStorage
+                    if (recentActivity.length > 50) {
+                        recentActivity = recentActivity.slice(0, 50);
+                    }
+
+                    localStorage.setItem('recentActivity', JSON.stringify(recentActivity));
+                    console.log('✅ Activity added to localStorage');
+
+                    // Save to database
+                    await saveActivityToDatabase(activityWithMetadata);
+
+                    // Update UI if activity tab is active
+                    if (currentTab === 'activity') {
+                        loadRecentActivity();
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error adding to recent activity:', error);
                 }
+            }
 
-                // Update the activity display if we're on the activity tab
-                if (currentTab === 'activity') {
-                    loadRecentActivity();
+            // New function to save activity to database
+            async function saveActivityToDatabase(activity) {
+                console.log('💾 Saving activity to database:', activity);
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/admin/save-activity', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        },
+                        body: JSON.stringify(activity)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ Activity saved to database:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('❌ Error saving activity to database:', error);
+                    // Don't throw - we don't want to break the UI if database save fails
                 }
             }
 

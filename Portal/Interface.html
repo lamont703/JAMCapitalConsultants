@@ -436,6 +436,59 @@
     </div>
 
     <script>
+               // Handle "View All" links. This is our MAIN INTERFACE INITIALIZATION.
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Initialize components
+                    setupTabNavigation();
+                    console.log('🔧 Setup Tab Navigation Fired!');
+                    loadHeaderComponent();
+                    console.log('🔧 Load Header Component Fired!');
+                    
+                    //initializeSidebar();
+                    //loadWidgetsForActiveTab();
+
+                    console.log('🔍 Mont DOMContentLoaded Fired!');
+                    const viewAllLinks = document.querySelectorAll('.interface-view-all');
+                    console.log('🔍 Mont Found view all links:', viewAllLinks.length);
+
+                    viewAllLinks.forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const tabId = this.getAttribute('data-tab');
+                            console.log('🔍 Mont Found tab ID:', tabId);
+                            // Find and click the corresponding nav link
+                            const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                            if (navLink) {
+                                navLink.click();
+                            }
+                        });
+                    });
+
+                    // Check URL hash on page load
+                    if (window.location.hash) {
+                        const tabId = window.location.hash.substring(1);
+                        const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                        console.log('🔍 Mont Found nav link:', navLink);
+                        if (navLink) {
+                            navLink.click();
+                            console.log('🔍 Mont Found nav link:', navLink);
+                        }
+                    }
+
+                    // Handle iframe height adjustments
+                    window.addEventListener('message', function (e) {
+                        // Check if message is from our iframe
+                        if (e.data && e.data.type === 'iframe-height') {
+                            const iframe = document.getElementById(e.data.frameId);
+                            if (iframe) {
+                                iframe.style.height = `${e.data.height}px`;
+                            }
+                        }
+                    });
+
+                    
+                });
+
 
 
         // Function to load the header component
@@ -490,47 +543,41 @@
         }
 
         // Function to initialize sidebar navigation
-        function initializeSidebar() {
-            const sidebarLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+ /*       function initializeSidebar() {
+            console.log('🔧 Initializing sidebar functionality');
 
-            sidebarLinks.forEach(link => {
+            const sidebarLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+            console.log('🔍 Found sidebar links:', sidebarLinks.length);
+
+            sidebarLinks.forEach((link, index) => {
+                console.log(`🔗 Setting up link ${index + 1}:`, link.textContent.trim(), 'href:', link.getAttribute('href'));
+
                 link.addEventListener('click', function (e) {
-                    // Prevent default anchor behavior
+                    console.log('🖱️ Sidebar link clicked:', this.textContent.trim());
+                    console.log('🔍 Link href:', this.getAttribute('href'));
+                    console.log('🔍 Event target:', e.target);
+                    console.log('🔍 Current target:', e.currentTarget);
+
                     e.preventDefault();
 
-                    // Get the href attribute
-                    const targetId = this.getAttribute('href').substring(1);
+                    const href = this.getAttribute('href');
+                    console.log('📍 Processing href:', href);
 
-                    // Handle tab switching
-                    const targetTab = document.getElementById(targetId);
-                    if (targetTab) {
-                        // Remove active class from all tabs
-                        document.querySelectorAll('.interface-tab').forEach(tab => {
-                            tab.classList.remove('active');
-                        });
-
-                        // Add active class to target tab
-                        targetTab.classList.add('active');
-
-                        // Update active state in sidebar
-                        document.querySelectorAll('.interface-sidebar-nav-link').forEach(navLink => {
-                            navLink.classList.remove('active');
-                        });
-                        this.classList.add('active');
-
-                        // Scroll to top of the page
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-
-                        // Load widgets for the selected tab
-                        loadWidgetsForTab(targetId);
+                    if (href === '#admin-panel') {
+                        console.log('🔧 Admin panel link detected - calling loadAdminPanel()');
+                        loadAdminPanel();
+                    } else if (href && href !== '#') {
+                        console.log('🌐 Regular navigation to:', href);
+                        window.location.href = href;
+                    } else {
+                        console.log('⚠️ No valid href found or href is #');
                     }
                 });
             });
-        }
 
+            console.log('✅ Sidebar initialization complete');
+        }
+*/
         // Function to find the active tab
         function getActiveTab() {
             return document.querySelector('.interface-tab.active');
@@ -719,49 +766,7 @@
                 });
         }
 
-        // Handle "View All" links
-        document.addEventListener('DOMContentLoaded', function () {
-            const viewAllLinks = document.querySelectorAll('.interface-view-all');
-
-            viewAllLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const tabId = this.getAttribute('data-tab');
-
-                    // Find and click the corresponding nav link
-                    const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
-                    if (navLink) {
-                        navLink.click();
-                    }
-                });
-            });
-
-            // Check URL hash on page load
-            if (window.location.hash) {
-                const tabId = window.location.hash.substring(1);
-                const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
-                if (navLink) {
-                    navLink.click();
-                }
-            }
-
-            // Handle iframe height adjustments
-            window.addEventListener('message', function (e) {
-                // Check if message is from our iframe
-                if (e.data && e.data.type === 'iframe-height') {
-                    const iframe = document.getElementById(e.data.frameId);
-                    if (iframe) {
-                        iframe.style.height = `${e.data.height}px`;
-                    }
-                }
-            });
-
-            // Initialize components
-            loadHeaderComponent();
-            initializeSidebar();
-            loadWidgetsForActiveTab();
-        });
-
+ 
         // Function to load the CreditReportModule with option to force reload
         function loadCreditReportModule(containerId, forceReload = false) {
             const container = document.getElementById(containerId);
@@ -1205,6 +1210,7 @@
         // Function to handle tab switching
         function setupTabNavigation() {
             const navLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+            console.log('🔧 Set Up Tab Navigation Fired!');
 
             navLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
@@ -1718,18 +1724,18 @@
         });
 
         // Initialize the dashboard when the page loads
-        document.addEventListener('DOMContentLoaded', function () {
+        /*document.addEventListener('DOMContentLoaded', function () {
             // Load header component
-            loadHeaderComponent();
+            //loadHeaderComponent();
 
             // Setup sidebar navigation
-            setupSidebarNavigation();
+           // setupSidebarNavigation();
 
             // Setup tab navigation
-            setupTabNavigation();
+            //setupTabNavigation();
 
             // No need to call loadWidgetsForActiveTab() here as setupTabNavigation will handle it
-        });
+        });*/
 
         // Add this near the top of your dashboardInterface.html file, before any code that uses MessagesModule
         document.addEventListener('DOMContentLoaded', function () {
