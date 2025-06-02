@@ -1523,7 +1523,7 @@
                                             <i class="fas fa-file"></i>
                                             <span class="file-name"></span>
                                             <span class="file-size"></span>
-                                            <button type="button" class="remove-file-btn" onclick="clearFileSelection()">
+                                            <button type="button" class="remove-file-btn">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
@@ -1706,20 +1706,16 @@
                     notificationForm.addEventListener('submit', handleNotificationSubmit);
                 }
 
-                const disputeForm = currentContainer.querySelector('#dispute-form');
+                // Fix: Use the correct form ID
+                const disputeForm = currentContainer.querySelector('#unified-dispute-form');
                 if (disputeForm) {
-                    console.log('🔧 Setting up dispute form listener');
+                    console.log('🔧 Setting up unified dispute form listener');
                     disputeForm.addEventListener('submit', handleDisputeSubmit);
+                } else {
+                    console.error('❌ Unified dispute form not found');
                 }
 
-                const reportForm = currentContainer.querySelector('#report-form');
-                if (reportForm) {
-                    console.log('🔧 Setting up report form listener');
-                    reportForm.addEventListener('submit', handleReportSubmit);
-                }
-
-                // Initialize file upload functionality
-                console.log('🔧 Initializing file upload');
+                // Initialize file upload
                 initializeFileUpload();
 
                 console.log('✅ All event listeners set up successfully');
@@ -1795,7 +1791,7 @@
             }
 
             // Initialize user search functionality
-            function initializeUserSearch() {
+            /*function initializeUserSearch() {
                 console.log('🔍 Initializing user search functionality');
 
                 if (!currentContainer) {
@@ -1831,9 +1827,10 @@
 
                 console.log('✅ User search functionality initialized');
             }
+*/
 
             // Handle user search
-            function handleUserSearch(query, resultsContainer, inputId) {
+            /*function handleUserSearch(query, resultsContainer, inputId) {
                 if (query.length < 2) {
                     resultsContainer.style.display = 'none';
                     return;
@@ -1875,171 +1872,117 @@
 
                 resultsContainer.style.display = 'block';
             }
+*/
 
-            // Update the initializeFileUpload function with more detailed debugging
+            // Fix the initializeFileUpload function to use the correct element IDs
             function initializeFileUpload() {
                 console.log('🔧 Initializing file upload functionality');
 
-                const fileUploadArea = document.getElementById('file-upload-area');
-                const fileInput = document.getElementById('report-file');
-                const fileInfo = document.getElementById('file-info');
-                const fileName = document.getElementById('file-name');
-                const removeFileBtn = document.getElementById('remove-file');
+                // Use the correct IDs from your HTML
+                const fileUploadContainer = document.querySelector('.file-upload-container');
+                const fileInput = document.getElementById('report-file-upload'); // Correct ID
+                const fileInfo = document.getElementById('selected-file-info'); // Correct ID
+                const fileName = fileInfo ? fileInfo.querySelector('.file-name') : null;
+                const fileSize = fileInfo ? fileInfo.querySelector('.file-size') : null;
+                const removeFileBtn = fileInfo ? fileInfo.querySelector('.remove-file-btn') : null;
 
                 console.log('🔍 File upload elements found:');
-                console.log('  - fileUploadArea:', !!fileUploadArea);
+                console.log('  - fileUploadContainer:', !!fileUploadContainer);
                 console.log('  - fileInput:', !!fileInput);
                 console.log('  - fileInfo:', !!fileInfo);
                 console.log('  - fileName:', !!fileName);
+                console.log('  - fileSize:', !!fileSize);
                 console.log('  - removeFileBtn:', !!removeFileBtn);
 
-                if (!fileUploadArea || !fileInput) {
+                if (!fileInput || !fileInfo) {
                     console.error('❌ Required file upload elements not found');
+                    console.error('  - fileInput (report-file-upload):', !!fileInput);
+                    console.error('  - fileInfo (selected-file-info):', !!fileInfo);
                     return;
                 }
 
-                // SOLUTION: Make the file input cover the entire upload area but remain invisible
-                fileInput.style.position = 'absolute';
-                fileInput.style.top = '0';
-                fileInput.style.left = '0';
-                fileInput.style.width = '100%';
-                fileInput.style.height = '100%';
-                fileInput.style.opacity = '0';
-                fileInput.style.cursor = 'pointer';
-                fileInput.style.zIndex = '10';
+                // File input change event
+                fileInput.addEventListener('change', function (event) {
+                    console.log('📁 File input change event triggered');
+                    const file = event.target.files[0];
 
-                // Make the upload area position relative so the absolute positioning works
-                fileUploadArea.style.position = 'relative';
+                    if (file) {
+                        console.log('📁 File selected:', file.name);
+                        console.log('📁 File size:', file.size, 'bytes');
+                        console.log('📁 File type:', file.type);
 
-                // Remove the click handler from the upload area since the file input will handle it
-                console.log('✅ File input positioned over upload area for direct clicking');
+                        // Validate file type
+                        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                        if (!allowedTypes.includes(file.type)) {
+                            console.error('❌ Invalid file type:', file.type);
+                            alert('Please select a PDF, DOC, or DOCX file.');
+                            fileInput.value = '';
+                            return;
+                        }
 
-                // File input change handler
-                fileInput.addEventListener('change', function (e) {
-                    console.log('📁 File input changed - detailed info:');
-                    console.log('  - Event target:', e.target);
-                    console.log('  - Files length:', e.target.files.length);
-                    if (e.target.files.length > 0) {
-                        console.log('  - First file name:', e.target.files[0].name);
-                        console.log('  - First file type:', e.target.files[0].type);
-                        console.log('  - First file size:', e.target.files[0].size);
-                        handleFileSelection(e.target.files[0]);
+                        // Check file size (10MB limit)
+                        const maxSize = 10 * 1024 * 1024; // 10MB
+                        if (file.size > maxSize) {
+                            console.error('❌ File too large:', file.size, 'bytes');
+                            alert('File size must be less than 10MB.');
+                            fileInput.value = '';
+                            return;
+                        }
+
+                        // Update UI to show selected file
+                        if (fileName) {
+                            fileName.textContent = file.name;
+                            console.log('✅ File name updated:', file.name);
+                        }
+
+                        if (fileSize) {
+                            fileSize.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                            console.log('✅ File size updated');
+                        }
+
+                        if (fileInfo) {
+                            fileInfo.style.display = 'flex';
+                            console.log('✅ File info container shown');
+                        }
+
+                        console.log('✅ File selection processed successfully');
+                    } else {
+                        console.log('📁 No file selected, hiding file info');
+                        if (fileInfo) {
+                            fileInfo.style.display = 'none';
+                        }
                     }
                 });
 
-                // Drag and drop handlers on the upload area
-                fileUploadArea.addEventListener('dragover', function (e) {
-                    console.log('📁 Drag over detected');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    fileUploadArea.classList.add('drag-over');
-                });
-
-                fileUploadArea.addEventListener('dragleave', function (e) {
-                    console.log('📁 Drag leave detected');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    fileUploadArea.classList.remove('drag-over');
-                });
-
-                fileUploadArea.addEventListener('drop', function (e) {
-                    console.log('📁 File drop detected');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    fileUploadArea.classList.remove('drag-over');
-
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        console.log('📁 Files dropped:', files.length);
-                        handleFileSelection(files[0]);
-
-                        // Manually set the file input files for form submission
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(files[0]);
-                        fileInput.files = dataTransfer.files;
-                    }
-                });
-
-                // Remove file handler
+                // Remove file button event
                 if (removeFileBtn) {
-                    removeFileBtn.addEventListener('click', function (e) {
-                        console.log('📁 Remove file clicked');
-                        e.preventDefault();
-                        e.stopPropagation();
+                    removeFileBtn.addEventListener('click', function () {
+                        console.log('🗑️ Remove file button clicked');
                         clearFileSelection();
                     });
                 }
 
-                console.log('✅ File upload initialization complete - file input now directly clickable');
+                // File upload container click to trigger file input
+                /*if (fileUploadContainer) {
+                    fileUploadContainer.addEventListener('click', function () {
+                        console.log('📁 File upload container clicked');
+                        fileInput.click();
+                    });
+                }*/
+
+                console.log('✅ File upload initialization complete');
             }
 
-            // Update the handleFileSelection function with debugging
-            function handleFileSelection(file) {
-                console.log('📁 Processing file selection:', file ? file.name : 'no file');
-
-                if (!file) {
-                    console.error('❌ No file provided to handleFileSelection');
-                    return;
-                }
-
-                const fileInfo = document.getElementById('file-info');
-                const fileName = document.getElementById('file-name');
-                const fileInput = document.getElementById('report-file');
-
-                console.log('🔍 File info elements:');
-                console.log('  - fileInfo:', !!fileInfo);
-                console.log('  - fileName:', !!fileName);
-                console.log('  - fileInput:', !!fileInput);
-
-                // Validate file type
-                console.log('📁 File type:', file.type);
-                console.log('📁 File size:', file.size, 'bytes');
-
-                if (file.type !== 'application/pdf') {
-                    console.error('❌ Invalid file type:', file.type);
-                    showMessage('error', 'Please select a PDF file only.');
-                    clearFileSelection();
-                    return;
-                }
-
-                // Check file size (10MB limit)
-                const maxSize = 10 * 1024 * 1024; // 10MB
-                if (file.size > maxSize) {
-                    console.error('❌ File too large:', file.size, 'bytes');
-                    showMessage('error', 'File size must be less than 10MB.');
-                    clearFileSelection();
-                    return;
-                }
-
-                // Update UI to show selected file
-                if (fileName) {
-                    fileName.textContent = file.name;
-                    console.log('✅ File name updated in UI');
-                }
-
-                if (fileInfo) {
-                    fileInfo.style.display = 'block';
-                    console.log('✅ File info shown');
-                }
-
-                // If we're using the drag/drop, we need to manually set the file input
-                if (fileInput && fileInput.files.length === 0) {
-                    console.log('📁 Setting file input manually for drag/drop');
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
-                }
-
-                console.log('✅ File selection processed successfully');
-            }
-
-            // Add function to clear file selection
+            // Update the clearFileSelection function to use correct IDs
             function clearFileSelection() {
-                console.log('📁 Clearing file selection');
+                console.log('🧹 Clearing file selection');
 
-                const fileInput = document.getElementById('report-file');
-                const fileInfo = document.getElementById('file-info');
-                const fileName = document.getElementById('file-name');
+                const fileInput = document.getElementById('report-file-upload'); // Correct ID
+                const fileInfo = document.getElementById('selected-file-info'); // Correct ID
+
+                console.log('🔍 Clear file elements:');
+                console.log('  - fileInput:', !!fileInput);
+                console.log('  - fileInfo:', !!fileInfo);
 
                 if (fileInput) {
                     fileInput.value = '';
@@ -2048,13 +1991,21 @@
 
                 if (fileInfo) {
                     fileInfo.style.display = 'none';
-                    console.log('✅ File info hidden');
+
+                    const fileName = fileInfo.querySelector('.file-name');
+                    const fileSize = fileInfo.querySelector('.file-size');
+
+                    if (fileName) {
+                        fileName.textContent = '';
+                        console.log('✅ File name cleared');
+                    }
+                    if (fileSize) {
+                        fileSize.textContent = '';
+                        console.log('✅ File size cleared');
+                    }
                 }
 
-                if (fileName) {
-                    fileName.textContent = '';
-                    console.log('✅ File name cleared');
-                }
+                console.log('✅ File selection cleared successfully');
             }
 
             // Load recent activity
@@ -2481,101 +2432,155 @@
             }
 
             // Function to handle dispute form submission
-            function handleDisputeSubmit(event) {
+            async function handleDisputeSubmit(event) {
                 event.preventDefault();
-                console.log('⚖️ Handling dispute submission');
+                console.log('📋 Dispute form submitted');
 
-                // Get form elements with better error handling
-                const userEmailInput = document.getElementById('disputeUserEmail') || document.querySelector('input[name="disputeUserEmail"]');
-                const statusSelect = document.getElementById('disputeStatus') || document.querySelector('select[name="disputeStatus"]');
-                const responseTextarea = document.getElementById('disputeResponse') || document.querySelector('textarea[name="disputeResponse"]');
-                const submitButton = event.target.querySelector('button[type="submit"]') || document.getElementById('disputeSubmitBtn');
+                // Get form elements
+                const userEmailInput = document.getElementById('dispute-user-email');
+                const reportDateInput = document.getElementById('dispute-report-date');
+                const reportTypeInput = document.getElementById('dispute-report-type');
+                const fileInput = document.getElementById('report-file-upload');
+                const disputeSummaryTextarea = document.getElementById('dispute-summary');
+                const experianScoreInput = document.getElementById('experian-score');
+                const equifaxScoreInput = document.getElementById('equifax-score');
+                const transunionScoreInput = document.getElementById('transunion-score');
+                const submitButton = event.target.querySelector('button[type="submit"]');
 
-                // Debug: Log what we found
-                console.log('🔍 Form elements found:');
-                console.log('  - userEmailInput:', !!userEmailInput);
-                console.log('  - statusSelect:', !!statusSelect);
-                console.log('  - responseTextarea:', !!responseTextarea);
-                console.log('  - submitButton:', !!submitButton);
-
-                // Check if all required elements exist
-                if (!userEmailInput || !statusSelect || !responseTextarea) {
-                    console.error('❌ Missing form elements:');
-                    console.error('  - userEmailInput:', !!userEmailInput);
-                    console.error('  - statusSelect:', !!statusSelect);
-                    console.error('  - responseTextarea:', !!responseTextarea);
-
-                    showMessage('error', 'Form elements not found. Please refresh the page and try again.');
+                // Validation
+                if (!userEmailInput || !reportDateInput || !fileInput || !disputeSummaryTextarea) {
+                    console.error('❌ Required dispute form elements not found');
+                    showMessage('error', 'Form elements not found. Please refresh the page.');
                     return;
                 }
 
-                // Get form values
                 const userEmail = userEmailInput.value.trim();
-                const status = statusSelect.value;
-                const response = responseTextarea.value.trim();
+                const reportDate = reportDateInput.value;
+                const reportType = reportTypeInput.value;
+                const file = fileInput.files[0];
+                const disputeSummary = disputeSummaryTextarea.value.trim();
+                const experianScore = experianScoreInput ? experianScoreInput.value : '';
+                const equifaxScore = equifaxScoreInput ? equifaxScoreInput.value : '';
+                const transunionScore = transunionScoreInput ? transunionScoreInput.value : '';
 
-                console.log('📝 Form values:', { userEmail, status, response });
+                console.log('📋 Dispute form values:');
+                console.log('  - userEmail:', userEmail);
+                console.log('  - reportDate:', reportDate);
+                console.log('  - reportType:', reportType);
+                console.log('  - file:', file ? file.name : 'No file selected');
+                console.log('  - disputeSummary:', disputeSummary);
+                console.log('  - experianScore:', experianScore);
+                console.log('  - equifaxScore:', equifaxScore);
+                console.log('  - transunionScore:', transunionScore);
 
-                // Validate form data
-                if (!userEmail || !status || !response) {
+                // Validation
+                if (!userEmail || !reportDate || !file || !disputeSummary) {
                     showMessage('error', 'Please fill in all required fields.');
                     return;
                 }
 
-                // Validate email format
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(userEmail)) {
-                    showMessage('error', 'Please enter a valid email address.');
+                // File validation
+                const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!allowedTypes.includes(file.type)) {
+                    showMessage('error', 'Please select a PDF, DOC, or DOCX file.');
                     return;
                 }
 
-                // Prepare dispute data
-                const disputeData = {
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    showMessage('error', 'File size must be less than 10MB.');
+                    return;
+                }
+
+                console.log('📄 Processing dispute submission for user:', userEmail);
+
+                // Create FormData to include the file
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('disputeData', JSON.stringify({
                     userEmail: userEmail,
-                    status: status,
-                    response: response,
-                    timestamp: new Date().toISOString()
-                };
+                    userName: userEmail.split('@')[0],
+                    reportDate: reportDate,
+                    reportType: reportType,
+                    disputeSummary: disputeSummary,
+                    creditScores: {
+                        experian: experianScore,
+                        equifax: equifaxScore,
+                        transunion: transunionScore
+                    },
+                    timestamp: new Date().toISOString(),
+                    status: 'submitted'
+                }));
 
-                // Disable submit button and show loading state
-                if (submitButton) {
-                    const originalButtonText = submitButton.textContent;
-                    submitButton.disabled = true;
-                    submitButton.textContent = 'Sending Update...';
+                // Disable submit button
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
 
-                    // Send dispute update
-                    sendDisputeUpdate(disputeData)
-                        .then(result => {
-                            if (result.success) {
-                                showMessage('success', `Dispute update sent successfully to ${userEmail}`);
+                try {
+                    // Use the correct function that sends FormData
+                    const result = await sendDisputeUpdateWithFile(formData);
 
-                                // Clear form
-                                userEmailInput.value = '';
-                                statusSelect.value = '';
-                                responseTextarea.value = '';
+                    if (result.success) {
+                        showMessage('success', `Dispute report submitted successfully for ${userEmail}`);
 
-                                // Add to recent activity
-                                addToRecentActivity({
-                                    type: 'dispute',
-                                    title: 'Dispute Update Sent',
-                                    description: `${status} update sent to ${userEmail}`,
-                                    time: 'Just now'
-                                });
-                            } else {
-                                showMessage('error', result.message || 'Failed to send dispute update');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('❌ Error sending dispute update:', error);
-                            showMessage('error', `Failed to send dispute update: ${error.message}`);
-                        })
-                        .finally(() => {
-                            // Reset submit button
-                            if (submitButton) {
-                                submitButton.disabled = false;
-                                submitButton.textContent = originalButtonText;
-                            }
+                        // Clear form
+                        userEmailInput.value = '';
+                        reportDateInput.value = '';
+                        fileInput.value = '';
+                        disputeSummaryTextarea.value = '';
+                        if (experianScoreInput) experianScoreInput.value = '';
+                        if (equifaxScoreInput) equifaxScoreInput.value = '';
+                        if (transunionScoreInput) transunionScoreInput.value = '';
+
+                        // Clear the file info display
+                        clearFileSelection();
+
+                        // Add to recent activity
+                        addToRecentActivity({
+                            type: 'dispute',
+                            title: 'Dispute Report Submitted',
+                            description: `Dispute report submitted for ${userEmail}`,
+                            time: 'Just now'
                         });
+                    } else {
+                        showMessage('error', result.message || 'Failed to submit dispute report');
+                    }
+                } catch (error) {
+                    console.error('❌ Error submitting dispute:', error);
+                    showMessage('error', `Failed to submit dispute: ${error.message}`);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                }
+            }
+
+            // New function to send dispute with file
+            async function sendDisputeUpdateWithFile(formData) {
+                console.log('🌐 Sending dispute update with file to backend...');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/admin/send-dispute-update', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${getAuthToken()}`
+                            // Don't set Content-Type - let browser set it for FormData
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('🌐 Backend response:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('🌐 Network error:', error);
+                    throw error; // Re-throw to be handled by the calling function
                 }
             }
 
@@ -2712,50 +2717,6 @@
                         submitButton.disabled = false;
                         submitButton.textContent = originalButtonText;
                     });
-            }
-
-            // Function to send dispute update to backend
-            async function sendDisputeUpdate(disputeData) {
-                console.log('🌐 Sending dispute update to backend:', disputeData);
-
-                try {
-                    const response = await fetch('http://localhost:3000/api/admin/send-dispute-update', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${getAuthToken()}`
-                        },
-                        body: JSON.stringify(disputeData)
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    console.log('🌐 Backend response:', result);
-                    return result;
-
-                } catch (error) {
-                    console.error('🌐 Network error:', error);
-
-                    // Fallback: Store locally
-                    console.log('📱 Storing dispute update locally as fallback');
-                    const disputeId = generateNotificationId();
-                    const localDispute = { ...disputeData, id: disputeId };
-
-                    let localDisputes = JSON.parse(localStorage.getItem('localDisputes') || '[]');
-                    localDisputes.push(localDispute);
-                    localStorage.setItem('localDisputes', JSON.stringify(localDisputes));
-
-                    return {
-                        success: true,
-                        message: 'Dispute update queued for delivery',
-                        id: disputeId,
-                        stored_locally: true
-                    };
-                }
             }
 
             // Function to upload report for user
@@ -2967,6 +2928,11 @@
             window.dispatchEvent(new CustomEvent('jamAdminPanelLoaded'));
             console.log('Admin Panel module loaded and event dispatched');
         }
+
+        // Keep only this DOMContentLoaded block
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ DOMContentLoaded - File upload handled by initializeFileUpload()');
+        });
     </script>
 </body>
 

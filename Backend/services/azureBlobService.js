@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-class AzureBlobService {
+export class AzureBlobService {
     constructor() {
         this.connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
         this.containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'jamblobstorage';

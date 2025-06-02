@@ -1,5 +1,5 @@
 import { NotificationSchema } from '../models/Notifications.js';
-import AzureBlobService from '../services/azureBlobService.js';
+import { AzureBlobService } from '../services/azureBlobService.js';
 
 // Add debugging to see if the module loads
 console.log('🔧 Loading adminController module...');
@@ -105,14 +105,46 @@ const adminController = {
         }
     },
 
-    // Send dispute update
+    // Send dispute update - Updated to handle complete dispute form data
     async sendDisputeUpdate(req, res) {
         try {
-            console.log('⚖️ Admin dispute update request received:', req.body);
+            console.log('⚖️ Admin dispute update request received');
+            console.log('📄 File info:', req.file);
+            console.log('📄 Dispute data:', req.body.disputeData);
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No file uploaded'
+                });
+            }
+
+            const disputeData = JSON.parse(req.body.disputeData);
+            const { 
+                userEmail, 
+                userName,
+                reportDate,
+                reportType,
+                disputeSummary,
+                creditScores,
+                timestamp,
+                status = 'submitted'
+            } = disputeData;
             
-            const { userEmail, status, response } = req.body;
-            const adminId = req.user.id;
+            const requestAdminId = req.user.id;
             const cosmosService = req.app.locals.cosmosService;
+
+            console.log('📋 Complete dispute data received:', {
+                userEmail,
+                userName,
+                reportDate,
+                reportType,
+                disputeSummary,
+                creditScores,
+                fileName: req.file.originalname,
+                fileSize: req.file.size,
+                status
+            });
 
             // Verify user exists
             console.log('🔍 Verifying user exists:', userEmail);
@@ -129,31 +161,108 @@ const adminController = {
 
             console.log(`✅ User found: ${user.name || user.firstName} (${user.email})`);
 
-            // Create dispute update notification using schema
-            const disputeNotification = NotificationSchema.createDisputeNotificationDocument({
+            // Initialize Azure Blob Service
+            const blobService = new AzureBlobService();
+            await blobService.initialize();
+
+            // Create unique filename for Azure storage
+            const timestamp_file = Date.now();
+            const randomString = Math.random().toString(36).substr(2, 9);
+            const fileExtension = req.file.originalname.split('.').pop();
+            const storedFileName = `dispute-reports/${user.id}_dispute_${timestamp_file}_${randomString}.${fileExtension}`;
+
+            console.log('☁️ Uploading file to Azure Blob Storage:', storedFileName);
+
+            // Upload file to Azure Blob Storage
+            const uploadResult = await blobService.uploadFile(req.file, storedFileName, {
+                userEmail: userEmail,
+                reportType: reportType,
+                uploadedBy: requestAdminId,
+                uploadDate: new Date().toISOString()
+            });
+
+            console.log('✅ File uploaded to Azure:', uploadResult.url);
+
+            // Create comprehensive dispute document with file URL
+            const disputeDocument = {
+                id: `dispute_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'dispute-report',
+                userId: user.id,
+                userEmail: user.email,
+                userName: userName || user.name || user.firstName,
+                reportDate: reportDate,
+                reportType: reportType || 'Dispute Report',
+                disputeSummary: disputeSummary,
+                creditScores: {
+                    experian: creditScores?.experian || '',
+                    equifax: creditScores?.equifax || '',
+                    transunion: creditScores?.transunion || ''
+                },
+                fileInfo: {
+                    fileName: req.file.originalname,
+                    storedFileName: storedFileName,
+                    fileSize: req.file.size,
+                    mimeType: req.file.mimetype,
+                    uploadedAt: timestamp || new Date().toISOString(),
+                    azureUrl: uploadResult.url,
+                    blobName: uploadResult.blobName
+                },
+                status: status,
+                adminId: requestAdminId,
+                submittedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            // Save the complete dispute document
+            console.log('💾 About to save dispute document:', disputeDocument);
+            await cosmosService.createDocument(disputeDocument);
+            console.log('💾 Complete dispute document saved to database:', disputeDocument.id);
+
+            // Create notification for the user
+            const disputeNotification = {
+                id: `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'notification',
+                notificationType: 'dispute-submitted',
                 userId: user.id,
                 userEmail: user.email,
                 userName: user.name || user.firstName,
-                disputeStatus: status,
-                response: response,
-                adminId: adminId
-            });
+                title: 'Dispute Report Submitted',
+                message: `Your dispute report has been submitted and is being reviewed. Report Type: ${reportType}`,
+                disputeId: disputeDocument.id,
+                status: 'unread',
+                priority: 'normal',
+                adminId: requestAdminId,
+                createdAt: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            };
 
             await cosmosService.createDocument(disputeNotification);
             console.log('💾 Dispute notification saved to database:', disputeNotification.id);
 
             res.status(200).json({
                 success: true,
-                message: 'Dispute update sent successfully',
+                message: 'Dispute report submitted successfully',
                 userFound: true,
-                notificationId: disputeNotification.id
+                disputeId: disputeDocument.id,
+                notificationId: disputeNotification.id,
+                fileUrl: uploadResult.url,
+                data: {
+                    disputeId: disputeDocument.id,
+                    userEmail: user.email,
+                    reportType: reportType,
+                    status: status,
+                    submittedAt: disputeDocument.submittedAt,
+                    fileUrl: uploadResult.url
+                }
             });
 
         } catch (error) {
-            console.error('❌ Error sending dispute update:', error);
+            console.error('❌ Error processing dispute submission:', error);
             res.status(500).json({
                 success: false,
-                message: 'Internal server error while sending dispute update'
+                message: 'Internal server error while processing dispute submission',
+                error: error.message
             });
         }
     },

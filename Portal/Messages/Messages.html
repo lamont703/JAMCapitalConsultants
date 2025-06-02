@@ -334,6 +334,243 @@
                 justify-content: space-between;
             }
         }
+
+        .dispute-report-item {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .dispute-report-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dispute-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dispute-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .dispute-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-submitted {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-progress {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-review {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-resolved {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .dispute-content {
+            padding: 16px;
+            display: none;
+        }
+
+        .dispute-report-item.expanded .dispute-content {
+            display: block;
+        }
+
+        .dispute-summary p {
+            margin: 8px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .credit-scores {
+            margin: 12px 0;
+        }
+
+        .scores-grid {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .score-item {
+            background: #f5f5f5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .dispute-file {
+            margin: 12px 0;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .view-file-btn {
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: auto;
+        }
+
+        .view-file-btn:hover {
+            text-decoration: underline;
+        }
+
+        .dispute-actions {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .no-disputes-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .no-disputes-message i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ccc;
+        }
+
+        .count-badge {
+            background: #1976d2;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .messages-section {
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            padding: 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .dispute-reports-header {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .dispute-reports-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dispute-reports-container {
+            margin-top: 10px;
+        }
+
+        .dispute-report-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fff;
+        }
+
+        .dispute-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dispute-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .dispute-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-submitted {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-progress {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-review {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-resolved {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #d32f2f;
+        }
     </style>
 </head>
 
@@ -465,6 +702,9 @@
                 // Set up event listeners
                 setupEventListeners(container);
 
+                // Load both notifications and dispute reports using the new function
+                await loadMessages();
+
                 // Mark as initialized
                 isInitialized = true;
                 return true;
@@ -511,6 +751,18 @@
                 messagesList.className = 'messages-list';
                 messagesList.id = 'messages-list';
 
+                // ADD: Create dispute reports container
+                const disputeReportsContainer = document.createElement('div');
+                disputeReportsContainer.className = 'dispute-reports-container';
+                disputeReportsContainer.id = 'dispute-reports-container';
+
+                // ADD: Create a section header for dispute reports
+                const disputeHeader = document.createElement('div');
+                disputeHeader.className = 'dispute-reports-header';
+                disputeHeader.innerHTML = `
+                    <h3><i class="fas fa-balance-scale"></i> Dispute Reports</h3>
+                `;
+
                 // Filter messages based on current filter
                 const filteredMessages = currentFilter === 'all'
                     ? messages
@@ -543,6 +795,10 @@
                 messagesContainer.appendChild(header);
                 messagesContainer.appendChild(messageDetail);
                 messagesContainer.appendChild(messagesList);
+
+                // ADD: Append dispute reports section
+                messagesContainer.appendChild(disputeHeader);
+                messagesContainer.appendChild(disputeReportsContainer);
 
                 // Clear the container and append the messages UI
                 container.innerHTML = '';
@@ -1054,6 +1310,291 @@
                 console.log('✅ Message click handlers attached successfully');
             }
 
+            // Move loadMessages function INSIDE the module
+            async function loadMessages() {
+                try {
+                    console.log('📬 Loading messages and dispute reports...');
+
+                    const token = localStorage.getItem('authToken');
+                    if (!token) {
+                        console.log('❌ No auth token found');
+                        return;
+                    }
+
+                    const response = await fetch('http://localhost:3000/api/user/notifications', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('📬 Received data:', data);
+
+                    if (data.success) {
+                        // Display notifications
+                        displayMessages(data.notifications || []);
+
+                        // Display dispute reports (new functionality)
+                        displayDisputeReports(data.disputeReports || []);
+
+                        // Update counts
+                        updateMessageCounts(data.counts || {});
+
+                        console.log(`📬 Loaded ${data.notifications?.length || 0} notifications and ${data.disputeReports?.length || 0} dispute reports`);
+                    } else {
+                        console.error('❌ Failed to load messages:', data.message);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error loading messages:', error);
+                    showErrorMessage('Failed to load messages. Please try again.');
+                }
+            }
+
+            // Move displayMessages function INSIDE the module
+            function displayMessages(notifications) {
+                console.log('📨 Displaying notifications:', notifications);
+
+                if (!notifications || notifications.length === 0) {
+                    console.log('📨 No notifications to display');
+                    return;
+                }
+
+                // Convert API notifications to the expected message format
+                const convertedMessages = notifications.map(notification => ({
+                    id: notification.id,
+                    sender: notification.sender || 'JAM System',
+                    subject: notification.subject || notification.title || 'Notification',
+                    body: notification.message || notification.body || '',
+                    time: notification.createdAt || notification.timestamp || new Date().toISOString(),
+                    read: notification.read || false,
+                    avatar: notification.sender ? notification.sender.charAt(0).toUpperCase() : 'J'
+                }));
+
+                // Update the global messages array
+                messages = convertedMessages;
+
+                // Re-render the messages UI if container exists
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (container) {
+                    renderMessagesUI(container);
+                    attachMessageClickHandlers(container);
+                }
+            }
+
+            // Move showErrorMessage function INSIDE the module
+            function showErrorMessage(message) {
+                console.error('❌ Error:', message);
+
+                // Try to find a container to show the error
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (container) {
+                    const errorHtml = `
+                        <div class="error-message" style="
+                            background: #ffebee; 
+                            color: #c62828; 
+                            padding: 15px; 
+                            border-radius: 4px; 
+                            margin: 10px 0;
+                            border-left: 4px solid #f44336;
+                        ">
+                            <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                            ${message}
+                        </div>
+                    `;
+
+                    // Insert error message at the top of the container
+                    container.insertAdjacentHTML('afterbegin', errorHtml);
+
+                    // Remove error message after 5 seconds
+                    setTimeout(() => {
+                        const errorElement = container.querySelector('.error-message');
+                        if (errorElement) {
+                            errorElement.remove();
+                        }
+                    }, 5000);
+                }
+
+                // Also show a browser alert as fallback
+                alert(message);
+            }
+
+            // Move displayDisputeReports function INSIDE the module
+            function displayDisputeReports(disputeReports) {
+                console.log('📋 Displaying dispute reports:', disputeReports);
+
+                const disputeContainer = document.getElementById('dispute-reports-container');
+                if (!disputeContainer) {
+                    console.error('❌ Dispute reports container not found');
+                    return;
+                }
+
+                if (!disputeReports || disputeReports.length === 0) {
+                    disputeContainer.innerHTML = `
+                        <div class="no-disputes-message">
+                            <i class="fas fa-file-alt"></i>
+                            <p>No dispute reports found</p>
+                            <small>Your submitted dispute reports will appear here</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const disputeHTML = disputeReports.map(dispute => {
+                    const submittedDate = new Date(dispute.submittedAt).toLocaleDateString();
+                    const reportDate = new Date(dispute.reportDate).toLocaleDateString();
+                    const statusClass = getDisputeStatusClass(dispute.status);
+                    const statusIcon = getDisputeStatusIcon(dispute.status);
+
+                    return `
+                        <div class="dispute-report-item" data-dispute-id="${dispute.id}">
+                            <div class="dispute-header">
+                                <div class="dispute-title">
+                                    <i class="fas fa-balance-scale"></i>
+                                    <span>${dispute.reportType}</span>
+                                    <span class="dispute-status ${statusClass}">
+                                        <i class="${statusIcon}"></i>
+                                        ${dispute.status.charAt(0).toUpperCase() + dispute.status.slice(1)}
+                                    </span>
+                                </div>
+                                <div class="dispute-date">
+                                    <small>Submitted: ${submittedDate}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="dispute-content">
+                                <div class="dispute-summary">
+                                    <strong>Summary:</strong>
+                                    <p>${dispute.disputeSummary}</p>
+                                </div>
+                                
+                                <div class="dispute-details">
+                                    <div class="detail-row">
+                                        <span><strong>Report Date:</strong> ${reportDate}</span>
+                                    </div>
+                                    
+                                    ${dispute.creditScores ? `
+                                        <div class="credit-scores">
+                                            <strong>Credit Scores:</strong>
+                                            <div class="scores-grid">
+                                                ${dispute.creditScores.experian ? `<span class="score-item">Experian: ${dispute.creditScores.experian}</span>` : ''}
+                                                ${dispute.creditScores.equifax ? `<span class="score-item">Equifax: ${dispute.creditScores.equifax}</span>` : ''}
+                                                ${dispute.creditScores.transunion ? `<span class="score-item">TransUnion: ${dispute.creditScores.transunion}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${dispute.fileInfo ? `
+                                        <div class="dispute-file">
+                                            <strong>Attached File:</strong>
+                                            <div class="file-info">
+                                                <i class="fas fa-file-pdf"></i>
+                                                <span>${dispute.fileInfo.fileName}</span>
+                                                <span class="file-size">(${formatFileSize(dispute.fileInfo.fileSize)})</span>
+                                                ${dispute.fileInfo.azureUrl ? `
+                                                    <a href="${dispute.fileInfo.azureUrl}" target="_blank" class="view-file-btn">
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                        View File
+                                                    </a>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="dispute-actions">
+                                <button class="btn-secondary" onclick="toggleDisputeDetails('${dispute.id}')">
+                                    <i class="fas fa-chevron-down"></i>
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                disputeContainer.innerHTML = disputeHTML;
+            }
+
+            // Move helper functions INSIDE the module
+            function updateMessageCounts(counts) {
+                const notificationCount = document.getElementById('notification-count');
+                const disputeCount = document.getElementById('dispute-count');
+
+                if (notificationCount) {
+                    notificationCount.textContent = counts.notifications || 0;
+                }
+
+                if (disputeCount) {
+                    disputeCount.textContent = counts.disputeReports || 0;
+                }
+
+                // Update unread notification badge
+                const unreadBadge = document.querySelector('.unread-badge');
+                if (unreadBadge) {
+                    const unreadCount = counts.unreadNotifications || 0;
+                    if (unreadCount > 0) {
+                        unreadBadge.textContent = unreadCount;
+                        unreadBadge.style.display = 'block';
+                    } else {
+                        unreadBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            function getDisputeStatusClass(status) {
+                const statusClasses = {
+                    'submitted': 'status-submitted',
+                    'in-progress': 'status-progress',
+                    'under-review': 'status-review',
+                    'resolved': 'status-resolved',
+                    'rejected': 'status-rejected'
+                };
+                return statusClasses[status] || 'status-default';
+            }
+
+            function getDisputeStatusIcon(status) {
+                const statusIcons = {
+                    'submitted': 'fas fa-paper-plane',
+                    'in-progress': 'fas fa-spinner',
+                    'under-review': 'fas fa-search',
+                    'resolved': 'fas fa-check-circle',
+                    'rejected': 'fas fa-times-circle'
+                };
+                return statusIcons[status] || 'fas fa-info-circle';
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function toggleDisputeDetails(disputeId) {
+                const disputeItem = document.querySelector(`[data-dispute-id="${disputeId}"]`);
+                if (disputeItem) {
+                    disputeItem.classList.toggle('expanded');
+                    const button = disputeItem.querySelector('.dispute-actions button');
+                    const icon = button.querySelector('i');
+
+                    if (disputeItem.classList.contains('expanded')) {
+                        icon.className = 'fas fa-chevron-up';
+                        button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
+                    } else {
+                        icon.className = 'fas fa-chevron-down';
+                        button.innerHTML = '<i class="fas fa-chevron-down"></i> View Details';
+                    }
+                }
+            }
+
             // Public API
             return {
                 init: init,
@@ -1066,6 +1607,27 @@
                 setFilter: setFilter
             };
         })();
+
+        // Add this OUTSIDE the MessagesModule, after the module definition
+        function toggleDisputeDetails(disputeId) {
+            const disputeItem = document.querySelector(`[data-dispute-id="${disputeId}"]`);
+            if (disputeItem) {
+                disputeItem.classList.toggle('expanded');
+                const button = disputeItem.querySelector('.dispute-actions button');
+                const icon = button.querySelector('i');
+
+                if (disputeItem.classList.contains('expanded')) {
+                    icon.className = 'fas fa-chevron-up';
+                    button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
+                } else {
+                    icon.className = 'fas fa-chevron-down';
+                    button.innerHTML = '<i class="fas fa-chevron-down"></i> View Details';
+                }
+            }
+        }
+
+        // Make it globally accessible
+        window.toggleDisputeDetails = toggleDisputeDetails;
 
         // Expose the module globally
         window.jamMessages = MessagesModule;

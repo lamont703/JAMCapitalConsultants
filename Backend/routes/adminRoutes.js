@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import { disputeUpdateUpload } from '../middleware/disputeUpdateUploadMiddleware.js';
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
@@ -73,6 +74,7 @@ console.log('✅ /send-notification route registered');
 router.post('/send-dispute-update', 
     authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
     adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }), 
+    disputeUpdateUpload.single('file'),
     adminController.sendDisputeUpdate
 );
 console.log('✅ /send-dispute-update route registered');
