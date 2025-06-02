@@ -21,6 +21,9 @@
             --gray-300: #dee2e6;
             --gray-600: #6c757d;
             --gray-800: #343a40;
+            --gray-700: #6c757d;
+            --gray-50: #f8f9fa;
+            --primary-color: #007bff;
         }
 
         .document-upload-container {
@@ -501,6 +504,152 @@
             border-radius: 5px;
             margin: 10px 0;
         }
+
+        /* ID Type Selection Styling - Match Credit Bureau Style Exactly */
+        .id-type-selection {
+            margin-bottom: 20px;
+        }
+
+        .id-type-selection h4 {
+            margin-bottom: 15px;
+            color: var(--gray-700);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .id-type-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .id-type-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            background-color: var(--gray-50);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .id-type-btn:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+        }
+
+        .id-type-btn.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .id-type-btn.occupied {
+            background-color: #e8f5e8 !important;
+            border: 2px solid #28a745 !important;
+            cursor: not-allowed;
+        }
+
+        .id-type-btn.occupied:hover {
+            background-color: #e8f5e8 !important;
+            transform: none;
+        }
+
+        .id-type-hint {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin: 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .id-type-btn.selected .id-type-hint {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .occupied-indicator {
+            font-size: 12px;
+            color: #28a745;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Add hint text styling to match bureau hint */
+        .id-type-selection .id-hint {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin: 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .id-type-buttons {
+                flex-direction: column;
+            }
+
+            .id-type-btn {
+                min-width: 100%;
+            }
+        }
+
+        /* Update ID Verification section header to match Credit Reports */
+        .document-section[data-section="id-verification"] .section-header h3 {
+            color: #09ccfc;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .document-section[data-section="id-verification"] .section-header p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        /* Make sure both sections have consistent styling */
+        .document-section .section-header h3 {
+            color: var(--gray-700);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .document-section .section-header p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        /* Ensure ID type selection header matches bureau selection */
+        .id-type-selection h4 {
+            color: var(--gray-700);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
@@ -530,36 +679,6 @@
                             <p class="document-upload-subtitle">
                                 Please upload the required documents to help us with your credit repair process.
                             </p>
-                        </div>
-                        
-                        <!-- SmartCredit Access Section -->
-                        <div class="document-section">
-                            <h3 class="document-section-title">SmartCredit Access (Optional)</h3>
-                            <p class="document-section-description">
-                                If you have a SmartCredit account, you can provide your login information below.
-                                This will allow us to access your credit reports directly and provide faster service.
-                            </p>
-                            
-                            <form id="smartcredit-access-form" class="smartcredit-form">
-                                <div class="form-group">
-                                    <label for="smartcredit-email">SmartCredit Email:</label>
-                                    <input type="email" id="smartcredit-email" name="email" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="smartcredit-password">SmartCredit Password:</label>
-                                    <input type="password" id="smartcredit-password" name="password" required>
-                                </div>
-                                
-                                <button type="submit" class="submit-btn">
-                                    <i class="fas fa-key"></i>
-                                    Provide SmartCredit Access
-                                </button>
-                                
-                                <p class="form-note">
-                                    If you prefer not to provide login access, you can download and upload your credit reports manually below.
-                                </p>
-                            </div>
                         </div>
                         
                         <!-- Credit Report Upload Section -->
@@ -603,22 +722,41 @@
                         </div>
                         
                         <!-- ID Verification Section -->
-                        <div class="document-section">
-                            <h3 class="document-section-title">ID Verification</h3>
-                            <p class="document-section-description">
-                                Please upload a copy of your government-issued ID and a recent utility bill or bank statement
-                                showing your name and current address.
-                            </p>
-                            
-                            <div class="document-upload-area" data-section="id-verification">
-                                <i class="fas fa-id-card document-upload-icon"></i>
-                                <p class="document-upload-text">Drag & drop your ID documents here</p>
-                                <p class="document-upload-subtext">or click to browse files</p>
-                                <input type="file" class="document-upload-input" id="id-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="document-section" data-section="id-verification">
+                            <div class="section-header">
+                                <h3>📋 ID Verification</h3>
+                                <p>Upload a valid government-issued ID and a utility bill with your current address</p>
                             </div>
-                            
-                            <div class="document-list" id="id-list">
-                                <!-- Uploaded documents will appear here -->
+
+                            <!-- ID Type Selection -->
+                            <div class="id-type-selection">
+                                <h4>Select Document Type:</h4>
+                                <div class="id-type-buttons">
+                                    <button type="button" class="id-type-btn" data-id-type="government-id">
+                                        <i class="fas fa-id-card"></i>
+                                        Government ID
+                                        <p class="id-type-hint">Driver's License, Passport, State ID</p>
+                                    </button>
+                                    <button type="button" class="id-type-btn" data-id-type="utility-bill">
+                                        <i class="fas fa-file-invoice"></i>
+                                        Utility Bill
+                                        <p class="id-type-hint">Electric, Gas, Water, Internet Bill</p>
+                                    </button>
+                                </div>
+                                <p class="id-hint">Please select which type of document you want to upload</p>
+                            </div>
+
+                            <!-- Upload Area (initially disabled) -->
+                            <div class="document-upload-area" id="id-verification-upload" style="opacity: 0.5; pointer-events: none;">
+                                <div class="upload-icon">📁</div>
+                                <div class="document-upload-text">Select a document type first</div>
+                                <input type="file" id="id-verification-input" accept=".pdf,.jpg,.jpeg,.png" multiple disabled>
+                            </div>
+
+                            <!-- Uploaded Files List -->
+                            <div class="uploaded-files-section">
+                                <h4>Uploaded Documents:</h4>
+                                <div class="uploaded-files-list" id="id-verification-list"></div>
                             </div>
                         </div>
                         
@@ -641,6 +779,36 @@
                                 <!-- Uploaded documents will appear here -->
                             </div>
                         </div>
+
+                        <!-- SmartCredit Access Section -->
+                        <div class="document-section">
+                            <h3 class="document-section-title">SmartCredit Access (Optional)</h3>
+                            <p class="document-section-description">
+                                If you have a SmartCredit account, you can provide your login information below.
+                                This will allow us to access your credit reports directly and provide faster service.
+                            </p>
+
+                            <form id="smartcredit-access-form" class="smartcredit-form">
+                                <div class="form-group">
+                                    <label for="smartcredit-email">SmartCredit Email:</label>
+                                    <input type="email" id="smartcredit-email" name="email" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="smartcredit-password">SmartCredit Password:</label>
+                                    <input type="password" id="smartcredit-password" name="password" required>
+                                </div>
+
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-key"></i>
+                                    Provide SmartCredit Access
+                                </button>
+
+                                <p class="form-note">
+                                    If you prefer not to provide login access, you can download and upload your credit reports manually below.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 `;
 
@@ -655,13 +823,14 @@
                         if (existingDocuments.length > 0) {
                             console.log(`📋 Loading ${existingDocuments.length} existing documents`);
                             displayExistingCreditReports(existingDocuments);
+                            displayExistingIdDocuments(existingDocuments);
                         } else {
                             console.log('📋 No existing documents found');
                         }
                     } catch (error) {
                         console.error('❌ Failed to load existing documents:', error);
                     }
-                }, 500); // Small delay to ensure DOM is ready
+                }, 500);
 
                 return true;
             }
@@ -693,11 +862,14 @@
                 // Bureau selection for credit reports
                 setupBureauSelection(container);
 
+                // ID type selection for ID verification
+                setupIdTypeSelection(container);
+
                 // Credit report upload
                 setupUploadArea(container, 'credit-report', 'credit-report-input', 'credit-report-list');
 
                 // ID verification upload
-                setupUploadArea(container, 'id-verification', 'id-input', 'id-list');
+                setupUploadArea(container, 'id-verification', 'id-verification-input', 'id-verification-list');
 
                 // Additional documents upload
                 setupUploadArea(container, 'additional-documents', 'additional-input', 'additional-list');
@@ -867,6 +1039,20 @@
                     }
                 }
 
+                // For ID verification, get the selected ID type
+                let selectedIdType = null;
+                if (sectionType === 'id-verification') {
+                    const selectedIdTypeBtn = container.querySelector('.id-type-btn.selected');
+                    if (selectedIdTypeBtn) {
+                        selectedIdType = selectedIdTypeBtn.getAttribute('data-id-type');
+                    }
+
+                    if (!selectedIdType) {
+                        alert('Please select a document type (Government ID or Utility Bill) before uploading.');
+                        return;
+                    }
+                }
+
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
 
@@ -888,6 +1074,11 @@
                     // Add bureau info for credit reports
                     if (sectionType === 'credit-report' && selectedBureau) {
                         documentData.bureau = selectedBureau;
+                    }
+
+                    // Add ID type info for ID verification
+                    if (sectionType === 'id-verification' && selectedIdType) {
+                        documentData.idType = selectedIdType;
                     }
 
                     uploadedDocuments.push(documentData);
@@ -963,33 +1154,22 @@
                         // Show uploading status
                         updateDocumentStatus(fileId, 'uploading', 'Please wait...');
 
-                        // Upload to backend with bureau info
-                        uploadToBackend(file, fileId, sectionType, selectedBureau)
-                            .then(result => {
-                                // Update the document in our array with backend data
-                                const docIndex = uploadedDocuments.findIndex(doc => doc.id === fileId);
-                                if (docIndex > -1) {
-                                    uploadedDocuments[docIndex].uploadStatus = 'success';
-                                    uploadedDocuments[docIndex].backendId = result.documentId;
-                                    uploadedDocuments[docIndex].fileUrl = result.fileUrl;
-                                }
-                            })
-                            .catch(error => {
-                                // Update the document in our array with error status
-                                const docIndex = uploadedDocuments.findIndex(doc => doc.id === fileId);
-                                if (docIndex > -1) {
-                                    uploadedDocuments[docIndex].uploadStatus = 'error';
-                                    uploadedDocuments[docIndex].errorMessage = error.message;
-                                }
-                            });
+                        // Upload to backend with appropriate parameters
+                        if (sectionType === 'credit-report') {
+                            uploadToBackend(file, fileId, sectionType, selectedBureau, null);
+                        } else if (sectionType === 'id-verification') {
+                            uploadToBackend(file, fileId, sectionType, null, selectedIdType);
+                        } else {
+                            uploadToBackend(file, fileId, sectionType, null, null);
+                        }
                     }
                 }
             }
 
             // Upload to backend function (updated to include bureau info)
-            async function uploadToBackend(file, fileId, sectionType, bureau = null) {
+            async function uploadToBackend(file, fileId, sectionType, bureau = null, idType = null) {
                 try {
-                    console.log('🌐 Uploading to backend:', file.name, 'Section:', sectionType, 'Bureau:', bureau);
+                    console.log('🌐 Uploading to backend:', file.name, 'Section:', sectionType, 'Bureau:', bureau, 'ID Type:', idType);
 
                     // Get user data and auth token
                     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -1013,6 +1193,11 @@
                     // Add bureau info for credit reports
                     if (sectionType === 'credit-report' && bureau) {
                         formData.append('bureau', bureau);
+                    }
+
+                    // Add ID type info for ID verification
+                    if (sectionType === 'id-verification' && idType) {
+                        formData.append('idType', idType);
                     }
 
                     // Upload to backend
@@ -1165,9 +1350,16 @@
                             // If this was a credit report, refresh the credit report display
                             if (document.sectionType === 'credit-report') {
                                 console.log('🔄 Document was credit report, refreshing display...');
-                                // Add a small delay to ensure backend deletion is complete
                                 setTimeout(() => {
                                     refreshCreditReportDisplay();
+                                }, 100);
+                            }
+
+                            // If this was an ID verification document, refresh the ID document display
+                            if (document.sectionType === 'id-verification') {
+                                console.log('🔄 Document was ID verification, refreshing display...');
+                                setTimeout(() => {
+                                    refreshIdDocumentDisplay();
                                 }, 100);
                             }
 
@@ -1189,6 +1381,13 @@
                     if (document.sectionType === 'credit-report') {
                         setTimeout(() => {
                             refreshCreditReportDisplay();
+                        }, 100);
+                    }
+
+                    // If this was an ID verification document, refresh the ID document display
+                    if (document.sectionType === 'id-verification') {
+                        setTimeout(() => {
+                            refreshIdDocumentDisplay();
                         }, 100);
                     }
                 }
@@ -1472,6 +1671,219 @@
                     })
                     .catch(error => {
                         console.error('❌ Failed to refresh credit report display:', error);
+                    });
+            }
+
+            // Setup ID type selection for ID verification
+            function setupIdTypeSelection(container) {
+                const idTypeButtons = container.querySelectorAll('.id-type-btn');
+                const uploadArea = container.querySelector('#id-verification-upload');
+                const uploadInput = container.querySelector('#id-verification-input');
+                let selectedIdType = null;
+
+                idTypeButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const idType = this.getAttribute('data-id-type');
+
+                        // Check if this ID type already has a document
+                        const existingDocument = uploadedDocuments.find(doc =>
+                            doc.sectionType === 'id-verification' &&
+                            doc.idType === idType &&
+                            doc.uploadStatus === 'success'
+                        );
+
+                        if (existingDocument) {
+                            // Show warning message
+                            showIdTypeLimitWarning(idType, existingDocument.name);
+                            return; // Don't allow selection
+                        }
+
+                        // Remove selected class from all buttons
+                        idTypeButtons.forEach(btn => btn.classList.remove('selected'));
+
+                        // Add selected class to clicked button
+                        this.classList.add('selected');
+
+                        // Store selected ID type
+                        selectedIdType = idType;
+
+                        // Enable upload area
+                        uploadArea.style.opacity = '1';
+                        uploadArea.style.pointerEvents = 'auto';
+                        uploadInput.disabled = false;
+
+                        // Update upload area text
+                        const uploadText = uploadArea.querySelector('.document-upload-text');
+                        const uploadIcon = uploadArea.querySelector('.document-upload-icon');
+                        const idTypeName = this.textContent.trim();
+
+                        uploadText.textContent = `Drag & drop your ${idTypeName} here`;
+
+                        // Update icon based on document type
+                        if (idType === 'government-id') {
+                            uploadIcon.className = 'fas fa-id-card document-upload-icon';
+                        } else if (idType === 'utility-bill') {
+                            uploadIcon.className = 'fas fa-file-invoice document-upload-icon';
+                        }
+
+                        console.log(`Selected ID type: ${selectedIdType}`);
+                    });
+                });
+
+                // Store the selected ID type for use in file upload
+                container.setAttribute('data-selected-id-type', '');
+
+                // Return the selected type getter
+                return () => selectedIdType;
+            }
+
+            // Show warning when trying to upload an ID type that already exists
+            function showIdTypeLimitWarning(idType, existingFileName) {
+                const idTypeNames = {
+                    'government-id': 'Government ID',
+                    'utility-bill': 'Utility Bill'
+                };
+
+                const idTypeDisplay = idTypeNames[idType] || idType;
+
+                const warningMessage = `
+                    You already have a ${idTypeDisplay} uploaded: "${existingFileName}"
+                    
+                    You can only have one document per type. Would you like to:
+                    1. Keep the existing document
+                    2. Delete the existing document and upload a new one
+                `;
+
+                if (confirm(warningMessage + '\n\nClick OK to delete the existing document and upload a new one, or Cancel to keep the existing document.')) {
+                    // User wants to replace - find and delete the existing document
+                    const existingDocument = uploadedDocuments.find(doc =>
+                        doc.sectionType === 'id-verification' &&
+                        doc.idType === idType &&
+                        doc.uploadStatus === 'success'
+                    );
+
+                    if (existingDocument) {
+                        console.log(`🔄 Replacing existing ${idType}:`, existingDocument.name);
+                        removeDocument(existingDocument.id);
+                    }
+                }
+            }
+
+            // Mark ID type button as occupied
+            function markIdTypeAsOccupied(idType) {
+                const idTypeButton = document.querySelector(`[data-id-type="${idType}"]`);
+                if (idTypeButton) {
+                    idTypeButton.classList.add('occupied');
+                    idTypeButton.innerHTML += ' <span class="occupied-indicator">✅ Uploaded</span>';
+                    idTypeButton.style.backgroundColor = '#e8f5e8';
+                    idTypeButton.style.border = '2px solid #28a745';
+                }
+            }
+
+            // Remove occupied status when document is deleted
+            function removeIdTypeOccupiedStatus(idType) {
+                const idTypeButton = document.querySelector(`[data-id-type="${idType}"]`);
+                if (idTypeButton) {
+                    idTypeButton.classList.remove('occupied');
+                    const indicator = idTypeButton.querySelector('.occupied-indicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                    idTypeButton.style.backgroundColor = '';
+                    idTypeButton.style.border = '';
+                }
+            }
+
+            // Display existing ID verification documents
+            function displayExistingIdDocuments(documents) {
+                const idDocuments = documents.filter(doc => doc.documentType === 'id-verification');
+                console.log('📋 Processing ID documents:', idDocuments.length);
+
+                if (idDocuments.length > 0) {
+                    // Find the ID verification list element
+                    const listElement = container.querySelector('#id-verification-list');
+
+                    if (listElement) {
+                        idDocuments.forEach(doc => {
+                            // Add to uploadedDocuments array
+                            const documentData = {
+                                id: `existing_${doc.id}`,
+                                name: doc.fileName,
+                                size: doc.fileSize || 0,
+                                type: doc.mimeType || 'application/pdf',
+                                uploadStatus: 'success',
+                                backendId: doc.id,
+                                fileUrl: doc.fileUrl,
+                                isExisting: true,
+                                idType: doc.idType,
+                                uploadDate: doc.createdAt,
+                                sectionType: 'id-verification'
+                            };
+
+                            uploadedDocuments.push(documentData);
+
+                            // Create DOM element for existing document
+                            const listItem = createExistingDocumentElement(documentData);
+                            listElement.appendChild(listItem);
+
+                            // Mark the ID type button as occupied
+                            if (doc.idType) {
+                                markIdTypeAsOccupied(doc.idType);
+                            }
+
+                            console.log(`✅ Added existing ${doc.idType} document: ${doc.fileName}`);
+                        });
+                    } else {
+                        console.error('❌ Could not find ID verification list element');
+                    }
+                }
+            }
+
+            // Updated refresh function for ID documents
+            function refreshIdDocumentDisplay() {
+                console.log('🔄 Refreshing ID document display...');
+
+                // Clear existing ID document displays - be more thorough
+                const idDocumentList = container.querySelector('#id-verification-list');
+                if (idDocumentList) {
+                    // Remove ALL items in the ID verification list
+                    idDocumentList.innerHTML = '';
+                    console.log('🧹 Cleared ID verification list');
+                }
+
+                // Remove ALL ID verification documents from uploadedDocuments array
+                uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'id-verification');
+                console.log('🧹 Cleared ID documents from uploadedDocuments array');
+
+                // Remove occupied status from all ID type buttons
+                const idTypeButtons = container.querySelectorAll('.id-type-btn');
+                idTypeButtons.forEach(button => {
+                    button.classList.remove('occupied');
+                    const indicator = button.querySelector('.occupied-indicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                    button.style.backgroundColor = '';
+                    button.style.border = '';
+                });
+                console.log('🧹 Cleared ID type button statuses');
+
+                // Re-fetch and display existing documents
+                fetchExistingDocuments()
+                    .then(documents => {
+                        console.log('📋 Fetched documents for ID refresh:', documents.length);
+                        const idDocs = documents.filter(doc => doc.documentType === 'id-verification');
+                        console.log('📋 ID documents found:', idDocs.length);
+
+                        if (idDocs.length > 0) {
+                            displayExistingIdDocuments(documents);
+                        } else {
+                            console.log('📋 No ID documents to display after refresh');
+                        }
+                        console.log('✅ ID document display refreshed');
+                    })
+                    .catch(error => {
+                        console.error('❌ Failed to refresh ID document display:', error);
                     });
             }
 

@@ -580,6 +580,41 @@ const adminController = {
                 }
             }
 
+            // Add this check after the credit report validation in your uploadDocument function
+            if (documentType === 'id-verification') {
+                const { idType } = req.body;
+                
+                if (!idType) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'ID type selection is required for ID verification documents'
+                    });
+                }
+
+                // Check for existing document of this ID type
+                const existingIdDocQuery = "SELECT * FROM c WHERE c.userId = @userId AND c.type = 'document' AND c.documentType = 'id-verification' AND c.idType = @idType";
+                const existingIdDocParams = [
+                    { name: "@userId", value: userId },
+                    { name: "@idType", value: idType }
+                ];
+                
+                const existingIdDocs = await cosmosService.queryDocuments(existingIdDocQuery, existingIdDocParams);
+                
+                if (existingIdDocs.length > 0) {
+                    console.log(`❌ User already has a ${idType} document:`, existingIdDocs[0].fileName);
+                    const idTypeDisplay = idType === 'government-id' ? 'Government ID' : 'Utility Bill';
+                    return res.status(409).json({
+                        success: false,
+                        message: `You already have a ${idTypeDisplay} uploaded. Please delete the existing document before uploading a new one.`,
+                        existingDocument: {
+                            id: existingIdDocs[0].id,
+                            fileName: existingIdDocs[0].fileName,
+                            idType: existingIdDocs[0].idType
+                        }
+                    });
+                }
+            }
+
             // Continue with the rest of your existing upload logic...
             // Create unique filename with timestamp and random string
             const timestamp = Date.now();
@@ -624,11 +659,13 @@ const adminController = {
                 fileSize: req.file.size,
                 mimeType: req.file.mimetype,
                 bureau: bureau || null,
-                uploadedBy: 'user',
-                timestamp: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                uploadedBy: 'user'
             };
+
+            // Add idType for ID verification documents
+            if (documentType === 'id-verification' && req.body.idType) {
+                documentRecord.idType = req.body.idType;
+            }
 
             await cosmosService.createDocument(documentRecord);
             console.log('💾 Document record saved to database:', documentRecord.id);
@@ -640,14 +677,15 @@ const adminController = {
                 userName: user.name || user.firstName,
                 notificationType: 'document-upload',
                 subject: 'Document Uploaded Successfully',
-                message: `Your ${documentType.replace('-', ' ')} "${req.file.originalname}" has been successfully uploaded and saved.${bureau ? ` Bureau: ${bureau.charAt(0).toUpperCase() + bureau.slice(1)}` : ''}`,
+                message: `Your ${documentType.replace('-', ' ')} "${req.file.originalname}" has been successfully uploaded and saved.${bureau ? ` Bureau: ${bureau.charAt(0).toUpperCase() + bureau.slice(1)}` : ''}${req.body.idType ? ` Type: ${req.body.idType === 'government-id' ? 'Government ID' : 'Utility Bill'}` : ''}`,
                 adminId: 'system',
                 status: 'sent',
                 metadata: {
                     documentId: documentRecord.id,
                     documentType: documentType,
                     fileName: req.file.originalname,
-                    bureau: bureau || null
+                    bureau: bureau || null,
+                    idType: req.body.idType || null
                 }
             });
 
