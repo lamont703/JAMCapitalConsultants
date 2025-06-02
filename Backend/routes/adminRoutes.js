@@ -1,10 +1,22 @@
 import express from 'express';
 import multer from 'multer';
 
-const upload = multer({ 
-    storage: multer.memoryStorage(),
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
     limits: {
-        fileSize: 10 * 1024 * 1024 // 10MB limit
+        fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Allow specific file types
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only PDF, JPG, PNG, and Word documents are allowed.'), false);
+        }
     }
 });
 
@@ -98,6 +110,15 @@ router.delete('/delete-notification',
     authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
     adminController.deleteNotification
 );
+
+// Add this route to your existing adminRoutes.js file
+router.post('/upload-document', upload.single('file'), adminController.uploadDocument);
+
+// Add this route to your existing adminRoutes.js file
+router.delete('/delete-document', authMiddleware.authenticateToken, adminController.deleteDocument);
+
+// Add this route to your existing adminRoutes.js file
+router.get('/get-user-documents', authMiddleware.authenticateToken, adminController.getUserDocuments);
 
 console.log('✅ Activity routes registered');
 

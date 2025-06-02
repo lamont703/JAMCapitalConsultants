@@ -399,6 +399,108 @@
         .document-item.upload-success .document-meta {
             color: var(--success);
         }
+
+        /* Bureau Selection Styles */
+        .bureau-selection {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: var(--gray-100);
+            border-radius: 8px;
+            border: 2px solid var(--gray-200);
+        }
+
+        .bureau-selection-label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .bureau-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bureau-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 20px;
+            border: 2px solid var(--gray-300);
+            background-color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bureau-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 128, 128, 0.15);
+        }
+
+        .bureau-btn.selected {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+        }
+
+        .bureau-btn i {
+            font-size: 1.5rem;
+        }
+
+        .bureau-hint {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin: 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Upload area disabled state */
+        .document-upload-area[disabled] {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Bureau button occupied state */
+        .bureau-btn.occupied {
+            background-color: #e8f5e8 !important;
+            border: 2px solid #28a745 !important;
+            cursor: not-allowed;
+        }
+
+        .bureau-btn.occupied:hover {
+            background-color: #e8f5e8 !important;
+        }
+
+        .occupied-indicator {
+            font-size: 12px;
+            color: #28a745;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Warning message styling */
+        .bureau-limit-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 
@@ -413,6 +515,8 @@
 
             // Initialize the module
             function init(containerId) {
+                console.log('Initializing Document Upload Module in container:', containerId);
+
                 container = document.getElementById(containerId);
                 if (!container) return false;
 
@@ -463,14 +567,34 @@
                             <h3 class="document-section-title">Credit Reports</h3>
                             <p class="document-section-description">
                                 Upload your credit reports from all three bureaus (Experian, Equifax, and TransUnion).
-                                PDF format is preferred.
+                                PDF format is preferred. Please select which bureau report you're uploading.
                             </p>
                             
-                            <div class="document-upload-area" data-section="credit-report">
+                            <!-- Bureau Selection -->
+                            <div class="bureau-selection" id="bureau-selection">
+                                <label class="bureau-selection-label">Select Credit Bureau:</label>
+                                <div class="bureau-options">
+                                    <button type="button" class="bureau-btn" data-bureau="experian">
+                                        <i class="fas fa-building"></i>
+                                        Experian
+                                    </button>
+                                    <button type="button" class="bureau-btn" data-bureau="equifax">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Equifax
+                                    </button>
+                                    <button type="button" class="bureau-btn" data-bureau="transunion">
+                                        <i class="fas fa-chart-line"></i>
+                                        TransUnion
+                                    </button>
+                                </div>
+                                <p class="bureau-hint">Please select which credit bureau report you want to upload</p>
+                            </div>
+                            
+                            <div class="document-upload-area" data-section="credit-report" id="credit-report-upload" style="opacity: 0.5; pointer-events: none;">
                                 <i class="fas fa-file-upload document-upload-icon"></i>
-                                <p class="document-upload-text">Drag & drop your credit reports here</p>
+                                <p class="document-upload-text">Select a credit bureau first, then drag & drop your credit report here</p>
                                 <p class="document-upload-subtext">or click to browse files</p>
-                                <input type="file" class="document-upload-input" id="credit-report-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                                <input type="file" class="document-upload-input" id="credit-report-input" multiple accept=".pdf,.jpg,.jpeg,.png" disabled>
                             </div>
                             
                             <div class="document-list" id="credit-report-list">
@@ -523,6 +647,22 @@
                 // Set up event listeners and other initialization
                 setupEventListeners(container);
 
+                // Load existing documents after initialization
+                setTimeout(async () => {
+                    try {
+                        console.log('🔄 Loading existing documents...');
+                        const existingDocuments = await fetchExistingDocuments();
+                        if (existingDocuments.length > 0) {
+                            console.log(`📋 Loading ${existingDocuments.length} existing documents`);
+                            displayExistingCreditReports(existingDocuments);
+                        } else {
+                            console.log('📋 No existing documents found');
+                        }
+                    } catch (error) {
+                        console.error('❌ Failed to load existing documents:', error);
+                    }
+                }, 500); // Small delay to ensure DOM is ready
+
                 return true;
             }
 
@@ -550,6 +690,9 @@
                     });
                 }
 
+                // Bureau selection for credit reports
+                setupBureauSelection(container);
+
                 // Credit report upload
                 setupUploadArea(container, 'credit-report', 'credit-report-input', 'credit-report-list');
 
@@ -558,6 +701,99 @@
 
                 // Additional documents upload
                 setupUploadArea(container, 'additional-documents', 'additional-input', 'additional-list');
+            }
+
+            // Update the setupBureauSelection function to check for existing reports
+            function setupBureauSelection(container) {
+                const bureauButtons = container.querySelectorAll('.bureau-btn');
+                const uploadArea = container.querySelector('#credit-report-upload');
+                const uploadInput = container.querySelector('#credit-report-input');
+                let selectedBureau = null;
+
+                bureauButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const bureau = this.getAttribute('data-bureau');
+
+                        // Check if this bureau already has a credit report
+                        const existingReport = uploadedDocuments.find(doc =>
+                            doc.sectionType === 'credit-report' &&
+                            doc.bureau === bureau &&
+                            doc.uploadStatus === 'success'
+                        );
+
+                        if (existingReport) {
+                            // Show warning message
+                            showBureauLimitWarning(bureau, existingReport.name);
+                            return; // Don't allow selection
+                        }
+
+                        // Remove selected class from all buttons
+                        bureauButtons.forEach(btn => btn.classList.remove('selected'));
+
+                        // Add selected class to clicked button
+                        this.classList.add('selected');
+
+                        // Store selected bureau
+                        selectedBureau = bureau;
+
+                        // Enable upload area
+                        uploadArea.style.opacity = '1';
+                        uploadArea.style.pointerEvents = 'auto';
+                        uploadInput.disabled = false;
+
+                        // Update upload area text
+                        const uploadText = uploadArea.querySelector('.document-upload-text');
+                        const bureauName = this.textContent.trim();
+                        uploadText.textContent = `Drag & drop your ${bureauName} credit report here`;
+
+                        console.log(`Selected bureau: ${selectedBureau}`);
+                    });
+                });
+
+                // Store the selected bureau for use in file upload
+                container.setAttribute('data-selected-bureau', '');
+            }
+
+            // Show warning when trying to upload to a bureau that already has a report
+            function showBureauLimitWarning(bureau, existingFileName) {
+                const bureauNames = {
+                    'experian': 'Experian',
+                    'equifax': 'Equifax',
+                    'transunion': 'TransUnion'
+                };
+
+                const bureauDisplay = bureauNames[bureau] || bureau;
+
+                // Create warning modal or alert
+                const warningMessage = `
+                    You already have a ${bureauDisplay} credit report uploaded: "${existingFileName}"
+                    
+                    You can only have one credit report per bureau. Would you like to:
+                    1. Keep the existing report
+                    2. Delete the existing report and upload a new one
+                `;
+
+                if (confirm(warningMessage + '\n\nClick OK to delete the existing report and upload a new one, or Cancel to keep the existing report.')) {
+                    // User wants to replace - find and delete the existing report
+                    const existingReport = uploadedDocuments.find(doc =>
+                        doc.sectionType === 'credit-report' &&
+                        doc.bureau === bureau &&
+                        doc.uploadStatus === 'success'
+                    );
+
+                    if (existingReport) {
+                        console.log(`🔄 Replacing existing ${bureau} report:`, existingReport.name);
+                        removeDocument(existingReport.id);
+
+                        // After deletion, allow the bureau selection
+                        setTimeout(() => {
+                            const bureauButton = document.querySelector(`[data-bureau="${bureau}"]`);
+                            if (bureauButton) {
+                                bureauButton.click(); // Trigger the selection again
+                            }
+                        }, 500);
+                    }
+                }
             }
 
             // Set up upload area functionality
@@ -617,6 +853,20 @@
                 const uploadArea = listElement.closest('.document-section').querySelector('.document-upload-area');
                 const sectionType = getSectionType(uploadArea);
 
+                // For credit reports, get the selected bureau
+                let selectedBureau = null;
+                if (sectionType === 'credit-report') {
+                    const selectedBureauBtn = container.querySelector('.bureau-btn.selected');
+                    if (selectedBureauBtn) {
+                        selectedBureau = selectedBureauBtn.getAttribute('data-bureau');
+                    }
+
+                    if (!selectedBureau) {
+                        alert('Please select a credit bureau before uploading your report.');
+                        return;
+                    }
+                }
+
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
 
@@ -624,7 +874,7 @@
                     const fileId = 'file-' + Date.now() + '-' + i;
 
                     // Add to our internal array
-                    uploadedDocuments.push({
+                    const documentData = {
                         id: fileId,
                         file: file,
                         name: file.name,
@@ -633,9 +883,16 @@
                         uploadDate: new Date(),
                         sectionType: sectionType,
                         uploadStatus: 'pending'
-                    });
+                    };
 
-                    // Create list item
+                    // Add bureau info for credit reports
+                    if (sectionType === 'credit-report' && selectedBureau) {
+                        documentData.bureau = selectedBureau;
+                    }
+
+                    uploadedDocuments.push(documentData);
+
+                    // Create list item with bureau info for credit reports
                     const listItem = document.createElement('div');
                     listItem.className = 'document-item';
                     listItem.id = fileId;
@@ -653,11 +910,22 @@
                     // Format file size
                     const fileSize = formatFileSize(file.size);
 
+                    // Create display name with bureau info for credit reports
+                    let displayName = file.name;
+                    if (sectionType === 'credit-report' && selectedBureau) {
+                        const bureauNames = {
+                            'experian': 'Experian',
+                            'equifax': 'Equifax',
+                            'transunion': 'TransUnion'
+                        };
+                        displayName = `${bureauNames[selectedBureau]} - ${file.name}`;
+                    }
+
                     // Add content to list item
                     listItem.innerHTML = `
                         <i class="fas ${iconClass} document-icon"></i>
                         <div class="document-info">
-                            <div class="document-name">${file.name}</div>
+                            <div class="document-name">${displayName}</div>
                             <div class="document-meta">${fileSize} • Uploaded just now</div>
                         </div>
                         <div class="document-actions">
@@ -678,7 +946,7 @@
                     if (deleteBtn) {
                         deleteBtn.addEventListener('click', function () {
                             const id = this.getAttribute('data-id');
-                            deleteDocument(id);
+                            removeDocument(id);
                         });
                     }
 
@@ -695,8 +963,8 @@
                         // Show uploading status
                         updateDocumentStatus(fileId, 'uploading', 'Please wait...');
 
-                        // Upload to backend
-                        uploadToBackend(file, fileId, sectionType)
+                        // Upload to backend with bureau info
+                        uploadToBackend(file, fileId, sectionType, selectedBureau)
                             .then(result => {
                                 // Update the document in our array with backend data
                                 const docIndex = uploadedDocuments.findIndex(doc => doc.id === fileId);
@@ -718,10 +986,10 @@
                 }
             }
 
-            // Upload to backend function (moved inside module)
-            async function uploadToBackend(file, fileId, sectionType) {
+            // Upload to backend function (updated to include bureau info)
+            async function uploadToBackend(file, fileId, sectionType, bureau = null) {
                 try {
-                    console.log('🌐 Uploading to backend:', file.name, 'Section:', sectionType);
+                    console.log('🌐 Uploading to backend:', file.name, 'Section:', sectionType, 'Bureau:', bureau);
 
                     // Get user data and auth token
                     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -741,6 +1009,11 @@
                     formData.append('userId', userId);
                     formData.append('documentType', sectionType);
                     formData.append('fileName', file.name);
+
+                    // Add bureau info for credit reports
+                    if (sectionType === 'credit-report' && bureau) {
+                        formData.append('bureau', bureau);
+                    }
 
                     // Upload to backend
                     const response = await fetch('http://localhost:3000/api/admin/upload-document', {
@@ -861,6 +1134,347 @@
                 return true;
             }
 
+            // Remove a document
+            function removeDocument(id) {
+                const docIndex = uploadedDocuments.findIndex(doc => doc.id === id);
+                if (docIndex === -1) return;
+
+                const document = uploadedDocuments[docIndex];
+                console.log('🗑️ Removing document:', document.name, 'Type:', document.sectionType);
+
+                // If this document was successfully uploaded to backend, delete it from database
+                if (document.uploadStatus === 'success' && document.backendId) {
+                    // Show confirmation dialog
+                    if (!confirm(`Are you sure you want to delete "${document.name}"? This action cannot be undone.`)) {
+                        return;
+                    }
+
+                    // Call backend to delete from database
+                    deleteDocumentFromBackend(document.backendId, document.name)
+                        .then(() => {
+                            console.log('✅ Backend deletion successful, updating UI...');
+
+                            // Remove from local array and DOM
+                            uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
+                            const documentElement = container.querySelector(`[data-file-id="${id}"]`);
+                            if (documentElement) {
+                                documentElement.remove();
+                                console.log('🗑️ Removed DOM element');
+                            }
+
+                            // If this was a credit report, refresh the credit report display
+                            if (document.sectionType === 'credit-report') {
+                                console.log('🔄 Document was credit report, refreshing display...');
+                                // Add a small delay to ensure backend deletion is complete
+                                setTimeout(() => {
+                                    refreshCreditReportDisplay();
+                                }, 100);
+                            }
+
+                            console.log('✅ Document deleted successfully');
+                        })
+                        .catch(error => {
+                            console.error('❌ Failed to delete document:', error);
+                            alert('Failed to delete document. Please try again.');
+                        });
+                } else {
+                    // Document wasn't uploaded to backend yet, just remove locally
+                    uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
+                    const documentElement = container.querySelector(`[data-file-id="${id}"]`);
+                    if (documentElement) {
+                        documentElement.remove();
+                    }
+
+                    // If this was a credit report, refresh the credit report display
+                    if (document.sectionType === 'credit-report') {
+                        setTimeout(() => {
+                            refreshCreditReportDisplay();
+                        }, 100);
+                    }
+                }
+            }
+
+            // Delete document from backend
+            async function deleteDocumentFromBackend(documentId, fileName) {
+                try {
+                    console.log('🗑️ Deleting document from backend:', fileName);
+
+                    // Get user data and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId || !authToken) {
+                        throw new Error('User authentication required');
+                    }
+
+                    const response = await fetch('http://localhost:3000/api/admin/delete-document', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            documentId: documentId,
+                            userId: userId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`Delete failed: ${errorData.message || response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ Document deleted from backend:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('❌ Failed to delete document from backend:', error);
+                    throw error;
+                }
+            }
+
+            // Fetch existing documents from backend
+            async function fetchExistingDocuments() {
+                try {
+                    console.log('📥 Fetching existing documents from backend...');
+
+                    // Get user data and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId || !authToken) {
+                        console.log('❌ User authentication required');
+                        return [];
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/admin/get-user-documents?userId=${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch documents: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ Existing documents fetched:', result.documents);
+                    return result.documents || [];
+
+                } catch (error) {
+                    console.error('❌ Failed to fetch existing documents:', error);
+                    return [];
+                }
+            }
+
+            // Display existing credit reports in the UI
+            function displayExistingCreditReports(documents) {
+                const creditReports = documents.filter(doc => doc.documentType === 'credit-report');
+                console.log('📋 Processing credit reports:', creditReports.length);
+
+                // Group by bureau
+                const reportsByBureau = {
+                    experian: creditReports.filter(doc => doc.bureau === 'experian'),
+                    equifax: creditReports.filter(doc => doc.bureau === 'equifax'),
+                    transunion: creditReports.filter(doc => doc.bureau === 'transunion')
+                };
+
+                console.log('📊 Reports by bureau:', reportsByBureau);
+
+                // Display each bureau's reports and mark buttons
+                Object.keys(reportsByBureau).forEach(bureau => {
+                    const reports = reportsByBureau[bureau];
+                    if (reports.length > 0) {
+                        console.log(`📄 Loading ${reports.length} ${bureau} reports`);
+
+                        // Mark the bureau button as occupied
+                        markBureauAsOccupied(bureau);
+
+                        // Find the correct list element for this bureau
+                        const listElement = container.querySelector('#credit-report-list');
+
+                        if (listElement) {
+                            reports.forEach(report => {
+                                // Add to uploadedDocuments array
+                                const documentData = {
+                                    id: `existing_${report.id}`,
+                                    name: report.fileName,
+                                    size: report.fileSize,
+                                    type: 'application/pdf',
+                                    uploadStatus: 'success',
+                                    backendId: report.id,
+                                    fileUrl: report.fileUrl,
+                                    isExisting: true,
+                                    bureau: report.bureau,
+                                    uploadDate: report.createdAt,
+                                    sectionType: 'credit-report'
+                                };
+
+                                uploadedDocuments.push(documentData);
+
+                                // Create DOM element for existing document
+                                const listItem = createExistingDocumentElement(documentData);
+                                listElement.appendChild(listItem);
+
+                                console.log(`✅ Added existing ${bureau} report: ${report.fileName}`);
+                            });
+                        }
+                    }
+                });
+            }
+
+            // Mark bureau button as occupied
+            function markBureauAsOccupied(bureau) {
+                const bureauButton = document.querySelector(`[data-bureau="${bureau}"]`);
+                if (bureauButton) {
+                    bureauButton.classList.add('occupied');
+                    bureauButton.innerHTML += ' <span class="occupied-indicator">✅ Uploaded</span>';
+                    bureauButton.style.backgroundColor = '#e8f5e8';
+                    bureauButton.style.border = '2px solid #28a745';
+                }
+            }
+
+            // Remove occupied status when document is deleted
+            function removeBureauOccupiedStatus(bureau) {
+                const bureauButton = document.querySelector(`[data-bureau="${bureau}"]`);
+                if (bureauButton) {
+                    bureauButton.classList.remove('occupied');
+                    const indicator = bureauButton.querySelector('.occupied-indicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                    bureauButton.style.backgroundColor = '';
+                    bureauButton.style.border = '';
+                }
+            }
+
+            // Create DOM element for existing documents
+            function createExistingDocumentElement(documentData) {
+                const listItem = document.createElement('div');
+                listItem.className = 'document-item existing-document';
+                listItem.id = documentData.id;
+
+                // Determine icon
+                let iconClass = 'fa-file-pdf';
+                if (documentData.type.includes('image')) {
+                    iconClass = 'fa-file-image';
+                }
+
+                // Format file size
+                const fileSize = formatFileSize(documentData.size);
+
+                // Format upload date
+                const uploadDate = new Date(documentData.uploadDate).toLocaleDateString();
+
+                // Bureau display name
+                const bureauNames = {
+                    'experian': 'Experian',
+                    'equifax': 'Equifax',
+                    'transunion': 'TransUnion'
+                };
+                const bureauDisplay = bureauNames[documentData.bureau] || documentData.bureau;
+
+                listItem.innerHTML = `
+                    <i class="fas ${iconClass} document-icon"></i>
+                    <div class="document-info">
+                        <div class="document-name">${bureauDisplay} - ${documentData.name}</div>
+                        <div class="document-meta">${fileSize} • ${uploadDate} • <span style="color: #28a745;">Saved</span></div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="document-action-btn view" data-id="${documentData.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="document-action-btn delete" data-id="${documentData.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Add event listeners
+                const deleteBtn = listItem.querySelector('.delete');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function () {
+                        const id = this.getAttribute('data-id');
+                        removeDocument(id);
+                    });
+                }
+
+                const viewBtn = listItem.querySelector('.view');
+                if (viewBtn) {
+                    viewBtn.addEventListener('click', function () {
+                        const id = this.getAttribute('data-id');
+                        viewExistingDocument(documentData.fileUrl);
+                    });
+                }
+
+                return listItem;
+            }
+
+            // View existing document
+            function viewExistingDocument(fileUrl) {
+                if (fileUrl) {
+                    window.open(fileUrl, '_blank');
+                } else {
+                    alert('Document URL not available');
+                }
+            }
+
+            // Updated refresh credit report display area
+            function refreshCreditReportDisplay() {
+                console.log('🔄 Refreshing credit report display...');
+
+                // Clear existing credit report displays - be more thorough
+                const creditReportList = container.querySelector('#credit-report-list');
+                if (creditReportList) {
+                    // Remove ALL items in the credit report list
+                    creditReportList.innerHTML = '';
+                    console.log('🧹 Cleared credit report list');
+                }
+
+                // Remove ALL credit reports from uploadedDocuments array
+                uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'credit-report');
+                console.log('🧹 Cleared credit reports from uploadedDocuments array');
+
+                // Remove occupied status from all bureau buttons
+                const bureauButtons = container.querySelectorAll('.bureau-btn');
+                bureauButtons.forEach(button => {
+                    button.classList.remove('occupied');
+                    const indicator = button.querySelector('.occupied-indicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                    button.style.backgroundColor = '';
+                    button.style.border = '';
+                });
+                console.log('🧹 Cleared bureau button statuses');
+
+                // Re-fetch and display existing documents
+                fetchExistingDocuments()
+                    .then(documents => {
+                        console.log('📋 Fetched documents for refresh:', documents.length);
+                        if (documents.length > 0) {
+                            displayExistingCreditReports(documents);
+                        } else {
+                            console.log('📋 No documents to display after refresh');
+                        }
+                        console.log('✅ Credit report display refreshed');
+                    })
+                    .catch(error => {
+                        console.error('❌ Failed to refresh credit report display:', error);
+                    });
+            }
+
             // Public API
             return {
                 init: init,
@@ -875,6 +1489,22 @@
         if (window.dispatchEvent) {
             window.dispatchEvent(new CustomEvent('documentUploadLoaded'));
         }
+
+        // Update your initialization code (add this after the existing setup)
+        document.addEventListener('DOMContentLoaded', async function () {
+            // ... existing initialization code ...
+
+            // Load existing documents from backend
+            try {
+                const existingDocuments = await fetchExistingDocuments();
+                if (existingDocuments.length > 0) {
+                    console.log(`📋 Loading ${existingDocuments.length} existing documents`);
+                    displayExistingCreditReports(existingDocuments);
+                }
+            } catch (error) {
+                console.error('❌ Failed to load existing documents:', error);
+            }
+        });
     </script>
 </body>
 

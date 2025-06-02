@@ -1,4 +1,4 @@
-import NotificationSchema from '../models/Notifications.js';
+import { NotificationSchema } from '../models/Notifications.js';
 import AzureBlobService from '../services/azureBlobService.js';
 
 // Add debugging to see if the module loads
@@ -498,6 +498,300 @@ const adminController = {
             res.status(500).json({
                 success: false,
                 message: 'Failed to delete notification',
+                error: error.message
+            });
+        }
+    },
+
+    // Upload document (credit reports, ID verification, additional documents)
+    async uploadDocument(req, res) {
+        try {
+            console.log('📄 Document upload request received');
+            console.log('📄 Request body:', req.body);
+            console.log('📄 File info:', req.file ? {
+                originalname: req.file.originalname,
+                mimetype: req.file.mimetype,
+                size: req.file.size
+            } : 'No file');
+
+            const { userId, documentType, fileName, bureau } = req.body;
+
+            // Validate required fields
+            if (!userId || !documentType || !req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing required fields: userId, documentType, and file are required'
+                });
+            }
+
+            // For credit reports, bureau is required
+            if (documentType === 'credit-report' && !bureau) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Bureau selection is required for credit reports'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            
+            // Initialize Azure Blob Service (same as uploadReport function)
+            const blobService = new AzureBlobService();
+            await blobService.initialize();
+
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            // Verify user exists
+            const userQuery = "SELECT * FROM c WHERE c.id = @userId AND c.type = 'user'";
+            const userParams = [{ name: "@userId", value: userId }];
+            const users = await cosmosService.queryDocuments(userQuery, userParams);
+
+            if (users.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
+
+            const user = users[0];
+
+            // **NEW: Check for existing credit report for this bureau**
+            if (documentType === 'credit-report') {
+                const existingReportQuery = "SELECT * FROM c WHERE c.userId = @userId AND c.type = 'document' AND c.documentType = 'credit-report' AND c.bureau = @bureau";
+                const existingReportParams = [
+                    { name: "@userId", value: userId },
+                    { name: "@bureau", value: bureau }
+                ];
+                
+                const existingReports = await cosmosService.queryDocuments(existingReportQuery, existingReportParams);
+                
+                if (existingReports.length > 0) {
+                    console.log(`❌ User already has a ${bureau} credit report:`, existingReports[0].fileName);
+                    return res.status(409).json({
+                        success: false,
+                        message: `You already have a ${bureau} credit report uploaded. Please delete the existing report before uploading a new one.`,
+                        existingReport: {
+                            id: existingReports[0].id,
+                            fileName: existingReports[0].fileName,
+                            bureau: existingReports[0].bureau
+                        }
+                    });
+                }
+            }
+
+            // Continue with the rest of your existing upload logic...
+            // Create unique filename with timestamp and random string
+            const timestamp = Date.now();
+            const randomString = Math.random().toString(36).substr(2, 9);
+            const fileExtension = req.file.originalname.split('.').pop();
+            
+            // Create organized filename based on document type and bureau
+            let storedFileName;
+            if (documentType === 'credit-report') {
+                storedFileName = `credit-reports/${bureau}/${userId}_${bureau}_${timestamp}_${randomString}.${fileExtension}`;
+            } else if (documentType === 'id-verification') {
+                storedFileName = `id-verification/${userId}_id_${timestamp}_${randomString}.${fileExtension}`;
+            } else if (documentType === 'additional-documents') {
+                storedFileName = `additional-documents/${userId}_additional_${timestamp}_${randomString}.${fileExtension}`;
+            } else {
+                storedFileName = `documents/${userId}_${documentType}_${timestamp}_${randomString}.${fileExtension}`;
+            }
+
+            console.log('📁 Uploading file to blob storage:', storedFileName);
+
+            // Upload file to blob storage
+            const uploadResult = await blobService.uploadFile(req.file, storedFileName, {
+                userEmail: user.email,
+                documentType: documentType,
+                bureau: bureau || null,
+                uploadedBy: 'user',
+                uploadDate: new Date().toISOString()
+            });
+            console.log('✅ File uploaded to blob storage:', uploadResult.url);
+
+            // Create document record in database
+            const documentRecord = {
+                id: `doc_${timestamp}_${randomString}`,
+                type: 'document',
+                userId: userId,
+                userEmail: user.email,
+                userName: user.name || user.firstName,
+                documentType: documentType,
+                fileName: req.file.originalname,
+                storedFileName: storedFileName,
+                fileUrl: uploadResult.url,
+                fileSize: req.file.size,
+                mimeType: req.file.mimetype,
+                bureau: bureau || null,
+                uploadedBy: 'user',
+                timestamp: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            await cosmosService.createDocument(documentRecord);
+            console.log('💾 Document record saved to database:', documentRecord.id);
+
+            // Create notification for user about successful upload
+            const documentNotification = NotificationSchema.createNotificationDocument({
+                userId: userId,
+                userEmail: user.email,
+                userName: user.name || user.firstName,
+                notificationType: 'document-upload',
+                subject: 'Document Uploaded Successfully',
+                message: `Your ${documentType.replace('-', ' ')} "${req.file.originalname}" has been successfully uploaded and saved.${bureau ? ` Bureau: ${bureau.charAt(0).toUpperCase() + bureau.slice(1)}` : ''}`,
+                adminId: 'system',
+                status: 'sent',
+                metadata: {
+                    documentId: documentRecord.id,
+                    documentType: documentType,
+                    fileName: req.file.originalname,
+                    bureau: bureau || null
+                }
+            });
+
+            await cosmosService.createDocument(documentNotification);
+            console.log('💾 Document notification saved to database:', documentNotification.id);
+
+            // Return success response
+            res.json({
+                success: true,
+                message: 'Document uploaded successfully',
+                documentId: documentRecord.id,
+                fileName: req.file.originalname,
+                fileUrl: uploadResult.url,
+                fileSize: req.file.size,
+                documentType: documentType,
+                bureau: bureau || null,
+                timestamp: documentRecord.timestamp
+            });
+
+        } catch (error) {
+            console.error('❌ Error uploading document:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to upload document',
+                error: error.message
+            });
+        }
+    },
+
+    // Delete document (credit reports, ID verification, additional documents)
+    async deleteDocument(req, res) {
+        try {
+            console.log('🗑️ Document deletion request received');
+            const { documentId, userId } = req.body;
+
+            if (!documentId || !userId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing required fields: documentId and userId are required'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            // Verify the document exists and belongs to the user
+            const documentQuery = "SELECT * FROM c WHERE c.id = @documentId AND c.userId = @userId AND c.type = 'document'";
+            const documentParams = [
+                { name: "@documentId", value: documentId },
+                { name: "@userId", value: userId }
+            ];
+            
+            const documents = await cosmosService.queryDocuments(documentQuery, documentParams);
+            
+            if (documents.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Document not found or does not belong to user'
+                });
+            }
+
+            const document = documents[0];
+            console.log('✅ Document found for deletion:', document.fileName);
+
+            // Delete the document from CosmosDB
+            await cosmosService.deleteDocument(documentId, document.type || 'document');
+            console.log('💾 Document deleted from database:', documentId);
+
+            // Create notification for user about document deletion
+            const deleteNotification = NotificationSchema.createNotificationDocument({
+                userId: userId,
+                userEmail: document.userEmail,
+                userName: document.userName,
+                notificationType: 'document-delete',
+                subject: 'Document Deleted',
+                message: `Your document "${document.fileName}" has been successfully deleted from your account.`,
+                adminId: 'system',
+                status: 'sent',
+                metadata: {
+                    deletedDocumentId: documentId,
+                    documentType: document.documentType,
+                    fileName: document.fileName,
+                    bureau: document.bureau || null
+                }
+            });
+
+            await cosmosService.createDocument(deleteNotification);
+            console.log('💾 Document deletion notification saved:', deleteNotification.id);
+
+            res.json({
+                success: true,
+                message: 'Document deleted successfully',
+                documentId: documentId,
+                fileName: document.fileName
+            });
+
+        } catch (error) {
+            console.error('❌ Error deleting document:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to delete document',
+                error: error.message
+            });
+        }
+    },
+
+    // Get user documents
+    async getUserDocuments(req, res) {
+        try {
+            console.log('📥 Get user documents request received');
+            const { userId } = req.query;
+
+            if (!userId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing required field: userId'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            // Query for user's documents
+            const documentsQuery = "SELECT * FROM c WHERE c.userId = @userId AND c.type = 'document' ORDER BY c.createdAt DESC";
+            const documentsParams = [{ name: "@userId", value: userId }];
+            
+            const documents = await cosmosService.queryDocuments(documentsQuery, documentsParams);
+            console.log(`✅ Found ${documents.length} documents for user:`, userId);
+
+            res.json({
+                success: true,
+                documents: documents,
+                count: documents.length
+            });
+
+        } catch (error) {
+            console.error('❌ Error fetching user documents:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to fetch user documents',
                 error: error.message
             });
         }
