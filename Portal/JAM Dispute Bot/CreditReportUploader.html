@@ -69,19 +69,18 @@
 
         /* Upload Area Styles */
         .Bot-upload-area {
-            border: 2px dashed #dee2e6;
-            border-radius: 12px;
+            border: 2px dashed #b3eafc;
+            border-radius: 8px;
             padding: 30px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
-            background: #f8f9fa;
+            cursor: pointer;
         }
 
-        .Bot-upload-area:hover,
-        .Bot-upload-area.Bot-file-upload-dragover {
+        .Bot-upload-area:hover {
+            background-color: #e6f9ff;
             border-color: #09ccfc;
-            background: #e6f9ff;
         }
 
         .Bot-upload-icon {
@@ -262,6 +261,169 @@
             color: #6c757d;
             font-size: 0.9rem;
         }
+
+        /* Document Section Styles */
+        .Bot-document-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .Bot-document-section-title {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e6f9ff;
+        }
+
+        .Bot-document-section-description {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #6c757d;
+        }
+
+        /* Bureau Selection Styles */
+        .Bot-bureau-selection {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .Bot-bureau-selection-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+
+        .Bot-bureau-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .Bot-bureau-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .Bot-bureau-btn:hover {
+            border-color: #09ccfc;
+            background-color: #e6f9ff;
+            color: #09ccfc;
+        }
+
+        .Bot-bureau-btn.selected {
+            border-color: #09ccfc;
+            background-color: #09ccfc;
+            color: white;
+        }
+
+        .Bot-bureau-btn.occupied {
+            border-color: #28a745;
+            background-color: #e8f5e8;
+            color: #28a745;
+        }
+
+        .Bot-bureau-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .Bot-bureau-hint {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .occupied-indicator {
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        /* Document List Styles */
+        .Bot-document-list {
+            margin-top: 30px;
+        }
+
+        .Bot-document-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .Bot-document-icon {
+            font-size: 1.5rem;
+            color: #09ccfc;
+            margin-right: 15px;
+        }
+
+        .Bot-document-info {
+            flex-grow: 1;
+        }
+
+        .Bot-document-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .Bot-document-meta {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .Bot-document-actions {
+            display: flex;
+        }
+
+        .Bot-document-action-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s;
+        }
+
+        .Bot-document-action-btn:hover {
+            color: #09ccfc;
+        }
+
+        .Bot-document-action-btn.delete:hover {
+            color: #dc3545;
+        }
+
+        /* Update existing upload area styles */
+        .Bot-upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+
+        .Bot-upload-subtext {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
     </style>
 </head>
 
@@ -274,54 +436,133 @@
             let uploadedReports = [];
             let parentModule = null;
 
-            // Function to initialize the module
-            function init(container, parent) {
-                if (!container) {
-                    console.error('Container not provided to CreditReportUploader module');
-                    return false;
-                }
+            // Function to clean up corrupted localStorage entries
+            function cleanupCorruptedEntries() {
+                try {
+                    console.log('🧹 Checking for corrupted localStorage entries...');
 
-                console.log('Initializing CreditReportUploader module');
+                    // Check jamBotUploadedReports for corrupted data
+                    const savedReports = localStorage.getItem('jamBotUploadedReports');
+                    if (savedReports) {
+                        const reports = JSON.parse(savedReports);
+                        if (Array.isArray(reports)) {
+                            const cleanReports = reports.filter(report => {
+                                // Check for corrupted report entries
+                                if (!report.name || report.name.includes('undefined')) {
+                                    console.log('🗑️ Removing corrupted report:', report);
+                                    return false;
+                                }
+                                if (!report.bureau || ['experian', 'equifax', 'transunion'].indexOf(report.bureau) === -1) {
+                                    console.log('🗑️ Removing report with invalid bureau:', report);
+                                    return false;
+                                }
+                                if (report.name.match(/^\d+-\d+-\d+/)) {
+                                    console.log('🗑️ Removing report with timestamp-corrupted name:', report);
+                                    return false;
+                                }
+                                return true;
+                            });
 
-                // Store reference to parent module for communication
-                parentModule = parent;
+                            if (cleanReports.length !== reports.length) {
+                                console.log(`🧹 Cleaned localStorage: ${reports.length - cleanReports.length} corrupted entries removed`);
+                                if (cleanReports.length > 0) {
+                                    localStorage.setItem('jamBotUploadedReports', JSON.stringify(cleanReports));
+                                } else {
+                                    localStorage.removeItem('jamBotUploadedReports');
+                                }
+                            }
+                        }
+                    }
 
-                // Clear localStorage on page refresh/load
-                // We'll use sessionStorage to detect page refreshes
-                const pageLoadFlag = sessionStorage.getItem('jamBotUploaderPageLoaded');
-
-                if (!pageLoadFlag) {
-                    // This is a fresh page load (not just a tab switch)
-                    console.log('Fresh page load detected, clearing uploaded reports');
-
-                    // Clear all jamBot items related to files
+                    // Clean up any file-related entries that might be corrupted
                     Object.keys(localStorage).forEach(key => {
-                        if (key.startsWith('jamBotFile_') || key === 'jamBotUploadedReports' || key === 'jamBotHasUploadedReports') {
-                            console.log('Clearing localStorage item:', key);
+                        if (key.startsWith('jamBotFile_') && key.includes('undefined')) {
+                            console.log('🗑️ Removing corrupted file entry:', key);
                             localStorage.removeItem(key);
                         }
                     });
 
-                    // Also clear the in-memory array
+                } catch (error) {
+                    console.error('❌ Error cleaning up corrupted entries:', error);
+                    // If there's an error, just clear all jamBot localStorage items
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('jamBot')) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                }
+            }
+
+            // Function to initialize the module
+            function init(container, parent = null) {
+                try {
+                    console.log('Initializing CreditReportUploader module');
+                    parentModule = parent;
+
+                    // FIRST: Clean up any corrupted localStorage entries
+                    cleanupCorruptedEntries();
+
+                    // Check if this is a fresh page load or just a tab switch
+                    const pageLoadFlag = sessionStorage.getItem('jamBotUploaderPageLoaded');
+
+                    if (!pageLoadFlag) {
+                        // This is a fresh page load (not just a tab switch)
+                        console.log('Fresh page load detected, clearing uploaded reports');
+
+                        // Clear ALL jamBot items to ensure clean start
+                        Object.keys(localStorage).forEach(key => {
+                            if (key.startsWith('jamBot')) {
+                                console.log('Clearing localStorage item:', key);
+                                localStorage.removeItem(key);
+                            }
+                        });
+
+                        // Also clear the in-memory array completely on fresh page load
+                        uploadedReports = [];
+
+                        // Set the flag to indicate page has been loaded in this session
+                        sessionStorage.setItem('jamBotUploaderPageLoaded', 'true');
+                    } else {
+                        // This is a tab switch, clear any potential duplicates from the array
+                        console.log('Tab switch detected, clearing duplicate reports from memory');
+                        clearDuplicateReports();
+                    }
+
+                    // Only initialize once per container
+                    if (container._creditReportUploaderInitialized) {
+                        console.log('CreditReportUploader module already initialized for this container');
+                        // Clear any existing DOM content first to prevent duplicates
+                        const existingList = container.querySelector('#credit-report-list');
+                        if (existingList) {
+                            const existingItems = existingList.querySelectorAll('.Bot-document-item');
+                            existingItems.forEach(item => item.remove());
+                            console.log(`🧹 Cleared ${existingItems.length} existing DOM items on re-init`);
+                        }
+
+                        // Clear duplicates and update view
+                        clearDuplicateReports();
+                        updateView(container);
+                        return true;
+                    }
+
+                    // Clear the uploadedReports array to start fresh for this container
                     uploadedReports = [];
 
-                    // Set the flag to indicate page has been loaded in this session
-                    sessionStorage.setItem('jamBotUploaderPageLoaded', 'true');
-                }
+                    // Clear any potential duplicates
+                    clearDuplicateReports();
 
-                // Only initialize once
-                if (isInitialized) {
-                    console.log('CreditReportUploader module already initialized');
-                    updateView(container);
+                    // Render the upload interface
+                    renderUploadInterface(container);
+
+                    // Mark this container as initialized
+                    container._creditReportUploaderInitialized = true;
+                    isInitialized = true;
+
                     return true;
+                } catch (error) {
+                    console.error('Failed to initialize CreditReportUploader module:', error);
+                    return false;
                 }
-
-                // Render the upload interface
-                renderUploadInterface(container);
-
-                // Mark as initialized
-                isInitialized = true;
-                return true;
             }
 
             // Function to render the upload interface
@@ -344,23 +585,43 @@
                             </div>
                         </div>
                         
-                        <div class="Bot-upload-area" id="uploadArea">
-                            <div class="Bot-upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
+                        <!-- Credit Report Upload Section -->
+                        <div class="Bot-document-section">
+                            <h3 class="Bot-document-section-title">Credit Reports</h3>
+                            <p class="Bot-document-section-description">
+                                Upload your credit reports from all three bureaus (Experian, Equifax, and TransUnion).
+                                PDF format is preferred. Please select which bureau report you're uploading.
+                            </p>
+                            
+                            <!-- Bureau Selection -->
+                            <div class="Bot-bureau-selection" id="bureau-selection">
+                                <label class="Bot-bureau-selection-label">Select Credit Bureau:</label>
+                                <div class="Bot-bureau-options">
+                                    <button type="button" class="Bot-bureau-btn" data-bureau="experian">
+                                        <i class="fas fa-building"></i>
+                                        Experian
+                                    </button>
+                                    <button type="button" class="Bot-bureau-btn" data-bureau="equifax">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Equifax
+                                    </button>
+                                    <button type="button" class="Bot-bureau-btn" data-bureau="transunion">
+                                        <i class="fas fa-chart-line"></i>
+                                        TransUnion
+                                    </button>
+                                </div>
+                                <p class="Bot-bureau-hint">Please select which credit bureau report you want to upload</p>
                             </div>
-                            <h3 class="Bot-upload-area-title">Drag & Drop Your Credit Report Files</h3>
-                            <p class="Bot-upload-area-subtitle">or click to browse your files</p>
-                            <p class="Bot-upload-area-formats">Supported formats: PDF, JPG, PNG</p>
-                            <input type="file" id="fileInput" class="Bot-file-input" accept=".pdf,.jpg,.jpeg,.png" multiple>
-                            <button class="Bot-btn Bot-btn-primary" id="browseFilesBtn">
-                                <i class="fas fa-folder-open"></i> Browse Files
-                            </button>
-                        </div>
-                        
-                        <div class="Bot-uploaded-reports" id="uploadedReports">
-                            <h3 class="Bot-uploaded-reports-title">Uploaded Reports</h3>
-                            <div class="Bot-uploaded-reports-list" id="reportsList">
-                                <!-- Uploaded reports will appear here -->
+                            
+                            <div class="Bot-upload-area" data-section="credit-report" id="credit-report-upload" style="opacity: 0.5; pointer-events: none;">
+                                <i class="fas fa-file-upload Bot-upload-icon"></i>
+                                <p class="Bot-upload-text">Select a credit bureau first, then drag & drop your credit report here</p>
+                                <p class="Bot-upload-subtext">or click to browse files</p>
+                                <input type="file" class="Bot-file-input" id="credit-report-input" multiple accept=".pdf,.jpg,.jpeg,.png" disabled>
+                            </div>
+                            
+                            <div class="Bot-document-list" id="credit-report-list">
+                                <!-- Uploaded documents will appear here -->
                             </div>
                         </div>
                         
@@ -379,256 +640,701 @@
 
             // Function to set up upload area event listeners
             function setupUploadAreaListeners(container) {
-                const uploadArea = container.querySelector('#uploadArea');
-                const fileInput = container.querySelector('#fileInput');
+                const uploadArea = container.querySelector('#credit-report-upload');
+                const fileInput = container.querySelector('#credit-report-input');
                 const browseFilesBtn = container.querySelector('#browseFilesBtn');
                 const continueToChat = container.querySelector('#continueToChat');
 
-                if (!uploadArea || !fileInput || !browseFilesBtn) return;
+                // Check if listeners are already set up to prevent duplicates
+                if (container._listenersSetup) {
+                    console.log('Upload area listeners already set up, skipping...');
+                    // Still need to update the view with existing data
+                    updateUploadedReportsList(container);
+                    return;
+                }
+                container._listenersSetup = true;
 
-                // Browse files button click
-                browseFilesBtn.addEventListener('click', function () {
-                    fileInput.click();
-                });
+                // Remove any existing event listeners first
+                if (fileInput) {
+                    fileInput.removeEventListener('change', fileInput._changeHandler);
+                }
+                if (uploadArea) {
+                    uploadArea.removeEventListener('click', uploadArea._clickHandler);
+                    uploadArea.removeEventListener('dragover', uploadArea._dragoverHandler);
+                    uploadArea.removeEventListener('dragleave', uploadArea._dragleaveHandler);
+                    uploadArea.removeEventListener('drop', uploadArea._dropHandler);
+                }
 
-                // File input change
-                fileInput.addEventListener('change', function () {
-                    if (this.files.length > 0) {
-                        handleUploadedFiles(this.files, container);
-                    }
-                });
+                // Setup bureau selection
+                setupBureauSelection(container);
+
+                // File input change event with debouncing
+                if (fileInput) {
+                    fileInput._changeHandler = function (e) {
+                        if (this.files && this.files.length > 0) {
+                            // Prevent multiple rapid calls
+                            if (this._uploading) {
+                                console.log('Upload already in progress, ignoring duplicate event');
+                                return;
+                            }
+                            this._uploading = true;
+
+                            handleUploadedFiles(this.files, container);
+
+                            // Reset flag after a delay
+                            setTimeout(() => {
+                                this._uploading = false;
+                            }, 2000);
+                        }
+                    };
+                    fileInput.addEventListener('change', fileInput._changeHandler);
+                }
+
+                // Browse files button
+                if (browseFilesBtn) {
+                    browseFilesBtn.addEventListener('click', function () {
+                        if (fileInput && !fileInput.disabled) {
+                            fileInput.click();
+                        }
+                    });
+                }
+
+                // Upload area click
+                if (uploadArea) {
+                    uploadArea._clickHandler = function () {
+                        if (fileInput && !fileInput.disabled) {
+                            fileInput.click();
+                        }
+                    };
+                    uploadArea.addEventListener('click', uploadArea._clickHandler);
+                }
 
                 // Drag and drop events
-                uploadArea.addEventListener('dragover', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.classList.add('Bot-file-upload-dragover');
-                });
+                if (uploadArea) {
+                    uploadArea._dragoverHandler = function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!fileInput.disabled) {
+                            this.style.borderColor = '#09ccfc';
+                            this.style.backgroundColor = '#e6f9ff';
+                        }
+                    };
 
-                uploadArea.addEventListener('dragleave', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.classList.remove('Bot-file-upload-dragover');
-                });
+                    uploadArea._dragleaveHandler = function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.style.borderColor = '#b3eafc';
+                        this.style.backgroundColor = '';
+                    };
 
-                uploadArea.addEventListener('drop', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.classList.remove('Bot-file-upload-dragover');
+                    uploadArea._dropHandler = function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.style.borderColor = '#b3eafc';
+                        this.style.backgroundColor = '';
 
-                    if (e.dataTransfer.files.length > 0) {
-                        handleUploadedFiles(e.dataTransfer.files, container);
-                    }
-                });
+                        if (e.dataTransfer.files.length > 0 && !fileInput.disabled) {
+                            // Prevent multiple rapid drops
+                            if (this._uploading) {
+                                console.log('Upload already in progress, ignoring duplicate drop');
+                                return;
+                            }
+                            this._uploading = true;
+
+                            handleUploadedFiles(e.dataTransfer.files, container);
+
+                            // Reset flag after a delay
+                            setTimeout(() => {
+                                this._uploading = false;
+                            }, 2000);
+                        }
+                    };
+
+                    uploadArea.addEventListener('dragover', uploadArea._dragoverHandler);
+                    uploadArea.addEventListener('dragleave', uploadArea._dragleaveHandler);
+                    uploadArea.addEventListener('drop', uploadArea._dropHandler);
+                }
 
                 // Continue to chat button
                 if (continueToChat) {
                     continueToChat.addEventListener('click', function () {
-                        // Navigate to the Chat tab
-                        if (window.parent && typeof window.parent.switchTab === 'function') {
-                            window.parent.switchTab('chat');
-                        } else if (window.jamDisputeBot && typeof window.jamDisputeBot.switchTab === 'function') {
-                            window.jamDisputeBot.switchTab('chat');
-                        } else {
+                        console.log('Continue to Chat button clicked');
+
+                        // Try multiple methods to switch to chat tab
+                        let switchSuccessful = false;
+
+                        // Method 1: Use parentModule if available
+                        if (parentModule && typeof parentModule.switchTab === 'function') {
+                            console.log('Using parentModule.switchTab');
+                            parentModule.switchTab('chat');
+                            switchSuccessful = true;
+                        }
+                        // Method 2: Use jamTipBot global (correct name from JamDisputeBot.html)
+                        else if (window.jamTipBot && typeof window.jamTipBot.switchTab === 'function') {
+                            console.log('Using jamTipBot.switchTab');
+                            window.jamTipBot.switchTab('chat');
+                            switchSuccessful = true;
+                        }
+                        // Method 3: Try to find and click the chat tab button directly
+                        else {
+                            console.log('Trying to find chat tab button');
                             const chatTabBtn = document.querySelector('.Bot-tab-btn[data-tab="chat"]');
                             if (chatTabBtn) {
+                                console.log('Found chat tab button, clicking');
                                 chatTabBtn.click();
-                            } else {
-                                console.error('Could not find a way to switch to the Chat tab');
+                                switchSuccessful = true;
                             }
+                        }
+
+                        // Method 4: Try parent window if this is in an iframe
+                        if (!switchSuccessful && window.parent && window.parent !== window) {
+                            try {
+                                if (window.parent.jamTipBot && typeof window.parent.jamTipBot.switchTab === 'function') {
+                                    console.log('Using parent.jamTipBot.switchTab');
+                                    window.parent.jamTipBot.switchTab('chat');
+                                    switchSuccessful = true;
+                                }
+                            } catch (e) {
+                                console.log('Could not access parent window:', e);
+                            }
+                        }
+
+                        if (!switchSuccessful) {
+                            console.error('Could not find a way to switch to the Chat tab');
+                            alert('Unable to switch to Chat tab. Please click the Chat tab manually.');
+                        } else {
+                            console.log('Successfully switched to Chat tab');
                         }
                     });
                 }
+
+                // Load existing documents from backend only if not already loaded for this container
+                if (!container._documentsLoaded) {
+                    container._documentsLoaded = true;
+                    console.log('📥 Loading existing documents for the first time...');
+
+                    // Clear any duplicates before loading from backend
+                    clearDuplicateReports();
+
+                    loadExistingDocuments(container);
+                } else {
+                    console.log('📥 Documents already loaded for this container, cleaning and updating view...');
+                    // Clear duplicates and update the view
+                    clearDuplicateReports();
+                    updateUploadedReportsList(container);
+                    updateContinueSection(container);
+                }
             }
 
-            // Function to handle uploaded files
+            // Setup bureau selection for credit reports
+            function setupBureauSelection(container) {
+                const bureauButtons = container.querySelectorAll('.Bot-bureau-btn');
+                const uploadArea = container.querySelector('#credit-report-upload');
+                const uploadInput = container.querySelector('#credit-report-input');
+                let selectedBureau = null;
+
+                bureauButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const bureau = this.getAttribute('data-bureau');
+
+                        // Check if this bureau already has a credit report
+                        const existingReport = uploadedReports.find(report =>
+                            report.bureau === bureau
+                        );
+
+                        if (existingReport) {
+                            // Show warning message
+                            showBureauLimitWarning(bureau, existingReport.name);
+                            return; // Don't allow selection
+                        }
+
+                        // Remove selected class from all buttons
+                        bureauButtons.forEach(btn => btn.classList.remove('selected'));
+
+                        // Add selected class to clicked button
+                        this.classList.add('selected');
+
+                        // Store selected bureau
+                        selectedBureau = bureau;
+
+                        // Enable upload area
+                        uploadArea.style.opacity = '1';
+                        uploadArea.style.pointerEvents = 'auto';
+                        uploadInput.disabled = false;
+
+                        // Update upload area text
+                        const uploadText = uploadArea.querySelector('.Bot-upload-text');
+                        const bureauName = this.textContent.trim();
+                        uploadText.textContent = `Drag & drop your ${bureauName} credit report here`;
+
+                        console.log(`Selected bureau: ${selectedBureau}`);
+                    });
+                });
+
+                // Store the selected bureau getter
+                container.getSelectedBureau = () => selectedBureau;
+            }
+
+            // Function to handle uploaded files with bureau support
             function handleUploadedFiles(files, container) {
                 if (!files || files.length === 0) {
                     console.log('No files to handle');
                     return;
                 }
 
-                console.log(`Processing ${files.length} uploaded files`);
+                // Get selected bureau
+                const selectedBureau = container.getSelectedBureau ? container.getSelectedBureau() : null;
 
-                // Track how many files we need to process
-                let filesToProcess = 0;
-                let filesProcessed = 0;
+                if (!selectedBureau) {
+                    alert('Please select a credit bureau first before uploading files.');
+                    return;
+                }
 
-                Array.from(files).forEach(file => {
+                console.log(`Processing ${files.length} uploaded files for ${selectedBureau}`);
+
+                // FIRST: Clear any existing duplicates before processing new files
+                clearDuplicateReports();
+
+                // Process files sequentially to avoid race conditions
+                Array.from(files).forEach(async (file, index) => {
                     // Check if file is a PDF
                     if (file.type !== 'application/pdf') {
                         console.warn('Skipping non-PDF file:', file.name);
+                        alert(`File "${file.name}" is not a PDF. Please upload PDF files only.`);
                         return;
                     }
 
-                    filesToProcess++;
+                    // ENHANCED: Multiple checks to prevent duplicate uploads
+                    const duplicateChecks = [
+                        // Check by exact file match (name, bureau, size, and status)
+                        uploadedReports.find(report =>
+                            report.name === file.name &&
+                            report.bureau === selectedBureau &&
+                            report.size === file.size &&
+                            (report.uploadStatus === 'uploading' || report.uploadStatus === 'success')
+                        ),
+                        // Check by bureau and name (prevent same file from same bureau)
+                        uploadedReports.find(report =>
+                            report.name === file.name &&
+                            report.bureau === selectedBureau
+                        ),
+                        // Check by bureau only (one report per bureau rule)
+                        uploadedReports.find(report =>
+                            report.bureau === selectedBureau &&
+                            (report.uploadStatus === 'success' || report.isExisting)
+                        )
+                    ];
 
-                    // Create a unique ID for the report
-                    const reportId = 'report_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    // If any duplicate check passes, handle accordingly
+                    const existingReport = duplicateChecks.find(check => check !== undefined);
 
-                    // Create a report object
+                    if (existingReport) {
+                        // Check if it's the same file being re-uploaded
+                        if (existingReport.name === file.name && existingReport.size === file.size) {
+                            console.log('File already being processed or uploaded:', file.name);
+                            alert(`"${file.name}" is already uploaded or being processed for ${selectedBureau}.`);
+                            return;
+                        }
+                        // Check if bureau already has a different report
+                        else if (existingReport.bureau === selectedBureau) {
+                            const bureauNames = {
+                                'experian': 'Experian',
+                                'equifax': 'Equifax',
+                                'transunion': 'TransUnion'
+                            };
+                            const bureauDisplay = bureauNames[selectedBureau] || selectedBureau;
+
+                            const shouldReplace = confirm(
+                                `You already have a ${bureauDisplay} credit report: "${existingReport.name}"\n\n` +
+                                `You can only have one credit report per bureau.\n\n` +
+                                `Do you want to delete the existing report and upload "${file.name}" instead?`
+                            );
+
+                            if (shouldReplace) {
+                                console.log(`🔄 User chose to replace existing ${selectedBureau} report`);
+                                await deleteReport(existingReport.id, container);
+                                // Small delay to ensure deletion is complete
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                            } else {
+                                console.log(`❌ User chose to keep existing ${selectedBureau} report`);
+                                return;
+                            }
+                        }
+                    }
+
+                    // Create a unique ID for the report with timestamp and index to ensure uniqueness
+                    const reportId = 'report_' + Date.now() + '_' + index + '_' + Math.random().toString(36).substr(2, 9);
+
+                    // Double-check one more time that we don't have this exact report already
+                    const finalDuplicateCheck = uploadedReports.find(report =>
+                        report.name === file.name &&
+                        report.bureau === selectedBureau &&
+                        report.size === file.size
+                    );
+
+                    if (finalDuplicateCheck) {
+                        console.log('Final duplicate check failed, skipping upload:', file.name);
+                        return;
+                    }
+
+                    // Create a report object with bureau information
                     const report = {
                         id: reportId,
                         name: file.name,
                         size: file.size,
                         uploadDate: new Date(),
-                        file: file // Store the actual file object
+                        file: file,
+                        bureau: selectedBureau,
+                        sectionType: 'credit-report',
+                        uploadStatus: 'uploading',
+                        backendId: null,
+                        fileUrl: null
                     };
 
                     // Add to uploaded reports
                     uploadedReports.push(report);
-                    console.log('Added report to uploadedReports:', report.name);
+                    console.log('Added report to uploadedReports:', report.name, 'Bureau:', selectedBureau, 'ID:', reportId);
 
-                    // Store file data in localStorage
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        try {
-                            // Store the file data as base64
-                            const fileData = {
-                                id: reportId,
-                                name: file.name,
-                                size: file.size,
-                                type: file.type,
-                                data: e.target.result,
-                                uploadDate: new Date()
-                            };
+                    // Update UI to show uploading status
+                    updateUploadedReportsList(container);
 
-                            // Store in localStorage (this might fail if the file is too large)
-                            try {
-                                localStorage.setItem('jamBotFile_' + reportId, JSON.stringify(fileData));
-                                console.log('File stored in localStorage:', reportId);
-                            } catch (storageError) {
-                                console.error('Failed to store file in localStorage (likely too large):', storageError);
+                    try {
+                        // Upload to backend
+                        const uploadResult = await uploadToBackend(file, reportId, selectedBureau);
+
+                        if (uploadResult.success) {
+                            // Update report with backend information
+                            const reportIndex = uploadedReports.findIndex(r => r.id === reportId);
+                            if (reportIndex !== -1) {
+                                uploadedReports[reportIndex].uploadStatus = 'success';
+                                uploadedReports[reportIndex].backendId = uploadResult.backendId;
+                                uploadedReports[reportIndex].fileUrl = uploadResult.fileUrl;
+                                uploadedReports[reportIndex].isExisting = false;
                             }
-                        } catch (error) {
-                            console.error('Error processing file for storage:', error);
+
+                            console.log('✅ Credit report uploaded successfully to backend:', reportId);
+
+                            // Mark bureau as occupied only if upload was successful
+                            markBureauAsOccupied(selectedBureau);
+
+                            // Reset bureau selection
+                            resetBureauSelection(container);
+
+                        } else {
+                            // Upload failed - update status
+                            const reportIndex = uploadedReports.findIndex(r => r.id === reportId);
+                            if (reportIndex !== -1) {
+                                uploadedReports[reportIndex].uploadStatus = 'failed';
+                                uploadedReports[reportIndex].error = uploadResult.error;
+                            }
+
+                            console.error('❌ Failed to upload credit report:', uploadResult.error);
+                            alert(`Failed to upload "${file.name}": ${uploadResult.error}`);
                         }
 
-                        // Track processed files
-                        filesProcessed++;
-
-                        // If all files are processed, update UI and debug
-                        if (filesProcessed === filesToProcess) {
-                            // Update the UI
-                            updateUploadedReportsList(container);
-
-                            // Save state
-                            saveState();
-
-                            // Debug localStorage contents after all files are processed
-                            setTimeout(debugLocalStorage, 100); // Small delay to ensure localStorage is updated
+                    } catch (error) {
+                        // Handle upload error
+                        const reportIndex = uploadedReports.findIndex(r => r.id === reportId);
+                        if (reportIndex !== -1) {
+                            uploadedReports[reportIndex].uploadStatus = 'failed';
+                            uploadedReports[reportIndex].error = error.message;
                         }
-                    };
 
-                    reader.onerror = function () {
-                        console.error('Error reading file:', file.name);
-                        filesProcessed++;
+                        console.error('❌ Upload error:', error);
+                        alert(`Failed to upload "${file.name}": ${error.message}`);
+                    }
 
-                        // If all files are processed, update UI and debug
-                        if (filesProcessed === filesToProcess) {
-                            updateUploadedReportsList(container);
-                            saveState();
-                            setTimeout(debugLocalStorage, 100);
-                        }
-                    };
-
-                    // Read the file as a data URL (base64)
-                    reader.readAsDataURL(file);
+                    // Update the UI
+                    updateUploadedReportsList(container);
+                    saveState();
                 });
 
-                // Update the UI immediately to show progress
-                updateUploadedReportsList(container);
-
-                // Notify parent module
-                if (parentModule && typeof parentModule.onReportUploaded === 'function') {
-                    uploadedReports.forEach(report => {
-                        parentModule.onReportUploaded(report);
-                    });
+                // Clear the file input to prevent re-triggering
+                const fileInput = container.querySelector('#credit-report-input');
+                if (fileInput) {
+                    fileInput.value = '';
                 }
+
+                // Notify parent module only once after all uploads are processed
+                setTimeout(() => {
+                    if (parentModule && typeof parentModule.onReportUploaded === 'function') {
+                        const successfulReports = uploadedReports.filter(report => report.uploadStatus === 'success');
+                        successfulReports.forEach(report => {
+                            parentModule.onReportUploaded(report);
+                        });
+                    }
+                }, 1000); // Small delay to ensure all uploads are processed
             }
 
             // Function to update the uploaded reports list
             function updateUploadedReportsList(container) {
-                const reportsList = container.querySelector('#reportsList');
-                const uploadedReportsSection = container.querySelector('#uploadedReports');
+                const reportsList = container.querySelector('#credit-report-list');
                 const continueSection = container.querySelector('#continueSection');
 
-                if (!reportsList || !uploadedReportsSection) return;
-
-                reportsList.innerHTML = '';
-
-                if (uploadedReports.length === 0) {
-                    uploadedReportsSection.style.display = 'none';
-                    if (continueSection) {
-                        continueSection.style.display = 'none';
-                    }
+                if (!reportsList) {
+                    console.error('❌ Reports list container not found');
                     return;
                 }
 
-                uploadedReportsSection.style.display = 'block';
+                console.log(`📋 Updating reports list with ${uploadedReports.length} reports`);
 
-                // Show the continue section when reports are uploaded
-                if (continueSection) {
-                    continueSection.style.display = 'block';
-                }
+                // FIRST: Clear duplicates from the array
+                clearDuplicateReports();
 
-                uploadedReports.forEach(report => {
+                // SECOND: Get the current DOM state for comparison
+                const existingDOMElements = Array.from(reportsList.querySelectorAll('.Bot-document-item'));
+                const existingDOMIds = existingDOMElements.map(el => el.getAttribute('data-report-id')).filter(Boolean);
+
+                console.log(`📋 Existing DOM elements: ${existingDOMElements.length}, IDs: [${existingDOMIds.join(', ')}]`);
+                console.log(`📋 Array reports: ${uploadedReports.length}, IDs: [${uploadedReports.map(r => r.id).join(', ')}]`);
+
+                // THIRD: Remove all existing DOM elements to start fresh
+                existingDOMElements.forEach(item => {
+                    if (item._clickHandler) {
+                        item.removeEventListener('click', item._clickHandler);
+                    }
+                    item.remove();
+                });
+                console.log(`🧹 Cleared ${existingDOMElements.length} existing DOM elements`);
+
+                // FOURTH: Track which reports we've added to DOM to prevent duplicates
+                const addedToDOMIds = new Set();
+
+                // FIFTH: Add each unique report to the DOM (only if not already added)
+                uploadedReports.forEach((report, index) => {
+                    // Skip if we've already added this report to DOM
+                    if (addedToDOMIds.has(report.id)) {
+                        console.log(`⚠️ Skipping DOM creation for already added report: ${report.name} (ID: ${report.id})`);
+                        return;
+                    }
+
+                    // Double-check that this report ID isn't already in DOM (safety check)
+                    const existingElement = reportsList.querySelector(`[data-report-id="${report.id}"]`);
+                    if (existingElement) {
+                        console.log(`⚠️ DOM element already exists for ${report.name}, removing old one`);
+                        existingElement.remove();
+                    }
+
+                    const bureauNames = {
+                        'experian': 'Experian',
+                        'equifax': 'Equifax',
+                        'transunion': 'TransUnion'
+                    };
+
+                    const bureauDisplay = bureauNames[report.bureau] || report.bureau;
                     const fileSize = formatFileSize(report.size);
                     const uploadDate = formatDate(report.uploadDate);
 
+                    let statusText = '';
+                    let statusColor = '';
+
+                    if (report.isExisting) {
+                        statusText = 'Saved';
+                        statusColor = '#28a745';
+                    } else {
+                        switch (report.uploadStatus) {
+                            case 'uploading':
+                                statusText = 'Uploading...';
+                                statusColor = '#ffc107';
+                                break;
+                            case 'success':
+                                statusText = 'Uploaded';
+                                statusColor = '#28a745';
+                                break;
+                            case 'failed':
+                                statusText = 'Failed';
+                                statusColor = '#dc3545';
+                                break;
+                            default:
+                                statusText = 'Processing...';
+                                statusColor = '#6c757d';
+                        }
+                    }
+
                     const reportElement = document.createElement('div');
-                    reportElement.className = 'Bot-upload-file';
+                    reportElement.className = 'Bot-document-item';
+                    reportElement.setAttribute('data-report-id', report.id);
+                    reportElement.setAttribute('data-bureau', report.bureau);
+
+                    if (report.isExisting) {
+                        reportElement.setAttribute('data-existing', 'true');
+                        reportElement.setAttribute('data-backend-id', report.backendId);
+                    }
+
                     reportElement.innerHTML = `
-                        <div class="Bot-upload-file-icon">
+                        <div class="Bot-document-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
-                        <div class="Bot-upload-file-info">
-                            <div class="Bot-upload-file-name">${report.name}</div>
-                            <div class="Bot-upload-file-size">${fileSize} • Uploaded ${uploadDate}</div>
+                        <div class="Bot-document-info">
+                            <div class="Bot-document-name">${bureauDisplay} - ${report.name}</div>
+                            <div class="Bot-document-meta">${fileSize} • ${uploadDate} • <span style="color: ${statusColor};">${statusText}</span></div>
                         </div>
-                        <div class="Bot-upload-file-actions">
-                            <button class="Bot-upload-file-action Bot-delete-report" data-id="${report.id}">
-                                <i class="fas fa-trash-alt"></i>
+                        <div class="Bot-document-actions">
+                            <button class="Bot-document-action-btn view" data-id="${report.id}" ${!report.fileUrl ? 'disabled' : ''} title="View Report">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="Bot-document-action-btn delete" data-id="${report.id}" title="Delete Report">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     `;
 
                     reportsList.appendChild(reportElement);
+                    addedToDOMIds.add(report.id);
+                    console.log(`✅ Added DOM element for report: ${report.name} (${bureauDisplay}) - ID: ${report.id}`);
                 });
 
-                // Add event listeners to delete buttons
-                const deleteButtons = container.querySelectorAll('.Bot-delete-report');
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function () {
+                // Add event listeners for ALL buttons after all elements are created
+                const viewButtons = reportsList.querySelectorAll('.Bot-document-action-btn.view');
+                const deleteButtons = reportsList.querySelectorAll('.Bot-document-action-btn.delete');
+
+                viewButtons.forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.stopPropagation();
                         const reportId = this.getAttribute('data-id');
-                        deleteReport(reportId, container);
+                        const report = uploadedReports.find(r => r.id === reportId);
+                        if (report && report.fileUrl) {
+                            console.log('📄 Opening report:', report.name);
+                            window.open(report.fileUrl, '_blank');
+                        } else {
+                            console.log('❌ No file URL available for report:', reportId);
+                        }
                     });
                 });
+
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        const reportId = this.getAttribute('data-id');
+                        const report = uploadedReports.find(r => r.id === reportId);
+                        if (report) {
+                            const confirmMessage = `Are you sure you want to delete "${report.name}"?`;
+                            if (confirm(confirmMessage)) {
+                                deleteReport(reportId, container);
+                            }
+                        }
+                    });
+                });
+
+                // Update continue section visibility - only show if we have successfully uploaded reports
+                const successfulReports = uploadedReports.filter(report =>
+                    report.uploadStatus === 'success' || report.isExisting
+                );
+                updateContinueSection(container, successfulReports.length > 0);
+
+                console.log(`✅ Updated DOM with ${uploadedReports.length} unique reports, ${successfulReports.length} successful`);
+                console.log(`📋 Final DOM count: ${reportsList.querySelectorAll('.Bot-document-item').length} elements`);
             }
 
             // Function to delete a report
-            function deleteReport(reportId, container) {
+            async function deleteReport(reportId, container) {
                 console.log('Deleting report:', reportId);
 
-                // Remove from uploadedReports array
-                uploadedReports = uploadedReports.filter(report => report.id !== reportId);
-
-                // Remove from localStorage
-                localStorage.removeItem('jamBotFile_' + reportId);
-                console.log('Removed file from localStorage:', 'jamBotFile_' + reportId);
-
-                updateUploadedReportsList(container);
-
-                // Notify parent module
-                if (parentModule && typeof parentModule.onReportDeleted === 'function') {
-                    parentModule.onReportDeleted(reportId);
+                // Find the report to delete
+                const reportToDelete = uploadedReports.find(report => report.id === reportId);
+                if (!reportToDelete) {
+                    console.error('Report not found:', reportId);
+                    return;
                 }
 
-                // Save state
-                saveState();
+                console.log('Report to delete:', {
+                    id: reportToDelete.id,
+                    name: reportToDelete.name,
+                    isExisting: reportToDelete.isExisting,
+                    backendId: reportToDelete.backendId,
+                    uploadStatus: reportToDelete.uploadStatus
+                });
 
-                // Debug localStorage contents
-                debugLocalStorage();
+                const bureau = reportToDelete.bureau;
+
+                try {
+                    // If this is an existing report from backend, delete it from backend first
+                    if (reportToDelete.isExisting && reportToDelete.backendId) {
+                        console.log('🗑️ Deleting existing report from backend:', reportToDelete.backendId);
+
+                        const deleteResult = await deleteDocumentFromBackend(reportToDelete.backendId);
+
+                        if (!deleteResult.success) {
+                            console.error('❌ Failed to delete from backend:', deleteResult.error);
+                            alert(`Failed to delete "${reportToDelete.name}" from server: ${deleteResult.error}`);
+                            return; // Don't proceed with local deletion if backend deletion failed
+                        }
+
+                        console.log('✅ Successfully deleted from backend');
+                    }
+                    // If this is a newly uploaded report, also delete from backend
+                    else if (reportToDelete.backendId && reportToDelete.uploadStatus === 'success') {
+                        console.log('🗑️ Deleting uploaded report from backend:', reportToDelete.backendId);
+
+                        const deleteResult = await deleteDocumentFromBackend(reportToDelete.backendId);
+
+                        if (!deleteResult.success) {
+                            console.error('❌ Failed to delete from backend:', deleteResult.error);
+                            alert(`Failed to delete "${reportToDelete.name}" from server: ${deleteResult.error}`);
+                            return; // Don't proceed with local deletion if backend deletion failed
+                        }
+
+                        console.log('✅ Successfully deleted from backend');
+                    } else {
+                        console.log('⚠️ Skipping backend deletion - Report conditions not met:', {
+                            hasBackendId: !!reportToDelete.backendId,
+                            isExisting: reportToDelete.isExisting,
+                            uploadStatus: reportToDelete.uploadStatus
+                        });
+                    }
+
+                    // Remove DOM element immediately
+                    const creditReportList = container.querySelector('#credit-report-list');
+                    if (creditReportList) {
+                        const elementToRemove = creditReportList.querySelector(`[data-report-id="${reportId}"]`);
+                        if (elementToRemove) {
+                            elementToRemove.remove();
+                            console.log('✅ Removed DOM element for report:', reportId);
+                        } else {
+                            console.log('⚠️ DOM element not found for report:', reportId);
+                            // Try alternative selectors
+                            const altElement = creditReportList.querySelector(`[data-id="${reportId}"]`);
+                            if (altElement) {
+                                altElement.remove();
+                                console.log('✅ Removed DOM element (alt selector) for report:', reportId);
+                            }
+                        }
+                    }
+
+                    // Remove from uploadedReports array
+                    uploadedReports = uploadedReports.filter(report => report.id !== reportId);
+
+                    // Remove bureau occupied status if no other reports for this bureau
+                    if (bureau) {
+                        const remainingReportsForBureau = uploadedReports.filter(report =>
+                            report.bureau === bureau && (report.uploadStatus === 'success' || report.isExisting)
+                        );
+                        if (remainingReportsForBureau.length === 0) {
+                            removeBureauOccupiedStatus(bureau);
+                            console.log('✅ Removed bureau occupied status for:', bureau);
+                        }
+                    }
+
+                    // Update UI (this should now reflect the changes)
+                    updateUploadedReportsList(container);
+
+                    // Update continue section visibility
+                    updateContinueSection(container);
+
+                    // Notify parent module
+                    if (parentModule && typeof parentModule.onReportDeleted === 'function') {
+                        parentModule.onReportDeleted(reportId);
+                    }
+
+                    // Save state
+                    saveState();
+
+                    console.log('✅ Report deleted successfully:', reportToDelete.name);
+
+                } catch (error) {
+                    console.error('❌ Error deleting report:', error);
+                    alert(`Error deleting "${reportToDelete.name}": ${error.message}`);
+                }
             }
 
             // Function to update the view
@@ -750,6 +1456,500 @@
                 console.log('File items:', jamBotFileCount);
                 console.log('Approximate storage used:', formatFileSize(totalStorageUsed));
                 console.log('------------------------');
+            }
+
+            // Setup upload area for file handling
+            function setupUploadArea(container, sectionType, inputId, listId) {
+                const uploadInput = container.querySelector(`#${inputId}`);
+                const uploadArea = container.querySelector(`[data-section="${sectionType}"]`);
+
+                if (!uploadInput || !uploadArea) {
+                    console.error(`Upload elements not found for section: ${sectionType}`);
+                    return;
+                }
+
+                // File input change event
+                uploadInput.addEventListener('change', function (e) {
+                    if (this.files && this.files.length > 0) {
+                        handleUploadedFiles(this.files, container);
+                    }
+                });
+            }
+
+            // Load existing documents from backend
+            async function loadExistingDocuments(container) {
+                try {
+                    console.log('📥 Loading existing credit reports from backend...');
+
+                    // Get user data and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId || !authToken) {
+                        console.log('❌ User authentication required for loading documents');
+                        return;
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/admin/get-user-documents?userId=${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch documents: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+
+                    // Ensure we have a valid documents array
+                    if (!result.documents || !Array.isArray(result.documents)) {
+                        console.log('📝 No documents array found in backend response');
+                        updateContinueSection(container);
+                        return;
+                    }
+
+                    // Filter for credit reports only and validate them
+                    const creditReports = result.documents.filter(doc => {
+                        if (doc.documentType !== 'credit-report') {
+                            return false;
+                        }
+
+                        // Additional validation for credit reports
+                        if (!doc.fileName || !doc.id) {
+                            console.warn('⚠️ Invalid credit report document:', doc);
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                    console.log(`✅ Existing credit reports loaded from backend: ${creditReports.length} valid reports`);
+
+                    // Clear any existing duplicates before adding new ones
+                    clearDuplicateReports();
+
+                    if (creditReports.length > 0) {
+                        displayExistingCreditReports(creditReports, container);
+                    } else {
+                        console.log('📝 No existing credit reports found in backend');
+                        // Update continue section even if no reports
+                        updateContinueSection(container);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Failed to load existing documents:', error);
+                    // Update continue section even on error
+                    updateContinueSection(container);
+                }
+            }
+
+            // Display existing credit reports
+            function displayExistingCreditReports(documents, container) {
+                console.log(`📋 Processing ${documents.length} existing documents from backend`);
+
+                // FIRST: Clear any existing duplicates before processing new documents
+                clearDuplicateReports();
+
+                // SECOND: Validate and filter documents to prevent malformed entries
+                const validDocuments = documents.filter(doc => {
+                    // Check if document has required fields
+                    if (!doc.id || !doc.fileName) {
+                        console.warn('⚠️ Skipping document with missing required fields:', doc);
+                        return false;
+                    }
+
+                    // Check if bureau is defined and valid
+                    const validBureaus = ['experian', 'equifax', 'transunion'];
+                    if (!doc.bureau || !validBureaus.includes(doc.bureau.toLowerCase())) {
+                        console.warn('⚠️ Skipping document with invalid bureau:', {
+                            fileName: doc.fileName,
+                            bureau: doc.bureau,
+                            validBureaus
+                        });
+                        return false;
+                    }
+
+                    // Check if fileName looks valid (not corrupted)
+                    if (doc.fileName.includes('undefined') || doc.fileName.match(/^\d+-\d+-\d+/)) {
+                        console.warn('⚠️ Skipping document with corrupted fileName:', doc.fileName);
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                console.log(`📋 Valid documents after filtering: ${validDocuments.length} of ${documents.length}`);
+
+                // THIRD: Process each valid document and check for duplicates before adding
+                validDocuments.forEach((doc, index) => {
+                    // Normalize bureau name to lowercase
+                    const normalizedBureau = doc.bureau.toLowerCase();
+
+                    // Create a unique identifier for this document
+                    const uniqueId = `existing_${doc.id}`;
+
+                    // Multiple comprehensive checks to prevent any possible duplicates
+                    const duplicateChecks = [
+                        // Check by unique ID
+                        uploadedReports.find(report => report.id === uniqueId),
+                        // Check by backend ID
+                        uploadedReports.find(report => report.backendId === doc.id),
+                        // Check by comprehensive matching for existing reports
+                        uploadedReports.find(report =>
+                            report.isExisting &&
+                            report.name === doc.fileName &&
+                            report.bureau === normalizedBureau &&
+                            report.size === doc.fileSize
+                        ),
+                        // Check by name and bureau (for any type of report)
+                        uploadedReports.find(report =>
+                            report.name === doc.fileName &&
+                            report.bureau === normalizedBureau
+                        )
+                    ];
+
+                    // If ANY of the duplicate checks return a result, skip this document
+                    const existingReport = duplicateChecks.find(check => check !== undefined);
+
+                    if (existingReport) {
+                        console.log('📌 Document already exists in array, skipping:', {
+                            fileName: doc.fileName,
+                            bureau: normalizedBureau,
+                            backendId: doc.id,
+                            existingReportId: existingReport.id,
+                            existingBackendId: existingReport.backendId,
+                            checkType: duplicateChecks.findIndex(check => check === existingReport)
+                        });
+                        return; // Skip this document as it's already in the array
+                    }
+
+                    // Add new document to array (no duplicates found)
+                    console.log('📌 Adding new existing document to array:', {
+                        fileName: doc.fileName,
+                        bureau: normalizedBureau,
+                        backendId: doc.id,
+                        uniqueId: uniqueId,
+                        index: index,
+                        fileSize: doc.fileSize,
+                        createdAt: doc.createdAt
+                    });
+
+                    // Ensure all required fields are properly set
+                    const reportData = {
+                        id: uniqueId,
+                        name: doc.fileName,
+                        size: doc.fileSize || 0,
+                        type: 'application/pdf',
+                        uploadStatus: 'success',
+                        backendId: doc.id,
+                        fileUrl: doc.fileUrl,
+                        isExisting: true,
+                        bureau: normalizedBureau, // Use normalized bureau name
+                        uploadDate: new Date(doc.createdAt || Date.now()),
+                        sectionType: 'credit-report'
+                    };
+
+                    // Validate the report data before adding
+                    if (!reportData.name || !reportData.bureau || !reportData.backendId) {
+                        console.error('❌ Invalid report data, skipping:', reportData);
+                        return;
+                    }
+
+                    uploadedReports.push(reportData);
+
+                    // Mark the bureau as occupied
+                    markBureauAsOccupied(normalizedBureau);
+                });
+
+                // FOURTH: Clear duplicates again after adding all documents (safety check)
+                clearDuplicateReports();
+
+                // FIFTH: Update the DOM with the cleaned data
+                console.log(`✅ Finished processing existing documents. Array count: ${uploadedReports.length}`);
+                updateUploadedReportsList(container);
+                updateContinueSection(container);
+            }
+
+            // Update continue section visibility
+            function updateContinueSection(container, hasSuccessfulReports = null) {
+                const continueSection = container.querySelector('#continueSection');
+                if (continueSection) {
+                    if (hasSuccessfulReports === null) {
+                        // Calculate if we have successful reports
+                        const successfulReports = uploadedReports.filter(report =>
+                            report.uploadStatus === 'success' || report.isExisting
+                        );
+                        hasSuccessfulReports = successfulReports.length > 0;
+                    }
+
+                    continueSection.style.display = hasSuccessfulReports ? 'block' : 'none';
+                }
+            }
+
+            // Mark bureau button as occupied
+            function markBureauAsOccupied(bureau) {
+                const bureauButton = document.querySelector(`[data-bureau="${bureau}"]`);
+                if (bureauButton) {
+                    bureauButton.classList.add('occupied');
+                    bureauButton.innerHTML = bureauButton.innerHTML.replace('</button>', ' <span class="occupied-indicator">✅ Uploaded</span></button>');
+                    bureauButton.style.backgroundColor = '#e8f5e8';
+                    bureauButton.style.border = '2px solid #28a745';
+                }
+            }
+
+            // Remove occupied status when document is deleted
+            function removeBureauOccupiedStatus(bureau) {
+                const bureauButton = document.querySelector(`[data-bureau="${bureau}"]`);
+                if (bureauButton) {
+                    bureauButton.classList.remove('occupied');
+                    const indicator = bureauButton.querySelector('.occupied-indicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                    bureauButton.style.backgroundColor = '';
+                    bureauButton.style.border = '';
+                }
+            }
+
+            // Reset bureau selection after upload
+            function resetBureauSelection(container) {
+                const bureauButtons = container.querySelectorAll('.Bot-bureau-btn');
+                const uploadArea = container.querySelector('#credit-report-upload');
+                const uploadInput = container.querySelector('#credit-report-input');
+
+                // Remove selected class from all buttons
+                bureauButtons.forEach(btn => btn.classList.remove('selected'));
+
+                // Disable upload area
+                uploadArea.style.opacity = '0.5';
+                uploadArea.style.pointerEvents = 'none';
+                uploadInput.disabled = true;
+
+                // Reset upload area text
+                const uploadText = uploadArea.querySelector('.Bot-upload-text');
+                uploadText.textContent = 'Select a credit bureau first, then drag & drop your credit report here';
+            }
+
+            // Show warning when trying to upload to a bureau that already has a report
+            function showBureauLimitWarning(bureau, existingFileName) {
+                const bureauNames = {
+                    'experian': 'Experian',
+                    'equifax': 'Equifax',
+                    'transunion': 'TransUnion'
+                };
+
+                const bureauDisplay = bureauNames[bureau] || bureau;
+
+                const warningMessage = `
+                    You already have a ${bureauDisplay} credit report uploaded: "${existingFileName}"
+                    
+                    You can only have one credit report per bureau. Would you like to:
+                    1. Keep the existing report
+                    2. Delete the existing report and upload a new one
+                `;
+
+                if (confirm(warningMessage + '\n\nClick OK to delete the existing report and upload a new one, or Cancel to keep the existing report.')) {
+                    // User wants to replace - find and delete the existing report
+                    const existingReport = uploadedReports.find(report => report.bureau === bureau);
+                    if (existingReport) {
+                        console.log(`🔄 Replacing existing ${bureau} report:`, existingReport.name);
+                        deleteReport(existingReport.id, container);
+                    }
+                }
+            }
+
+            // Function to upload credit report to backend
+            async function uploadToBackend(file, reportId, bureau) {
+                try {
+                    console.log(`📤 Uploading ${bureau} credit report to backend:`, file.name);
+
+                    // Get user data and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId || !authToken) {
+                        throw new Error('User authentication required');
+                    }
+
+                    // Create FormData for file upload
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('userId', userId);
+                    formData.append('documentType', 'credit-report');
+                    formData.append('fileName', file.name);
+                    formData.append('bureau', bureau);
+
+                    // Upload to backend
+                    const response = await fetch('http://localhost:3000/api/admin/upload-document', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ Credit report uploaded successfully:', result);
+
+                    return {
+                        success: true,
+                        backendId: result.document?.id,
+                        fileUrl: result.document?.fileUrl,
+                        message: result.message
+                    };
+
+                } catch (error) {
+                    console.error('❌ Failed to upload credit report to backend:', error);
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            }
+
+            // Function to delete document from backend
+            async function deleteDocumentFromBackend(documentId) {
+                try {
+                    console.log('🗑️ Deleting credit report from backend:', documentId);
+
+                    // Get user data and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId || !authToken) {
+                        throw new Error('User authentication required');
+                    }
+
+                    // Use the working endpoint directly
+                    const response = await fetch(`http://localhost:3000/api/admin/delete-document`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            documentId: documentId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Delete failed: ${response.status} ${response.statusText} - ${errorText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ Credit report deleted from backend successfully:', result);
+                    return { success: true, message: 'Document deleted successfully' };
+
+                } catch (error) {
+                    console.error('❌ Failed to delete credit report from backend:', error);
+                    return { success: false, error: error.message };
+                }
+            }
+
+            // Function to clear duplicate reports from uploadedReports array
+            function clearDuplicateReports() {
+                if (uploadedReports.length === 0) {
+                    console.log('🧹 No reports to clean, array is empty');
+                    return;
+                }
+
+                console.log(`🧹 Cleaning duplicates from ${uploadedReports.length} reports`);
+
+                const uniqueReports = [];
+                const seenIdentifiers = new Set();
+
+                uploadedReports.forEach((report, index) => {
+                    // Create multiple unique identifiers to catch all types of duplicates
+                    const identifiers = [];
+
+                    // Primary identifier based on report type
+                    if (report.isExisting) {
+                        identifiers.push(`existing_${report.backendId}`);
+                        identifiers.push(`backend_${report.backendId}`);
+                    } else {
+                        identifiers.push(`new_${report.bureau}_${report.name}_${report.size}`);
+                        if (report.backendId) {
+                            identifiers.push(`backend_${report.backendId}`);
+                        }
+                    }
+
+                    // Additional identifiers for comprehensive matching
+                    identifiers.push(`${report.bureau}_${report.name}_${report.size}`);
+                    identifiers.push(`${report.name}_${report.bureau}`);
+
+                    // Include ID-based identifiers
+                    if (report.id) {
+                        identifiers.push(`id_${report.id}`);
+                    }
+
+                    // Check if ANY of the identifiers have been seen before
+                    const isDuplicateByIdentifier = identifiers.some(id => seenIdentifiers.has(id));
+
+                    // Also check for content-based duplicates with stricter matching
+                    const isDuplicateByContent = uniqueReports.some(existingReport => {
+                        // Exact match criteria
+                        const exactMatch = (
+                            existingReport.name === report.name &&
+                            existingReport.bureau === report.bureau &&
+                            existingReport.size === report.size &&
+                            existingReport.isExisting === report.isExisting
+                        );
+
+                        // Backend ID match (if both have backend IDs and they match)
+                        const backendIdMatch = (
+                            existingReport.backendId &&
+                            report.backendId &&
+                            existingReport.backendId === report.backendId
+                        );
+
+                        // Same file uploaded multiple times
+                        const sameFileMatch = (
+                            !existingReport.isExisting &&
+                            !report.isExisting &&
+                            existingReport.name === report.name &&
+                            existingReport.bureau === report.bureau &&
+                            Math.abs(existingReport.size - report.size) < 100 // Allow small size differences due to encoding
+                        );
+
+                        return exactMatch || backendIdMatch || sameFileMatch;
+                    });
+
+                    if (!isDuplicateByIdentifier && !isDuplicateByContent) {
+                        // Add all identifiers to the seen set
+                        identifiers.forEach(id => seenIdentifiers.add(id));
+                        uniqueReports.push(report);
+                        console.log(`✅ Keeping report ${index + 1}: ${report.name} (${report.bureau}) - IDs: [${identifiers.join(', ')}]`);
+                    } else {
+                        console.log(`🗑️ Removing duplicate report ${index + 1}: ${report.name} (${report.bureau}) - Reason: ${isDuplicateByIdentifier ? 'Identifier match' : 'Content match'}`);
+                    }
+                });
+
+                const removedCount = uploadedReports.length - uniqueReports.length;
+                uploadedReports = uniqueReports;
+
+                console.log(`🧹 Cleanup complete: Removed ${removedCount} duplicates, ${uniqueReports.length} unique reports remaining`);
             }
 
             // Public API

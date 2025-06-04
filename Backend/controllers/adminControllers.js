@@ -612,6 +612,156 @@ const adminController = {
         }
     },
 
+    // Bulk delete notifications
+    async bulkDeleteNotifications(req, res) {
+        try {
+            const { notificationIds, userId } = req.body;
+            console.log('🗑️ Bulk deleting notifications:', notificationIds, 'for user:', userId);
+            
+            if (!notificationIds || !Array.isArray(notificationIds) || notificationIds.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'notificationIds must be a non-empty array'
+                });
+            }
+
+            if (!userId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'userId is required'
+                });
+            }
+            
+            const cosmosService = req.app.locals.cosmosService;
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            console.log(`🔍 Processing bulk delete for ${notificationIds.length} notifications`);
+
+            const results = {
+                successful: [],
+                failed: [],
+                notFound: []
+            };
+
+            // Process each notification ID
+            for (const notificationId of notificationIds) {
+                try {
+                    console.log(`🔍 Processing notification: ${notificationId}`);
+
+                    // First, verify the notification exists and belongs to the user
+                    const querySpec = "SELECT * FROM c WHERE c.id = @notificationId AND c.userId = @userId AND c.type = 'notification'";
+                    const parameters = [
+                        { name: "@notificationId", value: notificationId },
+                        { name: "@userId", value: userId }
+                    ];
+                    
+                    const notifications = await cosmosService.queryDocuments(querySpec, parameters);
+                    
+                    if (notifications.length === 0) {
+                        console.log(`❌ Notification not found: ${notificationId}`);
+                        results.notFound.push({
+                            id: notificationId,
+                            reason: 'Notification not found or does not belong to user'
+                        });
+                        continue;
+                    }
+
+                    const notification = notifications[0];
+                    console.log(`✅ Found notification: ${notificationId} - ${notification.subject}`);
+
+                    // Attempt to delete the notification
+                    try {
+                        // Try with document ID as partition key first
+                        await cosmosService.deleteDocument(notificationId, notificationId);
+                        console.log(`✅ Successfully deleted notification: ${notificationId}`);
+                        
+                        results.successful.push({
+                            id: notificationId,
+                            subject: notification.subject
+                        });
+                        
+                    } catch (deleteError) {
+                        console.error(`❌ Failed to delete with ID as partition key: ${notificationId}`, deleteError.message);
+                        
+                        // Try with type as partition key
+                        try {
+                            await cosmosService.deleteDocument(notificationId, 'notification');
+                            console.log(`✅ Successfully deleted notification with type PK: ${notificationId}`);
+                            
+                            results.successful.push({
+                                id: notificationId,
+                                subject: notification.subject
+                            });
+                            
+                        } catch (secondError) {
+                            console.error(`❌ Failed to delete with type as partition key: ${notificationId}`, secondError.message);
+                            
+                            // Try without partition key
+                            try {
+                                await cosmosService.deleteDocument(notificationId);
+                                console.log(`✅ Successfully deleted notification without PK: ${notificationId}`);
+                                
+                                results.successful.push({
+                                    id: notificationId,
+                                    subject: notification.subject
+                                });
+                                
+                            } catch (finalError) {
+                                console.error(`❌ All delete attempts failed for: ${notificationId}`);
+                                results.failed.push({
+                                    id: notificationId,
+                                    reason: finalError.message,
+                                    subject: notification.subject
+                                });
+                            }
+                        }
+                    }
+
+                } catch (processingError) {
+                    console.error(`❌ Error processing notification ${notificationId}:`, processingError);
+                    results.failed.push({
+                        id: notificationId,
+                        reason: processingError.message
+                    });
+                }
+            }
+            
+            console.log('📊 Bulk delete results:', results);
+            console.log(`✅ Successfully deleted: ${results.successful.length}`);
+            console.log(`❌ Failed: ${results.failed.length}`);
+            console.log(`🔍 Not found: ${results.notFound.length}`);
+            
+            // Return results
+            const totalAttempted = notificationIds.length;
+            const totalSuccessful = results.successful.length;
+            const hasErrors = results.failed.length > 0 || results.notFound.length > 0;
+            
+            res.status(hasErrors && totalSuccessful === 0 ? 400 : 200).json({
+                success: totalSuccessful > 0,
+                message: hasErrors 
+                    ? `Bulk delete completed with ${totalSuccessful}/${totalAttempted} successful deletions`
+                    : `Successfully deleted ${totalSuccessful} notifications`,
+                results: results,
+                summary: {
+                    attempted: totalAttempted,
+                    successful: totalSuccessful,
+                    failed: results.failed.length,
+                    notFound: results.notFound.length
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Error in bulk delete notifications:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to bulk delete notifications',
+                error: error.message
+            });
+        }
+    },
+
     // Upload document (credit reports, ID verification, additional documents)
     async uploadDocument(req, res) {
         try {

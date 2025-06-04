@@ -1292,6 +1292,12 @@
             function renderLetters() {
                 debugLog('renderLetters called');
 
+                // Check if DisputeCardsModule is available
+                if (!window.jamDisputeCards) {
+                    errorLog('DisputeCardsModule not available, cannot render letters');
+                    return;
+                }
+
                 // Find the letter grid element
                 let letterGrid = document.getElementById('letterGrid');
 
@@ -1373,9 +1379,9 @@
                     }
                 }
 
-                // Get filtered letters
+                // Get filtered letters from DisputeCardsModule (which has all our AI prompts)
                 debugLog(`Getting filtered letters with filter: ${currentFilter}, search: ${searchTerm}`);
-                const filteredLetters = window.jamDisputeCards.getFilteredLetters(currentFilter, searchTerm);
+                const filteredLetters = window.jamDisputeCards.filterLetters(currentFilter, searchTerm);
                 debugLog(`Found ${filteredLetters.length} letters after filtering`);
 
                 // Check if we have any letters
@@ -1407,13 +1413,16 @@
                             </div>
                             <div class="letter-card-back">
                                 <h3>${letter.title}</h3>
-                                <div class="letter-details">
-                                    <p>${letter.fullDescription}</p>
-                                    <div class="letter-actions">
-                                        <button class="letter-action-btn preview">
-                                            <i class="fas fa-eye"></i> Copy Prompt
-                                        </button>
+                                <div class="letter-content">
+                                    <p><strong>AI Prompt:</strong></p>
+                                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; max-height: 200px; overflow-y: auto; font-size: 0.85rem; line-height: 1.4;">
+                                        ${(letter.promptText || 'No prompt available').substring(0, 300)}${(letter.promptText && letter.promptText.length > 300) ? '...' : ''}
                                     </div>
+                                </div>
+                                <div class="letter-actions">
+                                    <button class="letter-action-btn preview" data-letter-id="${letter.id}">
+                                        <i class="fas fa-copy"></i> Copy Full Prompt
+                                    </button>
                                 </div>
                                 <button class="letter-back-btn">← Back</button>
                             </div>
@@ -1496,18 +1505,118 @@
                 debugLog(`previewLetter called for id: ${id}`);
                 if (!window.jamDisputeCards) {
                     errorLog('DisputeCards module not loaded');
+                    alert('Error: Dispute cards module not loaded. Please refresh the page.');
                     return;
                 }
 
                 const letter = window.jamDisputeCards.getLetterById(id);
                 if (!letter) {
                     errorLog(`Letter with id ${id} not found`);
+                    alert('Error: Letter not found.');
                     return;
                 }
 
-                debugLog(`Previewing letter: ${letter.title}`);
-                alert(`Preview functionality for "${letter.title}" would open a modal with the letter template.`);
-                // In a real implementation, this would open a modal with the letter preview
+                debugLog(`Copying prompt for letter: ${letter.title}`);
+
+                // Get the full prompt text
+                const promptText = letter.promptText || letter.content || 'No prompt available for this letter.';
+
+                if (!promptText || promptText === 'No prompt available for this letter.') {
+                    alert('No AI prompt available for this letter.');
+                    return;
+                }
+
+                debugLog(`Prompt text length: ${promptText.length}`);
+
+                // Copy to clipboard using modern API with fallback
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(promptText).then(
+                        function () {
+                            debugLog('✅ Prompt copied successfully via Clipboard API');
+                            showCopySuccessMessage(letter.title);
+                        },
+                        function (err) {
+                            errorLog('❌ Clipboard API failed', err);
+                            fallbackCopyText(promptText, letter.title);
+                        }
+                    );
+                } else {
+                    debugLog('Using fallback copy method');
+                    fallbackCopyText(promptText, letter.title);
+                }
+            }
+
+            // Fallback copy method
+            function fallbackCopyText(text, letterTitle) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Position off-screen
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                textArea.style.opacity = "0";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        debugLog('✅ Fallback copy successful');
+                        showCopySuccessMessage(letterTitle);
+                    } else {
+                        errorLog('❌ Fallback copy failed');
+                        alert('Failed to copy prompt. Please try selecting and copying the text manually.');
+                    }
+                } catch (err) {
+                    errorLog('❌ Fallback copy error', err);
+                    alert('Copy failed. Please try selecting and copying the text manually.');
+                }
+
+                document.body.removeChild(textArea);
+            }
+
+            // Show success message
+            function showCopySuccessMessage(letterTitle) {
+                // Create or update a temporary success message
+                let successDiv = document.getElementById('copy-success-message');
+                if (!successDiv) {
+                    successDiv = document.createElement('div');
+                    successDiv.id = 'copy-success-message';
+                    successDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #28a745;
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        z-index: 10000;
+                        font-family: 'Montserrat', sans-serif;
+                        font-weight: 500;
+                        transition: opacity 0.3s ease;
+                    `;
+                    document.body.appendChild(successDiv);
+                }
+
+                successDiv.innerHTML = `
+                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                    Prompt copied! "${letterTitle}"
+                `;
+                successDiv.style.opacity = '1';
+
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    successDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        if (successDiv.parentNode) {
+                            successDiv.parentNode.removeChild(successDiv);
+                        }
+                    }, 300);
+                }, 3000);
             }
 
             function downloadLetter(id) {

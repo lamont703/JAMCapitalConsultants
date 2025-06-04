@@ -268,6 +268,12 @@
                 // Load default letters
                 loadDefaultLetters();
 
+                // Debug all letters to check their content
+                debugAllLetters();
+
+                // Set up event listeners for card interactions
+                setupCardEventListeners();
+
                 // Set initialization flag
                 isInitialized = true;
 
@@ -278,6 +284,7 @@
                     }));
                 }
 
+                console.log('✅ DisputeCardsModule initialized with', getAllLetters().length, 'letters');
                 return true;
             }
 
@@ -290,7 +297,7 @@
                         description: "Request removal of a late payment based on your otherwise good payment history and relationship with the creditor.",
                         category: "Late Payments",
                         icon: "fa-hand-holding-heart",
-                        promptText: "Write a goodwill letter to Capital One requesting the removal of a 30-day late payment from April 2023. Explain that I experienced a temporary hardship, have paid on time since, and value our long-standing relationship.",
+                        promptText: "Create a professional goodwill letter requesting the removal of a late payment. Include these elements:\n\n1. Address it to the customer service department of [CREDITOR NAME]\n2. Reference account number [ACCOUNT NUMBER]\n3. Acknowledge the late payment occurred on [DATE]\n4. Explain the circumstances that led to the late payment (temporary hardship, oversight, etc.)\n5. Emphasize my otherwise excellent payment history with them\n6. Mention the value of our long-standing relationship\n7. Request they consider removing the late payment as a goodwill gesture\n8. Assure them of continued timely payments going forward\n9. Thank them for their consideration\n10. Use a respectful, humble tone throughout\n\nMake it personal and sincere, around 200-300 words.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -299,7 +306,7 @@
                         description: "Challenge a collection account that appears on your credit report that you believe is inaccurate or doesn't belong to you.",
                         category: "Collections",
                         icon: "fa-exclamation-circle",
-                        promptText: "Write a dispute letter to Experian to challenge a collection from ABC Collections that does not belong to me. Ask them to investigate and remove the account if it cannot be verified under the FCRA.",
+                        promptText: "Write a formal dispute letter to [CREDIT BUREAU] challenging a collection account. Include:\n\n1. My full name, address, SSN, and date of birth\n2. Reference the collection account from [COLLECTION AGENCY] dated [DATE]\n3. State that I dispute this account because [REASON: not mine/inaccurate/unverified]\n4. Cite Section 611 of the Fair Credit Reporting Act (FCRA)\n5. Request they investigate and verify the account within 30 days\n6. Demand removal if the account cannot be verified\n7. Request written confirmation of the investigation results\n8. Include 'This is not an acknowledgment of debt' disclaimer\n9. Request they forward my dispute to the collection agency\n10. Use formal, assertive business language\n\nEnd with: 'I expect your prompt attention to this matter and a written response within the timeframe required by law.'",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -308,7 +315,7 @@
                         description: "Dispute a charged-off account with incorrect information or balance on your credit report.",
                         category: "General",
                         icon: "fa-times-circle",
-                        promptText: "Write a letter disputing a charged-off account from Synchrony Bank that shows an incorrect balance. Request verification and correction under Section 611 of the Fair Credit Reporting Act.",
+                        promptText: "Create a dispute letter for a charged-off account with incorrect information. Include:\n\n1. Header with my contact information and date\n2. Address to [CREDIT BUREAU] dispute department\n3. Reference the charged-off account from [ORIGINAL CREDITOR]\n4. Specify the inaccuracy: [incorrect balance/wrong status/not mine/etc.]\n5. State: 'I dispute this account under Section 611 of the FCRA'\n6. Explain what the correct information should be (if applicable)\n7. Request verification of the account details\n8. Demand correction or removal if unverifiable\n9. Reference my rights under the FCRA\n10. Request written confirmation of actions taken\n\nUse professional language and cite specific FCRA sections. End with a firm but respectful request for prompt resolution.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -317,7 +324,7 @@
                         description: "Request removal of unauthorized hard inquiries that may be negatively affecting your credit score.",
                         category: "Inquiries",
                         icon: "fa-search",
-                        promptText: "Write a dispute letter to TransUnion requesting the removal of a hard inquiry from XYZ Auto that I did not authorize on June 2023.",
+                        promptText: "Write a dispute letter for unauthorized hard inquiries. Structure it as follows:\n\n1. My identifying information (name, address, SSN, DOB)\n2. Date and recipient (credit bureau)\n3. Subject: 'Dispute of Unauthorized Hard Inquiry'\n4. Reference the specific inquiry: Date [DATE], Company [COMPANY NAME]\n5. State clearly: 'I did not authorize this credit inquiry'\n6. Explain the impact on my credit score\n7. Cite Section 604 of the FCRA regarding permissible purposes\n8. Request immediate removal of the unauthorized inquiry\n9. Ask for written confirmation of removal\n10. Include: 'Continued reporting of this unauthorized inquiry may constitute willful non-compliance with the FCRA'\n\nKeep it factual and firm. Request they contact the company to verify authorization if needed.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -326,7 +333,7 @@
                         description: "Challenge duplicate accounts appearing on your credit report that are artificially lowering your credit score.",
                         category: "General",
                         icon: "fa-copy",
-                        promptText: "Write a dispute letter to Equifax requesting the deletion of a duplicate account listed twice from Credit One Bank. Request that only the accurate, original account be maintained.",
+                        promptText: "Create a letter disputing duplicate accounts on my credit report:\n\n1. Address to [CREDIT BUREAU] with my full identification\n2. Subject: 'Dispute of Duplicate Account Reporting'\n3. Identify the accounts that are duplicated (account numbers, creditor names)\n4. Explain that the same account is being reported multiple times\n5. State this violates accurate reporting requirements under the FCRA\n6. Explain how duplicate reporting artificially lowers my credit score\n7. Request they investigate and remove the duplicate entries\n8. Ask them to maintain only the original, accurate account listing\n9. Cite Section 623 of the FCRA regarding accurate reporting\n10. Request written confirmation of the corrections made\n\nEmphasize the unfair impact on my creditworthiness and request prompt correction.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -335,7 +342,7 @@
                         description: "Challenge medical collections on your credit report, especially those with billing errors or HIPAA violations.",
                         category: "Collections",
                         icon: "fa-hospital",
-                        promptText: "Write a letter to challenge a medical collection on my credit report from Health Recovery Group. Ask them to verify billing accuracy and confirm that HIPAA compliance was followed.",
+                        promptText: "Write a comprehensive medical debt collection dispute:\n\n1. Professional letter format with my identification details\n2. Address to the collection agency [COLLECTION AGENCY NAME]\n3. Reference account/medical debt number [REFERENCE NUMBER]\n4. State: 'I dispute this alleged medical debt'\n5. Request debt validation including:\n   - Original creditor documentation\n   - Itemized billing statements\n   - Proof of HIPAA-compliant authorization\n   - Chain of custody documentation\n6. Cite potential HIPAA violations in medical debt reporting\n7. Reference Section 1681s-2(a) of the FCRA\n8. Request they cease collection activities until validation is provided\n9. Include: 'This is not an acknowledgment of any debt'\n10. Demand removal from credit reports if validation cannot be provided\n\nEmphasize medical privacy rights and requirement for proper authorization.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -344,7 +351,7 @@
                         description: "Dispute accounts that appeared on your credit report due to identity theft with proper documentation.",
                         category: "Identity Theft",
                         icon: "fa-shield-alt",
-                        promptText: "Write a dispute letter to all three credit bureaus stating that a Capital One credit card opened in my name was the result of identity theft. Request removal and note that I have submitted a police report and FTC Identity Theft Affidavit.",
+                        promptText: "Create an identity theft dispute letter for fraudulent accounts:\n\n1. Mark the letter 'URGENT - IDENTITY THEFT DISPUTE'\n2. Address to all three credit bureaus simultaneously\n3. My complete identification information\n4. Reference the fraudulent account: [CREDITOR] account [ACCOUNT NUMBER]\n5. State clearly: 'This account was opened fraudulently without my knowledge or consent'\n6. Reference attached documentation:\n   - FTC Identity Theft Affidavit\n   - Police report number [REPORT NUMBER]\n   - Copy of driver's license\n7. Cite Section 605B of the FCRA regarding identity theft\n8. Request immediate removal of the fraudulent account\n9. Ask for a fraud alert to be placed on my file\n10. Request written confirmation and an updated credit report\n\nEmphasize the urgency and include strong language about the fraudulent nature of the account.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -353,7 +360,7 @@
                         description: "Request removal of negative accounts that have exceeded the 7-year reporting period under the FCRA.",
                         category: "General",
                         icon: "fa-calendar-times",
-                        promptText: "Write a letter to TransUnion requesting the removal of a closed Verizon Wireless account that was charged off over 7.5 years ago, in compliance with the 7-year reporting limit under the FCRA.",
+                        promptText: "Write a letter demanding removal of outdated negative information:\n\n1. Professional format with my complete contact information\n2. Address to [CREDIT BUREAU] legal compliance department\n3. Subject: 'Demand for Removal of Outdated Information'\n4. Reference the specific account that has exceeded 7 years\n5. State the original charge-off or first delinquency date [DATE]\n6. Calculate and show that 7+ years have passed\n7. Cite Section 605(a)(4) of the FCRA - 7-year reporting limit\n8. State: 'Continued reporting of this information violates federal law'\n9. Demand immediate removal of the outdated information\n10. Request written confirmation of removal within 30 days\n11. Include: 'Failure to remove this information may result in legal action'\n\nUse firm, legal language and emphasize the violation of federal law.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -362,7 +369,7 @@
                         description: "Correct inaccurate account statuses on your credit report, such as open accounts that were closed.",
                         category: "General",
                         icon: "fa-exclamation-triangle",
-                        promptText: "Write a letter to Equifax disputing a credit card account from Chase that is marked \"open\" but was closed in 2021. Request correction of the account status to \"closed by consumer.\"",
+                        promptText: "Create a letter to correct inaccurate account status information:\n\n1. Standard business letter format with my identification\n2. Address to [CREDIT BUREAU] with reference number for tracking\n3. Identify the specific account with incorrect status\n4. State what is currently being reported incorrectly\n5. Provide the correct status information with supporting details\n6. Include documentation if available (account closure letter, etc.)\n7. Cite Section 623(a)(1) of the FCRA regarding accurate reporting\n8. Explain how the incorrect status affects my credit profile\n9. Request immediate correction of the account status\n10. Ask for written confirmation of the correction\n\nEmphasize the importance of accurate reporting and include any proof of the correct status.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -371,7 +378,7 @@
                         description: "Request proper validation of a debt from a collection agency before they continue collection activities.",
                         category: "Collections",
                         icon: "fa-file-contract",
-                        promptText: "Write a debt validation request to Midland Credit Management for an alleged debt. Ask them to verify the original creditor, amount owed, and provide proper documentation before any reporting or collection activity continues.",
+                        promptText: "Write a formal debt validation request letter:\n\n1. Send via certified mail to [COLLECTION AGENCY]\n2. Include my name and their reference number only (no other personal info)\n3. State: 'I am requesting validation of the alleged debt you are attempting to collect'\n4. Cite Section 809(b) of the Fair Debt Collection Practices Act (FDCPA)\n5. Request specific documentation:\n   - Original creditor's name and address\n   - Original account number\n   - Amount owed with breakdown of charges\n   - Proof of their authority to collect\n   - Original signed contract or agreement\n   - Chain of custody documentation\n6. State: 'This is not an acknowledgment of any debt'\n7. Demand they cease all collection activities until validation is provided\n8. Request they not report to credit bureaus until debt is validated\n9. Include: 'Failure to validate may result in legal action for FDCPA violations'\n\nKeep it formal and cite specific legal requirements.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -380,7 +387,7 @@
                         description: "Request removal of a late student loan payment based on your otherwise good payment history.",
                         category: "Late Payments",
                         icon: "fa-graduation-cap",
-                        promptText: "Write a goodwill letter to Nelnet asking for the removal of a 60-day late student loan payment from February 2022. I've been current ever since and would appreciate the courtesy of a one-time adjustment.",
+                        promptText: "Create a goodwill letter specifically for student loan late payments:\n\n1. Address to [STUDENT LOAN SERVICER] customer service\n2. Reference my loan account number [ACCOUNT NUMBER]\n3. Acknowledge the specific late payment from [DATE]\n4. Explain the circumstances (financial hardship, administrative error, etc.)\n5. Emphasize my commitment to education and financial responsibility\n6. Highlight my otherwise consistent payment history\n7. Mention any financial challenges faced during education/post-graduation\n8. Show how I've improved my financial situation since\n9. Request removal as a one-time courtesy\n10. Assure continued timely payments\n11. Mention the impact on my ability to achieve goals (home purchase, etc.)\n\nUse an earnest, educational tone focusing on personal growth and responsibility.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -389,7 +396,7 @@
                         description: "Challenge accounts that have been improperly re-aged to extend the reporting period beyond the legal limit.",
                         category: "General",
                         icon: "fa-hourglass-half",
-                        promptText: "Write a dispute letter to TransUnion regarding a re-aged debt from Portfolio Recovery that restarted the reporting date. Request investigation and correction per the FCRA's 7-year rule.",
+                        promptText: "Write a dispute letter for illegally re-aged debt:\n\n1. Mark as 'URGENT LEGAL COMPLIANCE ISSUE'\n2. Address to [CREDIT BUREAU] legal department\n3. Reference the re-aged account and collection agency\n4. State: 'This account has been illegally re-aged'\n5. Provide the original date of first delinquency\n6. Show the incorrect 'new' date being reported\n7. Cite Section 623(a)(5) of the FCRA - prohibition on re-aging\n8. Explain that re-aging extends reporting beyond the legal 7-year limit\n9. State this violates federal consumer protection laws\n10. Demand immediate correction to the proper reporting dates\n11. Request removal if the account is beyond the 7-year limit\n12. Include: 'Re-aging debt is a serious FCRA violation'\n\nUse strong legal language emphasizing the violation of federal law.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -398,7 +405,7 @@
                         description: "Correct payment history errors that show late payments when you actually paid on time.",
                         category: "Late Payments",
                         icon: "fa-history",
-                        promptText: "Write a dispute letter to Experian asking for correction of inaccurate late payments listed for my Discover card. I've made all payments on time since 2021.",
+                        promptText: "Create a letter disputing inaccurate payment history:\n\n1. Professional business format with my complete identification\n2. Address to [CREDIT BUREAU] and [ORIGINAL CREDITOR]\n3. Reference the account with incorrect payment history\n4. List specific months/dates showing incorrect late payments\n5. State: 'I have never been late on this account' (if applicable)\n6. Provide evidence of on-time payments (bank statements, cancelled checks)\n7. Cite Section 623(a)(1) regarding accurate reporting requirements\n8. Request they investigate and correct the payment history\n9. Ask for removal of all inaccurate late payment markers\n10. Request written confirmation of corrections made\n11. Include supporting documentation\n\nEmphasize the importance of accurate payment history to my creditworthiness.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -407,7 +414,7 @@
                         description: "Dispute unauthorized credit inquiries resulting from identity theft.",
                         category: "Identity Theft",
                         icon: "fa-user-shield",
-                        promptText: "Write a dispute letter to Equifax requesting the removal of a fraudulent inquiry by XYZ Credit on July 2023. I did not authorize this pull and suspect identity theft.",
+                        promptText: "Write an identity theft inquiry dispute letter:\n\n1. Mark as 'IDENTITY THEFT - FRAUDULENT INQUIRY DISPUTE'\n2. Send to [CREDIT BUREAU] fraud department\n3. Include my complete identification information\n4. Reference the unauthorized inquiry: [COMPANY] on [DATE]\n5. State: 'This inquiry was made without my knowledge or consent'\n6. Explain the identity theft situation\n7. Reference police report number [REPORT NUMBER] and FTC complaint\n8. Cite Section 604 of the FCRA regarding permissible purposes\n9. State the inquiry was made for an impermissible purpose\n10. Request immediate removal of the fraudulent inquiry\n11. Ask for a fraud alert to be placed on my file\n12. Request they notify the company that made the unauthorized inquiry\n13. Include: 'This inquiry is evidence of identity theft'\n\nEmphasize the fraudulent nature and include documentation references.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -416,7 +423,7 @@
                         description: "Correct accounts that show an outstanding balance despite being settled in full.",
                         category: "General",
                         icon: "fa-check-circle",
-                        promptText: "Write a letter to Experian requesting an update on a Capital One account that was settled in full, but still reports an outstanding balance.",
+                        promptText: "Create a letter to correct a settled account showing incorrect balance:\n\n1. Business letter format with my identification details\n2. Address to [CREDIT BUREAU] and copy to [ORIGINAL CREDITOR]\n3. Reference the account that was settled\n4. State: 'This account was settled in full on [DATE]'\n5. Provide settlement agreement details and confirmation\n6. Show current incorrect balance being reported\n7. Request correction to show '$0 balance' and 'Settled' status\n8. Include copy of settlement agreement or payment confirmation\n9. Cite Section 623 regarding accurate reporting requirements\n10. Explain the negative impact of showing an outstanding balance\n11. Request immediate correction of the account status and balance\n12. Ask for written confirmation of the updates\n\nEmphasize that I fulfilled my settlement obligation and deserve accurate reporting.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -425,7 +432,7 @@
                         description: "Dispute bankruptcy information that is incorrectly reported on your credit file.",
                         category: "Bankruptcy",
                         icon: "fa-gavel",
-                        promptText: "Write a dispute letter to all three credit bureaus to challenge a Chapter 13 bankruptcy filed in error under my name. Request verification with the court and immediate deletion if inaccurate.",
+                        promptText: "Write a dispute for incorrect bankruptcy information:\n\n1. Mark as 'URGENT - INCORRECT PUBLIC RECORD DISPUTE'\n2. Address to all three credit bureaus\n3. Reference the incorrect bankruptcy information\n4. State specifically what is wrong (wrong person, wrong details, etc.)\n5. Provide correct information or state it doesn't belong to me\n6. Include court documentation or lack thereof\n7. Cite Section 607 of the FCRA regarding public record reporting\n8. Request verification with the appropriate court\n9. Demand immediate removal if information cannot be verified\n10. Explain the severe damage incorrect bankruptcy information causes\n11. Request expedited investigation due to the serious nature\n12. Include: 'Incorrect public record information is a serious FCRA violation'\n\nUse urgent language emphasizing the severity of incorrect bankruptcy reporting.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -434,7 +441,7 @@
                         description: "Challenge repossession accounts that show incorrect deficiency balances.",
                         category: "General",
                         icon: "fa-car",
-                        promptText: "Write a dispute letter to TransUnion requesting correction of a repossessed vehicle loan that reports the wrong deficiency balance.",
+                        promptText: "Create a dispute letter for inaccurate repossession balance:\n\n1. Professional format addressed to [CREDIT BUREAU]\n2. Reference the repossession account showing incorrect balance\n3. State what balance is being reported vs. the correct amount\n4. Explain the repossession process and sale details (if known)\n5. Request verification of the deficiency balance calculation\n6. Ask for documentation of:\n   - Vehicle sale price\n   - Sale expenses\n   - Proper notice of sale\n   - Calculation of deficiency\n7. Cite state and federal requirements for repossession procedures\n8. Request correction of the balance if calculation is incorrect\n9. Ask for removal if proper procedures weren't followed\n10. Include: 'Improper repossession procedures may invalidate the debt'\n\nEmphasize the need for proper documentation and legal compliance.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -443,7 +450,7 @@
                         description: "Correct credit reports that contain information belonging to someone else with a similar name.",
                         category: "Identity Theft",
                         icon: "fa-random",
-                        promptText: "Write a dispute letter to Equifax notifying them of mixed file data. My report includes accounts and personal information that belong to someone else with a similar name.",
+                        promptText: "Write a mixed file correction letter:\n\n1. Mark as 'URGENT - MIXED FILE CORRECTION REQUIRED'\n2. Address to [CREDIT BUREAU] with my complete, accurate information\n3. List all information that does NOT belong to me:\n   - Wrong addresses\n   - Wrong accounts\n   - Wrong employment\n   - Wrong personal details\n4. Provide my correct information for comparison\n5. Explain that files have been mixed with someone else's information\n6. Cite Section 607 of the FCRA regarding accuracy requirements\n7. Request immediate investigation and separation of files\n8. Demand removal of all information that isn't mine\n9. Ask for verification procedures to prevent future mixing\n10. Request a corrected credit report within 30 days\n11. Include: 'Mixed files violate my rights under the FCRA'\n\nEmphasize the serious nature of mixed files and identity confusion.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -452,7 +459,7 @@
                         description: "Request correction of accounts that still show as open despite being closed by you.",
                         category: "General",
                         icon: "fa-door-closed",
-                        promptText: "Write a letter to Experian requesting a correction to a Capital One account that was closed by me in 2022 but still reports as open.",
+                        promptText: "Create a letter to correct an account status from open to closed:\n\n1. Standard business letter with my identification information\n2. Address to [CREDIT BUREAU] with account reference\n3. Reference the specific account showing incorrect status\n4. State: 'This account was closed by me on [DATE]'\n5. Provide details of how the account was closed\n6. Include documentation if available (closure confirmation letter)\n7. Explain the difference between 'closed by consumer' vs. other statuses\n8. Request correction to show 'Closed by Consumer'\n9. Cite the importance of accurate account status reporting\n10. Ask for written confirmation of the status change\n11. Explain how incorrect status affects my credit profile\n\nEmphasize that I proactively closed the account and deserve proper credit for that action.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -461,7 +468,7 @@
                         description: "Remove outdated addresses and incorrect name variations from your credit report.",
                         category: "General",
                         icon: "fa-id-card",
-                        promptText: "Write a dispute letter requesting the removal of outdated addresses and incorrect variations of my name from all three credit bureaus.",
+                        promptText: "Write a comprehensive personal information correction letter:\n\n1. Address to all three credit bureaus simultaneously\n2. Subject: 'Correction of Personal Information'\n3. Provide my correct, current information clearly\n4. List all incorrect information to be removed:\n   - Wrong addresses (never lived there)\n   - Incorrect name spellings or variations\n   - Wrong phone numbers\n   - Incorrect employment information\n5. Provide proof of correct information (utility bills, driver's license)\n6. Cite Section 607 regarding accurate reporting of personal information\n7. Request removal of all outdated and incorrect information\n8. Ask them to update their records with correct information only\n9. Request written confirmation of all changes made\n10. Include: 'Inaccurate personal information can lead to mixed files'\n\nEmphasize the importance of accurate personal information for proper credit reporting.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -470,7 +477,7 @@
                         description: "Correct student loans that show as delinquent during valid forbearance periods.",
                         category: "Late Payments",
                         icon: "fa-graduation-cap",
-                        promptText: "Write a dispute letter to Equifax about a student loan account from Navient that incorrectly shows as delinquent during a valid forbearance period.",
+                        promptText: "Create a dispute for incorrect student loan forbearance reporting:\n\n1. Address to [CREDIT BUREAU] and [LOAN SERVICER]\n2. Reference my student loan account number\n3. State: 'This loan was in valid forbearance during [DATE PERIOD]'\n4. Provide forbearance approval documentation\n5. Show that payments were not required during forbearance\n6. Point out the incorrect delinquency reporting during this period\n7. Cite Higher Education Act requirements for forbearance reporting\n8. Request correction to show 'Forbearance' status instead of delinquent\n9. Ask for removal of any late payment markers during forbearance\n10. Include forbearance agreement or approval letter\n11. Request written confirmation of corrections\n\nEmphasize that forbearance is a legal right that should not negatively impact credit.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -479,7 +486,7 @@
                         description: "Request removal of charge-offs that have exceeded the legal reporting period.",
                         category: "General",
                         icon: "fa-stopwatch",
-                        promptText: "Write a dispute letter to TransUnion requesting removal of a charge-off account from Wells Fargo that's past the 7-year reporting limit under the FCRA.",
+                        promptText: "Write a demand letter for removal of time-barred charge-off:\n\n1. Mark as 'LEGAL COMPLIANCE DEMAND'\n2. Address to [CREDIT BUREAU] legal department\n3. Reference the charge-off account that exceeds 7 years\n4. Provide the date of first delinquency (DOFD)\n5. Calculate and show that 7+ years have passed\n6. Cite Section 605(a)(4) of the FCRA\n7. State: 'Continued reporting violates federal law'\n8. Reference the original charge-off date vs. current date\n9. Demand immediate removal within 30 days\n10. Include: 'The 7-year period cannot be extended or restarted'\n11. Request written confirmation of removal\n12. Warn of potential legal action for willful non-compliance\n\nUse firm legal language emphasizing the clear violation of federal law.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -488,7 +495,7 @@
                         description: "Request removal of collection accounts that should have been deleted after payment per agreement.",
                         category: "Collections",
                         icon: "fa-handshake",
-                        promptText: "Write a dispute letter to Experian requesting the removal of a collection account from ABC Collections that I paid under a pay-for-delete agreement.",
+                        promptText: "Create a breach of agreement letter for pay-for-delete violation:\n\n1. Address to [COLLECTION AGENCY] and [CREDIT BUREAU]\n2. Reference the collection account and payment date\n3. State: 'We had an agreement for deletion upon payment'\n4. Provide evidence of the pay-for-delete agreement\n5. Show proof of payment in full\n6. Point out their breach of our agreement\n7. Cite the agreement terms and my performance\n8. Demand immediate removal as agreed upon\n9. Reference potential contract law violations\n10. Include copies of:\n    - Pay-for-delete agreement (email, letter, recording transcript)\n    - Proof of payment\n11. Set a deadline for compliance (e.g., 30 days)\n12. Include: 'Failure to honor our agreement may result in legal action'\n\nEmphasize the binding nature of the agreement and my fulfilled obligations.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -497,7 +504,7 @@
                         description: "Request correction of credit limits that are reported lower than your actual limit.",
                         category: "General",
                         icon: "fa-credit-card",
-                        promptText: "Write a dispute letter to Experian requesting an update to the credit limit for my American Express account, which now reports $10,000 instead of the current $15,000 limit.",
+                        promptText: "Write a letter to update incorrect credit limit reporting:\n\n1. Professional format to [CREDIT BUREAU] and [CREDIT CARD COMPANY]\n2. Reference my credit card account number\n3. State the current credit limit being reported incorrectly\n4. Provide the correct, actual credit limit\n5. Include documentation of the credit limit increase\n6. Explain how incorrect limit affects my utilization ratio\n7. Show the impact on my credit score from incorrect reporting\n8. Request immediate update to reflect correct credit limit\n9. Cite Section 623 regarding accurate reporting requirements\n10. Ask the creditor to report the correct limit\n11. Request written confirmation of the correction\n12. Include copy of credit limit increase notification\n\nEmphasize how incorrect limits unfairly damage my credit utilization ratio.",
                         date: new Date().toLocaleDateString()
                     },
                     {
@@ -506,7 +513,7 @@
                         description: "Request removal from accounts where you were only an authorized user but are being affected by negative history.",
                         category: "General",
                         icon: "fa-user-minus",
-                        promptText: "Write a dispute letter requesting the removal of an authorized user account from my credit report. I am not financially responsible for the account and it's negatively impacting my score.",
+                        promptText: "Create a letter to remove negative authorized user account:\n\n1. Address to [CREDIT BUREAU] with my identification\n2. Reference the account where I was an authorized user\n3. State: 'I was only an authorized user, not financially responsible'\n4. Provide evidence of authorized user status (not joint account)\n5. Explain that I had no control over the account management\n6. Show the negative history is unfairly affecting my credit\n7. Request removal of the entire account from my credit report\n8. Cite that authorized users shouldn't be penalized for others' actions\n9. Include documentation showing authorized user status\n10. Ask for written confirmation of account removal\n11. Reference fair credit reporting principles\n\nEmphasize the unfairness of being penalized for an account I didn't control.",
                         date: new Date().toLocaleDateString()
                     }
                 ];
@@ -600,13 +607,25 @@
 
             // Flip a card
             function flipCard(id) {
-                const cardInner = document.querySelector(`.dispute-card-inner[data-id="${id}"]`);
-                if (!cardInner) return false;
+                console.log('🔄 [DEBUG] flipCard called with ID:', id);
 
-                if (cardInner.style.transform === 'rotateY(180deg)') {
+                const cardInner = document.querySelector(`.dispute-card-inner[data-id="${id}"]`);
+                console.log('🔄 [DEBUG] Card inner element found:', cardInner);
+
+                if (!cardInner) {
+                    console.error('❌ [DEBUG] Card inner element not found for ID:', id);
+                    return false;
+                }
+
+                const currentTransform = cardInner.style.transform;
+                console.log('🔄 [DEBUG] Current transform:', currentTransform);
+
+                if (currentTransform === 'rotateY(180deg)') {
                     cardInner.style.transform = 'rotateY(0deg)';
+                    console.log('🔄 [DEBUG] Flipped to front');
                 } else {
                     cardInner.style.transform = 'rotateY(180deg)';
+                    console.log('🔄 [DEBUG] Flipped to back');
                 }
 
                 return true;
@@ -615,51 +634,103 @@
             // Copy prompt to clipboard
             function copyPromptToClipboard(id) {
                 const letter = getLetterById(id);
-                if (!letter) return false;
+                if (!letter) {
+                    console.error('Letter not found for ID:', id);
+                    showToast('Error: Letter not found');
+                    return false;
+                }
 
                 const promptText = letter.promptText || letter.content || 'No content available';
 
-                try {
+                if (!promptText || promptText === 'No content available') {
+                    console.error('No prompt text available for letter:', letter.title);
+                    showToast('Error: No prompt text available');
+                    return false;
+                }
+
+                console.log('Copying prompt for:', letter.title);
+                console.log('Prompt text length:', promptText.length);
+
+                // Modern clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(promptText).then(
                         function () {
-                            alert('Prompt copied to clipboard!');
+                            console.log('✅ Prompt copied successfully via Clipboard API');
+                            showToast('Prompt copied to clipboard! 📋');
                         },
-                        function () {
-                            alert('Failed to copy prompt. Please try again or copy manually.');
+                        function (err) {
+                            console.error('❌ Clipboard API failed:', err);
+                            fallbackCopyTextToClipboard(promptText);
                         }
                     );
-                } catch (e) {
-                    // Fallback for older browsers
-                    const textarea = document.createElement('textarea');
-                    textarea.value = promptText;
-                    textarea.style.position = 'fixed';
-                    document.body.appendChild(textarea);
-                    textarea.focus();
-                    textarea.select();
-
-                    try {
-                        const successful = document.execCommand('copy');
-                        if (successful) {
-                            alert('Prompt copied to clipboard!');
-                        } else {
-                            alert('Failed to copy prompt. Please try again or copy manually.');
-                        }
-                    } catch (err) {
-                        alert('Failed to copy prompt. Please try again or copy manually.');
-                    }
-
-                    document.body.removeChild(textarea);
+                } else {
+                    console.log('Using fallback copy method');
+                    fallbackCopyTextToClipboard(promptText);
                 }
 
                 return true;
             }
 
+            // Fallback copy method for older browsers or non-secure contexts
+            function fallbackCopyTextToClipboard(text) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                textArea.style.opacity = "0";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        console.log('✅ Fallback copy successful');
+                        showToast('Prompt copied to clipboard! 📋');
+                    } else {
+                        console.error('❌ Fallback copy failed');
+                        showToast('Failed to copy. Please copy manually.');
+                    }
+                } catch (err) {
+                    console.error('❌ Fallback copy error:', err);
+                    showToast('Copy failed. Please select and copy the text manually.');
+                }
+
+                document.body.removeChild(textArea);
+            }
+
+            // Show toast notification
+            function showToast(message) {
+                const toast = document.getElementById('disputeCopyToast');
+                if (toast) {
+                    toast.textContent = message;
+                    toast.classList.add('show');
+
+                    // Hide after 3 seconds
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
+                }
+            }
+
             // Render card HTML with improved content handling
             function renderCardHTML(letter) {
+                console.log('🎨 [DEBUG] Rendering card for letter:', letter.id, letter.title);
+                console.log('🎨 [DEBUG] Letter promptText exists:', !!letter.promptText);
+                console.log('🎨 [DEBUG] Letter promptText length:', letter.promptText ? letter.promptText.length : 'N/A');
+
                 // Check if title is long and needs special handling
                 const titleClass = letter.title.length > 40 ? 'long-title' : '';
 
-                return `
+                // Get the prompt text for debugging
+                const promptText = letter.promptText || letter.content || 'No content available';
+                console.log('🎨 [DEBUG] Using prompt text:', promptText.substring(0, 100) + '...');
+
+                const cardHTML = `
                 <div class="dispute-prompt-card">
                     <div class="dispute-card-inner" data-id="${letter.id}">
                         <div class="dispute-card-front">
@@ -673,7 +744,7 @@
                         <div class="dispute-card-back">
                             <div class="dispute-prompt-content">
                                 <h4>${letter.promptTitle || letter.title}</h4>
-                                <pre><code>${letter.promptText || letter.content || 'No content available.'}</code></pre>
+                                <pre><code>${promptText}</code></pre>
                                 <div class="dispute-button-container">
                                     <button class="dispute-copy-btn">
                                         <span class="dispute-copy-icon">📋</span> Copy Text
@@ -685,12 +756,36 @@
                     </div>
                 </div>
                 `;
+
+                console.log('🎨 [DEBUG] Card HTML rendered for:', letter.title);
+                return cardHTML;
+            }
+
+            // Debug function to check all letters
+            function debugAllLetters() {
+                console.log('🔍 [DEBUG] === DEBUGGING ALL LETTERS ===');
+                console.log('🔍 [DEBUG] Total letters:', letters.length);
+
+                letters.forEach((letter, index) => {
+                    console.log(`🔍 [DEBUG] Letter ${index + 1}:`, {
+                        id: letter.id,
+                        title: letter.title,
+                        hasPromptText: !!letter.promptText,
+                        promptTextLength: letter.promptText ? letter.promptText.length : 0,
+                        promptTextPreview: letter.promptText ? letter.promptText.substring(0, 50) + '...' : 'No prompt text'
+                    });
+                });
+
+                console.log('🔍 [DEBUG] === END LETTER DEBUG ===');
             }
 
             // Render cards into a container
             function renderCardsIntoContainer(containerId, category = 'all', searchTerm = '') {
                 const container = document.getElementById(containerId);
-                if (!container) return false;
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return false;
+                }
 
                 const filteredLetters = filterLetters(category, searchTerm);
 
@@ -707,39 +802,135 @@
 
                 container.innerHTML = filteredLetters.map(letter => renderCardHTML(letter)).join('');
 
-                // Set up event listeners for the newly rendered cards
-                setupCardEventListeners();
-
+                console.log('✅ Rendered', filteredLetters.length, 'cards into container:', containerId);
                 return true;
             }
 
-            // Set up event listeners for cards
+            // Set up event listeners for cards using event delegation
             function setupCardEventListeners() {
-                // Set up flip buttons
-                document.querySelectorAll('.dispute-flip-btn').forEach(button => {
-                    button.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
+                // Remove any existing listeners to prevent duplicates
+                document.removeEventListener('click', handleCardEvents);
 
-                        // Get the card inner element
-                        const cardInner = this.closest('.dispute-card-inner');
+                // Add event delegation for all card interactions
+                document.addEventListener('click', handleCardEvents);
+            }
+
+            // Handle all card-related events using event delegation
+            function handleCardEvents(e) {
+                console.log('🔍 [DEBUG] Card event triggered:', e.type, e.target);
+                console.log('🔍 [DEBUG] Event target classes:', e.target.className);
+                console.log('🔍 [DEBUG] Event target closest dispute-copy-btn:', e.target.closest('.dispute-copy-btn'));
+                console.log('🔍 [DEBUG] Event target closest dispute-flip-btn:', e.target.closest('.dispute-flip-btn'));
+                console.log('🔍 [DEBUG] Event target closest letter-flip-btn:', e.target.closest('.letter-flip-btn'));
+
+                // Handle existing DisputeLibrary flip buttons (letter-flip-btn)
+                if (e.target.classList.contains('letter-flip-btn') || e.target.closest('.letter-flip-btn')) {
+                    console.log('🔄 [DEBUG] DisputeLibrary flip button detected');
+
+                    // Let the original handler run, then add our copy functionality
+                    setTimeout(() => {
+                        addCopyButtonsToFlippedCards();
+                    }, 100);
+                    return;
+                }
+
+                // Handle our dispute module flip buttons (dispute-flip-btn)
+                if (e.target.classList.contains('dispute-flip-btn') || e.target.closest('.dispute-flip-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const button = e.target.closest('.dispute-flip-btn');
+                    const cardInner = button.closest('.dispute-card-inner');
+
+                    console.log('🔄 [DEBUG] DisputeCards flip button clicked');
+                    console.log('🔄 [DEBUG] Button element:', button);
+                    console.log('🔄 [DEBUG] Card inner element:', cardInner);
+
+                    if (cardInner) {
                         const cardId = cardInner.getAttribute('data-id');
+                        console.log('🔄 [DEBUG] Flipping card ID:', cardId);
+                        flipCard(parseInt(cardId));
+                    }
+                    return;
+                }
 
-                        if (cardInner) {
-                            flipCard(parseInt(cardId));
-                        }
-                    });
-                });
+                // Handle copy button clicks
+                if (e.target.classList.contains('dispute-copy-btn') || e.target.closest('.dispute-copy-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                // Set up copy buttons
-                document.querySelectorAll('.dispute-copy-btn').forEach(button => {
-                    button.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
+                    const button = e.target.closest('.dispute-copy-btn');
+                    let cardId = null;
 
-                        const cardId = this.closest('.dispute-card-inner').getAttribute('data-id');
+                    // Try to find card ID from different possible structures
+                    const cardInner = button.closest('.dispute-card-inner');
+                    const letterCard = button.closest('.letter-card');
+
+                    console.log('📋 [DEBUG] Copy button clicked');
+                    console.log('📋 [DEBUG] Button element:', button);
+                    console.log('📋 [DEBUG] Card inner element:', cardInner);
+                    console.log('📋 [DEBUG] Letter card element:', letterCard);
+
+                    if (cardInner) {
+                        cardId = cardInner.getAttribute('data-id');
+                    } else if (letterCard) {
+                        cardId = letterCard.getAttribute('data-id') || letterCard.getAttribute('data-letter-id');
+                    } else {
+                        // Try to find from data attributes on the button itself
+                        cardId = button.getAttribute('data-card-id') || button.getAttribute('data-letter-id');
+                    }
+
+                    console.log('📋 [DEBUG] Copy button clicked for card ID:', cardId);
+
+                    if (cardId) {
+                        // Debug the letter data
+                        const letter = getLetterById(parseInt(cardId));
+                        console.log('📋 [DEBUG] Letter found:', letter);
+                        console.log('📋 [DEBUG] Letter title:', letter ? letter.title : 'N/A');
+                        console.log('📋 [DEBUG] Prompt text length:', letter ? (letter.promptText ? letter.promptText.length : 'No promptText') : 'No letter');
+
                         copyPromptToClipboard(parseInt(cardId));
-                    });
+                    } else {
+                        console.error('❌ [DEBUG] Could not find card ID for copy button');
+                    }
+                    return;
+                }
+            }
+
+            // Add copy buttons to flipped cards that don't have them
+            function addCopyButtonsToFlippedCards() {
+                console.log('🔄 [DEBUG] Adding copy buttons to flipped cards');
+
+                // Look for flipped cards (cards with rotateY(180deg) or flipped class)
+                const flippedCards = document.querySelectorAll('.letter-card.flipped, .letter-card[style*="rotateY(180deg)"]');
+                console.log('🔄 [DEBUG] Found flipped cards:', flippedCards.length);
+
+                flippedCards.forEach(card => {
+                    const cardId = card.getAttribute('data-id') || card.getAttribute('data-letter-id');
+                    const existingCopyBtn = card.querySelector('.dispute-copy-btn');
+
+                    if (cardId && !existingCopyBtn) {
+                        console.log('🔄 [DEBUG] Adding copy button to card:', cardId);
+
+                        // Find where to add the copy button (look for button container or card back)
+                        const cardBack = card.querySelector('.letter-card-back, .card-back, .letter-back');
+                        const buttonContainer = card.querySelector('.button-container, .card-buttons, .letter-buttons');
+
+                        if (cardBack || buttonContainer) {
+                            const copyButton = document.createElement('button');
+                            copyButton.className = 'dispute-copy-btn';
+                            copyButton.setAttribute('data-card-id', cardId);
+                            copyButton.innerHTML = '<span class="dispute-copy-icon">📋</span> Copy Prompt';
+
+                            if (buttonContainer) {
+                                buttonContainer.appendChild(copyButton);
+                            } else if (cardBack) {
+                                cardBack.appendChild(copyButton);
+                            }
+
+                            console.log('✅ [DEBUG] Copy button added to card:', cardId);
+                        }
+                    }
                 });
             }
 
@@ -760,7 +951,8 @@
                 copyPromptToClipboard: copyPromptToClipboard,
                 flipCard: flipCard,
                 renderCardHTML: renderCardHTML,
-                renderCardsIntoContainer: renderCardsIntoContainer
+                renderCardsIntoContainer: renderCardsIntoContainer,
+                debugAllLetters: debugAllLetters
             };
         })();
 

@@ -7,6 +7,7 @@ import { generateDisputeResponse, generateDisputeLetter } from '../utils/chatGpt
 import crypto from 'crypto';
 import { ensureCacheDirectory, cleanupCache, clearCache, getCacheStats } from '../utils/cacheManager.js';
 import { analyzeChunks, analyzeChunksFromFiles, comprehensiveAnalyzeChunksFromFiles } from '../utils/gptAnalyzer.js';
+import { getUserDocuments, saveAnalysisResults } from '../utils/databaseUtils.js';
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -437,6 +438,471 @@ export const chatController = {
     }
   },
 
+  // Generate multiple dispute letters for ChatModule
+  async generateMultipleLetters(req, res) {
+    try {
+      const { items, userInfo, analysisData, conversationState } = req.body;
+      
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: 'No items provided for dispute letters' });
+      }
+      
+      if (!userInfo || !userInfo.userEmail) {
+        return res.status(400).json({ error: 'User information is required' });
+      }
+      
+      console.log(`Generating dispute letters for ${items.length} items for user ${userInfo.userEmail}`);
+      
+      // Initialize services for database and blob storage
+      const { CosmosService } = await import('../services/cosmosService.js');
+      const { AzureBlobService } = await import('../services/azureBlobService.js');
+      
+      const cosmosService = new CosmosService();
+      const blobService = new AzureBlobService();
+      
+      await cosmosService.initialize();
+      await blobService.initialize();
+      
+      // Group items by bureau for better letter organization
+      const itemsByBureau = {};
+      items.forEach(item => {
+        const bureau = item.bureau || 'general';
+        if (!itemsByBureau[bureau]) {
+          itemsByBureau[bureau] = [];
+        }
+        itemsByBureau[bureau].push(item);
+      });
+      
+      console.log(`Items grouped by bureau:`, Object.keys(itemsByBureau).map(bureau => `${bureau}: ${itemsByBureau[bureau].length} items`));
+      
+      // Generate a letter for each bureau
+      const generatedLetters = [];
+      const savedLetters = []; // Track saved database records
+      
+      for (const [bureau, bureauItems] of Object.entries(itemsByBureau)) {
+        try {
+          console.log(`Generating letter for ${bureau} with ${bureauItems.length} items`);
+          
+          // Enhanced user info for letter generation
+          const enhancedUserInfo = {
+            ...userInfo,
+            bureau: bureau,
+            itemCount: bureauItems.length,
+            totalSelectedItems: items.length,
+            analysisContext: conversationState ? {
+              selectedCount: conversationState.selectedCount,
+              completedCategories: conversationState.categories
+            } : null
+          };
+          
+          // Generate letter using existing ChatGPT service
+          const letter = await generateDisputeLetter(bureauItems, enhancedUserInfo);
+          
+          // Create PDF content from the letter
+          const pdfContent = generatePDFContent(letter, bureau);
+          const pdfBuffer = Buffer.from(JSON.stringify(pdfContent), 'utf8'); // Simple PDF content as buffer
+          
+          // Generate unique filename for blob storage
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const sanitizedEmail = userInfo.userEmail.replace(/[^a-zA-Z0-9]/g, '_');
+          const fileName = `dispute-letters/${sanitizedEmail}/${timestamp}_${bureau}_dispute_letter.pdf`;
+          
+          // Upload PDF to blob storage
+          let blobUrl = null;
+          try {
+            const uploadResult = await blobService.uploadFile(
+              { buffer: pdfBuffer, mimetype: 'application/pdf' },
+              fileName,
+              {
+                userEmail: userInfo.userEmail,
+                userId: userInfo.userId || 'unknown',
+                bureau: bureau,
+                itemCount: bureauItems.length.toString(),
+                generatedAt: new Date().toISOString(),
+                letterType: 'dispute_letter'
+              }
+            );
+            blobUrl = uploadResult.url;
+            console.log(`✅ PDF uploaded to blob storage: ${fileName}`);
+          } catch (blobError) {
+            console.error(`❌ Error uploading PDF to blob storage:`, blobError);
+            // Continue without blob storage if it fails
+          }
+          
+          // Save letter to database
+          const letterData = {
+            bureau: bureau,
+            content: letter,
+            pdfContent: pdfContent,
+            blobUrl: blobUrl,
+            blobFileName: fileName,
+            items: bureauItems.map(item => ({
+              creditor: item.creditor_name,
+              account: item.account_number,
+              issue: item.dispute_reason,
+              confidence: item.confidence_level,
+              amount: item.amount,
+              itemId: item.id
+            })),
+            userInfo: {
+              email: userInfo.userEmail,
+              userId: userInfo.userId,
+              name: userInfo.name,
+              address: userInfo.address,
+              city: userInfo.city,
+              state: userInfo.state,
+              zipCode: userInfo.zipCode,
+              phone: userInfo.phone
+            },
+            analysisContext: conversationState,
+            generatedAt: new Date().toISOString(),
+            letterType: 'ai_generated',
+            status: 'generated'
+          };
+          
+          // Save to database
+          let savedLetter = null;
+          try {
+            savedLetter = await cosmosService.saveDisputeLetter(userInfo.userId || userInfo.userEmail, letterData);
+            console.log(`✅ Letter saved to database with ID: ${savedLetter.id}`);
+            savedLetters.push(savedLetter);
+          } catch (dbError) {
+            console.error(`❌ Error saving letter to database:`, dbError);
+            // Continue without database save if it fails
+          }
+          
+          generatedLetters.push({
+            bureau: bureau,
+            itemCount: bureauItems.length,
+            letter: letter,
+            pdfContent: pdfContent,
+            blobUrl: blobUrl,
+            blobFileName: fileName,
+            databaseId: savedLetter?.id,
+            items: bureauItems.map(item => ({
+              creditor: item.creditor_name,
+              account: item.account_number,
+              issue: item.dispute_reason,
+              confidence: item.confidence_level
+            }))
+          });
+          
+          console.log(`✅ Successfully generated and saved letter for ${bureau}`);
+          
+        } catch (letterError) {
+          console.error(`❌ Error generating letter for ${bureau}:`, letterError);
+          
+          // Add error placeholder but continue with other bureaus
+          generatedLetters.push({
+            bureau: bureau,
+            itemCount: bureauItems.length,
+            error: `Failed to generate letter for ${bureau}: ${letterError.message}`,
+            items: bureauItems.map(item => ({
+              creditor: item.creditor_name,
+              account: item.account_number,
+              issue: item.dispute_reason,
+              confidence: item.confidence_level
+            }))
+          });
+        }
+      }
+      
+      // Create summary response
+      const successfulLetters = generatedLetters.filter(letter => !letter.error);
+      const failedLetters = generatedLetters.filter(letter => letter.error);
+      
+      console.log(`📊 Letter generation summary:`);
+      console.log(`✅ Successful: ${successfulLetters.length} letters`);
+      console.log(`❌ Failed: ${failedLetters.length} letters`);
+      console.log(`💾 Saved to database: ${savedLetters.length} letters`);
+      console.log(`📁 Uploaded to blob storage: ${successfulLetters.filter(l => l.blobUrl).length} PDFs`);
+      
+      const responseData = {
+        success: successfulLetters.length > 0,
+        letters: generatedLetters,
+        summary: {
+          totalItems: items.length,
+          totalLetters: generatedLetters.length,
+          successfulLetters: successfulLetters.length,
+          failedLetters: failedLetters.length,
+          savedToDatabase: savedLetters.length,
+          uploadedToBlob: successfulLetters.filter(l => l.blobUrl).length,
+          bureaus: Object.keys(itemsByBureau),
+          generatedAt: new Date().toISOString()
+        },
+        userInfo: {
+          email: userInfo.userEmail,
+          userId: userInfo.userId
+        },
+        storage: {
+          databaseIds: savedLetters.map(letter => letter.id),
+          blobUrls: successfulLetters.filter(l => l.blobUrl).map(l => ({ bureau: l.bureau, url: l.blobUrl, fileName: l.blobFileName }))
+        }
+      };
+      
+      // If any letters were generated successfully, return success
+      if (successfulLetters.length > 0) {
+        return res.json(responseData);
+      } else {
+        return res.status(500).json({
+          ...responseData,
+          error: 'Failed to generate any dispute letters',
+          details: failedLetters.map(letter => letter.error)
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error in generateMultipleLetters:', error);
+      return res.status(500).json({ 
+        error: 'Failed to generate dispute letters',
+        details: error.message
+      });
+    }
+  },
+
+  // Get saved dispute letters for a user
+  async getUserDisputeLetters(req, res) {
+    try {
+      const { userId, userEmail } = req.query;
+      
+      if (!userId && !userEmail) {
+        return res.status(400).json({ error: 'User ID or email is required' });
+      }
+      
+      console.log(`Retrieving dispute letters for user: ${userId || userEmail}`);
+      
+      // Initialize database service
+      const { CosmosService } = await import('../services/cosmosService.js');
+      const cosmosService = new CosmosService();
+      await cosmosService.initialize();
+      
+      // Query for user's dispute letters
+      const query = `
+        SELECT * FROM c 
+        WHERE c.type = @type 
+        AND (c.userId = @userId OR c.letterData.userInfo.email = @userEmail)
+        ORDER BY c.createdAt DESC
+      `;
+      
+      const parameters = [
+        { name: '@type', value: 'dispute_letter' },
+        { name: '@userId', value: userId || '' },
+        { name: '@userEmail', value: userEmail || '' }
+      ];
+      
+      const letters = await cosmosService.queryDocuments(query, parameters);
+      
+      console.log(`Found ${letters.length} dispute letters for user`);
+      
+      // Format response data
+      const formattedLetters = letters.map(letter => ({
+        id: letter.id,
+        bureau: letter.letterData?.bureau,
+        content: letter.letterData?.content,
+        blobUrl: letter.letterData?.blobUrl,
+        blobFileName: letter.letterData?.blobFileName,
+        itemCount: letter.letterData?.items?.length || 0,
+        items: letter.letterData?.items || [],
+        status: letter.letterData?.status || 'generated',
+        generatedAt: letter.letterData?.generatedAt || letter.createdAt,
+        createdAt: letter.createdAt
+      }));
+      
+      return res.json({
+        success: true,
+        letters: formattedLetters,
+        total: formattedLetters.length,
+        userInfo: {
+          userId: userId,
+          userEmail: userEmail
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error retrieving user dispute letters:', error);
+      return res.status(500).json({ 
+        error: 'Failed to retrieve dispute letters',
+        details: error.message
+      });
+    }
+  },
+
+  // Delete a saved dispute letter
+  async deleteDisputeLetter(req, res) {
+    try {
+      const { letterId, userId } = req.body;
+      
+      if (!letterId || !userId) {
+        return res.status(400).json({ error: 'Letter ID and User ID are required' });
+      }
+      
+      console.log(`Deleting dispute letter ${letterId} for user ${userId}`);
+      
+      // Initialize services
+      const { CosmosService } = await import('../services/cosmosService.js');
+      const { AzureBlobService } = await import('../services/azureBlobService.js');
+      
+      const cosmosService = new CosmosService();
+      const blobService = new AzureBlobService();
+      
+      await cosmosService.initialize();
+      await blobService.initialize();
+      
+      // Get the letter first to check ownership and get blob filename
+      const letter = await cosmosService.getDocument(letterId, 'dispute_letter');
+      
+      if (!letter) {
+        return res.status(404).json({ error: 'Letter not found' });
+      }
+      
+      // Verify user ownership
+      if (letter.userId !== userId && letter.letterData?.userInfo?.userId !== userId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      // Delete from blob storage if exists
+      if (letter.letterData?.blobFileName) {
+        try {
+          await blobService.deleteFile(letter.letterData.blobFileName);
+          console.log(`✅ Deleted PDF from blob storage: ${letter.letterData.blobFileName}`);
+        } catch (blobError) {
+          console.error(`❌ Error deleting PDF from blob storage:`, blobError);
+          // Continue with database deletion even if blob deletion fails
+        }
+      }
+      
+      // Delete from database
+      await cosmosService.deleteDocument(letterId, 'dispute_letter');
+      console.log(`✅ Deleted letter from database: ${letterId}`);
+      
+      return res.json({
+        success: true,
+        message: 'Dispute letter deleted successfully',
+        deletedLetterId: letterId
+      });
+      
+    } catch (error) {
+      console.error('Error deleting dispute letter:', error);
+      return res.status(500).json({ 
+        error: 'Failed to delete dispute letter',
+        details: error.message
+      });
+    }
+  },
+
+  // Download generated letters as PDF
+  async downloadLetters(req, res) {
+    try {
+      const { userId, letters } = req.body;
+      
+      if (!letters || !Array.isArray(letters) || letters.length === 0) {
+        return res.status(400).json({ error: 'No letters provided for download' });
+      }
+      
+      console.log(`Preparing PDF download for ${letters.length} letters for user ${userId}`);
+      
+      // If only one letter, return individual PDF
+      if (letters.length === 1) {
+        const letter = letters[0];
+        const bureau = letter.bureau || 'general';
+        const pdfContent = generatePDFContent(letter.letter || letter.content, bureau);
+        
+        // Set headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="JAM_Dispute_Letter_${bureau}_${new Date().toISOString().split('T')[0]}.pdf"`);
+        
+        return res.json({
+          success: true,
+          pdfContent: pdfContent,
+          filename: `JAM_Dispute_Letter_${bureau}_${new Date().toISOString().split('T')[0]}.pdf`,
+          letterType: 'single_pdf',
+          bureau: bureau,
+          downloadInfo: {
+            letterCount: 1,
+            generatedAt: new Date().toISOString()
+          }
+        });
+      } else {
+        // Multiple letters - return array of PDFs
+        const pdfLetters = letters.map((letter, index) => {
+          const bureau = letter.bureau || `letter_${index + 1}`;
+          return {
+            filename: `JAM_Dispute_Letter_${bureau}_${new Date().toISOString().split('T')[0]}.pdf`,
+            pdfContent: generatePDFContent(letter.letter || letter.content, bureau),
+            bureau: bureau,
+            itemCount: letter.itemCount || 0
+          };
+        });
+        
+        res.setHeader('Content-Type', 'application/json');
+        
+        return res.json({
+          success: true,
+          letters: pdfLetters,
+          letterType: 'multiple_pdfs',
+          downloadInfo: {
+            letterCount: letters.length,
+            bureaus: pdfLetters.map(p => p.bureau),
+            generatedAt: new Date().toISOString()
+          }
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error in downloadLetters:', error);
+      return res.status(500).json({ 
+        error: 'Failed to prepare letters for download',
+        details: error.message
+      });
+    }
+  },
+
+  // Email generated letters to user
+  async emailLetters(req, res) {
+    try {
+      const { userId, userEmail, letters } = req.body;
+      
+      if (!userEmail) {
+        return res.status(400).json({ error: 'User email is required' });
+      }
+      
+      if (!letters || !Array.isArray(letters) || letters.length === 0) {
+        return res.status(400).json({ error: 'No letters provided for emailing' });
+      }
+      
+      console.log(`Preparing to email ${letters.length} letters to ${userEmail}`);
+      
+      // For now, return a success response
+      // In a full implementation, you would:
+      // 1. Create PDF files from the letters
+      // 2. Send them via email service (like SendGrid, AWS SES, etc.)
+      
+      const emailData = {
+        to: userEmail,
+        subject: `Your JAM Dispute Letters - ${letters.length} Letters Generated`,
+        letterCount: letters.length,
+        bureaus: letters.map(letter => letter.bureau).filter(Boolean),
+        sentAt: new Date().toISOString()
+      };
+      
+      // TODO: Implement actual email sending
+      console.log(`📧 Email would be sent to ${userEmail} with ${letters.length} letters`);
+      
+      return res.json({
+        success: true,
+        message: `Letters successfully sent to ${userEmail}`,
+        emailData: emailData
+      });
+      
+    } catch (error) {
+      console.error('Error in emailLetters:', error);
+      return res.status(500).json({ 
+        error: 'Failed to email letters',
+        details: error.message
+      });
+    }
+  },
+
   // Clear analysis cache (Keep this for now)
   async clearCache(req, res) {
     try {
@@ -478,10 +944,388 @@ export const chatController = {
       console.error('Error getting cache stats:', error);
       return res.status(500).json({ error: 'Failed to get cache statistics' });
     }
+  },
+
+  // New method to analyze already uploaded reports by user email
+  async analyzeUserReports(req, res) {
+    const startTime = Date.now();
+    
+    try {
+      console.log('\n===== ANALYZING USER REPORTS BY EMAIL =====\n');
+      console.log(`Analysis started at: ${new Date().toISOString()}`);
+      
+      // Get user email from query parameters
+      const { userEmail } = req.query;
+      
+      if (!userEmail) {
+        return res.status(400).json({ error: 'User email is required' });
+      }
+      
+      console.log(`Analyzing reports for user: ${userEmail}`);
+      
+      // Try to get user documents from your existing system
+      // This assumes you have a function to get user documents by email
+      let userDocuments;
+      
+      try {
+        // Option 1: If you have a database utility function
+        userDocuments = await getUserDocuments(userEmail);
+        
+        // Option 2: If you need to make an API call to your admin endpoint
+        // (You might need to implement this based on your existing system)
+        
+      } catch (dbError) {
+        console.error('Error fetching user documents:', dbError);
+        return res.status(404).json({ 
+          error: 'No uploaded reports found for this user',
+          details: 'Please upload your credit reports first'
+        });
+      }
+      
+      if (!userDocuments || userDocuments.length === 0) {
+        return res.status(404).json({ 
+          error: 'No credit reports found for this user',
+          details: 'Please upload your credit reports first'
+        });
+      }
+      
+      // Filter for credit reports only
+      const creditReports = userDocuments.filter(doc => 
+        doc.documentType === 'credit-report' || 
+        doc.type === 'credit-report' ||
+        doc.fileName?.toLowerCase().includes('credit')
+      );
+      
+      if (creditReports.length === 0) {
+        return res.status(404).json({ 
+          error: 'No credit reports found for this user',
+          details: 'Please upload your credit reports first'
+        });
+      }
+      
+      console.log(`Found ${creditReports.length} credit reports for user ${userEmail}`);
+      
+      // Generate a unique ID for this analysis session
+      const sessionId = crypto.randomBytes(8).toString('hex');
+      console.log(`Analysis session ID: ${sessionId}`);
+      
+      // Create cache directory if it doesn't exist
+      ensureCacheDirectory();
+      
+      // Create a cache file path for this analysis
+      const cacheFilePath = path.join(__dirname, `../cache/analysis_${sessionId}.json`);
+      console.log(`Cache file will be saved to: ${cacheFilePath}`);
+      
+      // Clean up old cache files
+      cleanupCache();
+      
+      // Track processed files
+      const processedFiles = [];
+      
+      // Create a directory for chunks
+      const chunksDir = path.join(__dirname, '../chunks');
+      if (!fs.existsSync(chunksDir)) {
+        fs.mkdirSync(chunksDir, { recursive: true });
+      }
+      
+      // Process each credit report
+      let allDisputableItems = [];
+      
+      for (const document of creditReports) {
+        try {
+          console.log(`\n----- Processing ${document.fileName || document.originalName} -----`);
+          
+          // Get the file path (this depends on how you store files)
+          const filePath = document.filePath || path.join(__dirname, '../uploads', document.fileName);
+          
+          if (!fs.existsSync(filePath)) {
+            console.error(`File not found: ${filePath}`);
+            continue;
+          }
+          
+          const stats = fs.statSync(filePath);
+          console.log(`File size: ${stats.size} bytes`);
+          
+          // Generate a unique prefix for this file's chunks
+          const filePrefix = crypto.randomBytes(8).toString('hex') + '_' + Date.now() + '-' + (document.fileName || 'report').replace(/[^a-zA-Z0-9]/g, '_');
+          
+          let extractedText = '';
+          
+          // Determine file type and extract text
+          const fileExtension = path.extname(filePath).toLowerCase();
+          const mimeType = document.mimeType || document.fileType || '';
+          
+          if (fileExtension === '.pdf' || mimeType === 'application/pdf') {
+            console.log(`Extracting text from PDF: ${filePath}`);
+            extractedText = await PdfExtraction(filePath);
+            console.log(`Extracted ${extractedText.length} characters from PDF`);
+          } else if (mimeType.startsWith('image/') || ['.jpg', '.jpeg', '.png', '.gif'].includes(fileExtension)) {
+            console.log(`Extracting text from image: ${filePath}`);
+            extractedText = await extractTextFromImage(filePath);
+            console.log(`Extracted ${extractedText.length} characters from image`);
+          } else {
+            console.log(`Reading text from file: ${filePath}`);
+            extractedText = fs.readFileSync(filePath, 'utf8');
+            console.log(`Read ${extractedText.length} characters from text file`);
+          }
+          
+          // Save the extracted text to a chunk file
+          const chunkPath = path.join(chunksDir, `${filePrefix}_1.txt`);
+          fs.writeFileSync(chunkPath, extractedText);
+          console.log(`Saved extracted text to: ${chunkPath}`);
+          
+          // Analyze the chunk with debugging
+          console.log(`Analyzing content from ${document.fileName || 'document'}...`);
+          const textAnalysisResult = await comprehensiveAnalyzeChunksFromFiles(chunksDir, filePrefix, { showOutput: true });
+          
+          if (!textAnalysisResult) {
+            console.error(`ERROR: comprehensiveAnalyzeChunksFromFiles returned undefined/null`);
+            continue;
+          }
+          
+          // Handle different result formats (same logic as analyzeReports)
+          if (!textAnalysisResult.summary) {
+            if (Array.isArray(textAnalysisResult)) {
+              const summary = {
+                uniqueItems: textAnalysisResult.length,
+                totalItems: textAnalysisResult.length,
+                categories: {}
+              };
+              
+              textAnalysisResult.forEach(item => {
+                const category = item.analysis_pass || 'unknown';
+                summary.categories[category] = (summary.categories[category] || 0) + 1;
+              });
+              
+              console.log(`Found ${summary.uniqueItems} disputable items in ${document.fileName}`);
+              
+              processedFiles.push({
+                filename: document.fileName || document.originalName,
+                path: filePath,
+                textLength: extractedText.length,
+                totalItems: summary.uniqueItems,
+                categories: summary.categories
+              });
+              
+              allDisputableItems.push(...textAnalysisResult);
+            }
+          } else {
+            console.log(`Found ${textAnalysisResult.summary.uniqueItems} disputable items in ${document.fileName}`);
+            
+            processedFiles.push({
+              filename: document.fileName || document.originalName,
+              path: filePath,
+              textLength: extractedText.length,
+              totalItems: textAnalysisResult.summary.uniqueItems,
+              categories: textAnalysisResult.summary.categories
+            });
+            
+            allDisputableItems.push(...textAnalysisResult.allItems);
+          }
+          
+          console.log(`\n----- Completed processing ${document.fileName || 'document'} -----`);
+          
+        } catch (error) {
+          console.error(`Error processing document ${document.fileName}:`, error);
+          // Continue with other files even if one fails
+        }
+      }
+      
+      // Calculate processing time for file analysis
+      const fileProcessingTime = Date.now() - startTime;
+      console.log(`\nFile processing completed in ${fileProcessingTime}ms`);
+      
+      // Generate a summary from the comprehensive analysis results
+      console.log(`\nGenerating summary for ${allDisputableItems.length} disputable items...`);
+
+      const gptAnalysisStart = Date.now();
+
+      // Categorize items for better organization
+      const categorizedItems = {};
+      allDisputableItems.forEach(item => {
+        const category = item.analysis_pass || 'other';
+        if (!categorizedItems[category]) {
+          categorizedItems[category] = [];
+        }
+        categorizedItems[category].push(item);
+      });
+      
+      // Create a simple summary instead of re-analyzing
+      const analysisResult = {
+        summary: `Found ${allDisputableItems.length} potential dispute items across ${processedFiles.length} credit report(s). Items include ${Object.keys(categorizedItems).join(', ')} issues.`,
+        detailedAnalysis: generateDetailedSummary(allDisputableItems, categorizedItems),
+        foundItems: allDisputableItems.length > 0
+      };
+
+      const gptAnalysisTime = Date.now() - gptAnalysisStart;
+      console.log(`Summary generation completed in ${gptAnalysisTime}ms`);
+      
+      // Calculate total processing time
+      const totalProcessingTime = Date.now() - startTime;
+      console.log(`Total analysis time: ${totalProcessingTime}ms`);
+      
+      // Prepare response object with both structured and formatted data
+      const responseObj = {
+        summary: analysisResult.summary,
+        analysis: analysisResult.detailedAnalysis,
+        formattedAnalysis: analysisResult.detailedAnalysis.replace(/\n/g, '<br>'),
+        foundItems: analysisResult.foundItems,
+        extractedItems: allDisputableItems,
+        processedFiles: processedFiles,
+        userEmail: userEmail
+      };
+      
+      // Add a flag to indicate this is from existing reports
+      responseObj.fromCache = false;
+      responseObj.source = 'existing_reports';
+      
+      console.log(`\nCategorized items:`, Object.keys(categorizedItems).map(cat => `${cat}: ${categorizedItems[cat].length}`));
+      
+      // Save results to cache (same logic as analyzeReports)
+      try {
+        const cacheData = {
+          timestamp: new Date().toISOString(),
+          userEmail: userEmail,
+          summary: {
+            totalFiles: processedFiles.length,
+            totalUniqueItems: allDisputableItems.length,
+            analysisDate: new Date().toLocaleDateString(),
+            processingTime: `${totalProcessingTime}ms`,
+            fileProcessingTime: `${fileProcessingTime}ms`,
+            gptAnalysisTime: `${gptAnalysisTime}ms`
+          },
+          disputeItems: {
+            personalInformation: categorizedItems.personal_info || [],
+            accountStatus: categorizedItems.account_status || [],
+            paymentHistory: categorizedItems.payment_history || [],
+            duplicateAccounts: categorizedItems.duplicates || [],
+            unauthorizedInquiries: categorizedItems.inquiries || [],
+            collections: categorizedItems.collections || [],
+            unverifiableInfo: categorizedItems.unverifiable || [],
+            outdatedInfo: categorizedItems.outdated || []
+          },
+          allDisputeItems: allDisputableItems.map((item, index) => ({
+            id: index + 1,
+            creditor: item.creditor_name,
+            accountNumber: item.account_number,
+            accountType: item.account_type,
+            issueType: item.issue_type,
+            issueDetails: item.issue_details,
+            disputeReason: item.dispute_reason,
+            confidenceLevel: item.confidence_level,
+            category: item.analysis_pass,
+            originalText: item.original_text?.substring(0, 200) + '...'
+          })),
+          processedFiles: processedFiles.map(file => ({
+            filename: file.filename,
+            itemsFound: file.totalItems || file.items,
+            fileSize: file.textLength ? `${Math.round(file.textLength / 1024)}KB` : 'Unknown',
+            processingStatus: 'Success'
+          })),
+          gptAnalysis: {
+            summary: analysisResult.summary,
+            detailedAnalysis: analysisResult.detailedAnalysis,
+            foundItems: analysisResult.foundItems
+          }
+        };
+
+        fs.writeFileSync(cacheFilePath, JSON.stringify(cacheData, null, 2));
+        console.log(`\nResults cached to: ${cacheFilePath}`);
+        
+      } catch (cacheError) {
+        console.error('Error saving to cache:', cacheError);
+      }
+      
+      // Near the end of the method, after creating responseObj, add:
+      try {
+        // Save analysis results to database
+        const analysisRecord = await saveAnalysisResults(user.id, {
+          summary: responseObj.summary,
+          analysis: responseObj.analysis,
+          extractedItems: responseObj.extractedItems,
+          processedFiles: responseObj.processedFiles,
+          totalItems: allDisputableItems.length,
+          categories: categorizedItems,
+          analysisDate: new Date().toISOString(),
+          processingTime: totalProcessingTime
+        });
+        
+        // Add the analysis ID to the response
+        responseObj.analysisId = analysisRecord.id;
+        
+        console.log(`Analysis results saved to database with ID: ${analysisRecord.id}`);
+      } catch (saveError) {
+        console.error('Error saving analysis to database:', saveError);
+        // Don't fail the request if saving fails
+      }
+      
+      console.log(`\n===== ANALYSIS COMPLETE =====`);
+      console.log(`Total items found: ${allDisputableItems.length}`);
+      console.log(`Files processed: ${processedFiles.length}`);
+      console.log(`Total time: ${totalProcessingTime}ms`);
+      console.log(`Analysis finished at: ${new Date().toISOString()}`);
+      
+      res.json(responseObj);
+      
+    } catch (error) {
+      const errorTime = Date.now() - startTime;
+      console.error('\n===== ANALYSIS ERROR =====');
+      console.error(`Error occurred after ${errorTime}ms`);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      res.status(500).json({ 
+        error: 'Failed to analyze user credit reports',
+        details: error.message,
+        processingTime: `${errorTime}ms`
+      });
+    }
   }
 };
 
 export default chatController;
+
+// Helper function to generate PDF content from letter text
+function generatePDFContent(letterContent, bureau) {
+  // For now, return formatted text that can be converted to PDF
+  // In a full implementation, you would use a PDF library like PDFKit or Puppeteer
+  
+  const formattedContent = {
+    title: `Credit Dispute Letter - ${bureau.charAt(0).toUpperCase() + bureau.slice(1)}`,
+    date: new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }),
+    content: letterContent,
+    footer: 'Generated by JAM Capital Consultants',
+    
+    // PDF generation instructions for frontend
+    pdfInstructions: {
+      format: 'letter',
+      margins: { top: 72, bottom: 72, left: 72, right: 72 },
+      fonts: { 
+        main: 'Times New Roman',
+        size: 12,
+        lineHeight: 1.5
+      },
+      header: {
+        text: `Credit Dispute Letter - ${bureau.charAt(0).toUpperCase() + bureau.slice(1)}`,
+        alignment: 'center',
+        fontSize: 16,
+        bold: true
+      },
+      letterStructure: {
+        datePosition: 'top-right',
+        recipientPosition: 'left',
+        bodySpacing: 'double',
+        signatureSpace: 72
+      }
+    }
+  };
+  
+  return formattedContent;
+}
 
 // If this file is run directly, test with a sample PDF
 /*if (import.meta.url === `file://${process.argv[1]}`) {

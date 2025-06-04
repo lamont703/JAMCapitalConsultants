@@ -15,53 +15,73 @@
 
         .messages-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #e0e0e0;
         }
 
-        .messages-search {
+        .messages-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .messages-bulk-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .bulk-selection-controls {
             display: flex;
             align-items: center;
-            background: #f5f5f5;
-            border-radius: 20px;
-            padding: 5px 15px;
-            width: 250px;
+            gap: 15px;
         }
 
-        .messages-search input {
-            border: none;
-            background: transparent;
-            padding: 8px;
-            width: 100%;
-            outline: none;
-        }
-
-        .messages-filters {
+        .bulk-select-all {
             display: flex;
-            gap: 10px;
-        }
-
-        .filter-btn {
-            background: #f5f5f5;
-            border: none;
-            border-radius: 15px;
-            padding: 5px 15px;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-weight: 500;
+            color: #495057;
         }
 
-        .filter-btn.active {
-            background: #09ccfc;
+        .bulk-select-all input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn-bulk-delete {
+            background: #dc3545;
             color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
         }
 
-        .messages-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .btn-bulk-delete:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn-bulk-delete:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .message-item {
@@ -73,12 +93,33 @@
             align-items: center;
         }
 
+        .message-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .message-checkbox {
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         .message-item:hover {
             background-color: #f9f9f9;
         }
 
         .message-item.unread {
             background-color: #e6f9ff;
+        }
+
+        .message-item.unread.selected {
+            background-color: #bbdefb;
         }
 
         .message-avatar {
@@ -335,180 +376,18 @@
             }
         }
 
-        .dispute-report-item {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .dispute-report-item:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .dispute-header {
-            padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dispute-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .dispute-status {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-submitted {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .status-progress {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .status-review {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .status-resolved {
-            background: #e8f5e8;
-            color: #388e3c;
-        }
-
-        .status-rejected {
-            background: #ffebee;
-            color: #d32f2f;
-        }
-
-        .dispute-content {
-            padding: 16px;
-            display: none;
-        }
-
-        .dispute-report-item.expanded .dispute-content {
-            display: block;
-        }
-
-        .dispute-summary p {
-            margin: 8px 0;
-            color: #666;
-            line-height: 1.5;
-        }
-
-        .credit-scores {
-            margin: 12px 0;
-        }
-
-        .scores-grid {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-        }
-
-        .score-item {
-            background: #f5f5f5;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .dispute-file {
-            margin: 12px 0;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 8px;
-            background: #f9f9f9;
-            border-radius: 6px;
-        }
-
-        .view-file-btn {
-            color: #1976d2;
-            text-decoration: none;
-            font-size: 14px;
-            margin-left: auto;
-        }
-
-        .view-file-btn:hover {
-            text-decoration: underline;
-        }
-
-        .dispute-actions {
-            padding: 12px 16px;
-            border-top: 1px solid #f0f0f0;
-            text-align: center;
-        }
-
-        .no-disputes-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .no-disputes-message i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: #ccc;
-        }
-
-        .count-badge {
-            background: #1976d2;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-left: 8px;
-        }
-
-        .messages-section {
-            margin-bottom: 24px;
-        }
-
-        .section-header {
-            padding: 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .section-header h3 {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 18px;
-            color: #333;
-        }
-
         .dispute-reports-header {
             margin-top: 30px;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .dispute-reports-header h3 {
             margin: 0;
             color: #333;
             font-size: 18px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -519,42 +398,59 @@
         }
 
         .dispute-report-item {
+            background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #fff;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .dispute-report-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-color: #d0d0d0;
         }
 
         .dispute-header {
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            border-bottom: none;
         }
 
         .dispute-title {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-weight: bold;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .dispute-title i {
+            color: #666;
+            font-size: 16px;
         }
 
         .dispute-status {
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .status-submitted {
             background: #e3f2fd;
-            color: #1976d2;
+            color: #1565c0;
         }
 
         .status-progress {
             background: #fff3e0;
-            color: #f57c00;
+            color: #ef6c00;
         }
 
         .status-review {
@@ -564,12 +460,222 @@
 
         .status-resolved {
             background: #e8f5e8;
-            color: #388e3c;
+            color: #2e7d32;
         }
 
         .status-rejected {
             background: #ffebee;
-            color: #d32f2f;
+            color: #c62828;
+        }
+
+        .dispute-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .dispute-content {
+            padding: 0 20px 15px 20px;
+            display: none;
+            background: #fafafa;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .dispute-report-item.expanded .dispute-content {
+            display: block;
+        }
+
+        .dispute-summary {
+            margin-bottom: 15px;
+        }
+
+        .dispute-summary strong {
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .dispute-summary p {
+            margin: 8px 0 0 0;
+            color: #555;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+
+        .dispute-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .credit-scores {
+            margin: 15px 0;
+        }
+
+        .credit-scores strong {
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .scores-grid {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            background: #f0f0f0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #555;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dispute-file {
+            margin: 15px 0;
+        }
+
+        .dispute-file strong {
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .file-info i {
+            color: #666;
+        }
+
+        .file-info span {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .view-file-btn {
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 12px;
+            margin-left: auto;
+            font-weight: 500;
+        }
+
+        .view-file-btn:hover {
+            text-decoration: underline;
+            color: #1565c0;
+        }
+
+        .dispute-actions {
+            padding: 12px 20px 15px 20px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .dispute-actions button {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dispute-actions button:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .dispute-actions button i {
+            margin-right: 5px;
+        }
+
+        .no-disputes-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .no-disputes-message i {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .no-disputes-message p {
+            margin: 8px 0 4px 0;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .no-disputes-message small {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .messages-search {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 5px 15px;
+            width: 250px;
+        }
+
+        .messages-search input {
+            border: none;
+            background: transparent;
+            padding: 8px;
+            width: 100%;
+            outline: none;
+        }
+
+        .messages-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .filter-btn.active {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .messages-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
     </style>
 </head>
@@ -718,7 +824,7 @@
                 const messagesContainer = document.createElement('div');
                 messagesContainer.className = 'messages-container';
 
-                // Create the header with search and filters
+                // Create the header with search, filters, and bulk actions
                 const header = document.createElement('div');
                 header.className = 'messages-header';
 
@@ -730,6 +836,22 @@
                     <input type="text" placeholder="Search messages..." id="message-search">
                 `;
 
+                // Bulk actions container
+                const bulkActions = document.createElement('div');
+                bulkActions.className = 'messages-bulk-actions';
+                bulkActions.innerHTML = `
+                    <div class="bulk-selection-controls">
+                        <label class="bulk-select-all">
+                            <input type="checkbox" id="select-all-messages">
+                            <span>Select All</span>
+                        </label>
+                        <button class="btn-bulk-delete" id="bulk-delete-btn" disabled>
+                            <i class="fas fa-trash"></i>
+                            Delete Selected (<span id="selected-count">0</span>)
+                        </button>
+                    </div>
+                `;
+
                 // Filters
                 const filters = document.createElement('div');
                 filters.className = 'messages-filters';
@@ -738,8 +860,14 @@
                     <button class="filter-btn ${currentFilter === 'unread' ? 'active' : ''}" data-filter="unread">Unread</button>
                 `;
 
-                header.appendChild(searchBox);
-                header.appendChild(filters);
+                // Arrange header layout
+                const headerTop = document.createElement('div');
+                headerTop.className = 'messages-header-top';
+                headerTop.appendChild(searchBox);
+                headerTop.appendChild(filters);
+
+                header.appendChild(headerTop);
+                header.appendChild(bulkActions);
 
                 // Message detail view (initially hidden)
                 const messageDetail = document.createElement('div');
@@ -778,6 +906,9 @@
                 } else {
                     messagesList.innerHTML = filteredMessages.map(message => `
                         <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
+                            <div class="message-checkbox">
+                                <input type="checkbox" class="message-select" data-message-id="${message.id}">
+                            </div>
                             <div class="message-avatar">${message.avatar}</div>
                             <div class="message-content">
                                 <div class="message-header">
@@ -804,9 +935,10 @@
                 container.innerHTML = '';
                 container.appendChild(messagesContainer);
 
-                // After rendering, automatically attach click handlers
+                // After rendering, automatically attach click handlers and setup bulk selection
                 setTimeout(() => {
                     attachMessageClickHandlers(container);
+                    setupBulkSelection(container);
                 }, 100); // Small delay to ensure DOM is updated
             }
 
@@ -1288,6 +1420,12 @@
                     console.log('🖱️ Click target:', event.target);
                     console.log('🖱️ Click target classes:', event.target.className);
 
+                    // Don't trigger message open if clicking on checkbox
+                    if (event.target.type === 'checkbox' || event.target.closest('.message-checkbox')) {
+                        console.log('🔲 Checkbox clicked, not opening message');
+                        return;
+                    }
+
                     // Find the closest message item
                     const messageItem = event.target.closest('.message-item');
                     console.log('🖱️ Found message item:', messageItem);
@@ -1308,6 +1446,262 @@
                 messagesList.setAttribute('data-handler-attached', 'true');
 
                 console.log('✅ Message click handlers attached successfully');
+            }
+
+            // Setup bulk selection functionality
+            function setupBulkSelection(container) {
+                console.log('🔗 Setting up bulk selection functionality');
+
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                const selectedCountSpan = container.querySelector('#selected-count');
+                const messageCheckboxes = container.querySelectorAll('.message-select');
+
+                if (!selectAllCheckbox || !bulkDeleteBtn || !selectedCountSpan) {
+                    console.error('❌ Bulk selection elements not found');
+                    return;
+                }
+
+                // Handle individual message checkbox changes
+                messageCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function (e) {
+                        const messageId = this.dataset.messageId;
+                        const messageItem = this.closest('.message-item');
+
+                        if (this.checked) {
+                            messageItem.classList.add('selected');
+                            console.log('✅ Selected message:', messageId);
+                        } else {
+                            messageItem.classList.remove('selected');
+                            console.log('❌ Deselected message:', messageId);
+                        }
+
+                        updateBulkSelectionState(container);
+                    });
+                });
+
+                // Handle select all checkbox
+                selectAllCheckbox.addEventListener('change', function (e) {
+                    const isChecked = this.checked;
+                    console.log('🔲 Select all toggled:', isChecked);
+
+                    messageCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                        const messageItem = checkbox.closest('.message-item');
+
+                        if (isChecked) {
+                            messageItem.classList.add('selected');
+                        } else {
+                            messageItem.classList.remove('selected');
+                        }
+                    });
+
+                    updateBulkSelectionState(container);
+                });
+
+                // Handle bulk delete button
+                bulkDeleteBtn.addEventListener('click', function (e) {
+                    console.log('🗑️ Bulk delete button clicked');
+                    performBulkDelete(container);
+                });
+
+                console.log('✅ Bulk selection functionality setup complete');
+            }
+
+            // Update bulk selection state
+            function updateBulkSelectionState(container) {
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                const selectedCountSpan = container.querySelector('#selected-count');
+                const messageCheckboxes = container.querySelectorAll('.message-select');
+
+                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
+                const selectedCount = selectedCheckboxes.length;
+
+                console.log('📊 Updating bulk selection state. Selected:', selectedCount);
+
+                // Update selected count
+                if (selectedCountSpan) {
+                    selectedCountSpan.textContent = selectedCount;
+                }
+
+                // Update bulk delete button state
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.disabled = selectedCount === 0;
+                }
+
+                // Update select all checkbox state
+                if (selectAllCheckbox) {
+                    if (selectedCount === 0) {
+                        selectAllCheckbox.indeterminate = false;
+                        selectAllCheckbox.checked = false;
+                    } else if (selectedCount === messageCheckboxes.length) {
+                        selectAllCheckbox.indeterminate = false;
+                        selectAllCheckbox.checked = true;
+                    } else {
+                        selectAllCheckbox.indeterminate = true;
+                        selectAllCheckbox.checked = false;
+                    }
+                }
+            }
+
+            // Perform bulk delete
+            function performBulkDelete(container) {
+                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
+                const selectedMessageIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.messageId);
+
+                console.log('🗑️ Bulk delete requested for messages:', selectedMessageIds);
+
+                if (selectedMessageIds.length === 0) {
+                    console.log('⚠️ No messages selected for deletion');
+                    return;
+                }
+
+                const confirmMessage = `Are you sure you want to delete ${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''}? This action cannot be undone.`;
+
+                if (!confirm(confirmMessage)) {
+                    console.log('❌ Bulk delete cancelled by user');
+                    return;
+                }
+
+                // Show loading state
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.disabled = true;
+                    bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                }
+
+                // Perform bulk deletion
+                bulkDeleteMessages(selectedMessageIds)
+                    .then(success => {
+                        if (success) {
+                            console.log('✅ Bulk delete successful');
+
+                            // Remove messages from local array
+                            selectedMessageIds.forEach(messageId => {
+                                const index = messages.findIndex(m => m.id == messageId);
+                                if (index > -1) {
+                                    messages.splice(index, 1);
+                                }
+                            });
+
+                            // Re-render the messages UI
+                            renderMessagesUI(container);
+                            attachMessageClickHandlers(container);
+
+                            // Show success message
+                            showSuccessMessage(`Successfully deleted ${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''}`);
+
+                        } else {
+                            console.error('❌ Bulk delete failed');
+                            showErrorMessage('Failed to delete messages. Please try again.');
+
+                            // Reset button state
+                            if (bulkDeleteBtn) {
+                                bulkDeleteBtn.disabled = false;
+                                bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error during bulk delete:', error);
+                        showErrorMessage('Error deleting messages. Please try again.');
+
+                        // Reset button state
+                        if (bulkDeleteBtn) {
+                            bulkDeleteBtn.disabled = false;
+                            bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)';
+                        }
+                    });
+            }
+
+            // Bulk delete messages from backend
+            async function bulkDeleteMessages(messageIds) {
+                try {
+                    console.log('🌐 Bulk deleting messages from backend:', messageIds);
+
+                    // Get user ID and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId) {
+                        console.error('❌ No user ID found for bulk deleting messages');
+                        return false;
+                    }
+
+                    if (!authToken) {
+                        console.error('❌ No auth token found for bulk deleting messages');
+                        return false;
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/admin/bulk-delete-notifications`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            notificationIds: messageIds,
+                            userId: userId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        console.log('✅ Messages bulk deleted from backend successfully');
+                        console.log('📊 Deletion results:', data.results);
+                        return true;
+                    } else {
+                        console.error('❌ Backend returned failure:', data.message);
+                        return false;
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error bulk deleting messages from backend:', error);
+                    return false;
+                }
+            }
+
+            // Show success message
+            function showSuccessMessage(message) {
+                console.log('✅ Success:', message);
+
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (container) {
+                    const successHtml = `
+                        <div class="success-message" style="
+                            background: #d4edda; 
+                            color: #155724; 
+                            padding: 15px; 
+                            border-radius: 4px; 
+                            margin: 10px 0;
+                            border-left: 4px solid #28a745;
+                        ">
+                            <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                            ${message}
+                        </div>
+                    `;
+
+                    container.insertAdjacentHTML('afterbegin', successHtml);
+
+                    // Remove success message after 3 seconds
+                    setTimeout(() => {
+                        const successElement = container.querySelector('.success-message');
+                        if (successElement) {
+                            successElement.remove();
+                        }
+                    }, 3000);
+                }
             }
 
             // Move loadMessages function INSIDE the module

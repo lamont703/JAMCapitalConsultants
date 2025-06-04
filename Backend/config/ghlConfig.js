@@ -19,22 +19,30 @@ export class GoHighLevelConfig {
 
     async initializeClient() {
         try {
+            console.log('🔧 Initializing GHL client...');
             const accessToken = await this.tokenService.getValidAccessToken();
             
             this.client = axios.create({
-                baseURL: this.baseUrl,
+                baseURL: 'https://services.leadconnectorhq.com',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                    'Version': '2021-07-28'
-                },
-                timeout: 30000
+                    'Content-Type': 'application/json'
+                }
             });
-
-            return this.client;
+            
+            console.log('✅ GHL client initialized successfully');
+            return true;
+            
         } catch (error) {
-            console.error('Failed to initialize GHL client:', error);
-            throw error;
+            // Clean error handling without verbose logging
+            if (error.message === 'GHL authentication required') {
+                console.log('⚠️  GHL client initialization skipped - authentication required');
+            } else {
+                console.log(`❌ GHL client initialization failed: ${error.message}`);
+            }
+            
+            this.client = null;
+            return false;
         }
     }
 
@@ -60,7 +68,10 @@ export class GoHighLevelConfig {
 
     async getClient() {
         if (!this.client) {
-            await this.initializeClient();
+            const initialized = await this.initializeClient();
+            if (!initialized) {
+                throw new Error('GHL client not available - authentication required');
+            }
         }
         return this.client;
     }

@@ -69,36 +69,38 @@ export class GHLOAuthExchange {
         }
     }
 
-    async refreshAccessToken(refreshToken) {
+    async refreshAccessToken() {
         try {
+            console.log('🔄 Attempting to refresh GHL access token...');
+            
             const response = await axios.post(this.tokenEndpoint, {
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
                 grant_type: 'refresh_token',
-                refresh_token: refreshToken
+                refresh_token: this.refreshToken
             }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             });
-
-            const tokens = {
-                access_token: response.data.access_token,
-                refresh_token: response.data.refresh_token || refreshToken,
-                expires_in: response.data.expires_in,
-                expires_at: new Date(Date.now() + (response.data.expires_in * 1000)).toISOString(),
-                token_type: response.data.token_type,
-                scope: response.data.scope
-            };
-
-            await this.saveTokens(tokens);
-            await this.updateEnvFile(tokens.access_token);
             
-            return tokens;
+            return response.data;
+            
         } catch (error) {
-            console.error('Token refresh failed:', error.response?.data || error.message);
-            throw error;
+            // Clean, specific error handling
+            if (error.response?.status === 400) {
+                const errorData = error.response.data;
+                if (errorData.error === 'invalid_grant') {
+                    throw new Error('Refresh token expired - re-authentication required');
+                } else {
+                    throw new Error(`OAuth error: ${errorData.error_description || errorData.error}`);
+                }
+            } else if (error.response?.status === 401) {
+                throw new Error('OAuth credentials invalid');
+            } else {
+                throw new Error(`Network error during token refresh: ${error.message}`);
+            }
         }
     }
 
@@ -184,7 +186,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
                     if (!savedTokens?.refresh_token) {
                         throw new Error('No refresh token found');
                     }
-                    return oauth.refreshAccessToken(savedTokens.refresh_token);
+                    return oauth.refreshAccessToken();
                 })
                 .then(tokens => {
                     console.log('✅ Tokens refreshed successfully!');

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM AI Credit Bot - JAM Credit Solutions</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -166,7 +166,7 @@
                 // Create script element to load the module
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'DisputeWorkflow.html';
+                script.src = 'Portal/JAM Dispute Bot/DisputeWorkflow.html';
                 script.async = true;
 
                 script.onload = function () {
@@ -211,7 +211,7 @@
 
                 // Create script element
                 const script = document.createElement('script');
-                script.src = 'CreditReportUploader.html';
+                script.src = 'Portal/JAM Dispute Bot/CreditReportUploader.html';
                 script.async = true;
 
                 // Set up event listeners
@@ -244,9 +244,9 @@
         async function loadChatModule() {
             return new Promise((resolve, reject) => {
                 // Check if module is already loaded
-                if (window.chatModule) {
+                if (window.ChatModule) {
                     console.log('ChatModule already loaded');
-                    resolve(window.chatModule);
+                    resolve(window.ChatModule);
                     return;
                 }
 
@@ -254,21 +254,21 @@
 
                 // Create script element
                 const script = document.createElement('script');
-                script.src = 'ChatModule.html';
+                script.src = 'Portal/JAM Dispute Bot/ChatModule.html';
                 script.async = true;
 
                 // Set up event listeners
                 script.onload = () => {
                     console.log('ChatModule script loaded');
                     // Wait for the module to be initialized
-                    if (window.chatModule) {
+                    if (window.ChatModule) {
                         console.log('ChatModule ready');
-                        resolve(window.chatModule);
+                        resolve(window.ChatModule);
                     } else {
                         // Listen for the module loaded event
                         window.addEventListener('chatModuleLoaded', () => {
                             console.log('ChatModule initialized');
-                            resolve(window.chatModule);
+                            resolve(window.ChatModule);
                         }, { once: true });
                     }
                 };
@@ -287,9 +287,9 @@
         async function loadLettersModule() {
             return new Promise((resolve, reject) => {
                 // Check if module is already loaded
-                if (window.lettersModule) {
+                if (window.LettersModule) {
                     console.log('LettersModule already loaded');
-                    resolve(window.lettersModule);
+                    resolve(window.LettersModule);
                     return;
                 }
 
@@ -297,21 +297,21 @@
 
                 // Create script element
                 const script = document.createElement('script');
-                script.src = 'LettersModule.html';
+                script.src = 'Portal/JAM Dispute Bot/LettersModule.html';
                 script.async = true;
 
                 // Set up event listeners
                 script.onload = () => {
                     console.log('LettersModule script loaded');
                     // Wait for the module to be initialized
-                    if (window.lettersModule) {
+                    if (window.LettersModule) {
                         console.log('LettersModule ready');
-                        resolve(window.lettersModule);
+                        resolve(window.LettersModule);
                     } else {
                         // Listen for the module loaded event
                         window.addEventListener('lettersModuleLoaded', () => {
                             console.log('LettersModule initialized');
-                            resolve(window.lettersModule);
+                            resolve(window.LettersModule);
                         }, { once: true });
                     }
                 };
@@ -549,6 +549,12 @@
                         onReportDeleted: function (reportId) {
                             console.log('Report deleted:', reportId);
                             // You can add additional functionality here
+                        },
+
+                        // Add switchTab function for "Continue to Chat" button
+                        switchTab: function (tabId) {
+                            console.log('Parent module switching to tab:', tabId);
+                            switchTab(tabId);
                         }
                     };
 
@@ -735,6 +741,18 @@ What can I help you with today?`, chatContainer);
                         onLetterView: function (letter) {
                             console.log('Letter view requested:', letter.name);
                             // You can implement a letter preview modal here
+                        },
+
+                        // Add switchTab method for ChatModule integration
+                        switchTab: switchTab,
+
+                        // Add method to add letters from ChatModule
+                        addGeneratedLetter: function (letter) {
+                            console.log('Adding generated letter to LettersModule:', letter);
+                            if (lettersModule) {
+                                lettersModule.addLetter(letter, lettersContainer);
+                                console.log('Letter added to LettersModule');
+                            }
                         }
                     };
 

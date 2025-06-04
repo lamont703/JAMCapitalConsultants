@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-06-04T01:31:40.848Z",
+  "userEmail": "lamont703@gmail.com",
+  "summary": {
+    "totalFiles": 0,
+    "totalUniqueItems": 0,
+    "analysisDate": "6/3/2025",
+    "processingTime": "353ms",
+    "fileProcessingTime": "353ms",
+    "gptAnalysisTime": "0ms"
+  },
+  "disputeItems": {
+    "personalInformation": [],
+    "accountStatus": [],
+    "paymentHistory": [],
+    "duplicateAccounts": [],
+    "unauthorizedInquiries": [],
+    "collections": [],
+    "unverifiableInfo": [],
+    "outdatedInfo": []
+  },
+  "allDisputeItems": [],
+  "processedFiles": [],
+  "gptAnalysis": {
+    "summary": "Found 0 potential dispute items across 0 credit report(s). Items include  issues.",
+    "detailedAnalysis": "## Credit Report Analysis Summary\n\nI've analyzed your credit reports and found **0 potential dispute items** that could be challenged.\n\n",
+    "foundItems": false
+  }
+}

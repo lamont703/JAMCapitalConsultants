@@ -55,43 +55,57 @@ app.get('*', (req, res) => {
 });
 
 let cosmosService;
+let ghlService;
+let azureBlobService;
 
 // Initialize CosmosDB on startup
 async function initializeApp() {
     try {
-        cosmosService = new CosmosService();
-        await cosmosService.initialize();
-        console.log('CosmosDB initialized successfully');
+        console.log('🚀 Starting JAM Capital server initialization...\n');
+
+        // Initialize core services first
+        console.log('📦 Initializing core services...');
         
-        // Make cosmosService available globally
-        app.locals.cosmosService = cosmosService;
-        
-        // Try to initialize GoHighLevel service
+        // Azure Blob Storage
         try {
-            console.log('🔄 Initializing GHL Service...');
-            const ghlService = new GoHighLevelService();
-            await ghlService.initialize();
-            console.log('GoHighLevel initialized successfully');
-            
-            // Make GHL service available both ways
-            app.locals.ghlService = ghlService;
-            global.ghlService = ghlService;
-            
-        } catch (ghlError) {
-            console.warn('GoHighLevel initialization failed (continuing without GHL):', ghlError.message);
-            app.locals.ghlService = null;
-            global.ghlService = null;
+            azureBlobService = new AzureBlobService();
+            await azureBlobService.initialize();
+            console.log('✅ Azure Blob Storage initialized');
+        } catch (error) {
+            console.log(`❌ Azure Blob Storage failed: ${error.message}`);
+            throw error; // This is critical, so we should fail
         }
-        
-        // Initialize Azure Blob Storage
-        const azureBlobService = new AzureBlobService();
-        await azureBlobService.initialize();
-        app.locals.azureBlobService = azureBlobService;
-        console.log('✅ Azure Blob Storage service initialized');
+
+        // GoHighLevel (non-critical)
+        try {
+            ghlService = new GoHighLevelService();
+            const ghlInitialized = await ghlService.initialize();
+            if (!ghlInitialized) {
+                console.log('ℹ️  Server will run without GHL integration');
+            }
+        } catch (error) {
+            console.log('ℹ️  Server will run without GHL integration');
+        }
+
+        // CosmosDB (CRITICAL - currently missing!)
+        try {
+            cosmosService = new CosmosService();
+            await cosmosService.initialize();
+            
+            // Make it available to all routes
+            app.locals.cosmosService = cosmosService;
+            
+            console.log('✅ CosmosDB service initialized');
+        } catch (error) {
+            console.log(`❌ CosmosDB failed: ${error.message}`);
+            throw error; // This is critical, so we should fail
+        }
+
+        console.log('\n✅ Server initialization completed');
         
     } catch (error) {
-        console.error('Failed to initialize core services:', error);
-        process.exit(1);
+        console.error('❌ Critical server initialization failed:', error.message);
+        throw error;
     }
 }
 

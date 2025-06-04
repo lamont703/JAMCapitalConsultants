@@ -662,6 +662,151 @@
             let uploadedDocuments = [];
             let container = null; // Add container reference
 
+            // Function to clean up corrupted localStorage entries
+            function cleanupCorruptedEntries() {
+                try {
+                    console.log('🧹 Checking for corrupted localStorage entries in DocumentUploader...');
+
+                    // Clean up any corrupted document entries
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('jamDocuments') && key.includes('undefined')) {
+                            console.log('🗑️ Removing corrupted document entry:', key);
+                            localStorage.removeItem(key);
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('❌ Error cleaning up corrupted entries:', error);
+                }
+            }
+
+            // Function to clear duplicate documents from uploadedDocuments array
+            function clearDuplicateDocuments() {
+                if (uploadedDocuments.length === 0) {
+                    console.log('🧹 No documents to clean, array is empty');
+                    return;
+                }
+
+                console.log(`🧹 Cleaning duplicates from ${uploadedDocuments.length} documents`);
+
+                const uniqueDocuments = [];
+                const seenIdentifiers = new Set();
+
+                uploadedDocuments.forEach((doc, index) => {
+                    // Create multiple unique identifiers to catch all types of duplicates
+                    const identifiers = [];
+
+                    // Primary identifier based on document type
+                    if (doc.isExisting) {
+                        identifiers.push(`existing_${doc.backendId}`);
+                        identifiers.push(`backend_${doc.backendId}`);
+                    } else {
+                        identifiers.push(`new_${doc.sectionType}_${doc.name}_${doc.size}`);
+                        if (doc.backendId) {
+                            identifiers.push(`backend_${doc.backendId}`);
+                        }
+                    }
+
+                    // FIXED: More specific identifiers that include bureau/idType to prevent false positives
+                    if (doc.sectionType === 'credit-report' && doc.bureau) {
+                        // Bureau-specific identifiers (these should be unique per bureau)
+                        identifiers.push(`credit-report_${doc.bureau}_${doc.name}_${doc.size}`);
+                        identifiers.push(`bureau_${doc.bureau}_${doc.name}`);
+                        // Only add generic identifier if it includes bureau info
+                        identifiers.push(`${doc.sectionType}_${doc.bureau}_${doc.name}_${doc.size}`);
+                    }
+
+                    if (doc.sectionType === 'id-verification' && doc.idType) {
+                        // ID type-specific identifiers (these should be unique per ID type)
+                        identifiers.push(`id-verification_${doc.idType}_${doc.name}_${doc.size}`);
+                        identifiers.push(`idtype_${doc.idType}_${doc.name}`);
+                        // Only add generic identifier if it includes idType info
+                        identifiers.push(`${doc.sectionType}_${doc.idType}_${doc.name}_${doc.size}`);
+                    }
+
+                    // REMOVED: Generic identifiers that don't include bureau/idType
+                    // These were causing false positives:
+                    // identifiers.push(`${doc.sectionType}_${doc.name}_${doc.size}`);
+
+                    // Only add generic identifiers for documents that don't have bureau/idType
+                    if (doc.sectionType !== 'credit-report' && doc.sectionType !== 'id-verification') {
+                        // For additional documents, include backend ID to ensure uniqueness
+                        if (doc.sectionType === 'additional-documents' && doc.backendId) {
+                            identifiers.push(`${doc.sectionType}_${doc.backendId}_${doc.name}_${doc.size}`);
+                        } else {
+                            identifiers.push(`${doc.sectionType}_${doc.name}_${doc.size}`);
+                        }
+                    }
+
+                    // Include ID-based identifiers (these are always unique)
+                    if (doc.id) {
+                        identifiers.push(`id_${doc.id}`);
+                    }
+
+                    // Check if ANY of the identifiers have been seen before
+                    const isDuplicateByIdentifier = identifiers.some(id => seenIdentifiers.has(id));
+
+                    // ENHANCED: More precise content-based duplicate checking
+                    const isDuplicateByContent = uniqueDocuments.some(existingDoc => {
+                        // Exact match criteria with better specificity
+                        const exactMatch = (
+                            existingDoc.name === doc.name &&
+                            existingDoc.sectionType === doc.sectionType &&
+                            existingDoc.size === doc.size &&
+                            existingDoc.isExisting === doc.isExisting
+                        );
+
+                        // Backend ID match (if both have backend IDs and they match)
+                        const backendIdMatch = (
+                            existingDoc.backendId &&
+                            doc.backendId &&
+                            existingDoc.backendId === doc.backendId
+                        );
+
+                        // Credit report specific matching - MUST include bureau
+                        const creditReportMatch = (
+                            existingDoc.sectionType === 'credit-report' &&
+                            doc.sectionType === 'credit-report' &&
+                            existingDoc.bureau === doc.bureau &&  // Same bureau
+                            existingDoc.name === doc.name &&
+                            exactMatch  // Also require exact match
+                        );
+
+                        // ID verification specific matching - MUST include idType
+                        const idVerificationMatch = (
+                            existingDoc.sectionType === 'id-verification' &&
+                            doc.sectionType === 'id-verification' &&
+                            existingDoc.idType === doc.idType &&  // Same ID type
+                            existingDoc.name === doc.name &&
+                            exactMatch  // Also require exact match
+                        );
+
+                        // Only consider it a duplicate if it's an exact match OR 
+                        // a backend ID match OR a specific type match with same bureau/idType
+                        return backendIdMatch || creditReportMatch || idVerificationMatch;
+                    });
+
+                    if (!isDuplicateByIdentifier && !isDuplicateByContent) {
+                        // Add all identifiers to the seen set
+                        identifiers.forEach(id => seenIdentifiers.add(id));
+                        uniqueDocuments.push(doc);
+
+                        // Enhanced logging for debugging
+                        const typeInfo = doc.bureau ? `(${doc.bureau})` : doc.idType ? `(${doc.idType})` : '';
+                        console.log(`✅ Keeping document ${index + 1}: ${doc.name} (${doc.sectionType}) ${typeInfo} - IDs: [${identifiers.slice(0, 3).join(', ')}...]`);
+                    } else {
+                        const reason = isDuplicateByIdentifier ? 'Identifier match' : 'Content match';
+                        const typeInfo = doc.bureau ? `(${doc.bureau})` : doc.idType ? `(${doc.idType})` : '';
+                        console.log(`🗑️ Removing duplicate document ${index + 1}: ${doc.name} (${doc.sectionType}) ${typeInfo} - Reason: ${reason}`);
+                    }
+                });
+
+                const removedCount = uploadedDocuments.length - uniqueDocuments.length;
+                uploadedDocuments = uniqueDocuments;
+
+                console.log(`🧹 Document cleanup complete: Removed ${removedCount} duplicates, ${uniqueDocuments.length} unique documents remaining`);
+            }
+
             // Initialize the module
             function init(containerId) {
                 console.log('Initializing Document Upload Module in container:', containerId);
@@ -669,7 +814,63 @@
                 container = document.getElementById(containerId);
                 if (!container) return false;
 
+                // FIRST: Clean up any corrupted localStorage entries
+                cleanupCorruptedEntries();
+
+                // Check if this is a fresh page load or just a tab switch
+                const pageLoadFlag = sessionStorage.getItem('jamDocumentUploaderPageLoaded');
+
+                if (!pageLoadFlag) {
+                    // This is a fresh page load (not just a tab switch)
+                    console.log('Fresh page load detected, clearing uploaded documents');
+
+                    // Clear the in-memory array completely on fresh page load
+                    uploadedDocuments = [];
+
+                    // Set the flag to indicate page has been loaded in this session
+                    sessionStorage.setItem('jamDocumentUploaderPageLoaded', 'true');
+                } else {
+                    // This is a tab switch, clear any potential duplicates from the array
+                    console.log('Tab switch detected, clearing duplicate documents from memory');
+                    clearDuplicateDocuments();
+                }
+
+                // Check if container already has the HTML structure
+                const existingContainer = container.querySelector('.document-upload-container');
+
+                if (existingContainer && container._documentUploaderInitialized) {
+                    console.log('Document Upload Module already initialized, refreshing content only');
+
+                    // Clear duplicates and reload documents without clearing the entire structure
+                    clearDuplicateDocuments();
+
+                    // Only clear the document lists, not the entire container
+                    clearDocumentLists();
+
+                    // Reload existing documents with better timing
+                    requestAnimationFrame(async () => {
+                        // Ensure structure is still ready after clearing
+                        const structureReady = container.querySelector('#credit-report-list') &&
+                            container.querySelector('#id-verification-list');
+
+                        if (structureReady) {
+                            console.log('🏗️ [DEBUG] Existing structure confirmed ready, reloading documents...');
+                            await reloadExistingDocuments();
+                        } else {
+                            console.warn('⚠️ [DEBUG] Existing structure not ready, retrying in 50ms...');
+                            setTimeout(async () => {
+                                await reloadExistingDocuments();
+                            }, 50);
+                        }
+                    });
+
+                    return true;
+                }
+
                 console.log(`Initializing Document Upload Module in container: ${containerId}`);
+
+                // Clear the uploadedDocuments array to start fresh for this container
+                uploadedDocuments = [];
 
                 // Insert the widget HTML
                 container.innerHTML = `
@@ -809,30 +1010,428 @@
                                 </p>
                             </div>
                         </div>
+
+                        <!-- IdentityIQ Access Section -->
+                        <div class="document-section">
+                            <h3 class="document-section-title">IdentityIQ Access (Optional)</h3>
+                            <p class="document-section-description">
+                                If you have an IdentityIQ account, you can provide your login information below.
+                                This will allow us to access your credit monitoring and identity protection data to better assist with your credit repair process.
+                            </p>
+
+                            <form id="identityiq-access-form" class="smartcredit-form">
+                                <div class="form-group">
+                                    <label for="identityiq-email">IdentityIQ Email:</label>
+                                    <input type="email" id="identityiq-email" name="email" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="identityiq-password">IdentityIQ Password:</label>
+                                    <input type="password" id="identityiq-password" name="password" required>
+                                </div>
+
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Provide IdentityIQ Access
+                                </button>
+
+                                <p class="form-note">
+                                    Your IdentityIQ login information will be used securely to enhance our credit repair analysis and monitoring capabilities.
+                                </p>
+                            </form>
+                        </div>
                     </div>
                 `;
 
                 // Set up event listeners and other initialization
                 setupEventListeners(container);
 
-                // Load existing documents after initialization
-                setTimeout(async () => {
-                    try {
-                        console.log('🔄 Loading existing documents...');
-                        const existingDocuments = await fetchExistingDocuments();
-                        if (existingDocuments.length > 0) {
-                            console.log(`📋 Loading ${existingDocuments.length} existing documents`);
-                            displayExistingCreditReports(existingDocuments);
-                            displayExistingIdDocuments(existingDocuments);
-                        } else {
-                            console.log('📋 No existing documents found');
-                        }
-                    } catch (error) {
-                        console.error('❌ Failed to load existing documents:', error);
+                // Mark this container as initialized
+                container._documentUploaderInitialized = true;
+
+                // Load existing documents after initialization with better timing
+                // Use requestAnimationFrame to ensure DOM is fully rendered
+                requestAnimationFrame(async () => {
+                    // Double check that the structure is ready
+                    const structureReady = container.querySelector('#credit-report-list') &&
+                        container.querySelector('#id-verification-list');
+
+                    if (structureReady) {
+                        console.log('🏗️ [DEBUG] DOM structure confirmed ready, loading documents...');
+                        await reloadExistingDocuments();
+                    } else {
+                        console.warn('⚠️ [DEBUG] DOM structure not ready, retrying in 100ms...');
+                        setTimeout(async () => {
+                            await reloadExistingDocuments();
+                        }, 100);
                     }
-                }, 500);
+                });
 
                 return true;
+            }
+
+            // New function to clear only document lists, not the entire structure
+            function clearDocumentLists() {
+                const creditReportList = container.querySelector('#credit-report-list');
+                const idVerificationList = container.querySelector('#id-verification-list');
+                const additionalList = container.querySelector('#additional-list');
+
+                if (creditReportList) {
+                    creditReportList.innerHTML = '';
+                    console.log('🧹 Cleared credit report list');
+                }
+
+                if (idVerificationList) {
+                    idVerificationList.innerHTML = '';
+                    console.log('🧹 Cleared ID verification list');
+                }
+
+                if (additionalList) {
+                    additionalList.innerHTML = '';
+                    console.log('🧹 Cleared additional documents list');
+                }
+
+                // Reset button statuses
+                const bureauButtons = container.querySelectorAll('.bureau-btn');
+                const idTypeButtons = container.querySelectorAll('.id-type-btn');
+
+                bureauButtons.forEach(button => {
+                    button.classList.remove('occupied', 'selected');
+                    const indicator = button.querySelector('.occupied-indicator');
+                    if (indicator) indicator.remove();
+                    button.style.backgroundColor = '';
+                    button.style.border = '';
+                });
+
+                idTypeButtons.forEach(button => {
+                    button.classList.remove('occupied', 'selected');
+                    const indicator = button.querySelector('.occupied-indicator');
+                    if (indicator) indicator.remove();
+                    button.style.backgroundColor = '';
+                    button.style.border = '';
+                });
+
+                console.log('🧹 Cleared document lists and reset button statuses');
+            }
+
+            // Clear existing DOM elements to prevent duplicates
+            function clearExistingDOMElements() {
+                // This function is now replaced by clearDocumentLists()
+                clearDocumentLists();
+            }
+
+            // Fetch existing documents from backend
+            async function fetchExistingDocuments() {
+                try {
+                    console.log('📥 [DEBUG] Starting fetchExistingDocuments...');
+
+                    // Get user data and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+
+                    // Try multiple token locations
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    console.log('🔐 [DEBUG] Auth check:', {
+                        userId: userId ? 'Found' : 'Missing',
+                        authToken: authToken ? 'Found' : 'Missing',
+                        userDataKeys: Object.keys(userData),
+                        localStorageKeys: Object.keys(localStorage).filter(k => k.includes('token') || k.includes('auth')),
+                        sessionStorageKeys: Object.keys(sessionStorage).filter(k => k.includes('token') || k.includes('auth'))
+                    });
+
+                    if (!userId || !authToken) {
+                        console.warn('⚠️ [DEBUG] Missing authentication - userId:', !!userId, 'authToken:', !!authToken);
+                        return [];
+                    }
+
+                    const url = `http://localhost:3000/api/admin/get-user-documents?userId=${userId}`;
+                    console.log('🌐 [DEBUG] Making API call to:', url);
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    console.log('📡 [DEBUG] API response status:', response.status, response.statusText);
+
+                    if (!response.ok) {
+                        const errorText = await response.text().catch(() => 'Unable to read error');
+                        console.error('❌ [DEBUG] API error response:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            errorText: errorText
+                        });
+                        throw new Error(`Failed to fetch documents: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('✅ [DEBUG] API response received:', {
+                        documentsCount: result.documents ? result.documents.length : 0,
+                        resultKeys: Object.keys(result),
+                        documents: result.documents
+                    });
+
+                    // Validate response structure
+                    if (!result.documents || !Array.isArray(result.documents)) {
+                        console.warn('⚠️ [DEBUG] Invalid response structure:', result);
+                        return [];
+                    }
+
+                    console.log('✅ [DEBUG] Returning', result.documents.length, 'documents');
+                    return result.documents;
+
+                } catch (error) {
+                    console.error('❌ [DEBUG] fetchExistingDocuments error:', {
+                        message: error.message,
+                        stack: error.stack,
+                        name: error.name
+                    });
+                    return [];
+                }
+            }
+
+            // Enhanced reload function with retry logic and better debugging
+            async function reloadExistingDocuments(retryCount = 0) {
+                const MAX_RETRIES = 3;
+                const RETRY_DELAY = 1000;
+
+                try {
+                    console.log(`🔄 [DEBUG] reloadExistingDocuments attempt ${retryCount + 1}/${MAX_RETRIES + 1}`);
+
+                    // Check if container and structure exist
+                    if (!container) {
+                        console.error('❌ [DEBUG] Container not available');
+                        return;
+                    }
+
+                    const containerStructure = container.querySelector('.document-upload-container');
+                    if (!containerStructure) {
+                        console.error('❌ [DEBUG] Container structure not available');
+                        return;
+                    }
+
+                    console.log('✅ [DEBUG] Container structure validated');
+
+                    // Clear duplicates before loading
+                    const beforeClearCount = uploadedDocuments.length;
+                    clearDuplicateDocuments();
+                    console.log(`🧹 [DEBUG] Cleared duplicates: ${beforeClearCount} -> ${uploadedDocuments.length}`);
+
+                    // Clear document lists if container structure exists
+                    clearDocumentLists();
+                    console.log('🧹 [DEBUG] Cleared document lists');
+
+                    // Fetch documents with retry logic
+                    console.log('📥 [DEBUG] Fetching existing documents...');
+                    const existingDocuments = await fetchExistingDocuments();
+
+                    console.log(`📋 [DEBUG] Fetched ${existingDocuments.length} total documents:`, {
+                        creditReports: existingDocuments.filter(doc => doc.documentType === 'credit-report').length,
+                        idVerification: existingDocuments.filter(doc => doc.documentType === 'id-verification').length,
+                        additionalDocuments: existingDocuments.filter(doc => doc.documentType === 'additional-documents').length,
+                        other: existingDocuments.filter(doc => !['credit-report', 'id-verification', 'additional-documents'].includes(doc.documentType)).length
+                    });
+
+                    if (existingDocuments.length > 0) {
+                        console.log('📄 [DEBUG] Processing credit reports...');
+                        await displayExistingCreditReports(existingDocuments);
+
+                        console.log('📄 [DEBUG] Processing ID documents...');
+                        await displayExistingIdDocuments(existingDocuments);
+
+                        console.log('📄 [DEBUG] Processing additional documents...');
+                        await displayExistingAdditionalDocuments(existingDocuments);
+
+                        console.log(`✅ [DEBUG] Documents displayed successfully. Final uploadedDocuments count: ${uploadedDocuments.length}`);
+                    } else {
+                        console.log('📋 [DEBUG] No existing documents found to display');
+                    }
+
+                    // Clear duplicates after loading (safety check)
+                    const afterLoadCount = uploadedDocuments.length;
+                    clearDuplicateDocuments();
+                    const finalCount = uploadedDocuments.length;
+
+                    if (afterLoadCount !== finalCount) {
+                        console.log(`🧹 [DEBUG] Post-load cleanup: ${afterLoadCount} -> ${finalCount}`);
+                    }
+
+                    console.log('✅ [DEBUG] reloadExistingDocuments completed successfully');
+
+                } catch (error) {
+                    console.error(`❌ [DEBUG] reloadExistingDocuments error (attempt ${retryCount + 1}):`, {
+                        message: error.message,
+                        stack: error.stack
+                    });
+
+                    // Retry logic
+                    if (retryCount < MAX_RETRIES) {
+                        console.log(`🔄 [DEBUG] Retrying in ${RETRY_DELAY}ms... (attempt ${retryCount + 2}/${MAX_RETRIES + 1})`);
+                        setTimeout(() => {
+                            reloadExistingDocuments(retryCount + 1);
+                        }, RETRY_DELAY);
+                    } else {
+                        console.error('❌ [DEBUG] All retry attempts failed for reloadExistingDocuments');
+                    }
+                }
+            }
+
+            // Enhanced document display functions with better debugging
+            function displayExistingCreditReports(documents) {
+                return new Promise((resolve) => {
+                    try {
+                        const creditReports = documents.filter(doc => doc.documentType === 'credit-report');
+                        console.log('📋 [DEBUG] displayExistingCreditReports - Processing', creditReports.length, 'credit reports');
+
+                        if (creditReports.length === 0) {
+                            console.log('📋 [DEBUG] No credit reports to display');
+                            resolve();
+                            return;
+                        }
+
+                        // FIRST: Clear any existing duplicates before processing new documents
+                        const beforeClearCount = uploadedDocuments.length;
+                        clearDuplicateDocuments();
+                        console.log(`🧹 [DEBUG] Credit reports - cleared duplicates: ${beforeClearCount} -> ${uploadedDocuments.length}`);
+
+                        // SECOND: Enhanced validation and filtering with detailed logging
+                        const validCreditReports = creditReports.filter((doc, index) => {
+                            console.log(`🔍 [DEBUG] Validating credit report ${index + 1}:`, {
+                                fileName: doc.fileName,
+                                bureau: doc.bureau,
+                                id: doc.id,
+                                documentType: doc.documentType
+                            });
+
+                            // Check if document has required fields
+                            if (!doc.id || !doc.fileName) {
+                                console.warn(`⚠️ [DEBUG] Credit report ${index + 1} missing required fields:`, {
+                                    hasId: !!doc.id,
+                                    hasFileName: !!doc.fileName,
+                                    doc: doc
+                                });
+                                return false;
+                            }
+
+                            // Check if bureau is defined and valid
+                            const validBureaus = ['experian', 'equifax', 'transunion'];
+                            if (!doc.bureau || !validBureaus.includes(doc.bureau.toLowerCase())) {
+                                console.warn(`⚠️ [DEBUG] Credit report ${index + 1} has invalid bureau:`, {
+                                    fileName: doc.fileName,
+                                    bureau: doc.bureau,
+                                    validBureaus: validBureaus
+                                });
+                                return false;
+                            }
+
+                            // Check if fileName looks valid (not corrupted)
+                            if (doc.fileName.includes('undefined') || doc.fileName.match(/^\d+-\d+-\d+/)) {
+                                console.warn(`⚠️ [DEBUG] Credit report ${index + 1} has corrupted fileName:`, doc.fileName);
+                                return false;
+                            }
+
+                            console.log(`✅ [DEBUG] Credit report ${index + 1} passed validation`);
+                            return true;
+                        });
+
+                        console.log(`📋 [DEBUG] Valid credit reports after filtering: ${validCreditReports.length} of ${creditReports.length}`);
+
+                        // Process each valid credit report
+                        validCreditReports.forEach((report, index) => {
+                            console.log(`📄 [DEBUG] Processing credit report ${index + 1}:`, {
+                                fileName: report.fileName,
+                                bureau: report.bureau,
+                                id: report.id
+                            });
+
+                            const listElement = container.querySelector('#credit-report-list');
+                            if (!listElement) {
+                                console.error('❌ [DEBUG] Credit report list element not found');
+                                return;
+                            }
+
+                            // Create unique identifier
+                            const uniqueId = `existing_${report.id}`;
+
+                            // Comprehensive duplicate checking with detailed logging
+                            const duplicateChecks = [
+                                uploadedDocuments.find(doc => doc.id === uniqueId),
+                                uploadedDocuments.find(doc => doc.backendId === report.id),
+                                uploadedDocuments.find(doc =>
+                                    doc.isExisting &&
+                                    doc.name === report.fileName &&
+                                    doc.bureau === report.bureau &&
+                                    doc.size === report.fileSize
+                                ),
+                                uploadedDocuments.find(doc =>
+                                    doc.name === report.fileName &&
+                                    doc.bureau === report.bureau &&
+                                    doc.sectionType === 'credit-report'
+                                )
+                            ];
+
+                            const existingDocument = duplicateChecks.find(check => check !== undefined);
+
+                            if (existingDocument) {
+                                console.log(`📌 [DEBUG] Credit report ${index + 1} already exists, skipping:`, {
+                                    fileName: report.fileName,
+                                    bureau: report.bureau,
+                                    backendId: report.id,
+                                    existingDocumentId: existingDocument.id,
+                                    existingBackendId: existingDocument.backendId
+                                });
+                                return;
+                            }
+
+                            // Create document data
+                            const documentData = {
+                                id: uniqueId,
+                                name: report.fileName,
+                                size: report.fileSize || 0,
+                                type: 'application/pdf',
+                                uploadStatus: 'success',
+                                backendId: report.id,
+                                fileUrl: report.fileUrl,
+                                isExisting: true,
+                                bureau: report.bureau,
+                                uploadDate: new Date(report.createdAt || Date.now()),
+                                sectionType: 'credit-report'
+                            };
+
+                            // Final validation
+                            if (!documentData.name || !documentData.bureau || !documentData.backendId) {
+                                console.error(`❌ [DEBUG] Invalid credit report data for ${index + 1}, skipping:`, documentData);
+                                return;
+                            }
+
+                            // Add to array and create DOM element
+                            uploadedDocuments.push(documentData);
+                            const listItem = createExistingDocumentElement(documentData);
+                            listElement.appendChild(listItem);
+
+                            console.log(`✅ [DEBUG] Added credit report ${index + 1}: ${report.fileName} (${report.bureau})`);
+
+                            // Mark bureau as occupied
+                            markBureauAsOccupied(report.bureau);
+                        });
+
+                        // Final cleanup and resolve
+                        clearDuplicateDocuments();
+                        console.log(`✅ [DEBUG] displayExistingCreditReports completed. Total uploadedDocuments: ${uploadedDocuments.length}`);
+                        resolve();
+
+                    } catch (error) {
+                        console.error('❌ [DEBUG] displayExistingCreditReports error:', error);
+                        resolve(); // Don't reject, just log and continue
+                    }
+                });
             }
 
             // Set up event listeners
@@ -854,6 +1453,28 @@
                                 <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
                                 <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
                                 <p>Thank you for providing your SmartCredit access. Our team will use this to help with your credit repair process.</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // IdentityIQ form submission
+                const identityIQForm = container.querySelector('#identityiq-access-form');
+                if (identityIQForm) {
+                    identityIQForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const email = container.querySelector('#identityiq-email').value;
+                        const password = container.querySelector('#identityiq-password').value;
+
+                        // Here you would normally send this data securely to your backend
+                        console.log('IdentityIQ access submitted');
+
+                        // Show success message
+                        identityIQForm.innerHTML = `
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                                <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
+                                <p>Thank you for providing your IdentityIQ access. Our team will use this to enhance your credit monitoring and repair process.</p>
                             </div>
                         `;
                     });
@@ -1281,45 +1902,6 @@
             }
 
             // Delete a document
-            function deleteDocument(id) {
-                // Remove from DOM
-                const element = container.querySelector(`#${id}`);
-                if (element) {
-                    element.remove();
-                }
-
-                // Remove from our array
-                uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
-            }
-
-            // View a document
-            function viewDocument(id) {
-                const document = uploadedDocuments.find(doc => doc.id === id);
-                if (!document) return;
-
-                // For images, we can create a URL and open it
-                if (document.file.type.includes('image')) {
-                    const url = URL.createObjectURL(document.file);
-                    window.open(url, '_blank');
-                } else if (document.file.type.includes('pdf')) {
-                    // For PDFs, we can also use URL.createObjectURL
-                    const url = URL.createObjectURL(document.file);
-                    window.open(url, '_blank');
-                } else {
-                    // For other file types, we might need to download them
-                    alert('Preview not available for this file type. Please download the file to view it.');
-                }
-            }
-
-            // Reset function to allow reinitialization
-            function reset() {
-                isInitialized = false;
-                container = null;
-                uploadedDocuments = [];
-                return true;
-            }
-
-            // Remove a document
             function removeDocument(id) {
                 const docIndex = uploadedDocuments.findIndex(doc => doc.id === id);
                 if (docIndex === -1) return;
@@ -1341,26 +1923,38 @@
 
                             // Remove from local array and DOM
                             uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
-                            const documentElement = container.querySelector(`[data-file-id="${id}"]`);
+
+                            // FIXED: Use correct selector - elements are created with id, not data-file-id
+                            const documentElement = container.querySelector(`#${id}`);
                             if (documentElement) {
                                 documentElement.remove();
-                                console.log('🗑️ Removed DOM element');
+                                console.log('🗑️ Removed DOM element for:', document.name);
+                            } else {
+                                console.warn('⚠️ Could not find DOM element with id:', id);
                             }
 
-                            // If this was a credit report, refresh the credit report display
+                            // Handle section-specific refresh/cleanup
                             if (document.sectionType === 'credit-report') {
                                 console.log('🔄 Document was credit report, refreshing display...');
                                 setTimeout(() => {
                                     refreshCreditReportDisplay();
                                 }, 100);
-                            }
-
-                            // If this was an ID verification document, refresh the ID document display
-                            if (document.sectionType === 'id-verification') {
+                            } else if (document.sectionType === 'id-verification') {
                                 console.log('🔄 Document was ID verification, refreshing display...');
                                 setTimeout(() => {
                                     refreshIdDocumentDisplay();
                                 }, 100);
+                            } else if (document.sectionType === 'additional-documents') {
+                                // FIXED: Add proper handling for additional documents
+                                console.log('🔄 Document was additional document, updating display...');
+                                // For additional documents, we don't need a full refresh since there are no 
+                                // selection buttons to reset, just ensure the DOM element is removed
+                                // The element should already be removed above, but let's double-check
+                                const remainingElement = container.querySelector(`#${id}`);
+                                if (remainingElement) {
+                                    remainingElement.remove();
+                                    console.log('🗑️ Force removed remaining DOM element for additional document');
+                                }
                             }
 
                             console.log('✅ Document deleted successfully');
@@ -1372,24 +1966,25 @@
                 } else {
                     // Document wasn't uploaded to backend yet, just remove locally
                     uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
-                    const documentElement = container.querySelector(`[data-file-id="${id}"]`);
+
+                    // FIXED: Use correct selector for local documents too
+                    const documentElement = container.querySelector(`#${id}`);
                     if (documentElement) {
                         documentElement.remove();
+                        console.log('🗑️ Removed local DOM element for:', document.name);
                     }
 
-                    // If this was a credit report, refresh the credit report display
+                    // Handle section-specific refresh/cleanup for local documents
                     if (document.sectionType === 'credit-report') {
                         setTimeout(() => {
                             refreshCreditReportDisplay();
                         }, 100);
-                    }
-
-                    // If this was an ID verification document, refresh the ID document display
-                    if (document.sectionType === 'id-verification') {
+                    } else if (document.sectionType === 'id-verification') {
                         setTimeout(() => {
                             refreshIdDocumentDisplay();
                         }, 100);
                     }
+                    // Additional documents don't need special refresh logic for local removal
                 }
             }
 
@@ -1437,102 +2032,6 @@
                 }
             }
 
-            // Fetch existing documents from backend
-            async function fetchExistingDocuments() {
-                try {
-                    console.log('📥 Fetching existing documents from backend...');
-
-                    // Get user data and auth token
-                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                    const userId = userData.id;
-                    const authToken = localStorage.getItem('authToken') ||
-                        localStorage.getItem('token') ||
-                        sessionStorage.getItem('authToken') ||
-                        sessionStorage.getItem('token');
-
-                    if (!userId || !authToken) {
-                        console.log('❌ User authentication required');
-                        return [];
-                    }
-
-                    const response = await fetch(`http://localhost:3000/api/admin/get-user-documents?userId=${userId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${authToken}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch documents: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    console.log('✅ Existing documents fetched:', result.documents);
-                    return result.documents || [];
-
-                } catch (error) {
-                    console.error('❌ Failed to fetch existing documents:', error);
-                    return [];
-                }
-            }
-
-            // Display existing credit reports in the UI
-            function displayExistingCreditReports(documents) {
-                const creditReports = documents.filter(doc => doc.documentType === 'credit-report');
-                console.log('📋 Processing credit reports:', creditReports.length);
-
-                // Group by bureau
-                const reportsByBureau = {
-                    experian: creditReports.filter(doc => doc.bureau === 'experian'),
-                    equifax: creditReports.filter(doc => doc.bureau === 'equifax'),
-                    transunion: creditReports.filter(doc => doc.bureau === 'transunion')
-                };
-
-                console.log('📊 Reports by bureau:', reportsByBureau);
-
-                // Display each bureau's reports and mark buttons
-                Object.keys(reportsByBureau).forEach(bureau => {
-                    const reports = reportsByBureau[bureau];
-                    if (reports.length > 0) {
-                        console.log(`📄 Loading ${reports.length} ${bureau} reports`);
-
-                        // Mark the bureau button as occupied
-                        markBureauAsOccupied(bureau);
-
-                        // Find the correct list element for this bureau
-                        const listElement = container.querySelector('#credit-report-list');
-
-                        if (listElement) {
-                            reports.forEach(report => {
-                                // Add to uploadedDocuments array
-                                const documentData = {
-                                    id: `existing_${report.id}`,
-                                    name: report.fileName,
-                                    size: report.fileSize,
-                                    type: 'application/pdf',
-                                    uploadStatus: 'success',
-                                    backendId: report.id,
-                                    fileUrl: report.fileUrl,
-                                    isExisting: true,
-                                    bureau: report.bureau,
-                                    uploadDate: report.createdAt,
-                                    sectionType: 'credit-report'
-                                };
-
-                                uploadedDocuments.push(documentData);
-
-                                // Create DOM element for existing document
-                                const listItem = createExistingDocumentElement(documentData);
-                                listElement.appendChild(listItem);
-
-                                console.log(`✅ Added existing ${bureau} report: ${report.fileName}`);
-                            });
-                        }
-                    }
-                });
-            }
-
             // Mark bureau button as occupied
             function markBureauAsOccupied(bureau) {
                 const bureauButton = document.querySelector(`[data-bureau="${bureau}"]`);
@@ -1568,6 +2067,10 @@
                 let iconClass = 'fa-file-pdf';
                 if (documentData.type.includes('image')) {
                     iconClass = 'fa-file-image';
+                } else if (documentData.type.includes('word')) {
+                    iconClass = 'fa-file-word';
+                } else if (documentData.type.includes('excel') || documentData.type.includes('spreadsheet')) {
+                    iconClass = 'fa-file-excel';
                 }
 
                 // Format file size
@@ -1576,18 +2079,33 @@
                 // Format upload date
                 const uploadDate = new Date(documentData.uploadDate).toLocaleDateString();
 
-                // Bureau display name
-                const bureauNames = {
-                    'experian': 'Experian',
-                    'equifax': 'Equifax',
-                    'transunion': 'TransUnion'
-                };
-                const bureauDisplay = bureauNames[documentData.bureau] || documentData.bureau;
+                // Create display name based on document type
+                let displayName = documentData.name;
+
+                if (documentData.sectionType === 'credit-report' && documentData.bureau) {
+                    // Bureau display name for credit reports
+                    const bureauNames = {
+                        'experian': 'Experian',
+                        'equifax': 'Equifax',
+                        'transunion': 'TransUnion'
+                    };
+                    const bureauDisplay = bureauNames[documentData.bureau] || documentData.bureau;
+                    displayName = `${bureauDisplay} - ${documentData.name}`;
+                } else if (documentData.sectionType === 'id-verification' && documentData.idType) {
+                    // ID type display name for ID verification
+                    const idTypeNames = {
+                        'government-id': 'Government ID',
+                        'utility-bill': 'Utility Bill'
+                    };
+                    const idTypeDisplay = idTypeNames[documentData.idType] || documentData.idType;
+                    displayName = `${idTypeDisplay} - ${documentData.name}`;
+                }
+                // For additional documents, just use the filename as-is
 
                 listItem.innerHTML = `
                     <i class="fas ${iconClass} document-icon"></i>
                     <div class="document-info">
-                        <div class="document-name">${bureauDisplay} - ${documentData.name}</div>
+                        <div class="document-name">${displayName}</div>
                         <div class="document-meta">${fileSize} • ${uploadDate} • <span style="color: #28a745;">Saved</span></div>
                     </div>
                     <div class="document-actions">
@@ -1633,39 +2151,27 @@
             function refreshCreditReportDisplay() {
                 console.log('🔄 Refreshing credit report display...');
 
-                // Clear existing credit report displays - be more thorough
-                const creditReportList = container.querySelector('#credit-report-list');
-                if (creditReportList) {
-                    // Remove ALL items in the credit report list
-                    creditReportList.innerHTML = '';
-                    console.log('🧹 Cleared credit report list');
-                }
+                // FIRST: Clear existing credit report displays using the new function
+                clearDocumentLists();
 
-                // Remove ALL credit reports from uploadedDocuments array
+                // SECOND: Remove ALL credit reports from uploadedDocuments array
                 uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'credit-report');
                 console.log('🧹 Cleared credit reports from uploadedDocuments array');
 
-                // Remove occupied status from all bureau buttons
-                const bureauButtons = container.querySelectorAll('.bureau-btn');
-                bureauButtons.forEach(button => {
-                    button.classList.remove('occupied');
-                    const indicator = button.querySelector('.occupied-indicator');
-                    if (indicator) {
-                        indicator.remove();
-                    }
-                    button.style.backgroundColor = '';
-                    button.style.border = '';
-                });
-                console.log('🧹 Cleared bureau button statuses');
+                // THIRD: Clear any potential duplicates from remaining documents
+                clearDuplicateDocuments();
 
-                // Re-fetch and display existing documents
+                // FOURTH: Re-fetch and display existing documents
                 fetchExistingDocuments()
                     .then(documents => {
                         console.log('📋 Fetched documents for refresh:', documents.length);
-                        if (documents.length > 0) {
+                        const creditReports = documents.filter(doc => doc.documentType === 'credit-report');
+                        console.log('📋 Credit reports found:', creditReports.length);
+
+                        if (creditReports.length > 0) {
                             displayExistingCreditReports(documents);
                         } else {
-                            console.log('📋 No documents to display after refresh');
+                            console.log('📋 No credit reports to display after refresh');
                         }
                         console.log('✅ Credit report display refreshed');
                     })
@@ -1796,79 +2302,182 @@
 
             // Display existing ID verification documents
             function displayExistingIdDocuments(documents) {
-                const idDocuments = documents.filter(doc => doc.documentType === 'id-verification');
-                console.log('📋 Processing ID documents:', idDocuments.length);
+                return new Promise((resolve) => {
+                    try {
+                        const idDocuments = documents.filter(doc => doc.documentType === 'id-verification');
+                        console.log('📋 [DEBUG] displayExistingIdDocuments - Processing', idDocuments.length, 'ID documents');
 
-                if (idDocuments.length > 0) {
-                    // Find the ID verification list element
-                    const listElement = container.querySelector('#id-verification-list');
+                        if (idDocuments.length === 0) {
+                            console.log('📋 [DEBUG] No ID documents to display');
+                            resolve();
+                            return;
+                        }
 
-                    if (listElement) {
-                        idDocuments.forEach(doc => {
-                            // Add to uploadedDocuments array
-                            const documentData = {
-                                id: `existing_${doc.id}`,
-                                name: doc.fileName,
-                                size: doc.fileSize || 0,
-                                type: doc.mimeType || 'application/pdf',
-                                uploadStatus: 'success',
-                                backendId: doc.id,
-                                fileUrl: doc.fileUrl,
-                                isExisting: true,
+                        // FIRST: Clear any existing duplicates before processing new documents
+                        const beforeClearCount = uploadedDocuments.filter(doc => doc.sectionType === 'id-verification').length;
+                        clearDuplicateDocuments();
+                        const afterClearCount = uploadedDocuments.filter(doc => doc.sectionType === 'id-verification').length;
+                        console.log(`🧹 [DEBUG] ID documents - cleared duplicates: ${beforeClearCount} -> ${afterClearCount}`);
+
+                        // SECOND: Enhanced validation and filtering with detailed logging
+                        const validIdDocuments = idDocuments.filter((doc, index) => {
+                            console.log(`🔍 [DEBUG] Validating ID document ${index + 1}:`, {
+                                fileName: doc.fileName,
                                 idType: doc.idType,
-                                uploadDate: doc.createdAt,
-                                sectionType: 'id-verification'
-                            };
+                                id: doc.id,
+                                documentType: doc.documentType
+                            });
 
-                            uploadedDocuments.push(documentData);
-
-                            // Create DOM element for existing document
-                            const listItem = createExistingDocumentElement(documentData);
-                            listElement.appendChild(listItem);
-
-                            // Mark the ID type button as occupied
-                            if (doc.idType) {
-                                markIdTypeAsOccupied(doc.idType);
+                            // Check if document has required fields
+                            if (!doc.id || !doc.fileName) {
+                                console.warn(`⚠️ [DEBUG] ID document ${index + 1} missing required fields:`, {
+                                    hasId: !!doc.id,
+                                    hasFileName: !!doc.fileName,
+                                    doc: doc
+                                });
+                                return false;
                             }
 
-                            console.log(`✅ Added existing ${doc.idType} document: ${doc.fileName}`);
+                            // Check if idType is defined and valid
+                            const validIdTypes = ['government-id', 'utility-bill'];
+                            if (!doc.idType || !validIdTypes.includes(doc.idType)) {
+                                console.warn(`⚠️ [DEBUG] ID document ${index + 1} has invalid idType:`, {
+                                    fileName: doc.fileName,
+                                    idType: doc.idType,
+                                    validIdTypes: validIdTypes
+                                });
+                                return false;
+                            }
+
+                            // Check if fileName looks valid (not corrupted)
+                            if (doc.fileName.includes('undefined') || doc.fileName.match(/^\d+-\d+-\d+/)) {
+                                console.warn(`⚠️ [DEBUG] ID document ${index + 1} has corrupted fileName:`, doc.fileName);
+                                return false;
+                            }
+
+                            console.log(`✅ [DEBUG] ID document ${index + 1} passed validation`);
+                            return true;
                         });
-                    } else {
-                        console.error('❌ Could not find ID verification list element');
+
+                        console.log(`📋 [DEBUG] Valid ID documents after filtering: ${validIdDocuments.length} of ${idDocuments.length}`);
+
+                        if (validIdDocuments.length > 0) {
+                            // Find the ID verification list element
+                            const listElement = container.querySelector('#id-verification-list');
+
+                            if (!listElement) {
+                                console.error('❌ [DEBUG] ID verification list element not found');
+                                resolve();
+                                return;
+                            }
+
+                            validIdDocuments.forEach((doc, index) => {
+                                console.log(`📄 [DEBUG] Processing ID document ${index + 1}:`, {
+                                    fileName: doc.fileName,
+                                    idType: doc.idType,
+                                    id: doc.id
+                                });
+
+                                // Create a unique identifier for this document
+                                const uniqueId = `existing_${doc.id}`;
+
+                                // Multiple comprehensive checks to prevent any possible duplicates
+                                const duplicateChecks = [
+                                    uploadedDocuments.find(document => document.id === uniqueId),
+                                    uploadedDocuments.find(document => document.backendId === doc.id)
+                                ];
+                                // Note: For additional documents, we allow multiple files with the same name
+                                // since users might upload different versions or related documents
+
+                                // If ANY of the duplicate checks return a result, skip this document
+                                const existingDocument = duplicateChecks.find(check => check !== undefined);
+
+                                if (existingDocument) {
+                                    console.log(`📌 [DEBUG] ID document ${index + 1} already exists, skipping:`, {
+                                        fileName: doc.fileName,
+                                        idType: doc.idType,
+                                        backendId: doc.id,
+                                        existingDocumentId: existingDocument.id,
+                                        existingBackendId: existingDocument.backendId
+                                    });
+                                    return; // Skip this document as it's already in the array
+                                }
+
+                                // Add to uploadedDocuments array (no duplicates found)
+                                const documentData = {
+                                    id: uniqueId,
+                                    name: doc.fileName,
+                                    size: doc.fileSize || 0,
+                                    type: doc.mimeType || 'application/pdf',
+                                    uploadStatus: 'success',
+                                    backendId: doc.id,
+                                    fileUrl: doc.fileUrl,
+                                    isExisting: true,
+                                    idType: doc.idType,
+                                    uploadDate: new Date(doc.createdAt || Date.now()),
+                                    sectionType: 'id-verification'
+                                };
+
+                                // Validate the document data before adding
+                                if (!documentData.name || !documentData.idType || !documentData.backendId) {
+                                    console.error(`❌ [DEBUG] Invalid ID document data for ${index + 1}, skipping:`, documentData);
+                                    return;
+                                }
+
+                                uploadedDocuments.push(documentData);
+
+                                // Create DOM element for existing document
+                                const listItem = createExistingDocumentElement(documentData);
+                                listElement.appendChild(listItem);
+
+                                console.log(`✅ [DEBUG] Added ID document ${index + 1}: ${doc.fileName} (${doc.idType})`);
+                            });
+
+                            // Mark ID type buttons as occupied only if we have documents for those types
+                            const idTypes = ['government-id', 'utility-bill'];
+                            idTypes.forEach(idType => {
+                                const idDocumentsForType = uploadedDocuments.filter(doc =>
+                                    doc.sectionType === 'id-verification' &&
+                                    doc.idType === idType &&
+                                    (doc.uploadStatus === 'success' || doc.isExisting)
+                                );
+
+                                if (idDocumentsForType.length > 0) {
+                                    console.log(`📌 [DEBUG] Marking ${idType} as occupied`);
+                                    markIdTypeAsOccupied(idType);
+                                }
+                            });
+                        } else {
+                            console.log('📋 [DEBUG] No valid ID documents to display');
+                        }
+
+                        // THIRD: Clear duplicates again after adding all documents (safety check)
+                        clearDuplicateDocuments();
+                        console.log(`✅ [DEBUG] displayExistingIdDocuments completed. Total uploadedDocuments: ${uploadedDocuments.length}`);
+                        resolve();
+
+                    } catch (error) {
+                        console.error('❌ [DEBUG] displayExistingIdDocuments error:', error);
+                        resolve(); // Don't reject, just log and continue
                     }
-                }
+                });
             }
 
             // Updated refresh function for ID documents
             function refreshIdDocumentDisplay() {
                 console.log('🔄 Refreshing ID document display...');
 
-                // Clear existing ID document displays - be more thorough
-                const idDocumentList = container.querySelector('#id-verification-list');
-                if (idDocumentList) {
-                    // Remove ALL items in the ID verification list
-                    idDocumentList.innerHTML = '';
-                    console.log('🧹 Cleared ID verification list');
-                }
+                // FIRST: Clear existing ID document displays using the new function
+                clearDocumentLists();
 
-                // Remove ALL ID verification documents from uploadedDocuments array
+                // SECOND: Remove ALL ID verification documents from uploadedDocuments array
                 uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'id-verification');
                 console.log('🧹 Cleared ID documents from uploadedDocuments array');
 
-                // Remove occupied status from all ID type buttons
-                const idTypeButtons = container.querySelectorAll('.id-type-btn');
-                idTypeButtons.forEach(button => {
-                    button.classList.remove('occupied');
-                    const indicator = button.querySelector('.occupied-indicator');
-                    if (indicator) {
-                        indicator.remove();
-                    }
-                    button.style.backgroundColor = '';
-                    button.style.border = '';
-                });
-                console.log('🧹 Cleared ID type button statuses');
+                // THIRD: Clear any potential duplicates from remaining documents
+                clearDuplicateDocuments();
 
-                // Re-fetch and display existing documents
+                // FOURTH: Re-fetch and display existing documents
                 fetchExistingDocuments()
                     .then(documents => {
                         console.log('📋 Fetched documents for ID refresh:', documents.length);
@@ -1885,6 +2494,139 @@
                     .catch(error => {
                         console.error('❌ Failed to refresh ID document display:', error);
                     });
+            }
+
+            // Display existing additional documents
+            function displayExistingAdditionalDocuments(documents) {
+                return new Promise((resolve) => {
+                    try {
+                        const additionalDocuments = documents.filter(doc => doc.documentType === 'additional-documents');
+                        console.log('📋 [DEBUG] displayExistingAdditionalDocuments - Processing', additionalDocuments.length, 'additional documents');
+
+                        if (additionalDocuments.length === 0) {
+                            console.log('📋 [DEBUG] No additional documents to display');
+                            resolve();
+                            return;
+                        }
+
+                        // FIRST: Clear any existing duplicates before processing new documents
+                        const beforeClearCount = uploadedDocuments.filter(doc => doc.sectionType === 'additional-documents').length;
+                        clearDuplicateDocuments();
+                        const afterClearCount = uploadedDocuments.filter(doc => doc.sectionType === 'additional-documents').length;
+                        console.log(`🧹 [DEBUG] Additional documents - cleared duplicates: ${beforeClearCount} -> ${afterClearCount}`);
+
+                        // SECOND: Enhanced validation and filtering with detailed logging
+                        const validAdditionalDocuments = additionalDocuments.filter((doc, index) => {
+                            console.log(`🔍 [DEBUG] Validating additional document ${index + 1}:`, {
+                                fileName: doc.fileName,
+                                id: doc.id,
+                                documentType: doc.documentType
+                            });
+
+                            // Check if document has required fields
+                            if (!doc.id || !doc.fileName) {
+                                console.warn(`⚠️ [DEBUG] Additional document ${index + 1} missing required fields:`, {
+                                    hasId: !!doc.id,
+                                    hasFileName: !!doc.fileName,
+                                    doc: doc
+                                });
+                                return false;
+                            }
+
+                            // Check if fileName looks valid (not corrupted)
+                            if (doc.fileName.includes('undefined') || doc.fileName.match(/^\d+-\d+-\d+/)) {
+                                console.warn(`⚠️ [DEBUG] Additional document ${index + 1} has corrupted fileName:`, doc.fileName);
+                                return false;
+                            }
+
+                            console.log(`✅ [DEBUG] Additional document ${index + 1} passed validation`);
+                            return true;
+                        });
+
+                        console.log(`📋 [DEBUG] Valid additional documents after filtering: ${validAdditionalDocuments.length} of ${additionalDocuments.length}`);
+
+                        if (validAdditionalDocuments.length > 0) {
+                            // Find the additional documents list element
+                            const listElement = container.querySelector('#additional-list');
+
+                            if (!listElement) {
+                                console.error('❌ [DEBUG] Additional documents list element not found');
+                                resolve();
+                                return;
+                            }
+
+                            validAdditionalDocuments.forEach((doc, index) => {
+                                console.log(`📄 [DEBUG] Processing additional document ${index + 1}:`, {
+                                    fileName: doc.fileName,
+                                    id: doc.id
+                                });
+
+                                // Create a unique identifier for this document
+                                const uniqueId = `existing_${doc.id}`;
+
+                                // Multiple comprehensive checks to prevent any possible duplicates
+                                const duplicateChecks = [
+                                    uploadedDocuments.find(document => document.id === uniqueId),
+                                    uploadedDocuments.find(document => document.backendId === doc.id)
+                                ];
+                                // Note: For additional documents, we allow multiple files with the same name
+                                // since users might upload different versions or related documents
+
+                                // If ANY of the duplicate checks return a result, skip this document
+                                const existingDocument = duplicateChecks.find(check => check !== undefined);
+
+                                if (existingDocument) {
+                                    console.log(`📌 [DEBUG] Additional document ${index + 1} already exists, skipping:`, {
+                                        fileName: doc.fileName,
+                                        backendId: doc.id,
+                                        existingDocumentId: existingDocument.id,
+                                        existingBackendId: existingDocument.backendId
+                                    });
+                                    return; // Skip this document as it's already in the array
+                                }
+
+                                // Add to uploadedDocuments array (no duplicates found)
+                                const documentData = {
+                                    id: uniqueId,
+                                    name: doc.fileName,
+                                    size: doc.fileSize || 0,
+                                    type: doc.mimeType || 'application/pdf',
+                                    uploadStatus: 'success',
+                                    backendId: doc.id,
+                                    fileUrl: doc.fileUrl,
+                                    isExisting: true,
+                                    uploadDate: new Date(doc.createdAt || Date.now()),
+                                    sectionType: 'additional-documents'
+                                };
+
+                                // Validate the document data before adding
+                                if (!documentData.name || !documentData.backendId) {
+                                    console.error(`❌ [DEBUG] Invalid additional document data for ${index + 1}, skipping:`, documentData);
+                                    return;
+                                }
+
+                                uploadedDocuments.push(documentData);
+
+                                // Create DOM element for existing document
+                                const listItem = createExistingDocumentElement(documentData);
+                                listElement.appendChild(listItem);
+
+                                console.log(`✅ [DEBUG] Added additional document ${index + 1}: ${doc.fileName}`);
+                            });
+                        } else {
+                            console.log('📋 [DEBUG] No valid additional documents to display');
+                        }
+
+                        // THIRD: Clear duplicates again after adding all documents (safety check)
+                        clearDuplicateDocuments();
+                        console.log(`✅ [DEBUG] displayExistingAdditionalDocuments completed. Total uploadedDocuments: ${uploadedDocuments.length}`);
+                        resolve();
+
+                    } catch (error) {
+                        console.error('❌ [DEBUG] displayExistingAdditionalDocuments error:', error);
+                        resolve(); // Don't reject, just log and continue
+                    }
+                });
             }
 
             // Public API
@@ -1917,6 +2659,47 @@
                 console.error('❌ Failed to load existing documents:', error);
             }
         });
+
+        // Delete a document
+        function deleteDocument(id) {
+            // Remove from DOM
+            const element = container.querySelector(`#${id}`);
+            if (element) {
+                element.remove();
+            }
+
+            // Remove from our array
+            uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
+        }
+
+        // View a document
+        function viewDocument(id) {
+            const document = uploadedDocuments.find(doc => doc.id === id);
+            if (!document) return;
+
+            // For images, we can create a URL and open it
+            if (document.file.type.includes('image')) {
+                const url = URL.createObjectURL(document.file);
+                window.open(url, '_blank');
+            } else if (document.file.type.includes('pdf')) {
+                // For PDFs, we can also use URL.createObjectURL
+                const url = URL.createObjectURL(document.file);
+                window.open(url, '_blank');
+            } else {
+                // For other file types, we might need to download them
+                alert('Preview not available for this file type. Please download the file to view it.');
+            }
+        }
+
+        // Reset function to allow reinitialization
+        function reset() {
+            isInitialized = false;
+            container = null;
+            uploadedDocuments = [];
+            return true;
+        }
+
+        // Remove a document
     </script>
 </body>
 

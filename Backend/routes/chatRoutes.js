@@ -51,11 +51,57 @@ if (chatController.analyzeReports) {
   router.post('/analyze', upload.array('reports'), (req, res) => res.status(501).json({ error: 'Not implemented' }));
 }
 
+// New GET route for analyzing already uploaded reports by user email
+if (chatController.analyzeUserReports) {
+  router.get('/analyze', chatController.analyzeUserReports);
+} else {
+  console.error("Warning: chatController.analyzeUserReports is undefined");
+  router.get('/analyze', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
 if (chatController.generateLetter) {
   router.post('/generate-letter', chatController.generateLetter);
 } else {
   console.error("Warning: chatController.generateLetter is undefined");
   router.post('/generate-letter', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
+// Add new route for generating multiple dispute letters
+if (chatController.generateMultipleLetters) {
+  router.post('/generate-letters', chatController.generateMultipleLetters);
+} else {
+  console.error("Warning: chatController.generateMultipleLetters is undefined");
+  router.post('/generate-letters', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
+// Add routes for letter management
+if (chatController.downloadLetters) {
+  router.post('/download-letters', chatController.downloadLetters);
+} else {
+  console.error("Warning: chatController.downloadLetters is undefined");
+  router.post('/download-letters', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
+if (chatController.emailLetters) {
+  router.post('/email-letters', chatController.emailLetters);
+} else {
+  console.error("Warning: chatController.emailLetters is undefined");
+  router.post('/email-letters', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
+// Add new routes for saved dispute letters
+if (chatController.getUserDisputeLetters) {
+  router.get('/user-letters', chatController.getUserDisputeLetters);
+} else {
+  console.error("Warning: chatController.getUserDisputeLetters is undefined");
+  router.get('/user-letters', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
+if (chatController.deleteDisputeLetter) {
+  router.delete('/dispute-letter', chatController.deleteDisputeLetter);
+} else {
+  console.error("Warning: chatController.deleteDisputeLetter is undefined");
+  router.delete('/dispute-letter', (req, res) => res.status(501).json({ error: 'Not implemented' }));
 }
 
 // Add these new routes for cache management

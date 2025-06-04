@@ -113,6 +113,12 @@ router.delete('/delete-notification',
     adminController.deleteNotification
 );
 
+// Bulk delete notifications
+router.delete('/bulk-delete-notifications', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }), 
+    adminController.bulkDeleteNotifications
+);
+
 // Add this route to your existing adminRoutes.js file
 router.post('/upload-document', upload.single('file'), adminController.uploadDocument);
 

@@ -14,24 +14,35 @@ export class GHLTokenService {
 
     async getValidAccessToken() {
         try {
-            const tokens = await this.oauth.loadSavedTokens();
+            // Check if current token is still valid
+            if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
+                return this.accessToken;
+            }
+
+            // Try to refresh the token
+            console.log('🔄 Refreshing GHL access token...');
+            const tokenData = await this.oauth.refreshAccessToken();
             
-            if (!tokens) {
-                throw new Error('No tokens found. Please run OAuth flow first.');
-            }
-
-            // Check if token is expired
-            if (this.oauth.isTokenExpired(tokens)) {
-                console.log('Access token expired, refreshing...');
-                const refreshedTokens = await this.oauth.refreshAccessToken(tokens.refresh_token);
-                return refreshedTokens.access_token;
-            }
-
-            return tokens.access_token;
+            this.accessToken = tokenData.access_token;
+            this.tokenExpiry = Date.now() + (tokenData.expires_in * 1000);
+            
+            console.log('✅ GHL access token refreshed successfully');
+            return this.accessToken;
             
         } catch (error) {
-            console.error('Error getting valid access token:', error);
-            throw error;
+            // Handle token refresh errors gracefully
+            if (error.response?.status === 400 && error.response?.data?.error === 'invalid_grant') {
+                console.log('⚠️  GHL refresh token has expired. Please re-authenticate.');
+                console.log('   → Go to your GHL OAuth settings to generate new tokens');
+            } else {
+                console.log(`❌ GHL token refresh failed: ${error.message}`);
+            }
+            
+            // Clear invalid tokens
+            this.accessToken = null;
+            this.tokenExpiry = null;
+            
+            throw new Error('GHL authentication required');
         }
     }
 

@@ -9,17 +9,18 @@ export class GoHighLevelService {
     }
 
     async initialize() {
-        console.log('🔄 Initializing GHL Service...');
         try {
-            this.client = await this.ghlConfig.getClient(); // Properly await the client
+            console.log('🔧 Initializing GoHighLevel service...');
+            this.client = await this.ghlConfig.getClient();
             this.isInitialized = true;
-            console.log('✅ GHL Client initialized');
-            console.log('🔍 Client type:', typeof this.client);
-            console.log('🔍 Client has post method:', typeof this.client?.post);
-            return this.client;
+            console.log('✅ GoHighLevel service initialized successfully');
+            return true;
+            
         } catch (error) {
-            console.error('❌ Failed to initialize GHL client:', error);
-            throw error;
+            console.log('⚠️  GoHighLevel service initialization failed - continuing without GHL features');
+            this.client = null;
+            this.isInitialized = false;
+            return false;
         }
     }
 
