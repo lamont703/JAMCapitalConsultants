@@ -1040,6 +1040,36 @@
                                 </p>
                             </form>
                         </div>
+
+                        <!-- MyScoreIQ Access Section -->
+                        <div class="document-section">
+                            <h3 class="document-section-title">MyScoreIQ Access (Optional)</h3>
+                            <p class="document-section-description">
+                                If you have a MyScoreIQ account, you can provide your login information below.
+                                This will allow us to access your credit score tracking and analysis data to provide more comprehensive credit repair assistance.
+                            </p>
+
+                            <form id="myscoreiq-access-form" class="smartcredit-form">
+                                <div class="form-group">
+                                    <label for="myscoreiq-email">MyScoreIQ Email:</label>
+                                    <input type="email" id="myscoreiq-email" name="email" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="myscoreiq-password">MyScoreIQ Password:</label>
+                                    <input type="password" id="myscoreiq-password" name="password" required>
+                                </div>
+
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Provide MyScoreIQ Access
+                                </button>
+
+                                <p class="form-note">
+                                    Your MyScoreIQ login information will be used securely to enhance our credit score analysis and tracking capabilities.
+                                </p>
+                            </form>
+                        </div>
                     </div>
                 `;
 
@@ -1112,6 +1142,51 @@
                 });
 
                 console.log('🧹 Cleared document lists and reset button statuses');
+            }
+
+            // Section-specific clear functions to avoid clearing everything
+            function clearCreditReportListOnly() {
+                const creditReportList = container.querySelector('#credit-report-list');
+                if (creditReportList) {
+                    creditReportList.innerHTML = '';
+                    console.log('🧹 Cleared credit report list only');
+                }
+
+                // Reset only bureau button statuses
+                const bureauButtons = container.querySelectorAll('.bureau-btn');
+                bureauButtons.forEach(button => {
+                    button.classList.remove('occupied', 'selected');
+                    const indicator = button.querySelector('.occupied-indicator');
+                    if (indicator) indicator.remove();
+                    button.style.backgroundColor = '';
+                    button.style.border = '';
+                });
+            }
+
+            function clearIdVerificationListOnly() {
+                const idVerificationList = container.querySelector('#id-verification-list');
+                if (idVerificationList) {
+                    idVerificationList.innerHTML = '';
+                    console.log('🧹 Cleared ID verification list only');
+                }
+
+                // Reset only ID type button statuses
+                const idTypeButtons = container.querySelectorAll('.id-type-btn');
+                idTypeButtons.forEach(button => {
+                    button.classList.remove('occupied', 'selected');
+                    const indicator = button.querySelector('.occupied-indicator');
+                    if (indicator) indicator.remove();
+                    button.style.backgroundColor = '';
+                    button.style.border = '';
+                });
+            }
+
+            function clearAdditionalDocumentsListOnly() {
+                const additionalList = container.querySelector('#additional-list');
+                if (additionalList) {
+                    additionalList.innerHTML = '';
+                    console.log('🧹 Cleared additional documents list only');
+                }
             }
 
             // Clear existing DOM elements to prevent duplicates
@@ -1475,6 +1550,28 @@
                                 <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
                                 <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
                                 <p>Thank you for providing your IdentityIQ access. Our team will use this to enhance your credit monitoring and repair process.</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // MyScoreIQ form submission
+                const myScoreIQForm = container.querySelector('#myscoreiq-access-form');
+                if (myScoreIQForm) {
+                    myScoreIQForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const email = container.querySelector('#myscoreiq-email').value;
+                        const password = container.querySelector('#myscoreiq-password').value;
+
+                        // Here you would normally send this data securely to your backend
+                        console.log('MyScoreIQ access submitted');
+
+                        // Show success message
+                        myScoreIQForm.innerHTML = `
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                                <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
+                                <p>Thank you for providing your MyScoreIQ access. Our team will use this to enhance our credit score analysis and tracking capabilities.</p>
                             </div>
                         `;
                     });
@@ -1933,28 +2030,22 @@
                                 console.warn('⚠️ Could not find DOM element with id:', id);
                             }
 
-                            // Handle section-specific refresh/cleanup
+                            // Handle section-specific refresh/cleanup using section-specific functions
                             if (document.sectionType === 'credit-report') {
-                                console.log('🔄 Document was credit report, refreshing display...');
+                                console.log('🔄 Document was credit report, refreshing display (section-specific)...');
                                 setTimeout(() => {
-                                    refreshCreditReportDisplay();
+                                    refreshCreditReportDisplayOnly();
                                 }, 100);
                             } else if (document.sectionType === 'id-verification') {
-                                console.log('🔄 Document was ID verification, refreshing display...');
+                                console.log('🔄 Document was ID verification, refreshing display (section-specific)...');
                                 setTimeout(() => {
-                                    refreshIdDocumentDisplay();
+                                    refreshIdDocumentDisplayOnly();
                                 }, 100);
                             } else if (document.sectionType === 'additional-documents') {
-                                // FIXED: Add proper handling for additional documents
-                                console.log('🔄 Document was additional document, updating display...');
-                                // For additional documents, we don't need a full refresh since there are no 
-                                // selection buttons to reset, just ensure the DOM element is removed
-                                // The element should already be removed above, but let's double-check
-                                const remainingElement = container.querySelector(`#${id}`);
-                                if (remainingElement) {
-                                    remainingElement.remove();
-                                    console.log('🗑️ Force removed remaining DOM element for additional document');
-                                }
+                                console.log('🔄 Document was additional document, refreshing display (section-specific)...');
+                                setTimeout(() => {
+                                    refreshAdditionalDocumentsDisplayOnly();
+                                }, 100);
                             }
 
                             console.log('✅ Document deleted successfully');
@@ -1974,17 +2065,20 @@
                         console.log('🗑️ Removed local DOM element for:', document.name);
                     }
 
-                    // Handle section-specific refresh/cleanup for local documents
+                    // Handle section-specific refresh/cleanup for local documents using section-specific functions
                     if (document.sectionType === 'credit-report') {
                         setTimeout(() => {
-                            refreshCreditReportDisplay();
+                            refreshCreditReportDisplayOnly();
                         }, 100);
                     } else if (document.sectionType === 'id-verification') {
                         setTimeout(() => {
-                            refreshIdDocumentDisplay();
+                            refreshIdDocumentDisplayOnly();
+                        }, 100);
+                    } else if (document.sectionType === 'additional-documents') {
+                        setTimeout(() => {
+                            refreshAdditionalDocumentsDisplayOnly();
                         }, 100);
                     }
-                    // Additional documents don't need special refresh logic for local removal
                 }
             }
 
@@ -2177,6 +2271,39 @@
                     })
                     .catch(error => {
                         console.error('❌ Failed to refresh credit report display:', error);
+                    });
+            }
+
+            // Section-specific refresh functions that don't affect other sections
+            function refreshCreditReportDisplayOnly() {
+                console.log('🔄 Refreshing credit report display only...');
+
+                // FIRST: Clear only credit report displays
+                clearCreditReportListOnly();
+
+                // SECOND: Remove only credit reports from uploadedDocuments array
+                uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'credit-report');
+                console.log('🧹 Cleared credit reports from uploadedDocuments array (section-specific)');
+
+                // THIRD: Clear any potential duplicates from remaining documents
+                clearDuplicateDocuments();
+
+                // FOURTH: Re-fetch and display only credit report documents
+                fetchExistingDocuments()
+                    .then(documents => {
+                        console.log('📋 Fetched documents for credit report refresh:', documents.length);
+                        const creditReports = documents.filter(doc => doc.documentType === 'credit-report');
+                        console.log('📋 Credit reports found:', creditReports.length);
+
+                        if (creditReports.length > 0) {
+                            displayExistingCreditReports(documents);
+                        } else {
+                            console.log('📋 No credit reports to display after section-specific refresh');
+                        }
+                        console.log('✅ Credit report display refreshed (section-specific)');
+                    })
+                    .catch(error => {
+                        console.error('❌ Failed to refresh credit report display (section-specific):', error);
                     });
             }
 
@@ -2493,6 +2620,70 @@
                     })
                     .catch(error => {
                         console.error('❌ Failed to refresh ID document display:', error);
+                    });
+            }
+
+            function refreshIdDocumentDisplayOnly() {
+                console.log('🔄 Refreshing ID document display only...');
+
+                // FIRST: Clear only ID verification displays
+                clearIdVerificationListOnly();
+
+                // SECOND: Remove only ID verification documents from uploadedDocuments array
+                uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'id-verification');
+                console.log('🧹 Cleared ID documents from uploadedDocuments array (section-specific)');
+
+                // THIRD: Clear any potential duplicates from remaining documents
+                clearDuplicateDocuments();
+
+                // FOURTH: Re-fetch and display only ID verification documents
+                fetchExistingDocuments()
+                    .then(documents => {
+                        console.log('📋 Fetched documents for ID refresh (section-specific):', documents.length);
+                        const idDocs = documents.filter(doc => doc.documentType === 'id-verification');
+                        console.log('📋 ID documents found:', idDocs.length);
+
+                        if (idDocs.length > 0) {
+                            displayExistingIdDocuments(documents);
+                        } else {
+                            console.log('📋 No ID documents to display after section-specific refresh');
+                        }
+                        console.log('✅ ID document display refreshed (section-specific)');
+                    })
+                    .catch(error => {
+                        console.error('❌ Failed to refresh ID document display (section-specific):', error);
+                    });
+            }
+
+            function refreshAdditionalDocumentsDisplayOnly() {
+                console.log('🔄 Refreshing additional documents display only...');
+
+                // FIRST: Clear only additional documents displays
+                clearAdditionalDocumentsListOnly();
+
+                // SECOND: Remove only additional documents from uploadedDocuments array
+                uploadedDocuments = uploadedDocuments.filter(doc => doc.sectionType !== 'additional-documents');
+                console.log('🧹 Cleared additional documents from uploadedDocuments array (section-specific)');
+
+                // THIRD: Clear any potential duplicates from remaining documents
+                clearDuplicateDocuments();
+
+                // FOURTH: Re-fetch and display only additional documents
+                fetchExistingDocuments()
+                    .then(documents => {
+                        console.log('📋 Fetched documents for additional docs refresh (section-specific):', documents.length);
+                        const additionalDocs = documents.filter(doc => doc.documentType === 'additional-documents');
+                        console.log('📋 Additional documents found:', additionalDocs.length);
+
+                        if (additionalDocs.length > 0) {
+                            displayExistingAdditionalDocuments(documents);
+                        } else {
+                            console.log('📋 No additional documents to display after section-specific refresh');
+                        }
+                        console.log('✅ Additional documents display refreshed (section-specific)');
+                    })
+                    .catch(error => {
+                        console.error('❌ Failed to refresh additional documents display (section-specific):', error);
                     });
             }
 

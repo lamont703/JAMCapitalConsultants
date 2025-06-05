@@ -43,7 +43,9 @@ router.get('/notifications', authenticateToken, (req, res) => {
     return userController.getNotifications(req, res);
 });
 
-router.get('/dispute-reports', authenticateToken, userController.getUserDisputeReports);
+router.get('/dispute-reports/:userId', authenticateToken, (req, res) => {
+    return userController.getUserDisputeReports(req, res);
+});
 
 // Make sure to export as default for ES6 modules
 export default router;

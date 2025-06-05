@@ -545,11 +545,7 @@
                         downloadLetter(letterId, container);
                     }
 
-                    // Handle delete button clicks
-                    if (e.target.classList.contains('delete-letter-btn') || e.target.closest('.delete-letter-btn')) {
-                        const letterId = e.target.closest('.delete-letter-btn').getAttribute('data-id');
-                        deleteLetter(letterId, container);
-                    }
+
 
                     // Handle view button clicks
                     if (e.target.classList.contains('view-letter-btn') || e.target.closest('.view-letter-btn')) {
@@ -619,11 +615,8 @@
                             <button class="Bot-letter-action view-letter-btn" title="View Letter" data-id="${letter.id}">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="Bot-letter-action download download-letter-btn" title="Download ${hasBlob ? 'PDF' : 'Text'}" data-id="${letter.id}" ${hasBlob ? '' : 'disabled'}>
+                            <button class="Bot-letter-action download download-letter-btn" title="Download PDF" data-id="${letter.id}" ${hasBlob ? '' : 'disabled'}>
                                 <i class="fas fa-download"></i>
-                            </button>
-                            <button class="Bot-letter-action delete delete-letter-btn" title="Delete Letter" data-id="${letter.id}">
-                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     `;
@@ -653,46 +646,50 @@
 
                 try {
                     if (letter.blobUrl) {
-                        // Download PDF from blob storage
-                        console.log('📄 Downloading PDF from blob storage:', letter.blobUrl);
+                        // Download PDF via backend proxy to avoid CORS issues
+                        console.log('📄 Downloading PDF via backend proxy for letter:', letter.id);
 
-                        const response = await fetch(letter.blobUrl);
-                        if (!response.ok) {
-                            throw new Error('Failed to download PDF from blob storage');
+                        const authToken = getAuthToken();
+                        if (!authToken) {
+                            throw new Error('Authentication required for PDF download');
                         }
 
-                        const blob = await response.blob();
-                        const url = window.URL.createObjectURL(blob);
+                        // Create download URL pointing to our backend proxy
+                        const downloadUrl = `http://localhost:3000/api/chat/download-letter/${letter.id}`;
+
+                        // Use fetch with proper authentication
+                        const response = await fetch(downloadUrl, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+                        }
+
+                        // Get the PDF blob from response
+                        const pdfBlob = await response.blob();
+
+                        // Create download link
+                        const url = window.URL.createObjectURL(pdfBlob);
                         const a = document.createElement('a');
                         a.href = url;
                         a.download = letter.blobFileName || `${letter.name.replace(/\s+/g, '_')}.pdf`;
+                        a.style.display = 'none';
                         document.body.appendChild(a);
                         a.click();
+
+                        // Clean up
                         window.URL.revokeObjectURL(url);
                         document.body.removeChild(a);
 
                         showSuccessMessage(container, `Downloaded: ${letter.name}`);
-                        console.log('✅ PDF downloaded successfully');
-
-                    } else if (letter.content) {
-                        // Download as text file if no PDF available
-                        console.log('📄 Downloading as text file');
-
-                        const blob = new Blob([letter.content], { type: 'text/plain' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `${letter.name.replace(/\s+/g, '_')}.txt`;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-
-                        showSuccessMessage(container, `Downloaded: ${letter.name} (as text)`);
-                        console.log('✅ Text file downloaded successfully');
+                        console.log('✅ PDF downloaded successfully via backend proxy');
 
                     } else {
-                        throw new Error('No content available for download');
+                        throw new Error('PDF not available for this letter');
                     }
 
                     // Notify parent module
@@ -702,7 +699,11 @@
 
                 } catch (error) {
                     console.error('❌ Download error:', error);
-                    showErrorMessage(container, `Failed to download ${letter.name}`);
+                    if (error.message.includes('PDF not available')) {
+                        showErrorMessage(container, `PDF not ready for ${letter.name}. Please try again in a moment.`);
+                    } else {
+                        showErrorMessage(container, `Failed to download ${letter.name} PDF. Please try again.`);
+                    }
                 } finally {
                     // Re-enable the download button
                     if (downloadBtn) {
@@ -712,90 +713,7 @@
                 }
             }
 
-            // Function to delete a letter
-            async function deleteLetter(letterId, container) {
-                console.log(`🗑️ Deleting letter ${letterId}`);
 
-                const letter = savedLetters.find(l => l.id === letterId);
-                if (!letter) {
-                    showErrorMessage(container, 'Letter not found');
-                    return;
-                }
-
-                // Confirm deletion
-                if (!confirm(`Are you sure you want to delete "${letter.name}"? This action cannot be undone.`)) {
-                    return;
-                }
-
-                const authToken = getAuthToken();
-                if (!authToken) {
-                    showErrorMessage(container, 'Authentication required for deletion');
-                    return;
-                }
-
-                // Disable the delete button temporarily
-                const deleteBtn = container.querySelector(`[data-id="${letterId}"].delete-letter-btn`);
-                if (deleteBtn) {
-                    deleteBtn.disabled = true;
-                    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                }
-
-                try {
-                    console.log('🌐 Sending delete request to server...');
-
-                    const response = await fetch('http://localhost:3000/api/chat/dispute-letter', {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${authToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            letterId: letterId,
-                            userId: currentUser.id
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('Delete request failed:', errorText);
-                        throw new Error(`Failed to delete letter: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    console.log('✅ Delete response:', result);
-
-                    if (result.success) {
-                        // Remove from local array
-                        savedLetters = savedLetters.filter(l => l.id !== letterId);
-
-                        // Update the UI
-                        updateLettersList(container);
-
-                        showSuccessMessage(container, `Deleted: ${letter.name}`);
-                        console.log('✅ Letter deleted successfully');
-
-                        // Notify parent module
-                        if (parentModule && typeof parentModule.onLetterDeleted === 'function') {
-                            parentModule.onLetterDeleted(letterId);
-                        }
-
-                        // Save state
-                        saveState();
-                    } else {
-                        throw new Error(result.error || 'Unknown deletion error');
-                    }
-
-                } catch (error) {
-                    console.error('❌ Delete error:', error);
-                    showErrorMessage(container, `Failed to delete ${letter.name}`);
-
-                    // Re-enable the delete button
-                    if (deleteBtn) {
-                        deleteBtn.disabled = false;
-                        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-                    }
-                }
-            }
 
             // Function to view a letter
             function viewLetter(letterId) {
@@ -805,6 +723,8 @@
 
                 // Create a modal or popup to show the letter content
                 const modal = document.createElement('div');
+                modal.id = `letter-modal-${letterId}`;
+                modal.className = 'letter-preview-modal';
                 modal.style.cssText = `
                     position: fixed;
                     top: 0;
@@ -829,8 +749,15 @@
                     position: relative;
                 `;
 
+                // Function to close the modal
+                function closeModal() {
+                    if (modal && modal.parentNode) {
+                        modal.parentNode.removeChild(modal);
+                    }
+                }
+
                 modalContent.innerHTML = `
-                    <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" 
+                    <button class="modal-close-x" 
                             style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6c757d;">
                         ×
                     </button>
@@ -845,9 +772,9 @@
                     <div style="margin-top: 20px; text-align: right;">
                         <button onclick="LettersModule.downloadLetter('${letter.id}', document.querySelector('.Bot-letters-container'))" 
                                 style="background: #09ccfc; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px;">
-                            Download ${letter.blobUrl ? 'PDF' : 'Text'}
+                            Download PDF
                         </button>
-                        <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" 
+                        <button class="modal-close-btn"
                                 style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
                             Close
                         </button>
@@ -855,14 +782,35 @@
                 `;
 
                 modal.appendChild(modalContent);
-                document.body.appendChild(modal);
+
+                // Add event listeners for close buttons
+                const closeXBtn = modalContent.querySelector('.modal-close-x');
+                const closeBtn = modalContent.querySelector('.modal-close-btn');
+
+                if (closeXBtn) {
+                    closeXBtn.addEventListener('click', closeModal);
+                }
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
 
                 // Close modal on background click
                 modal.addEventListener('click', function (e) {
                     if (e.target === modal) {
-                        modal.remove();
+                        closeModal();
                     }
                 });
+
+                // Close modal on Escape key
+                function handleEscapeKey(e) {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                        document.removeEventListener('keydown', handleEscapeKey);
+                    }
+                }
+                document.addEventListener('keydown', handleEscapeKey);
+
+                document.body.appendChild(modal);
 
                 // Notify parent module
                 if (parentModule && typeof parentModule.onLetterView === 'function') {

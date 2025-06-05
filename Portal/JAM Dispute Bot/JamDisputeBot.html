@@ -648,7 +648,7 @@
                     } else if (success) {
                         // Add welcome message if no saved messages
                         setTimeout(() => {
-                            chatModule.addBotMessage(`👋 Hi there! I'm your JAM AI Credit Assistant. I can help you with:
+                            chatModule.addBotMessage(`👋 Hi there! I'm your JAM Dispute Bot. I can help you with:
 
 - Creating dispute letters
 - Understanding your credit report
@@ -719,18 +719,9 @@ What can I help you with today?`, chatContainer);
 
                         onLetterDownload: function (letter) {
                             console.log('Letter download requested:', letter.name);
-                            // Create a blob from the letter content
-                            const blob = new Blob([letter.content || 'Letter content placeholder'], { type: 'text/plain' });
-                            const url = URL.createObjectURL(blob);
-
-                            // Create a link and trigger download
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${letter.name.replace(/\s+/g, '_')}.txt`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
+                            // Note: This function is deprecated in favor of LettersModule's PDF download functionality
+                            // PDF downloads are now handled directly by the LettersModule
+                            console.log('PDF download should be handled by LettersModule directly');
                         },
 
                         onLetterDeleted: function (letterId) {
@@ -811,7 +802,7 @@ What can I help you with today?`, chatContainer);
                     chatModule.hideTypingIndicator(chatContainer);
 
                     // Generate a simple response (in a real app, this would call an API)
-                    let response = "I'm processing your question about credit repair. This is a placeholder response. In the production version, this would connect to our AI backend.";
+                    let response = "I'm JAM Dispute Bot, and I'm processing your question about credit repair. This is a placeholder response. In the production version, this would connect to our AI backend.";
 
                     // Add some context-aware responses
                     if (message.toLowerCase().includes("dispute")) {
@@ -848,7 +839,7 @@ What can I help you with today?`, chatContainer);
                         </div>
                     `).join('');
 
-                    // Add event listeners to download buttons
+                    // Add event listeners to download buttons  
                     const downloadButtons = lettersList.querySelectorAll('[data-letter-id]');
                     downloadButtons.forEach(button => {
                         button.addEventListener('click', function () {
@@ -856,18 +847,16 @@ What can I help you with today?`, chatContainer);
                             const letter = workflowState.generatedLetters.find(l => l.id === letterId);
 
                             if (letter) {
-                                // Create a blob from the letter content
-                                const blob = new Blob([letter.content], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
+                                // Switch to Letters tab where proper PDF download is handled
+                                console.log('Switching to Letters tab for PDF download');
+                                switchTab('letters');
 
-                                // Create a link and trigger download
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `Dispute_Letter_${new Date(letter.createdAt).toLocaleDateString().replace(/\//g, '-')}.txt`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
+                                // Show message about proper download location
+                                setTimeout(() => {
+                                    if (lettersModule) {
+                                        console.log('Letters available in Letters tab for PDF download');
+                                    }
+                                }, 1000);
                             }
                         });
                     });
@@ -1031,6 +1020,13 @@ What can I help you with today?`, chatContainer);
 
             // Dispatch the loaded event
             window.dispatchEvent(new Event('jamTipBotLoaded'));
+
+            // Listen for custom switch tab event
+            window.addEventListener('switchToLettersTab', function () {
+                if (window.jamTipBot && typeof window.jamTipBot.switchTab === 'function') {
+                    window.jamTipBot.switchTab('letters');
+                }
+            });
         });
     </script>
 </body>

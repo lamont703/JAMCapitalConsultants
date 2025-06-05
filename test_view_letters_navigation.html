@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: View My Letters Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #09ccfc;
+            background: #f8f9fa;
+        }
+
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #abd1ff;
+        }
+
+        button {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #07a3ca;
+        }
+
+        .code-block {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+
+        .console-output {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>🧪 Test: "View My Letters" Navigation</h1>
+        <p>This test simulates what happens when a user clicks the "View My Letters" button in ChatModule.</p>
+
+        <div class="test-section">
+            <h2>📋 Test Setup</h2>
+            <div id="setupResults"></div>
+            <button onclick="setupTestEnvironment()">🔧 Setup Test Environment</button>
+            <button onclick="clearTestEnvironment()">🗑️ Clear Test Environment</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Current State Check</h2>
+            <div id="stateResults"></div>
+            <button onclick="checkCurrentState()">🔍 Check Current State</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🚀 Simulate "View My Letters" Click</h2>
+            <div id="navigationResults"></div>
+            <button onclick="simulateViewLettersClick()">▶️ Simulate Button Click</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Console Output</h2>
+            <div id="consoleOutput" class="console-output">Console output will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        // Override console.log to capture output
+        let consoleOutput = [];
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+
+        console.log = function (...args) {
+            consoleOutput.push(`[LOG] ${args.join(' ')}`);
+            originalConsoleLog.apply(console, args);
+            updateConsoleDisplay();
+        };
+
+        console.error = function (...args) {
+            consoleOutput.push(`[ERROR] ${args.join(' ')}`);
+            originalConsoleError.apply(console, args);
+            updateConsoleDisplay();
+        };
+
+        console.warn = function (...args) {
+            consoleOutput.push(`[WARN] ${args.join(' ')}`);
+            originalConsoleWarn.apply(console, args);
+            updateConsoleDisplay();
+        };
+
+        function updateConsoleDisplay() {
+            const consoleDiv = document.getElementById('consoleOutput');
+            consoleDiv.textContent = consoleOutput.slice(-20).join('\n'); // Show last 20 lines
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            container.appendChild(resultDiv);
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        function setupTestEnvironment() {
+            clearResults('setupResults');
+            console.log('🔧 Setting up test environment...');
+
+            // Create sample generated letters
+            const sampleLetters = [
+                {
+                    id: 'letter_1',
+                    bureau: 'experian',
+                    letter: 'Dear Experian,\n\nTest dispute letter content...',
+                    content: 'Test letter content for Experian.',
+                    itemCount: 3,
+                    generatedAt: new Date().toISOString()
+                },
+                {
+                    id: 'letter_2',
+                    bureau: 'equifax',
+                    letter: 'Dear Equifax,\n\nTest dispute letter content...',
+                    content: 'Test letter content for Equifax.',
+                    itemCount: 2,
+                    generatedAt: new Date().toISOString()
+                }
+            ];
+
+            localStorage.setItem('jamBotGeneratedLetters', JSON.stringify(sampleLetters));
+            addResult('setupResults', '✅ Sample dispute letters created', 'success');
+
+            // Create sample user data
+            const userData = {
+                id: 'test_user_123',
+                email: 'test@example.com',
+                name: 'Test User'
+            };
+            localStorage.setItem('userData', JSON.stringify(userData));
+            addResult('setupResults', '✅ Sample user data created', 'success');
+
+            // Create mock parent module
+            window.mockParentModule = {
+                switchTab: function (tabName) {
+                    console.log(`mockParentModule.switchTab called with: ${tabName}`);
+                    addResult('navigationResults', `✅ parentModule.switchTab('${tabName}') called`, 'success');
+                },
+                addGeneratedLetter: function (letter) {
+                    console.log('addGeneratedLetter called:', letter.name);
+                    addResult('navigationResults', `✅ Letter added: ${letter.name}`, 'success');
+                }
+            };
+            addResult('setupResults', '✅ Mock parent module created', 'success');
+
+            // Create mock jamTipBot
+            window.jamTipBot = {
+                switchTab: function (tabName) {
+                    console.log(`jamTipBot.switchTab called with: ${tabName}`);
+                    addResult('navigationResults', `✅ jamTipBot.switchTab('${tabName}') called`, 'success');
+                }
+            };
+            addResult('setupResults', '✅ Mock jamTipBot created', 'success');
+
+            // Set up custom event listener
+            window.addEventListener('switchToLettersTab', function () {
+                console.log('Custom event "switchToLettersTab" fired');
+                addResult('navigationResults', '✅ Custom event captured', 'success');
+            });
+            addResult('setupResults', '✅ Event listener set up', 'success');
+        }
+
+        function clearTestEnvironment() {
+            clearResults('setupResults');
+            localStorage.removeItem('jamBotGeneratedLetters');
+            localStorage.removeItem('userData');
+            delete window.mockParentModule;
+            delete window.jamTipBot;
+            consoleOutput = [];
+            updateConsoleDisplay();
+            console.log('🗑️ Test environment cleared');
+        }
+
+        function checkCurrentState() {
+            clearResults('stateResults');
+            console.log('🔍 Checking current state...');
+
+            // Check localStorage
+            const savedLetters = localStorage.getItem('jamBotGeneratedLetters');
+            if (savedLetters) {
+                const letters = JSON.parse(savedLetters);
+                addResult('stateResults', `📄 Found ${letters.length} letters in localStorage`, 'success');
+            } else {
+                addResult('stateResults', '❌ No letters in localStorage', 'error');
+            }
+
+            // Check global objects
+            const checks = [
+                { name: 'ChatModule', obj: window.ChatModule },
+                { name: 'LettersModule', obj: window.LettersModule },
+                { name: 'mockParentModule', obj: window.mockParentModule },
+                { name: 'jamTipBot', obj: window.jamTipBot }
+            ];
+
+            checks.forEach(check => {
+                if (check.obj) {
+                    addResult('stateResults', `✅ ${check.name} available`, 'success');
+                } else {
+                    addResult('stateResults', `❌ ${check.name} not found`, 'error');
+                }
+            });
+        }
+
+        function simulateViewLettersClick() {
+            clearResults('navigationResults');
+            clearResults('testResults');
+            console.log('🚀 Simulating "View My Letters" button click...');
+
+            try {
+                // Simulate the exact ChatModule handleButtonClick logic for 'view_letters'
+                addResult('navigationResults', '1️⃣ Starting view_letters handler...', 'info');
+
+                // Check for saved letters
+                const savedLetters = localStorage.getItem('jamBotGeneratedLetters');
+                if (savedLetters) {
+                    const letters = JSON.parse(savedLetters);
+                    console.log('Found generated letters:', letters.length);
+                    addResult('navigationResults', `📄 Found ${letters.length} letters`, 'success');
+
+                    // Convert to LettersModule format
+                    letters.forEach((letter, index) => {
+                        const formattedLetter = {
+                            id: `generated_${Date.now()}_${index}`,
+                            name: `Dispute Letter - ${letter.bureau || `Letter ${index + 1}`}`,
+                            content: letter.letter || letter.content,
+                            createdAt: new Date().toISOString(),
+                            bureau: letter.bureau,
+                            itemCount: letter.itemCount || 0
+                        };
+
+                        // Add to parent module
+                        if (window.mockParentModule?.addGeneratedLetter) {
+                            window.mockParentModule.addGeneratedLetter(formattedLetter);
+                        }
+                    });
+                }
+
+                // Test navigation methods
+                addResult('navigationResults', '2️⃣ Testing navigation...', 'info');
+                let navigationSuccess = false;
+
+                // Method 1: parentModule.switchTab
+                if (window.mockParentModule?.switchTab) {
+                    setTimeout(() => window.mockParentModule.switchTab('letters'), 1500);
+                    navigationSuccess = true;
+                } else {
+                    addResult('navigationResults', '⚠️ parentModule.switchTab not available', 'warning');
+                }
+
+                // Method 2: jamTipBot.switchTab  
+                if (window.jamTipBot?.switchTab) {
+                    setTimeout(() => window.jamTipBot.switchTab('letters'), 1500);
+                    navigationSuccess = true;
+                } else {
+                    addResult('navigationResults', '⚠️ jamTipBot.switchTab not available', 'warning');
+                }
+
+                // Method 3: Custom event
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('switchToLettersTab'));
+                }, 1500);
+
+                // Test LettersModule access
+                if (window.LettersModule) {
+                    addResult('navigationResults', '3️⃣ Testing LettersModule access...', 'info');
+
+                    const methods = ['init', 'addLetter', 'getSavedLetters', 'updateView'];
+                    methods.forEach(method => {
+                        if (typeof window.LettersModule[method] === 'function') {
+                            addResult('navigationResults', `✅ LettersModule.${method} available`, 'success');
+                        } else {
+                            addResult('navigationResults', `❌ LettersModule.${method} missing`, 'error');
+                        }
+                    });
+
+                    // Try to get current letters
+                    try {
+                        const currentLetters = window.LettersModule.getSavedLetters();
+                        addResult('navigationResults', `📋 LettersModule has ${currentLetters.length} letters`, 'info');
+                    } catch (error) {
+                        addResult('navigationResults', `❌ Error accessing letters: ${error.message}`, 'error');
+                    }
+                } else {
+                    addResult('navigationResults', '❌ LettersModule not available', 'error');
+                }
+
+                // Summary
+                if (navigationSuccess) {
+                    addResult('testResults', '🎉 TEST PASSED: Navigation methods available', 'success');
+                } else {
+                    addResult('testResults', '❌ TEST FAILED: No navigation methods worked', 'error');
+                }
+
+            } catch (error) {
+                addResult('testResults', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-setup on load
+        window.addEventListener('load', function () {
+            addResult('setupResults', 'ℹ️ Ready to test. Click Setup to begin.', 'info');
+        });
+    </script>
+</body>
+
+</html>

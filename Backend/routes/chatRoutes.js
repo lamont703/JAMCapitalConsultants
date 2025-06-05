@@ -104,6 +104,14 @@ if (chatController.deleteDisputeLetter) {
   router.delete('/dispute-letter', (req, res) => res.status(501).json({ error: 'Not implemented' }));
 }
 
+// Add new route for downloading PDFs from blob storage
+if (chatController.downloadLetterPDF) {
+  router.get('/download-letter/:letterId', chatController.downloadLetterPDF);
+} else {
+  console.error("Warning: chatController.downloadLetterPDF is undefined");
+  router.get('/download-letter/:letterId', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+}
+
 // Add these new routes for cache management
 if (chatController.clearCache) {
   router.get('/manage-cache', (req, res) => {

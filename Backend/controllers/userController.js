@@ -48,29 +48,85 @@ const userController = {
 
     // Add this new function to fetch user dispute reports
     async getUserDisputeReports(req, res) {
-        const userId = req.user.id;
-        const cosmosService = req.app.locals.cosmosService;
+        try {
+            const { userId } = req.params; // Get userId from route parameters
+            const cosmosService = req.app.locals.cosmosService;
 
-        console.log('📋 Fetching dispute reports for user:', userId);
+            console.log('📋 Fetching dispute reports for user:', userId);
 
-        // Query for user's dispute reports
-        const disputeQuery = `
-            SELECT * FROM c 
-            WHERE c.type = 'dispute-report' 
-            AND c.userId = @userId 
-            ORDER BY c.submittedAt DESC
-        `;
-        
-        const disputeParams = [{ name: "@userId", value: userId }];
-        const disputeReports = await cosmosService.queryDocuments(disputeQuery, disputeParams);
+            if (!userId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'User ID is required'
+                });
+            }
 
-        console.log(`📋 Found ${disputeReports.length} dispute reports for user`);
+            if (!cosmosService) {
+                console.error('❌ CosmosDB service not available');
+                return res.status(500).json({
+                    success: false,
+                    message: 'Database service unavailable'
+                });
+            }
 
-        res.status(200).json({
-            success: true,
-            disputeReports: disputeReports || [],
-            count: disputeReports.length
-        });
+            try {
+                // Query for user's dispute reports
+                const disputeQuery = `
+                    SELECT * FROM c 
+                    WHERE c.type = 'dispute-report' 
+                    AND c.userId = @userId 
+                    ORDER BY c.submittedAt DESC
+                `;
+                
+                const disputeParams = [{ name: "@userId", value: userId }];
+                const disputeReports = await cosmosService.queryDocuments(disputeQuery, disputeParams);
+
+                console.log(`📋 Found ${disputeReports?.length || 0} dispute reports for user`);
+
+                // Format the response to match expected structure
+                const formattedReports = (disputeReports || []).map(report => ({
+                    id: report.id,
+                    userId: report.userId,
+                    reportType: report.reportType || 'Credit Report Dispute',
+                    status: report.status || 'submitted',
+                    disputeSummary: report.disputeSummary || report.summary || 'No summary available',
+                    submittedAt: report.submittedAt || report.createdAt || new Date().toISOString(),
+                    reportDate: report.reportDate || report.submittedAt || new Date().toISOString(),
+                    creditScores: report.creditScores || null,
+                    fileInfo: report.fileInfo || null,
+                    metadata: report.metadata || {}
+                }));
+
+                res.status(200).json({
+                    success: true,
+                    disputeReports: formattedReports,
+                    count: formattedReports.length
+                });
+
+            } catch (queryError) {
+                console.error('❌ Error querying dispute reports:', queryError);
+                
+                // If it's a "container not found" error, return empty array
+                if (queryError.code === 404 || queryError.message?.includes('NotFound')) {
+                    console.log('📋 DisputeReports collection not found, returning empty array');
+                    return res.status(200).json({
+                        success: true,
+                        disputeReports: [],
+                        count: 0
+                    });
+                }
+
+                throw queryError; // Re-throw other errors
+            }
+
+        } catch (error) {
+            console.error('❌ Error in getUserDisputeReports:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to fetch dispute reports',
+                error: error.message
+            });
+        }
     },
 
     // Get user profile/settings

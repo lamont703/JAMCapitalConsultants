@@ -792,7 +792,7 @@
 
                 setTimeout(() => {
                     hideTypingIndicator(container);
-                    addBotMessage("I'm here to help! Could you please be more specific about what you'd like assistance with regarding credit repair?");
+                    addBotMessage("I'm JAM Dispute Bot, and I'm here to help! Could you please be more specific about what you'd like assistance with regarding credit repair?");
                     updateMessagesDisplay(container);
                     // Don't save - we want fresh conversations each time
                 }, 1500);
@@ -1162,6 +1162,81 @@
                 updateProgress();
             }
 
+            // NEW: Continuous waiting animation for API processing
+            let waitingInterval = null;
+            let waitingMessageId = null;
+            let waitingTipIndex = 0;
+
+            const waitingTips = [
+                "🔍 **Deep Scanning:** Analyzing every line of your credit reports for inaccuracies...",
+                "⚖️ **Legal Review:** Checking compliance with Fair Credit Reporting Act standards...",
+                "🎯 **Strategy Building:** Calculating the best dispute approach for maximum impact...",
+                "📊 **Impact Analysis:** Determining which items will boost your score the most...",
+                "🔬 **AI Processing:** Using machine learning to identify subtle reporting errors...",
+                "💡 **Opportunity Detection:** Finding dispute opportunities you might have missed...",
+                "📈 **Score Modeling:** Predicting your potential credit score improvements...",
+                "🛡️ **Validation Check:** Ensuring all dispute reasons meet legal requirements...",
+                "🎪 **Final Assembly:** Compiling your personalized dispute strategy..."
+            ];
+
+            async function startContinuousWaiting(container, originalProgressMessageId) {
+                // Create initial waiting message
+                const waitingMessage = addBotMessage(
+                    "⏳ **Processing Your Analysis...**\n\nThis may take a moment as we thoroughly examine your credit reports.\n\n🔍 **Deep Scanning:** Analyzing every line of your credit reports for inaccuracies...\n\n" +
+                    "🟦🟦🟦⬜⬜⬜⬜⬜⬜⬜ Processing..."
+                );
+                waitingMessageId = waitingMessage.id;
+                updateMessagesDisplay(container);
+
+                // Start continuous updates every 3 seconds
+                waitingInterval = setInterval(() => {
+                    if (waitingMessageId) {
+                        waitingTipIndex = (waitingTipIndex + 1) % waitingTips.length;
+                        const currentTip = waitingTips[waitingTipIndex];
+
+                        // Create animated progress bars
+                        const progressBarOptions = [
+                            "🟦🟦🟦🟦⬜⬜⬜⬜⬜⬜",
+                            "🟦🟦🟦🟦🟦🟦⬜⬜⬜⬜",
+                            "🟦🟦🟦🟦🟦🟦🟦🟦⬜⬜",
+                            "🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦"
+                        ];
+                        const progressBar = progressBarOptions[waitingTipIndex % progressBarOptions.length];
+
+                        const updatedMessage = "⏳ **Processing Your Analysis...**\n\nThis may take a moment as we thoroughly examine your credit reports.\n\n" +
+                            currentTip + "\n\n" +
+                            progressBar + " Processing...";
+
+                        const existingMessage = messages.find(msg => msg.id === waitingMessageId);
+                        if (existingMessage) {
+                            existingMessage.content = updatedMessage;
+                            updateMessagesDisplay(container);
+                        }
+                    }
+                }, 3000);
+
+                return waitingMessageId;
+            }
+
+            function stopContinuousWaiting() {
+                if (waitingInterval) {
+                    clearInterval(waitingInterval);
+                    waitingInterval = null;
+                }
+
+                if (waitingMessageId) {
+                    // Update the waiting message to show completion
+                    const existingMessage = messages.find(msg => msg.id === waitingMessageId);
+                    if (existingMessage) {
+                        existingMessage.content = "✅ **Analysis Processing Complete!**\n\nGenerating your comprehensive dispute strategy...\n\n🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦 Complete!";
+                    }
+                    waitingMessageId = null;
+                }
+
+                // Reset the tip index for next time
+                waitingTipIndex = 0;
+            }
+
             // NEW: Perform the actual analysis call
             async function performActualAnalysis(userEmail, container, progressMessageId) {
                 try {
@@ -1178,6 +1253,9 @@
 
                     // Small delay for dramatic effect
                     await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Start continuous waiting animation for the API processing
+                    const waitingMessageId = await startContinuousWaiting(container, progressMessageId);
 
                     // Now make the actual API call
                     const response = await fetch(`http://localhost:3000/api/chat/analyze?userEmail=${encodeURIComponent(userEmail)}`, {
@@ -1196,6 +1274,12 @@
                     }
 
                     const data = await response.json();
+
+                    // Stop the continuous waiting animation
+                    stopContinuousWaiting();
+
+                    // Small delay to show completion animation
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
                     console.log('=== ANALYSIS RESPONSE DEBUG ===');
                     console.log('Response data keys:', Object.keys(data));
@@ -1219,6 +1303,9 @@
 
                 } catch (error) {
                     console.error('=== ANALYSIS ERROR ===', error);
+
+                    // Stop the continuous waiting animation on error
+                    stopContinuousWaiting();
 
                     let errorMessage = "❌ **Analysis Error**\n\nI encountered an error while analyzing your reports. ";
 
@@ -1421,12 +1508,23 @@
                         } catch (error) {
                             console.error('Error processing generated letters:', error);
                         }
+                    } else {
+                        addBotMessage("🎉 Switching you to the Letters tab to view your dispute letters...");
                     }
 
-                    // Switch to letters tab
-                    if (parentModule && parentModule.switchTab) {
+                    // Switch to letters tab - try multiple methods to ensure it works
+                    if (parentModule && typeof parentModule.switchTab === 'function') {
                         setTimeout(() => {
                             parentModule.switchTab('letters');
+                        }, 1500);
+                    } else if (window.jamTipBot && typeof window.jamTipBot.switchTab === 'function') {
+                        setTimeout(() => {
+                            window.jamTipBot.switchTab('letters');
+                        }, 1500);
+                    } else {
+                        // Fallback - try to trigger a custom event
+                        setTimeout(() => {
+                            window.dispatchEvent(new CustomEvent('switchToLettersTab'));
                         }, 1500);
                     }
 
@@ -1513,7 +1611,7 @@
                     generateDisputeLetters(container);
 
                 } else if (value === 'download_letters') {
-                    addUserMessage("💾 Download my letters");
+                    addUserMessage("💾 Download my letters as PDF");
                     downloadGeneratedLetters(container);
 
                 } else if (value === 'email_letters') {
@@ -2221,7 +2319,7 @@
                         addBotMessageWithButtons(summary, [
                             { text: "📄 View My Letters", value: "view_letters" },
                             { text: "📊 Final Summary", value: "show_final_summary" },
-                            { text: "💾 Download Letters", value: "download_letters" },
+                            { text: "💾 Download PDF Letters", value: "download_letters" },
                             { text: "📧 Email Letters to Me", value: "email_letters" }
                         ]);
 
@@ -2360,9 +2458,8 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                 try {
                     // Check if jsPDF is available
                     if (typeof window.jsPDF === 'undefined') {
-                        console.warn('jsPDF not available, falling back to text download');
-                        downloadAsTextFile(pdfContent, filename);
-                        return;
+                        console.error('jsPDF not available - cannot generate PDF');
+                        throw new Error('PDF generation library not available');
                     }
 
                     // Create new PDF document
@@ -2411,44 +2508,8 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                     console.log(`📄 Downloaded PDF: ${filename}`);
                 } catch (error) {
                     console.error('Error generating PDF:', error);
-                    // Fallback to text download
-                    downloadAsTextFile(pdfContent, filename);
+                    addBotMessage("❌ Error generating PDF. Please try again or contact support for assistance.");
                 }
-            }
-
-            // Fallback function for text download
-            function downloadAsTextFile(pdfContent, filename) {
-                const pdfDocument = createFormattedPDF(pdfContent);
-                const blob = new Blob([pdfDocument], { type: 'text/plain' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename.replace('.pdf', '.txt');
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-                console.log(`📄 Downloaded as text: ${filename.replace('.pdf', '.txt')}`);
-            }
-
-            // Helper function to create formatted document for text fallback
-            function createFormattedPDF(pdfContent) {
-                let formattedDocument = '';
-
-                // Add header
-                formattedDocument += `${pdfContent.title}\n`;
-                formattedDocument += `Date: ${pdfContent.date}\n\n`;
-                formattedDocument += '─'.repeat(60) + '\n\n';
-
-                // Add main content
-                formattedDocument += pdfContent.content + '\n\n';
-
-                // Add footer
-                formattedDocument += '─'.repeat(60) + '\n';
-                formattedDocument += `${pdfContent.footer}\n`;
-                formattedDocument += `Generated on: ${new Date().toLocaleString()}\n`;
-
-                return formattedDocument;
             }
 
             async function emailGeneratedLetters(container) {
@@ -2533,7 +2594,7 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
 
                 addBotMessageWithButtons(summary, [
                     { text: "📄 View Letters", value: "view_letters" },
-                    { text: "💾 Download Letters", value: "download_letters" },
+                    { text: "💾 Download PDF Letters", value: "download_letters" },
                     { text: "🔄 Start New Analysis", value: "restart_analysis" }
                 ]);
 
@@ -2717,6 +2778,9 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                         categoryOrder: ['high_impact', 'medium_impact', 'low_impact']
                     };
 
+                    // Stop any active waiting animations from previous sessions
+                    stopContinuousWaiting();
+
                     // Clear any saved chat state
                     localStorage.removeItem('jamBotChatMessages');
                     localStorage.removeItem('jamBotChatState');
@@ -2860,6 +2924,10 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                         groupedItems: null,
                         categoryOrder: ['high_impact', 'medium_impact', 'low_impact']
                     };
+
+                    // Stop any active waiting animations
+                    stopContinuousWaiting();
+
                     localStorage.removeItem('jamBotChatMessages');
                     localStorage.removeItem('jamBotChatState');
                     console.log('✅ Chat history cleared - fresh conversation ready');

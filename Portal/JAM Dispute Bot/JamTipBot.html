@@ -1724,22 +1724,11 @@ Chester, PA 19016`
 
                 if (downloadButton) {
                     downloadButton.addEventListener('click', () => {
-                        // Create a blob with the letter content
-                        const blob = new Blob([workflowState.generatedLetter], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
+                        // Note: Text download is deprecated - redirect to Letters tab for PDF download
+                        console.log('Download redirected to Letters tab for PDF functionality');
 
-                        // Create a download link and click it
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `Dispute_Letter_${new Date().toISOString().split('T')[0]}.txt`;
-                        document.body.appendChild(a);
-                        a.click();
-
-                        // Clean up
-                        setTimeout(() => {
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                        }, 100);
+                        // Show message about PDF download availability
+                        alert('For PDF downloads, please visit the "My Letters" tab where you can download professional dispute letters.');
                     });
                 }
             }

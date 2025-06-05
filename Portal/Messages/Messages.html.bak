@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages Module</title>
+    <style>
+        /* Messages Module Styles */
+        .messages-container {
+            font-family: 'Roboto', sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .messages-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .messages-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .messages-bulk-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .bulk-selection-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bulk-select-all {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .bulk-select-all input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn-bulk-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-bulk-delete:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn-bulk-delete:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .message-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .message-checkbox {
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .message-item.unread {
+            background-color: #e6f9ff;
+        }
+
+        .message-item.unread.selected {
+            background-color: #bbdefb;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #09ccfc;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .message-sender {
+            font-weight: bold;
+        }
+
+        .message-time {
+            color: #888;
+            font-size: 0.8em;
+        }
+
+        .message-subject {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .message-preview {
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 500px;
+        }
+
+        .message-detail {
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message-detail.active {
+            display: block;
+        }
+
+        .message-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .message-detail-info {
+            flex: 1;
+        }
+
+        .message-detail-subject {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .message-detail-meta {
+            display: flex;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .message-detail-sender {
+            margin-right: 15px;
+            font-weight: 500;
+        }
+
+        .message-detail-time {
+            color: #888;
+        }
+
+        .message-detail-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-detail-action {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .message-detail-action:hover {
+            background: #e0e0e0;
+        }
+
+        .message-detail-action.primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .message-detail-action.primary:hover {
+            background: #07a3ca;
+        }
+
+        .message-detail-action.danger {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .message-detail-action.danger:hover {
+            background: #ffcdd2;
+        }
+
+        .message-detail-body {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-line;
+        }
+
+        .message-compose {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .message-compose-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .message-compose-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #07a3ca;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .messages-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .messages-search {
+                width: 100%;
+            }
+
+            .message-detail-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .message-detail-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        .dispute-reports-header {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .dispute-reports-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dispute-reports-container {
+            margin-top: 10px;
+        }
+
+        .dispute-report-item {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .dispute-report-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-color: #d0d0d0;
+        }
+
+        .dispute-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: none;
+        }
+
+        .dispute-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .dispute-title i {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .dispute-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-submitted {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-progress {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-review {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .status-resolved {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .dispute-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .dispute-content {
+            padding: 0 20px 15px 20px;
+            display: none;
+            background: #fafafa;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .dispute-report-item.expanded .dispute-content {
+            display: block;
+        }
+
+        .dispute-summary {
+            margin-bottom: 15px;
+        }
+
+        .dispute-summary strong {
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .dispute-summary p {
+            margin: 8px 0 0 0;
+            color: #555;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+
+        .dispute-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .credit-scores {
+            margin: 15px 0;
+        }
+
+        .credit-scores strong {
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .scores-grid {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            background: #f0f0f0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #555;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dispute-file {
+            margin: 15px 0;
+        }
+
+        .dispute-file strong {
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .file-info i {
+            color: #666;
+        }
+
+        .file-info span {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .view-file-btn {
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 12px;
+            margin-left: auto;
+            font-weight: 500;
+        }
+
+        .view-file-btn:hover {
+            text-decoration: underline;
+            color: #1565c0;
+        }
+
+        .dispute-actions {
+            padding: 12px 20px 15px 20px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .dispute-actions button {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dispute-actions button:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .dispute-actions button i {
+            margin-right: 5px;
+        }
+
+        .no-disputes-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .no-disputes-message i {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .no-disputes-message p {
+            margin: 8px 0 4px 0;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .no-disputes-message small {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .messages-search {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 5px 15px;
+            width: 250px;
+        }
+
+        .messages-search input {
+            border: none;
+            background: transparent;
+            padding: 8px;
+            width: 100%;
+            outline: none;
+        }
+
+        .messages-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .filter-btn.active {
+            background: #09ccfc;
+            color: white;
+        }
+
+        .messages-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Messages Module
+        const MessagesModule = (function () {
+            // Private variables
+            let isInitialized = false;
+            let messages = [];
+            let currentFilter = 'all';
+            let activeMessageId = null;
+            let disputeReports = []; // Add dispute reports storage
+            let loadingInterval = null; // For periodic refresh
+            let retryAttempts = 0;
+            const MAX_RETRY_ATTEMPTS = 3;
+            const SMART_REFRESH_INTERVAL = 300000; // 5 minutes instead of 30 seconds
+            const FOCUS_REFRESH_DELAY = 10000; // 10 seconds after regaining focus
+            let lastRefreshTime = 0;
+            let isPageVisible = true;
+            let focusTimeoutId = null;
+
+            // Sample message data
+            const sampleMessages = [];
+
+            // Format date for display
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else if (diffDays < 7) {
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    return days[date.getDay()];
+                } else {
+                    return date.toLocaleDateString();
+                }
+            }
+
+            // Function to fetch user notifications from the API
+            async function fetchUserNotifications() {
+                try {
+                    console.log('📨 Fetching user notifications from API...');
+
+                    // Get user ID from userData object in localStorage
+                    let userId = localStorage.getItem('userId') || localStorage.getItem('user_id');
+
+                    if (!userId) {
+                        // Try to get it from userData object
+                        const userData = localStorage.getItem('userData');
+                        if (userData) {
+                            try {
+                                const parsedUserData = JSON.parse(userData);
+                                userId = parsedUserData.id;
+                                console.log('🔍 Found user ID in userData:', userId);
+                            } catch (error) {
+                                console.error('Error parsing userData:', error);
+                            }
+                        }
+                    }
+
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId) {
+                        console.warn('⚠️ No user ID found in localStorage');
+                        return null;
+                    }
+
+                    if (!authToken || authToken === 'demo-token') {
+                        console.warn('⚠️ No valid auth token found');
+                        return null;
+                    }
+
+                    console.log('🔍 Making API request for user:', userId);
+
+                    const response = await fetch(`http://localhost:3000/api/admin/get-user-notifications/${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success && Array.isArray(data.messages)) {
+                        console.log('✅ Successfully fetched notifications from API:', data.messages.length);
+                        return data.messages;
+                    } else {
+                        throw new Error('Invalid API response format');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error fetching user notifications:', error);
+                    return null;
+                }
+            }
+
+            // Initialize the module
+            async function init(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found`);
+                    return false;
+                }
+
+                // Only initialize once unless reset
+                if (isInitialized) {
+                    console.log('Messages Module already initialized');
+                    return true;
+                }
+
+                console.log('Initializing Messages Module');
+
+                // Try to fetch notifications from API, fallback to sample messages
+                const apiMessages = await fetchUserNotifications();
+
+                if (apiMessages && apiMessages.length > 0) {
+                    console.log('📨 Using notifications from API');
+                    messages = apiMessages;
+                } else {
+                    console.log('📨 Using sample messages as fallback');
+                    messages = [...sampleMessages];
+                }
+
+                // Render the initial UI
+                renderMessagesUI(container);
+
+                // Set up event listeners
+                setupEventListeners(container);
+
+                // Load both notifications and dispute reports using the new function
+                await loadMessages();
+
+                // After initial load, start the refresh cycle for dispute reports
+                const messagesContainer = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (messagesContainer) {
+                    // Start periodic refresh after initial load
+                    setTimeout(() => {
+                        refreshDisputeReports(messagesContainer, false); // Silent initial refresh
+                    }, 5000); // Wait 5 seconds after init for stability
+                }
+
+                // Mark as initialized
+                isInitialized = true;
+                return true;
+            }
+
+            // Render the messages UI
+            function renderMessagesUI(container) {
+                console.log('🎨 Rendering messages UI with', messages.length, 'messages');
+
+                // Create the messages container
+                const messagesContainer = document.createElement('div');
+                messagesContainer.className = 'messages-container';
+
+                // Create the header with search, filters, and bulk actions
+                const header = document.createElement('div');
+                header.className = 'messages-header';
+
+                // Search box
+                const searchBox = document.createElement('div');
+                searchBox.className = 'messages-search';
+                searchBox.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search messages..." id="message-search">
+                `;
+
+                // Bulk actions container
+                const bulkActions = document.createElement('div');
+                bulkActions.className = 'messages-bulk-actions';
+                bulkActions.innerHTML = `
+                    <div class="bulk-selection-controls">
+                        <label class="bulk-select-all">
+                            <input type="checkbox" id="select-all-messages">
+                            <span>Select All</span>
+                        </label>
+                        <button class="btn-bulk-delete" id="bulk-delete-btn" disabled>
+                            <i class="fas fa-trash"></i>
+                            Delete Selected (<span id="selected-count">0</span>)
+                        </button>
+                    </div>
+                `;
+
+                // Filters
+                const filters = document.createElement('div');
+                filters.className = 'messages-filters';
+                filters.innerHTML = `
+                    <button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>
+                    <button class="filter-btn ${currentFilter === 'unread' ? 'active' : ''}" data-filter="unread">Unread</button>
+                `;
+
+                // Arrange header layout
+                const headerTop = document.createElement('div');
+                headerTop.className = 'messages-header-top';
+                headerTop.appendChild(searchBox);
+                headerTop.appendChild(filters);
+
+                header.appendChild(headerTop);
+                header.appendChild(bulkActions);
+
+                // Message detail view (initially hidden)
+                const messageDetail = document.createElement('div');
+                messageDetail.className = 'message-detail';
+                messageDetail.id = 'message-detail';
+
+                // Messages list
+                const messagesList = document.createElement('ul');
+                messagesList.className = 'messages-list';
+                messagesList.id = 'messages-list';
+
+                // ADD: Create dispute reports container
+                const disputeReportsContainer = document.createElement('div');
+                disputeReportsContainer.className = 'dispute-reports-container';
+                disputeReportsContainer.id = 'dispute-reports-container';
+
+                // ADD: Create a section header for dispute reports
+                const disputeHeader = document.createElement('div');
+                disputeHeader.className = 'dispute-reports-header';
+                disputeHeader.innerHTML = `
+                    <h3>
+                        <i class="fas fa-balance-scale"></i> 
+                        Dispute Reports
+                        <span id="dispute-reports-count" class="dispute-count-badge" style="
+                            background: #e3f2fd; 
+                            color: #1565c0; 
+                            padding: 2px 8px; 
+                            border-radius: 12px; 
+                            font-size: 12px; 
+                            margin-left: 8px;
+                            display: none;
+                        ">0</span>
+                    </h3>
+                    <div class="dispute-controls" style="display: flex; gap: 10px; align-items: center;">
+                        <button id="refresh-dispute-reports" class="btn-refresh" style="
+                            background: #f5f5f5; 
+                            border: 1px solid #ddd; 
+                            border-radius: 4px; 
+                            padding: 6px 12px; 
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 5px;
+                            font-size: 13px;
+                            transition: all 0.2s ease;
+                        ">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Reports
+                        </button>
+                        <div id="dispute-loading-indicator" style="display: none; color: #666; font-size: 13px;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading...
+                        </div>
+                    </div>
+                `;
+
+                // Filter messages based on current filter
+                const filteredMessages = currentFilter === 'all'
+                    ? messages
+                    : messages.filter(msg => !msg.read);
+
+                if (filteredMessages.length === 0) {
+                    messagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No messages found</p>
+                        </div>
+                    `;
+                } else {
+                    messagesList.innerHTML = filteredMessages.map(message => `
+                        <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
+                            <div class="message-checkbox">
+                                <input type="checkbox" class="message-select" data-message-id="${message.id}">
+                            </div>
+                            <div class="message-avatar">${message.avatar}</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${message.sender}</span>
+                                    <span class="message-time">${formatDate(message.time)}</span>
+                                </div>
+                                <div class="message-subject">${message.subject}</div>
+                                <div class="message-preview">${message.body.substring(0, 100)}${message.body.length > 100 ? '...' : ''}</div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+
+                // Append all elements to the container
+                messagesContainer.appendChild(header);
+                messagesContainer.appendChild(messageDetail);
+                messagesContainer.appendChild(messagesList);
+
+                // ADD: Append dispute reports section
+                messagesContainer.appendChild(disputeHeader);
+                messagesContainer.appendChild(disputeReportsContainer);
+
+                // Clear the container and append the messages UI
+                container.innerHTML = '';
+                container.appendChild(messagesContainer);
+
+                // After rendering, automatically attach click handlers and setup bulk selection
+                setTimeout(() => {
+                    attachMessageClickHandlers(container);
+                    setupBulkSelection(container);
+                    setupDisputeReportsEventListeners(container); // Add dispute reports event listeners
+                }, 100); // Small delay to ensure DOM is updated
+            }
+
+            // Set up event listeners
+            function setupEventListeners(container) {
+                console.log('🔧 Setting up event listeners for Messages module');
+
+                // Search functionality
+                const searchInput = container.querySelector('.messages-search input');
+                if (searchInput) {
+                    console.log('✅ Search input found, adding event listener');
+                    searchInput.addEventListener('input', function (e) {
+                        console.log('🔍 Search input changed:', e.target.value);
+                        filterMessages(e.target.value);
+                    });
+                } else {
+                    console.error('❌ Search input not found');
+                }
+
+                // Filter buttons
+                const filterButtons = container.querySelectorAll('.messages-filter-btn');
+                console.log('🔧 Found filter buttons:', filterButtons.length);
+
+                filterButtons.forEach(button => {
+                    console.log('✅ Adding click listener to filter button:', button.textContent);
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const filter = this.dataset.filter;
+                        console.log('🔘 Filter button clicked:', filter);
+                        setFilter(filter, container);
+                    });
+                });
+
+                // Message item clicks - This is the key part for clicking messages
+                const messagesList = container.querySelector('.messages-list');
+                if (messagesList) {
+                    console.log('✅ Messages list found, adding click delegation');
+
+                    messagesList.addEventListener('click', function (e) {
+                        console.log('🖱️ Click detected on messages list');
+                        console.log('🖱️ Click target:', e.target);
+                        console.log('🖱️ Click target classes:', e.target.className);
+
+                        // Find the message item (could be clicked on child element)
+                        const messageItem = e.target.closest('.message-item');
+                        console.log('🖱️ Found message item:', messageItem);
+
+                        if (messageItem) {
+                            const messageId = messageItem.dataset.id;
+                            console.log('📨 Message clicked - ID:', messageId);
+                            console.log('📨 Message item dataset:', messageItem.dataset);
+
+                            // Mark as read
+                            markAsRead(messageId);
+
+                            // Show message details
+                            showMessageDetails(messageId, container);
+                        } else {
+                            console.log('❌ No message item found in click path');
+                        }
+                    });
+                } else {
+                    console.error('❌ Messages list not found for event delegation');
+                }
+
+                // Compose button
+                const composeBtn = container.querySelector('.messages-compose-btn');
+                if (composeBtn) {
+                    console.log('✅ Compose button found, adding event listener');
+                    composeBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        console.log('✉️ Compose button clicked');
+                        showComposeModal(container);
+                    });
+                } else {
+                    console.log('⚠️ Compose button not found');
+                }
+
+                console.log('🔧 Event listeners setup complete');
+            }
+
+            // Mark message as read
+            function markAsRead(messageId) {
+                console.log('✅ Marking message as read:', messageId);
+
+                const message = messages.find(m => m.id == messageId);
+                if (message) {
+                    message.read = true;
+                    console.log('✅ Message marked as read in local array');
+
+                    // Update the UI to reflect read status
+                    const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.classList.remove('unread');
+                        messageElement.classList.add('read');
+                        console.log('✅ Message UI updated to read status');
+                    }
+
+                    // TODO: Send API call to backend to mark as read in database
+                    // This would be something like:
+                    // updateMessageReadStatus(messageId, true);
+                } else {
+                    console.error('❌ Message not found for marking as read:', messageId);
+                }
+            }
+
+            // Show message details
+            function showMessageDetails(messageId, container) {
+                console.log('📖 showMessageDetails called with ID:', messageId);
+                console.log('📖 Available messages:', messages.length);
+
+                const message = messages.find(m => m.id == messageId);
+                console.log('📖 Found message:', message);
+
+                if (!message) {
+                    console.error('❌ Message not found with ID:', messageId);
+                    return;
+                }
+
+                // Look for the existing message detail panel
+                let detailsPanel = container.querySelector('.message-detail');
+                console.log('📖 Looking for message detail panel:', detailsPanel);
+
+                if (!detailsPanel) {
+                    console.log('📖 Message detail panel not found, checking for alternative selectors');
+                    detailsPanel = container.querySelector('#message-detail') ||
+                        container.querySelector('.message-details') ||
+                        container.querySelector('[class*="detail"]');
+                    console.log('📖 Alternative detail panel found:', detailsPanel);
+                }
+
+                if (!detailsPanel) {
+                    console.error('❌ No message details panel found in container');
+                    console.log('📖 Available elements in container:', container.querySelectorAll('*'));
+                    return;
+                }
+
+                console.log('📖 Updating details panel with message data');
+
+                // Update the detail panel content
+                detailsPanel.innerHTML = `
+        <div class="message-detail-header">
+            <button class="message-detail-back" onclick="closeMessageDetail()">
+                <i class="fas fa-arrow-left"></i> Back to Messages
+            </button>
+            <div class="message-detail-actions">
+                <button class="message-detail-action" data-action="mark-unread" onclick="toggleReadStatus('${messageId}')">
+                    <i class="fas fa-envelope"></i> Mark as unread
+                </button>
+                <button class="message-detail-action" data-action="delete" onclick="deleteMessage('${messageId}')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        <div class="message-detail-info">
+            <div class="message-detail-avatar">${message.avatar}</div>
+            <div>
+                <div class="message-detail-sender">${message.sender}</div>
+                <div class="message-detail-time">${new Date(message.time).toLocaleString()}</div>
+            </div>
+        </div>
+        <div class="message-detail-subject">
+            <h2>${message.subject}</h2>
+        </div>
+        <div class="message-detail-body">
+            ${message.body.replace(/\n/g, '<br>')}
+        </div>
+    `;
+
+                // Show the detail panel by adding the active class
+                detailsPanel.classList.add('active');
+                console.log('📖 Added active class to detail panel');
+
+                // Hide the messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    messagesList.style.display = 'none';
+                    console.log('📖 Hidden messages list');
+                } else {
+                    console.log('⚠️ Messages list not found to hide');
+                }
+
+                // Set the active message ID
+                activeMessageId = messageId;
+
+                console.log('📖 Message details updated and displayed successfully');
+            }
+
+            // Open a message
+            function openMessage(messageId, container) {
+                const message = messages.find(msg => msg.id === messageId);
+                if (!message) return;
+
+                // Mark as read
+                if (!message.read) {
+                    message.read = true;
+                    // In a real app, you would send an API request to mark as read
+                }
+
+                // Store active message ID
+                activeMessageId = messageId;
+
+                // Update the message detail view
+                const messageDetail = container.querySelector('#message-detail');
+                if (messageDetail) {
+                    messageDetail.innerHTML = `
+                        <div class="message-detail-header">
+                            <div class="message-detail-subject">${message.subject}</div>
+                            <div class="message-detail-actions">
+                                <button class="message-detail-action" data-action="back">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button class="message-detail-action" data-action="${message.read ? 'mark-unread' : 'mark-read'}">
+                                    <i class="fas ${message.read ? 'fa-envelope' : 'fa-envelope-open'}"></i> 
+                                    ${message.read ? 'Mark as unread' : 'Mark as read'}
+                                </button>
+                                <button class="message-detail-action" data-action="delete">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        <div class="message-detail-info">
+                            <div class="message-detail-avatar">${message.avatar}</div>
+                            <div>
+                                <div class="message-detail-sender">${message.sender}</div>
+                                <div class="message-detail-time">${new Date(message.time).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="message-detail-body">
+                            ${message.body.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    messageDetail.classList.add('active');
+                }
+
+                // Hide the messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    messagesList.style.display = 'none';
+                }
+
+                // Update the message item in the list to reflect read status
+                const messageItem = container.querySelector(`.message-item[data-id="${messageId}"]`);
+                if (messageItem) {
+                    messageItem.classList.remove('unread');
+                }
+            }
+
+            // Close message detail function - make it globally accessible
+            window.closeMessageDetail = function () {
+                console.log('🔙 Closing message detail');
+
+                const moduleContainer = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (!moduleContainer) {
+                    console.error('❌ Container not found for closing message detail');
+                    return;
+                }
+
+                const messageDetail = moduleContainer.querySelector('.message-detail');
+                if (messageDetail) {
+                    messageDetail.classList.remove('active');
+                    console.log('📖 Removed active class from detail panel');
+                }
+
+                const messagesList = moduleContainer.querySelector('#messages-list');
+                if (messagesList) {
+                    messagesList.style.display = 'block';
+                    console.log('📖 Showed messages list');
+                }
+
+                activeMessageId = null;
+                console.log('🔙 Message detail closed successfully');
+            };
+
+            // Toggle read status - also make it globally accessible
+            window.toggleReadStatus = function (messageId) {
+                console.log('🔄 Toggle read status for message:', messageId);
+                const message = messages.find(m => m.id == messageId);
+                if (message) {
+                    message.read = !message.read;
+                    console.log('✅ Message read status toggled to:', message.read);
+
+                    // Update the UI
+                    const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                    if (container) {
+                        // Re-render the message details to update the button
+                        showMessageDetails(messageId, container);
+                    }
+                }
+            };
+
+            // Delete a message - also make it globally accessible
+            window.deleteMessage = function (messageId) {
+                console.log('🗑️ Delete message:', messageId);
+                if (confirm('Are you sure you want to delete this message?')) {
+                    // First, try to delete from the backend
+                    deleteMessageFromBackend(messageId)
+                        .then(success => {
+                            if (success) {
+                                console.log('✅ Message deleted from backend successfully');
+
+                                // Remove from local array
+                                const index = messages.findIndex(m => m.id == messageId);
+                                if (index > -1) {
+                                    messages.splice(index, 1);
+                                    console.log('✅ Message deleted from local array');
+
+                                    // Close the detail view and go back to list
+                                    window.closeMessageDetail();
+
+                                    // Re-render the messages list AND re-attach event handlers
+                                    const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                                    if (container) {
+                                        renderMessagesUI(container);
+                                        // Re-attach click handlers after re-rendering
+                                        attachMessageClickHandlers(container);
+                                    }
+                                }
+                            } else {
+                                console.error('❌ Failed to delete message from backend');
+                                alert('Failed to delete message. Please try again.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('❌ Error deleting message from backend:', error);
+                            alert('Error deleting message. Please try again.');
+                        });
+                }
+            };
+
+            // Function to delete message from backend
+            async function deleteMessageFromBackend(messageId) {
+                try {
+                    console.log('🌐 Deleting message from backend:', messageId);
+
+                    // Get user ID and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId) {
+                        console.error('❌ No user ID found for deleting message');
+                        return false;
+                    }
+
+                    if (!authToken) {
+                        console.error('❌ No auth token found for deleting message');
+                        return false;
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/admin/delete-notification`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            notificationId: messageId,
+                            userId: userId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        console.log('✅ Message deleted from backend successfully');
+                        return true;
+                    } else {
+                        console.error('❌ Backend returned failure:', data.message);
+                        return false;
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error deleting message from backend:', error);
+                    return false;
+                }
+            }
+
+            // Search messages
+            function searchMessages(query, container) {
+                if (!query) {
+                    // If query is empty, reset to current filter
+                    renderMessagesUI(container);
+                    return;
+                }
+
+                // Filter messages based on search query
+                const filteredMessages = messages.filter(msg => {
+                    const searchText = query.toLowerCase();
+                    return (
+                        msg.subject.toLowerCase().includes(searchText) ||
+                        msg.body.toLowerCase().includes(searchText) ||
+                        msg.sender.toLowerCase().includes(searchText)
+                    );
+                });
+
+                // Update messages list
+                const messagesList = container.querySelector('#messages-list');
+                if (messagesList) {
+                    if (filteredMessages.length === 0) {
+                        messagesList.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <p>No messages found matching "${query}"</p>
+                            </div>
+                        `;
+                    } else {
+                        messagesList.innerHTML = filteredMessages.map(message => `
+                            <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
+                                <div class="message-avatar">${message.avatar}</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">${message.sender}</span>
+                                        <span class="message-time">${formatDate(message.time)}</span>
+                                    </div>
+                                    <div class="message-subject">${message.subject}</div>
+                                    <div class="message-preview">${message.body.substring(0, 100)}${message.body.length > 100 ? '...' : ''}</div>
+                                </div>
+                            </li>
+                        `).join('');
+                    }
+                }
+            }
+
+            // Set filter
+            function setFilter(filter, container) {
+                if (filter === currentFilter) return;
+
+                currentFilter = filter;
+
+                // Update filter buttons
+                const filterBtns = container.querySelectorAll('.filter-btn');
+                filterBtns.forEach(btn => {
+                    if (btn.dataset.filter === filter) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                // Re-render messages list
+                renderMessagesUI(container);
+            }
+
+            // Reset initialization state (for reloading)
+            function reset() {
+                isInitialized = false;
+                activeMessageId = null;
+
+                // Stop periodic refresh
+                stopPeriodicRefresh();
+
+                // Clear stored data
+                messages = [];
+                disputeReports = [];
+                retryAttempts = 0;
+
+                console.log('🔄 Messages module reset complete');
+                return true;
+            }
+
+            // Function to attach click handlers to messages
+            function attachMessageClickHandlers(container) {
+                console.log('🔗 Attaching message click handlers');
+
+                const messagesList = container.querySelector('#messages-list');
+                if (!messagesList) {
+                    console.error('❌ Messages list not found for attaching handlers');
+                    return;
+                }
+
+                // Remove any existing event listeners to prevent duplicates
+                const existingHandler = messagesList.getAttribute('data-handler-attached');
+                if (existingHandler) {
+                    messagesList.removeEventListener('click', window.messagesClickHandler);
+                }
+
+                // Create and store the click handler function
+                window.messagesClickHandler = function (event) {
+                    console.log('🖱️ Click detected on messages list');
+                    console.log('🖱️ Click target:', event.target);
+                    console.log('🖱️ Click target classes:', event.target.className);
+
+                    // Don't trigger message open if clicking on checkbox
+                    if (event.target.type === 'checkbox' || event.target.closest('.message-checkbox')) {
+                        console.log('🔲 Checkbox clicked, not opening message');
+                        return;
+                    }
+
+                    // Find the closest message item
+                    const messageItem = event.target.closest('.message-item');
+                    console.log('🖱️ Found message item:', messageItem);
+
+                    if (messageItem && messageItem.dataset.id) {
+                        const messageId = messageItem.dataset.id;
+                        console.log('📨 Message clicked - ID:', messageId);
+                        console.log('📨 Message item dataset:', messageItem.dataset);
+
+                        // Mark as read and show details
+                        markAsRead(messageId);
+                        showMessageDetails(messageId, container);
+                    }
+                };
+
+                // Attach the event listener
+                messagesList.addEventListener('click', window.messagesClickHandler);
+                messagesList.setAttribute('data-handler-attached', 'true');
+
+                console.log('✅ Message click handlers attached successfully');
+            }
+
+            // Setup bulk selection functionality
+            function setupBulkSelection(container) {
+                console.log('🔗 Setting up bulk selection functionality');
+
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                const selectedCountSpan = container.querySelector('#selected-count');
+                const messageCheckboxes = container.querySelectorAll('.message-select');
+
+                if (!selectAllCheckbox || !bulkDeleteBtn || !selectedCountSpan) {
+                    console.error('❌ Bulk selection elements not found');
+                    return;
+                }
+
+                // Handle individual message checkbox changes
+                messageCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function (e) {
+                        const messageId = this.dataset.messageId;
+                        const messageItem = this.closest('.message-item');
+
+                        if (this.checked) {
+                            messageItem.classList.add('selected');
+                            console.log('✅ Selected message:', messageId);
+                        } else {
+                            messageItem.classList.remove('selected');
+                            console.log('❌ Deselected message:', messageId);
+                        }
+
+                        updateBulkSelectionState(container);
+                    });
+                });
+
+                // Handle select all checkbox
+                selectAllCheckbox.addEventListener('change', function (e) {
+                    const isChecked = this.checked;
+                    console.log('🔲 Select all toggled:', isChecked);
+
+                    messageCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                        const messageItem = checkbox.closest('.message-item');
+
+                        if (isChecked) {
+                            messageItem.classList.add('selected');
+                        } else {
+                            messageItem.classList.remove('selected');
+                        }
+                    });
+
+                    updateBulkSelectionState(container);
+                });
+
+                // Handle bulk delete button
+                bulkDeleteBtn.addEventListener('click', function (e) {
+                    console.log('🗑️ Bulk delete button clicked');
+                    performBulkDelete(container);
+                });
+
+                console.log('✅ Bulk selection functionality setup complete');
+            }
+
+            // Update bulk selection state
+            function updateBulkSelectionState(container) {
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                const selectedCountSpan = container.querySelector('#selected-count');
+                const messageCheckboxes = container.querySelectorAll('.message-select');
+
+                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
+                const selectedCount = selectedCheckboxes.length;
+
+                console.log('📊 Updating bulk selection state. Selected:', selectedCount);
+
+                // Update selected count
+                if (selectedCountSpan) {
+                    selectedCountSpan.textContent = selectedCount;
+                }
+
+                // Update bulk delete button state
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.disabled = selectedCount === 0;
+                }
+
+                // Update select all checkbox state
+                if (selectAllCheckbox) {
+                    if (selectedCount === 0) {
+                        selectAllCheckbox.indeterminate = false;
+                        selectAllCheckbox.checked = false;
+                    } else if (selectedCount === messageCheckboxes.length) {
+                        selectAllCheckbox.indeterminate = false;
+                        selectAllCheckbox.checked = true;
+                    } else {
+                        selectAllCheckbox.indeterminate = true;
+                        selectAllCheckbox.checked = false;
+                    }
+                }
+            }
+
+            // Perform bulk delete
+            function performBulkDelete(container) {
+                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
+                const selectedMessageIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.messageId);
+
+                console.log('🗑️ Bulk delete requested for messages:', selectedMessageIds);
+
+                if (selectedMessageIds.length === 0) {
+                    console.log('⚠️ No messages selected for deletion');
+                    return;
+                }
+
+                const confirmMessage = `Are you sure you want to delete ${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''}? This action cannot be undone.`;
+
+                if (!confirm(confirmMessage)) {
+                    console.log('❌ Bulk delete cancelled by user');
+                    return;
+                }
+
+                // Show loading state
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.disabled = true;
+                    bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                }
+
+                // Perform bulk deletion
+                bulkDeleteMessages(selectedMessageIds)
+                    .then(success => {
+                        if (success) {
+                            console.log('✅ Bulk delete successful');
+
+                            // Remove messages from local array
+                            selectedMessageIds.forEach(messageId => {
+                                const index = messages.findIndex(m => m.id == messageId);
+                                if (index > -1) {
+                                    messages.splice(index, 1);
+                                }
+                            });
+
+                            // Re-render the messages UI
+                            renderMessagesUI(container);
+                            attachMessageClickHandlers(container);
+
+                            // Show success message
+                            showSuccessMessage(`Successfully deleted ${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''}`);
+
+                        } else {
+                            console.error('❌ Bulk delete failed');
+                            showErrorMessage('Failed to delete messages. Please try again.');
+
+                            // Reset button state
+                            if (bulkDeleteBtn) {
+                                bulkDeleteBtn.disabled = false;
+                                bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error during bulk delete:', error);
+                        showErrorMessage('Error deleting messages. Please try again.');
+
+                        // Reset button state
+                        if (bulkDeleteBtn) {
+                            bulkDeleteBtn.disabled = false;
+                            bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)';
+                        }
+                    });
+            }
+
+            // Bulk delete messages from backend
+            async function bulkDeleteMessages(messageIds) {
+                try {
+                    console.log('🌐 Bulk deleting messages from backend:', messageIds);
+
+                    // Get user ID and auth token
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+                    const authToken = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!userId) {
+                        console.error('❌ No user ID found for bulk deleting messages');
+                        return false;
+                    }
+
+                    if (!authToken) {
+                        console.error('❌ No auth token found for bulk deleting messages');
+                        return false;
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/admin/bulk-delete-notifications`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            notificationIds: messageIds,
+                            userId: userId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        console.log('✅ Messages bulk deleted from backend successfully');
+                        console.log('📊 Deletion results:', data.results);
+                        return true;
+                    } else {
+                        console.error('❌ Backend returned failure:', data.message);
+                        return false;
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error bulk deleting messages from backend:', error);
+                    return false;
+                }
+            }
+
+            // Show success message
+            function showSuccessMessage(message) {
+                console.log('✅ Success:', message);
+
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (container) {
+                    const successHtml = `
+                        <div class="success-message" style="
+                            background: #d4edda; 
+                            color: #155724; 
+                            padding: 15px; 
+                            border-radius: 4px; 
+                            margin: 10px 0;
+                            border-left: 4px solid #28a745;
+                        ">
+                            <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                            ${message}
+                        </div>
+                    `;
+
+                    container.insertAdjacentHTML('afterbegin', successHtml);
+
+                    // Remove success message after 3 seconds
+                    setTimeout(() => {
+                        const successElement = container.querySelector('.success-message');
+                        if (successElement) {
+                            successElement.remove();
+                        }
+                    }, 3000);
+                }
+            }
+
+            // Move loadMessages function INSIDE the module
+            async function loadMessages() {
+                try {
+                    console.log('📬 Loading messages and dispute reports...');
+
+                    const token = localStorage.getItem('authToken');
+                    if (!token) {
+                        console.log('❌ No auth token found');
+                        return;
+                    }
+
+                    // Load notifications and dispute reports separately for better reliability
+                    const promises = [
+                        loadNotifications(token),
+                        loadDisputeReportsInitial()
+                    ];
+
+                    const [notificationsResult, disputeReportsResult] = await Promise.allSettled(promises);
+
+                    // Handle notifications result
+                    if (notificationsResult.status === 'fulfilled' && notificationsResult.value) {
+                        displayMessages(notificationsResult.value.notifications || []);
+                        updateMessageCounts(notificationsResult.value.counts || {});
+                    } else {
+                        console.warn('⚠️ Failed to load notifications:', notificationsResult.reason);
+                        displayMessages([]); // Show empty state
+                    }
+
+                    // Handle dispute reports result
+                    if (disputeReportsResult.status === 'fulfilled' && disputeReportsResult.value) {
+                        disputeReports = disputeReportsResult.value;
+                        displayDisputeReports(disputeReports);
+                        updateDisputeReportsCount(disputeReports.length);
+                    } else {
+                        console.warn('⚠️ Failed to load dispute reports:', disputeReportsResult.reason);
+                        displayDisputeReports([]); // Show empty state
+                    }
+
+                    console.log(`📬 Loading complete: ${notificationsResult.value?.notifications?.length || 0} notifications, ${disputeReports.length} dispute reports`);
+
+                } catch (error) {
+                    console.error('❌ Error loading messages:', error);
+                    showErrorMessage('Failed to load messages. Please try again.');
+                }
+            }
+
+            // Load notifications separately
+            async function loadNotifications(token) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/user/notifications', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('📬 Notifications loaded:', data);
+
+                    if (data.success) {
+                        return data;
+                    } else {
+                        throw new Error('Failed to load notifications: ' + (data.message || 'Unknown error'));
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error loading notifications:', error);
+                    throw error;
+                }
+            }
+
+            // Load dispute reports during initial load
+            async function loadDisputeReportsInitial() {
+                try {
+                    console.log('📋 Initial load of dispute reports...');
+                    const reports = await fetchDisputeReports();
+                    console.log(`📋 Initial dispute reports loaded: ${reports.length} reports`);
+                    return reports;
+                } catch (error) {
+                    console.error('❌ Error in initial dispute reports load:', error);
+                    return []; // Return empty array instead of throwing
+                }
+            }
+
+            // Move displayMessages function INSIDE the module
+            function displayMessages(notifications) {
+                console.log('📨 Displaying notifications:', notifications);
+
+                if (!notifications || notifications.length === 0) {
+                    console.log('📨 No notifications to display');
+                    return;
+                }
+
+                // Convert API notifications to the expected message format
+                const convertedMessages = notifications.map(notification => ({
+                    id: notification.id,
+                    sender: notification.sender || 'JAM System',
+                    subject: notification.subject || notification.title || 'Notification',
+                    body: notification.message || notification.body || '',
+                    time: notification.createdAt || notification.timestamp || new Date().toISOString(),
+                    read: notification.read || false,
+                    avatar: notification.sender ? notification.sender.charAt(0).toUpperCase() : 'J'
+                }));
+
+                // Update the global messages array
+                messages = convertedMessages;
+
+                // Re-render the messages UI if container exists
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (container) {
+                    renderMessagesUI(container);
+                    attachMessageClickHandlers(container);
+                }
+            }
+
+            // Move showErrorMessage function INSIDE the module
+            function showErrorMessage(message) {
+                console.error('❌ Error:', message);
+
+                // Try to find a container to show the error
+                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
+                if (container) {
+                    const errorHtml = `
+                        <div class="error-message" style="
+                            background: #ffebee; 
+                            color: #c62828; 
+                            padding: 15px; 
+                            border-radius: 4px; 
+                            margin: 10px 0;
+                            border-left: 4px solid #f44336;
+                        ">
+                            <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                            ${message}
+                        </div>
+                    `;
+
+                    // Insert error message at the top of the container
+                    container.insertAdjacentHTML('afterbegin', errorHtml);
+
+                    // Remove error message after 5 seconds
+                    setTimeout(() => {
+                        const errorElement = container.querySelector('.error-message');
+                        if (errorElement) {
+                            errorElement.remove();
+                        }
+                    }, 5000);
+                }
+
+                // Also show a browser alert as fallback
+                alert(message);
+            }
+
+            // Move displayDisputeReports function INSIDE the module
+            function displayDisputeReports(disputeReports) {
+                console.log('📋 Displaying dispute reports:', disputeReports);
+
+                const disputeContainer = document.getElementById('dispute-reports-container');
+                if (!disputeContainer) {
+                    console.error('❌ Dispute reports container not found');
+                    return;
+                }
+
+                if (!disputeReports || disputeReports.length === 0) {
+                    disputeContainer.innerHTML = `
+                        <div class="no-disputes-message">
+                            <i class="fas fa-file-alt"></i>
+                            <p>No dispute reports found</p>
+                            <small>Your submitted dispute reports will appear here</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const disputeHTML = disputeReports.map(dispute => {
+                    const submittedDate = new Date(dispute.submittedAt).toLocaleDateString();
+                    const reportDate = new Date(dispute.reportDate).toLocaleDateString();
+                    const statusClass = getDisputeStatusClass(dispute.status);
+                    const statusIcon = getDisputeStatusIcon(dispute.status);
+
+                    return `
+                        <div class="dispute-report-item" data-dispute-id="${dispute.id}">
+                            <div class="dispute-header">
+                                <div class="dispute-title">
+                                    <i class="fas fa-balance-scale"></i>
+                                    <span>${dispute.reportType}</span>
+                                    <span class="dispute-status ${statusClass}">
+                                        <i class="${statusIcon}"></i>
+                                        ${dispute.status.charAt(0).toUpperCase() + dispute.status.slice(1)}
+                                    </span>
+                                </div>
+                                <div class="dispute-date">
+                                    <small>Submitted: ${submittedDate}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="dispute-content">
+                                <div class="dispute-summary">
+                                    <strong>Summary:</strong>
+                                    <p>${dispute.disputeSummary}</p>
+                                </div>
+                                
+                                <div class="dispute-details">
+                                    <div class="detail-row">
+                                        <span><strong>Report Date:</strong> ${reportDate}</span>
+                                    </div>
+                                    
+                                    ${dispute.creditScores ? `
+                                        <div class="credit-scores">
+                                            <strong>Credit Scores:</strong>
+                                            <div class="scores-grid">
+                                                ${dispute.creditScores.experian ? `<span class="score-item">Experian: ${dispute.creditScores.experian}</span>` : ''}
+                                                ${dispute.creditScores.equifax ? `<span class="score-item">Equifax: ${dispute.creditScores.equifax}</span>` : ''}
+                                                ${dispute.creditScores.transunion ? `<span class="score-item">TransUnion: ${dispute.creditScores.transunion}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${dispute.fileInfo ? `
+                                        <div class="dispute-file">
+                                            <strong>Attached File:</strong>
+                                            <div class="file-info">
+                                                <i class="fas fa-file-pdf"></i>
+                                                <span>${dispute.fileInfo.fileName}</span>
+                                                <span class="file-size">(${formatFileSize(dispute.fileInfo.fileSize)})</span>
+                                                ${dispute.fileInfo.azureUrl ? `
+                                                    <a href="${dispute.fileInfo.azureUrl}" target="_blank" class="view-file-btn">
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                        View File
+                                                    </a>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="dispute-actions">
+                                <button class="btn-secondary" onclick="toggleDisputeDetails('${dispute.id}')">
+                                    <i class="fas fa-chevron-down"></i>
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                disputeContainer.innerHTML = disputeHTML;
+            }
+
+            // Move helper functions INSIDE the module
+            function updateMessageCounts(counts) {
+                const notificationCount = document.getElementById('notification-count');
+                const disputeCount = document.getElementById('dispute-count');
+
+                if (notificationCount) {
+                    notificationCount.textContent = counts.notifications || 0;
+                }
+
+                if (disputeCount) {
+                    disputeCount.textContent = counts.disputeReports || 0;
+                }
+
+                // Update unread notification badge
+                const unreadBadge = document.querySelector('.unread-badge');
+                if (unreadBadge) {
+                    const unreadCount = counts.unreadNotifications || 0;
+                    if (unreadCount > 0) {
+                        unreadBadge.textContent = unreadCount;
+                        unreadBadge.style.display = 'block';
+                    } else {
+                        unreadBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            function getDisputeStatusClass(status) {
+                const statusClasses = {
+                    'submitted': 'status-submitted',
+                    'in-progress': 'status-progress',
+                    'under-review': 'status-review',
+                    'resolved': 'status-resolved',
+                    'rejected': 'status-rejected'
+                };
+                return statusClasses[status] || 'status-default';
+            }
+
+            function getDisputeStatusIcon(status) {
+                const statusIcons = {
+                    'submitted': 'fas fa-paper-plane',
+                    'in-progress': 'fas fa-spinner',
+                    'under-review': 'fas fa-search',
+                    'resolved': 'fas fa-check-circle',
+                    'rejected': 'fas fa-times-circle'
+                };
+                return statusIcons[status] || 'fas fa-info-circle';
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function toggleDisputeDetails(disputeId) {
+                const disputeItem = document.querySelector(`[data-dispute-id="${disputeId}"]`);
+                if (disputeItem) {
+                    disputeItem.classList.toggle('expanded');
+                    const button = disputeItem.querySelector('.dispute-actions button');
+                    const icon = button.querySelector('i');
+
+                    if (disputeItem.classList.contains('expanded')) {
+                        icon.className = 'fas fa-chevron-up';
+                        button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
+                    } else {
+                        icon.className = 'fas fa-chevron-down';
+                        button.innerHTML = '<i class="fas fa-chevron-down"></i> View Details';
+                    }
+                }
+            }
+
+            // Setup dispute reports event listeners
+            function setupDisputeReportsEventListeners(container) {
+                console.log('🔧 Setting up dispute reports event listeners');
+
+                // Manual refresh button
+                const refreshBtn = container.querySelector('#refresh-dispute-reports');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function () {
+                        console.log('🔄 Manual dispute reports refresh triggered');
+                        refreshDisputeReports(container, true); // Force refresh
+                    });
+                }
+
+                // CHANGED: Smart refresh strategy instead of continuous polling
+                setupSmartRefresh(container);
+
+                console.log('✅ Dispute reports event listeners setup complete');
+            }
+
+            // CHANGED: Smart refresh system to reduce API costs
+            function setupSmartRefresh(container) {
+                console.log('🧠 Setting up smart refresh system');
+
+                // Setup page visibility change detection
+                setupPageVisibilityDetection(container);
+
+                // Setup window focus detection  
+                setupWindowFocusDetection(container);
+
+                // Setup longer interval for background refresh (only when page is visible)
+                startSmartPeriodicRefresh(container);
+
+                // Setup user activity detection for on-demand refresh
+                setupUserActivityDetection(container);
+
+                console.log('✅ Smart refresh system setup complete');
+            }
+
+            // Setup page visibility API to pause/resume refreshing
+            function setupPageVisibilityDetection(container) {
+                if (typeof document.visibilityState !== 'undefined') {
+                    document.addEventListener('visibilitychange', function () {
+                        const wasVisible = isPageVisible;
+                        isPageVisible = !document.hidden;
+
+                        console.log(`👁️ Page visibility changed: ${isPageVisible ? 'visible' : 'hidden'}`);
+
+                        if (!wasVisible && isPageVisible) {
+                            // Page became visible - check if we need to refresh
+                            const timeSinceLastRefresh = Date.now() - lastRefreshTime;
+                            if (timeSinceLastRefresh > 60000) { // More than 1 minute ago
+                                console.log('🔄 Page became visible, refreshing dispute reports');
+                                setTimeout(() => {
+                                    refreshDisputeReports(container, false);
+                                }, 2000); // Small delay to let page settle
+                            }
+                        }
+                    });
+                    console.log('✅ Page visibility detection enabled');
+                } else {
+                    console.log('⚠️ Page Visibility API not supported');
+                }
+            }
+
+            // Setup window focus detection for smart refreshing
+            function setupWindowFocusDetection(container) {
+                window.addEventListener('focus', function () {
+                    console.log('🎯 Window gained focus');
+
+                    // Clear any existing focus timeout
+                    if (focusTimeoutId) {
+                        clearTimeout(focusTimeoutId);
+                    }
+
+                    // Check if we should refresh after focus
+                    const timeSinceLastRefresh = Date.now() - lastRefreshTime;
+                    if (timeSinceLastRefresh > 30000) { // More than 30 seconds ago
+                        focusTimeoutId = setTimeout(() => {
+                            console.log('🔄 Window focus refresh triggered');
+                            refreshDisputeReports(container, false);
+                        }, FOCUS_REFRESH_DELAY);
+                    }
+                });
+
+                window.addEventListener('blur', function () {
+                    console.log('🌫️ Window lost focus');
+                    // Clear focus timeout if window loses focus
+                    if (focusTimeoutId) {
+                        clearTimeout(focusTimeoutId);
+                        focusTimeoutId = null;
+                    }
+                });
+
+                console.log('✅ Window focus detection enabled');
+            }
+
+            // Smart periodic refresh - only when page is visible and at longer intervals
+            function startSmartPeriodicRefresh(container) {
+                console.log('⏰ Starting smart periodic refresh');
+
+                // Clear any existing interval
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                }
+
+                // Set up new interval with smart conditions
+                loadingInterval = setInterval(() => {
+                    // Only refresh if page is visible and it's been a while
+                    if (isPageVisible) {
+                        const timeSinceLastRefresh = Date.now() - lastRefreshTime;
+                        if (timeSinceLastRefresh > SMART_REFRESH_INTERVAL) {
+                            console.log('⏰ Smart periodic refresh triggered');
+                            refreshDisputeReports(container, false);
+                        } else {
+                            console.log('⏰ Skipping refresh - too recent');
+                        }
+                    } else {
+                        console.log('⏰ Skipping refresh - page not visible');
+                    }
+                }, SMART_REFRESH_INTERVAL);
+
+                console.log(`✅ Smart periodic refresh started (every ${SMART_REFRESH_INTERVAL / 1000} seconds when visible)`);
+            }
+
+            // Setup user activity detection for contextual refreshing
+            function setupUserActivityDetection(container) {
+                console.log('🎮 Setting up user activity detection');
+
+                // Refresh when user navigates to Messages module
+                const moduleContainer = container.closest('.tab-content') || container;
+                if (moduleContainer) {
+                    // Use MutationObserver to detect when Messages module becomes active
+                    const observer = new MutationObserver(function (mutations) {
+                        mutations.forEach(function (mutation) {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                                const target = mutation.target;
+                                if (target.style.display !== 'none' && target.contains(container)) {
+                                    const timeSinceLastRefresh = Date.now() - lastRefreshTime;
+                                    if (timeSinceLastRefresh > 30000) { // 30 seconds
+                                        console.log('🎮 Messages module became active, refreshing');
+                                        setTimeout(() => {
+                                            refreshDisputeReports(container, false);
+                                        }, 1000);
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    observer.observe(moduleContainer, {
+                        attributes: true,
+                        attributeFilter: ['style', 'class']
+                    });
+
+                    console.log('✅ User activity detection enabled');
+                }
+            }
+
+            // Start periodic refresh for dispute reports (LEGACY - now using smart refresh)
+            function startPeriodicRefresh(container) {
+                console.log('⚠️ Using legacy periodic refresh - consider upgrading to smart refresh');
+                // Redirect to smart refresh
+                setupSmartRefresh(container);
+            }
+
+            // Stop periodic refresh
+            function stopPeriodicRefresh() {
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    loadingInterval = null;
+                    console.log('⏰ Periodic refresh stopped');
+                }
+            }
+
+            // Enhanced refresh dispute reports function
+            async function refreshDisputeReports(container, showLoading = true) {
+                try {
+                    if (showLoading) {
+                        showDisputeLoadingIndicator(container, true);
+                    }
+
+                    console.log('🔄 Refreshing dispute reports...');
+
+                    // CHANGED: Track refresh time for smart caching
+                    lastRefreshTime = Date.now();
+
+                    // Fetch dispute reports specifically
+                    const reports = await fetchDisputeReports();
+
+                    if (reports && reports.length >= 0) {
+                        disputeReports = reports;
+                        displayDisputeReports(reports);
+                        updateDisputeReportsCount(reports.length);
+                        retryAttempts = 0; // Reset retry counter on success
+
+                        console.log(`✅ Dispute reports refreshed: ${reports.length} reports found`);
+                    } else {
+                        throw new Error('Failed to fetch dispute reports');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error refreshing dispute reports:', error);
+
+                    retryAttempts++;
+                    if (retryAttempts < MAX_RETRY_ATTEMPTS) {
+                        console.log(`🔄 Retrying dispute reports fetch (attempt ${retryAttempts + 1}/${MAX_RETRY_ATTEMPTS})`);
+
+                        // Retry after a delay
+                        setTimeout(() => {
+                            refreshDisputeReports(container, false);
+                        }, 2000 * retryAttempts); // Increasing delay
+                    } else {
+                        console.error('❌ Max retry attempts reached for dispute reports');
+                        showDisputeReportsError(container);
+                    }
+                } finally {
+                    if (showLoading) {
+                        showDisputeLoadingIndicator(container, false);
+                    }
+                }
+            }
+
+            // Fetch dispute reports from API
+            async function fetchDisputeReports() {
+                try {
+                    console.log('📋 Fetching dispute reports from API...');
+
+                    const token = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!token || token === 'demo-token') {
+                        console.warn('⚠️ No valid auth token found for dispute reports');
+                        return [];
+                    }
+
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+
+                    if (!userId) {
+                        console.warn('⚠️ No user ID found for dispute reports');
+                        return [];
+                    }
+
+                    const response = await fetch(`http://localhost:3000/api/user/dispute-reports/${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            console.log('📋 No dispute reports found (404)');
+                            return [];
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('📋 Dispute reports API response:', data);
+
+                    if (data.success && Array.isArray(data.disputeReports)) {
+                        console.log(`✅ Successfully fetched ${data.disputeReports.length} dispute reports`);
+                        return data.disputeReports;
+                    } else if (data.disputeReports && Array.isArray(data.disputeReports)) {
+                        // Handle case where success field might not be present
+                        console.log(`✅ Fetched ${data.disputeReports.length} dispute reports`);
+                        return data.disputeReports;
+                    } else {
+                        console.log('📋 No dispute reports in response');
+                        return [];
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error fetching dispute reports:', error);
+                    throw error;
+                }
+            }
+
+            // Show/hide dispute loading indicator
+            function showDisputeLoadingIndicator(container, show) {
+                const indicator = container.querySelector('#dispute-loading-indicator');
+                const refreshBtn = container.querySelector('#refresh-dispute-reports');
+
+                if (indicator) {
+                    indicator.style.display = show ? 'flex' : 'none';
+                }
+
+                if (refreshBtn) {
+                    refreshBtn.disabled = show;
+                    if (show) {
+                        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                    } else {
+                        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Reports';
+                    }
+                }
+            }
+
+            // Update dispute reports count badge
+            function updateDisputeReportsCount(count) {
+                const countBadge = document.getElementById('dispute-reports-count');
+                if (countBadge) {
+                    if (count > 0) {
+                        countBadge.textContent = count;
+                        countBadge.style.display = 'inline-block';
+                    } else {
+                        countBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            // Show dispute reports error
+            function showDisputeReportsError(container) {
+                const disputeContainer = document.getElementById('dispute-reports-container');
+                if (disputeContainer) {
+                    disputeContainer.innerHTML = `
+                        <div class="dispute-error-message" style="
+                            background: #ffebee; 
+                            color: #c62828; 
+                            padding: 15px; 
+                            border-radius: 8px; 
+                            margin: 10px 0;
+                            border-left: 4px solid #f44336;
+                            text-align: center;
+                        ">
+                            <i class="fas fa-exclamation-triangle" style="margin-right: 8px; font-size: 18px;"></i>
+                            <div>Failed to load dispute reports</div>
+                            <button onclick="window.jamMessages.refreshDisputeReports()" style="
+                                background: #f44336; 
+                                color: white; 
+                                border: none; 
+                                padding: 8px 16px; 
+                                border-radius: 4px; 
+                                margin-top: 10px;
+                                cursor: pointer;
+                            ">
+                                <i class="fas fa-retry"></i> Try Again
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                openMessage: openMessage,
+                closeMessageDetail: closeMessageDetail,
+                toggleReadStatus: toggleReadStatus,
+                deleteMessage: deleteMessage,
+                searchMessages: searchMessages,
+                setFilter: setFilter,
+                refreshDisputeReports: refreshDisputeReports
+            };
+        })();
+
+        // Add this OUTSIDE the MessagesModule, after the module definition
+        function toggleDisputeDetails(disputeId) {
+            const disputeItem = document.querySelector(`[data-dispute-id="${disputeId}"]`);
+            if (disputeItem) {
+                disputeItem.classList.toggle('expanded');
+                const button = disputeItem.querySelector('.dispute-actions button');
+                const icon = button.querySelector('i');
+
+                if (disputeItem.classList.contains('expanded')) {
+                    icon.className = 'fas fa-chevron-up';
+                    button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
+                } else {
+                    icon.className = 'fas fa-chevron-down';
+                    button.innerHTML = '<i class="fas fa-chevron-down"></i> View Details';
+                }
+            }
+        }
+
+        // Make it globally accessible
+        window.toggleDisputeDetails = toggleDisputeDetails;
+
+        // Expose the module globally
+        window.jamMessages = MessagesModule;
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('messagesModuleLoaded'));
+        }
+    </script>
+</body>
+
+</html>

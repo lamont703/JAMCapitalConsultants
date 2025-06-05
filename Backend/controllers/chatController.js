@@ -498,9 +498,9 @@ export const chatController = {
           // Generate letter using existing ChatGPT service
           const letter = await generateDisputeLetter(bureauItems, enhancedUserInfo);
           
-          // Create PDF content from the letter
+          // Create actual PDF from the letter content
           const pdfContent = generatePDFContent(letter, bureau);
-          const pdfBuffer = Buffer.from(JSON.stringify(pdfContent), 'utf8'); // Simple PDF content as buffer
+          const pdfBuffer = await generateActualPDF(letter, bureau, enhancedUserInfo);
           
           // Generate unique filename for blob storage
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -730,62 +730,257 @@ export const chatController = {
   // Delete a saved dispute letter
   async deleteDisputeLetter(req, res) {
     try {
-      const { letterId, userId } = req.body;
-      
-      if (!letterId || !userId) {
-        return res.status(400).json({ error: 'Letter ID and User ID are required' });
+      console.log('🗑️ Delete dispute letter request received');
+      console.log('Request body:', req.body);
+
+      const { letterId } = req.body;
+
+      if (!letterId) {
+        console.error('❌ No letter ID provided');
+        return res.status(400).json({
+          success: false,
+          message: 'Letter ID is required'
+        });
       }
-      
-      console.log(`Deleting dispute letter ${letterId} for user ${userId}`);
-      
-      // Initialize services
-      const { CosmosService } = await import('../services/cosmosService.js');
-      const { AzureBlobService } = await import('../services/azureBlobService.js');
-      
-      const cosmosService = new CosmosService();
-      const blobService = new AzureBlobService();
-      
-      await cosmosService.initialize();
-      await blobService.initialize();
-      
-      // Get the letter first to check ownership and get blob filename
-      const letter = await cosmosService.getDocument(letterId, 'dispute_letter');
-      
+
+      // Import database functions
+      const { CosmosClient } = await import('@azure/cosmos');
+      const { BlobServiceClient } = await import('@azure/storage-blob');
+
+      // Initialize Cosmos client
+      const cosmosClient = new CosmosClient({
+        endpoint: process.env.COSMOS_DB_ENDPOINT,
+        key: process.env.COSMOS_DB_KEY
+      });
+
+      const database = cosmosClient.database(process.env.COSMOS_DB_DATABASE_NAME);
+      const container = database.container('DisputeLetters');
+
+      // First, fetch the letter to get blob information
+      console.log(`🔍 Fetching letter with ID: ${letterId}`);
+      const { resource: letter } = await container.item(letterId, letterId).read();
+
       if (!letter) {
-        return res.status(404).json({ error: 'Letter not found' });
+        console.error('❌ Letter not found in database');
+        return res.status(404).json({
+          success: false,
+          message: 'Letter not found'
+        });
       }
-      
-      // Verify user ownership
-      if (letter.userId !== userId && letter.letterData?.userInfo?.userId !== userId) {
-        return res.status(403).json({ error: 'Access denied' });
-      }
-      
-      // Delete from blob storage if exists
-      if (letter.letterData?.blobFileName) {
+
+      console.log('📄 Letter found:', letter.fileName);
+
+      // Delete from blob storage if blob info exists
+      if (letter.blobUrl && letter.fileName) {
         try {
-          await blobService.deleteFile(letter.letterData.blobFileName);
-          console.log(`✅ Deleted PDF from blob storage: ${letter.letterData.blobFileName}`);
+          console.log('🗑️ Deleting blob from storage...');
+          
+          const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+          const containerClient = blobServiceClient.getContainerClient('dispute-letters');
+          
+          // Extract blob name from URL or use fileName
+          const blobName = letter.fileName.includes('/') ? letter.fileName : `dispute-letters/${letter.userEmail}/${letter.fileName}`;
+          const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+          
+          await blockBlobClient.deleteIfExists();
+          console.log('✅ Blob deleted successfully');
         } catch (blobError) {
-          console.error(`❌ Error deleting PDF from blob storage:`, blobError);
+          console.error('❌ Error deleting blob:', blobError);
           // Continue with database deletion even if blob deletion fails
         }
       }
-      
+
       // Delete from database
-      await cosmosService.deleteDocument(letterId, 'dispute_letter');
-      console.log(`✅ Deleted letter from database: ${letterId}`);
-      
-      return res.json({
+      console.log('🗑️ Deleting letter from database...');
+      await container.item(letterId, letterId).delete();
+
+      console.log('✅ Letter deleted successfully');
+
+      res.json({
         success: true,
-        message: 'Dispute letter deleted successfully',
-        deletedLetterId: letterId
+        message: 'Letter deleted successfully'
       });
-      
+
     } catch (error) {
-      console.error('Error deleting dispute letter:', error);
-      return res.status(500).json({ 
-        error: 'Failed to delete dispute letter',
-        details: error.message
+      console.error('❌ Error deleting dispute letter:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete letter',
+        error: error.message
+      });
+    }
+  },
+
+  // Download PDF from blob storage with proper headers
+  async downloadLetterPDF(req, res) {
+    try {
+      console.log('📥 PDF download request received');
+      const { letterId } = req.params;
+
+      if (!letterId) {
+        console.error('❌ No letter ID provided');
+        return res.status(400).json({
+          success: false,
+          message: 'Letter ID is required'
+        });
+      }
+
+      console.log(`🔍 Fetching letter with ID: ${letterId}`);
+
+      // Initialize database service (same approach as getUserDisputeLetters)
+      const { CosmosService } = await import('../services/cosmosService.js');
+      const cosmosService = new CosmosService();
+      await cosmosService.initialize();
+
+      // Query for the specific letter
+      const query = `SELECT * FROM c WHERE c.id = @letterId`;
+      const parameters = [{ name: '@letterId', value: letterId }];
+      
+      const letters = await cosmosService.queryDocuments(query, parameters);
+      
+      if (!letters || letters.length === 0) {
+        console.error('❌ Letter not found in database');
+        return res.status(404).json({
+          success: false,
+          message: 'Letter not found'
+        });
+      }
+
+      const letter = letters[0];
+      console.log('📄 Letter found:', letter.letterData?.blobFileName);
+
+      const blobUrl = letter.letterData?.blobUrl;
+      const fileName = letter.letterData?.blobFileName;
+
+      if (!blobUrl) {
+        console.error('❌ No blob URL found for letter');
+        return res.status(404).json({
+          success: false,
+          message: 'PDF not available for this letter'
+        });
+      }
+
+      console.log(`📄 Fetching PDF from blob storage: ${blobUrl}`);
+
+      // Fetch the PDF from blob storage
+      const response = await fetch(blobUrl);
+
+      if (!response.ok) {
+        console.error(`❌ Failed to fetch PDF from blob storage: ${response.status}`);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to retrieve PDF from storage'
+        });
+      }
+
+      // Get the PDF buffer
+      const pdfBuffer = await response.arrayBuffer();
+      
+      console.log(`✅ PDF fetched successfully, size: ${pdfBuffer.byteLength} bytes`);
+
+      // Set appropriate headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName || 'dispute-letter.pdf'}"`);
+      res.setHeader('Content-Length', pdfBuffer.byteLength);
+      res.setHeader('Cache-Control', 'no-cache');
+
+      // Send the PDF buffer
+      res.send(Buffer.from(pdfBuffer));
+
+      console.log(`✅ PDF download completed for letter: ${letterId}`);
+
+    } catch (error) {
+      console.error('❌ Error downloading PDF:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to download PDF',
+        error: error.message
+      });
+    }
+  },
+
+  // Get dispute reports for a specific user
+  async getUserDisputeReports(req, res) {
+    try {
+      console.log('📋 Get user dispute reports request received');
+      const { userId } = req.params;
+
+      if (!userId) {
+        console.error('❌ No user ID provided');
+        return res.status(400).json({
+          success: false,
+          message: 'User ID is required'
+        });
+      }
+
+      console.log(`🔍 Fetching dispute reports for user: ${userId}`);
+
+      // Import database functions
+      const { CosmosClient } = await import('@azure/cosmos');
+
+      // Initialize Cosmos client
+      const cosmosClient = new CosmosClient({
+        endpoint: process.env.COSMOS_DB_ENDPOINT,
+        key: process.env.COSMOS_DB_KEY
+      });
+
+      const database = cosmosClient.database(process.env.COSMOS_DB_DATABASE_NAME);
+      const container = database.container('DisputeReports'); // Different container for dispute reports
+
+      // Query for dispute reports by user ID
+      const querySpec = {
+        query: 'SELECT * FROM c WHERE c.userId = @userId ORDER BY c.submittedAt DESC',
+        parameters: [
+          {
+            name: '@userId',
+            value: userId
+          }
+        ]
+      };
+
+      console.log('📋 Executing query:', querySpec);
+
+      const { resources: disputeReports } = await container.items.query(querySpec).fetchAll();
+
+      console.log(`✅ Found ${disputeReports.length} dispute reports for user ${userId}`);
+
+      // Transform the data to match expected format
+      const formattedReports = disputeReports.map(report => ({
+        id: report.id,
+        userId: report.userId,
+        reportType: report.reportType || 'Credit Report Dispute',
+        status: report.status || 'submitted',
+        disputeSummary: report.disputeSummary || report.summary || 'No summary available',
+        submittedAt: report.submittedAt || report.createdAt || new Date().toISOString(),
+        reportDate: report.reportDate || report.submittedAt || new Date().toISOString(),
+        creditScores: report.creditScores || null,
+        fileInfo: report.fileInfo || null,
+        metadata: report.metadata || {}
+      }));
+
+      res.json({
+        success: true,
+        disputeReports: formattedReports,
+        count: formattedReports.length
+      });
+
+    } catch (error) {
+      console.error('❌ Error fetching user dispute reports:', error);
+      
+      // If it's a "container not found" error, return empty array
+      if (error.code === 404 || error.message.includes('NotFound')) {
+        console.log('📋 DisputeReports container not found, returning empty array');
+        return res.json({
+          success: true,
+          disputeReports: [],
+          count: 0
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch dispute reports',
+        error: error.message
       });
     }
   },
@@ -1284,6 +1479,132 @@ export const chatController = {
 };
 
 export default chatController;
+
+// Helper function to generate actual PDF using pdf-lib
+async function generateActualPDF(letterContent, bureau, userInfo) {
+  try {
+    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+    
+    // Create a new PDF document
+    const pdfDoc = await PDFDocument.create();
+    
+    // Add a page
+    let page = pdfDoc.addPage([612, 792]); // Standard letter size (8.5" x 11")
+    const { width, height } = page.getSize();
+    
+    // Set up fonts and sizes
+    const font = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+    const fontSize = 12;
+    const lineHeight = 18;
+    
+    // Define margins
+    const leftMargin = 72; // 1 inch
+    const rightMargin = 72; // 1 inch
+    const topMargin = 72; // 1 inch
+    const bottomMargin = 72; // 1 inch
+    const textWidth = width - leftMargin - rightMargin;
+    
+    let currentY = height - topMargin;
+    
+    // Helper function to add text with word wrapping
+    function addText(text, x, y, options = {}) {
+      const useFont = options.bold ? boldFont : font;
+      const useFontSize = options.fontSize || fontSize;
+      const useColor = options.color || rgb(0, 0, 0);
+      
+      // Split text into words
+      const words = text.split(' ');
+      let lines = [];
+      let currentLine = '';
+      
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const textWidth_test = useFont.widthOfTextAtSize(testLine, useFontSize);
+        
+        if (textWidth_test <= textWidth) {
+          currentLine = testLine;
+        } else {
+          if (currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            lines.push(word); // Word is longer than line width
+          }
+        }
+      }
+      
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+      
+      // Draw the lines
+      let lineY = y;
+      for (const line of lines) {
+        page.drawText(line, {
+          x: x,
+          y: lineY,
+          size: useFontSize,
+          font: useFont,
+          color: useColor,
+        });
+        lineY -= lineHeight;
+      }
+      
+      return lineY;
+    }
+    
+    // Add title
+    currentY = addText(`Credit Dispute Letter - ${bureau.charAt(0).toUpperCase() + bureau.slice(1)}`, 
+                      leftMargin, currentY, { bold: true, fontSize: 16 });
+    currentY -= lineHeight;
+    
+    // Add date
+    const currentDate = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    currentY = addText(currentDate, leftMargin, currentY);
+    currentY -= lineHeight * 2;
+    
+    // Process and add letter content
+    const lines = letterContent.split('\n');
+    for (const line of lines) {
+      if (line.trim()) {
+        currentY = addText(line.trim(), leftMargin, currentY);
+        currentY -= lineHeight * 0.5; // Small space between paragraphs
+      } else {
+        currentY -= lineHeight; // Larger space for empty lines
+      }
+      
+      // Check if we need a new page
+      if (currentY < bottomMargin + (lineHeight * 3)) {
+        page = pdfDoc.addPage([612, 792]);
+        currentY = height - topMargin;
+      }
+    }
+    
+    // Add footer
+    const footer = 'Generated by JAM Capital Consultants';
+    page.drawText(footer, {
+      x: leftMargin,
+      y: bottomMargin - 20,
+      size: 10,
+      font: font,
+      color: rgb(0.5, 0.5, 0.5),
+    });
+    
+    // Serialize the PDF
+    const pdfBytes = await pdfDoc.save();
+    return Buffer.from(pdfBytes);
+    
+  } catch (error) {
+    console.error('❌ Error generating PDF:', error);
+    // Fallback to text content if PDF generation fails
+    return Buffer.from(letterContent, 'utf8');
+  }
+}
 
 // Helper function to generate PDF content from letter text
 function generatePDFContent(letterContent, bureau) {

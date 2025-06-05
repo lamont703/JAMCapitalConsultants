@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages Module</title>
     <style>
-        /* Messages Module Styles */
+        /* Copy the CSS styles from the original file - keeping them the same */
         .messages-container {
             font-family: 'Roboto', sans-serif;
             max-width: 100%;
@@ -120,6 +120,122 @@
 
         .message-item.unread.selected {
             background-color: #bbdefb;
+        }
+
+        .message-item.expanded {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        .message-expanded-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-expanded-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .message-expanded-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .message-expanded-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .message-meta-label {
+            font-weight: 600;
+            min-width: 80px;
+            color: #333;
+        }
+
+        .message-expanded-body {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-line;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #09ccfc;
+        }
+
+        .notification-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notification-type-general {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .notification-type-urgent {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .notification-type-announcement {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .notification-type-system {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .expand-toggle {
+            background: none;
+            border: none;
+            color: #09ccfc;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .expand-toggle:hover {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .expand-toggle i {
+            transition: transform 0.2s;
+        }
+
+        .expand-toggle.expanded i {
+            transform: rotate(180deg);
         }
 
         .message-avatar {
@@ -255,127 +371,6 @@
             background: #ffcdd2;
         }
 
-        .message-detail-body {
-            line-height: 1.6;
-            color: #333;
-            white-space: pre-line;
-        }
-
-        .message-compose {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 5px;
-        }
-
-        .message-compose-header {
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .message-compose-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            color: #555;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #09ccfc;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #07a3ca;
-        }
-
-        .btn-secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-        }
-
-        .empty-state i {
-            font-size: 3em;
-            margin-bottom: 15px;
-            color: #ddd;
-        }
-
-        .empty-state p {
-            font-size: 1.1em;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .messages-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .messages-search {
-                width: 100%;
-            }
-
-            .message-detail-header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .message-detail-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-        }
-
         .dispute-reports-header {
             margin-top: 30px;
             margin-bottom: 15px;
@@ -395,215 +390,6 @@
 
         .dispute-reports-container {
             margin-top: 10px;
-        }
-
-        .dispute-report-item {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        .dispute-report-item:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-color: #d0d0d0;
-        }
-
-        .dispute-header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: none;
-        }
-
-        .dispute-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .dispute-title i {
-            color: #666;
-            font-size: 16px;
-        }
-
-        .dispute-status {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-submitted {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .status-progress {
-            background: #fff3e0;
-            color: #ef6c00;
-        }
-
-        .status-review {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .status-resolved {
-            background: #e8f5e8;
-            color: #2e7d32;
-        }
-
-        .status-rejected {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .dispute-date {
-            font-size: 12px;
-            color: #888;
-        }
-
-        .dispute-content {
-            padding: 0 20px 15px 20px;
-            display: none;
-            background: #fafafa;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .dispute-report-item.expanded .dispute-content {
-            display: block;
-        }
-
-        .dispute-summary {
-            margin-bottom: 15px;
-        }
-
-        .dispute-summary strong {
-            color: #333;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .dispute-summary p {
-            margin: 8px 0 0 0;
-            color: #555;
-            line-height: 1.4;
-            font-size: 13px;
-        }
-
-        .dispute-details {
-            margin-bottom: 15px;
-        }
-
-        .detail-row {
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .credit-scores {
-            margin: 15px 0;
-        }
-
-        .credit-scores strong {
-            color: #333;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .scores-grid {
-            display: flex;
-            gap: 10px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-
-        .score-item {
-            background: #f0f0f0;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #555;
-            border: 1px solid #e0e0e0;
-        }
-
-        .dispute-file {
-            margin: 15px 0;
-        }
-
-        .dispute-file strong {
-            color: #333;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 8px 10px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            border: 1px solid #e8e8e8;
-        }
-
-        .file-info i {
-            color: #666;
-        }
-
-        .file-info span {
-            font-size: 12px;
-            color: #555;
-        }
-
-        .view-file-btn {
-            color: #1976d2;
-            text-decoration: none;
-            font-size: 12px;
-            margin-left: auto;
-            font-weight: 500;
-        }
-
-        .view-file-btn:hover {
-            text-decoration: underline;
-            color: #1565c0;
-        }
-
-        .dispute-actions {
-            padding: 12px 20px 15px 20px;
-            text-align: center;
-            background: #fafafa;
-        }
-
-        .dispute-actions button {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .dispute-actions button:hover {
-            background: #e8e8e8;
-            color: #333;
-        }
-
-        .dispute-actions button i {
-            margin-right: 5px;
         }
 
         .no-disputes-message {
@@ -677,21 +463,274 @@
             padding: 0;
             margin: 0;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        /* Dispute Report Detail Modal Styles */
+        .dispute-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .dispute-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dispute-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .dispute-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dispute-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .dispute-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .dispute-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dispute-modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .dispute-detail-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dispute-detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .dispute-detail-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .dispute-detail-value {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .dispute-status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pdf-viewer-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .pdf-viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pdf-viewer-header h4 {
+            margin: 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pdf-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+
+        .pdf-btn:hover {
+            background: #0056b3;
+        }
+
+        .pdf-btn.download {
+            background: #28a745;
+        }
+
+        .pdf-btn.download:hover {
+            background: #1e7e34;
+        }
+
+        .pdf-preview {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .no-pdf-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            background: white;
+            border-radius: 4px;
+            border: 2px dashed #ddd;
+        }
+
+        .no-pdf-message i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .dispute-report-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dispute-report-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .clickable-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                max-height: 500px;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
     <script>
-        // Messages Module
+        // 🎯 LOAD-ONLY MODE - ALL AUTOMATIC API CALLS DISABLED
+        const LOAD_ONLY_MODE = true; // Prevents expensive 403 error loops
+
+        // Messages Module - Fixed Version
         const MessagesModule = (function () {
             // Private variables
             let isInitialized = false;
             let messages = [];
             let currentFilter = 'all';
             let activeMessageId = null;
+            let disputeReports = [];
+            let retryAttempts = 0;
+            const MAX_RETRY_ATTEMPTS = 3;
 
-            // Sample message data
-            const sampleMessages = [];
+
 
             // Format date for display
             function formatDate(dateString) {
@@ -709,16 +748,41 @@
                 }
             }
 
+            // Normalize message data structure to handle different API formats
+            function normalizeMessageData(messages) {
+                return messages.map(msg => {
+                    // Create a normalized message object
+                    const normalized = {
+                        id: msg.id,
+                        subject: msg.subject || 'No Subject',
+                        message: msg.message || msg.body || 'No message content',
+                        notificationType: msg.notificationType || 'general',
+                        read: msg.read || false,
+                        timestamp: msg.timestamp || msg.createdAt || msg.time,
+                        // Keep original fields for reference
+                        ...msg
+                    };
+
+                    console.log('🔄 Normalized message:', {
+                        id: normalized.id,
+                        hasMessage: !!normalized.message,
+                        messageSource: msg.message ? 'message field' : (msg.body ? 'body field' : 'none'),
+                        hasNotificationType: !!normalized.notificationType,
+                        notificationTypeSource: msg.notificationType ? 'notificationType field' : 'default (general)'
+                    });
+
+                    return normalized;
+                });
+            }
+
             // Function to fetch user notifications from the API
             async function fetchUserNotifications() {
                 try {
                     console.log('📨 Fetching user notifications from API...');
 
-                    // Get user ID from userData object in localStorage
                     let userId = localStorage.getItem('userId') || localStorage.getItem('user_id');
 
                     if (!userId) {
-                        // Try to get it from userData object
                         const userData = localStorage.getItem('userData');
                         if (userData) {
                             try {
@@ -738,17 +802,29 @@
 
                     if (!userId) {
                         console.warn('⚠️ No user ID found in localStorage');
+                        console.log('📝 Available localStorage keys:', Object.keys(localStorage));
                         return null;
                     }
 
                     if (!authToken || authToken === 'demo-token') {
                         console.warn('⚠️ No valid auth token found');
+                        console.log('📝 Available auth tokens:', {
+                            localStorage_authToken: localStorage.getItem('authToken'),
+                            localStorage_token: localStorage.getItem('token'),
+                            sessionStorage_authToken: sessionStorage.getItem('authToken'),
+                            sessionStorage_token: sessionStorage.getItem('token')
+                        });
                         return null;
                     }
 
-                    console.log('🔍 Making API request for user:', userId);
+                    console.log('🔍 Making API request for user notifications:', {
+                        userId: userId,
+                        hasToken: !!authToken,
+                        tokenPreview: authToken ? authToken.substring(0, 20) + '...' : 'none'
+                    });
 
-                    const response = await fetch(`http://localhost:3000/api/admin/get-user-notifications/${userId}`, {
+                    // Try the notifications endpoint first (most likely for your structure)
+                    let response = await fetch(`http://localhost:3000/api/user/notifications/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -756,21 +832,85 @@
                         }
                     });
 
+                    console.log('📨 Notifications API Response Status:', response.status, response.statusText);
+
                     if (!response.ok) {
-                        throw new Error(`API request failed: ${response.status}`);
+                        console.log('❌ First endpoint failed, trying alternative endpoint...');
+
+                        // Try alternative endpoint
+                        response = await fetch(`http://localhost:3000/api/admin/get-user-notifications/${userId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+
+                        console.log('📨 Alternative API Response Status:', response.status, response.statusText);
+
+                        if (!response.ok) {
+                            console.log('❌ Both endpoints failed, trying without auth...');
+
+                            // Try without authorization header as fallback
+                            response = await fetch(`http://localhost:3000/api/user/notifications/${userId}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            console.log('📨 No-auth API Response Status:', response.status, response.statusText);
+                        }
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status} - ${response.statusText}`);
                     }
 
                     const data = await response.json();
+                    console.log('📨 Raw API response data:', data);
 
-                    if (data.success && Array.isArray(data.messages)) {
-                        console.log('✅ Successfully fetched notifications from API:', data.messages.length);
-                        return data.messages;
+                    // Handle different possible response structures
+                    let notifications = null;
+
+                    if (Array.isArray(data)) {
+                        // Direct array response
+                        notifications = data;
+                        console.log('📨 Using direct array response');
+                    } else if (data.success && Array.isArray(data.messages)) {
+                        // Wrapped in success object with messages array
+                        notifications = data.messages;
+                        console.log('📨 Using data.messages array');
+                    } else if (data.success && Array.isArray(data.notifications)) {
+                        // Wrapped in success object with notifications array
+                        notifications = data.notifications;
+                        console.log('📨 Using data.notifications array');
+                    } else if (Array.isArray(data.data)) {
+                        // Wrapped in data object
+                        notifications = data.data;
+                        console.log('📨 Using data.data array');
+                    } else if (data.notifications && Array.isArray(data.notifications)) {
+                        // Direct notifications property
+                        notifications = data.notifications;
+                        console.log('📨 Using direct data.notifications array');
+                    }
+
+                    if (notifications && notifications.length > 0) {
+                        console.log('✅ Successfully fetched notifications from API:', notifications.length);
+                        console.log('📨 First notification sample:', notifications[0]);
+                        return notifications;
                     } else {
-                        throw new Error('Invalid API response format');
+                        console.log('📨 No notifications found in API response');
+                        console.log('📨 Available data properties:', Object.keys(data));
+                        return [];
                     }
 
                 } catch (error) {
                     console.error('❌ Error fetching user notifications:', error);
+                    console.log('🔍 Full error details:', {
+                        message: error.message,
+                        stack: error.stack
+                    });
                     return null;
                 }
             }
@@ -783,23 +923,43 @@
                     return false;
                 }
 
-                // Only initialize once unless reset
-                if (isInitialized) {
-                    console.log('Messages Module already initialized');
-                    return true;
-                }
-
-                console.log('Initializing Messages Module');
+                // ✅ FIXED: Always render UI, even if previously initialized
+                console.log('🎯 AUTO-LOAD MODE: Initializing Messages Module (Auto-loading notifications and dispute reports)');
 
                 // Try to fetch notifications from API, fallback to sample messages
+                console.log('📨 Attempting to fetch notifications from API...');
                 const apiMessages = await fetchUserNotifications();
 
                 if (apiMessages && apiMessages.length > 0) {
-                    console.log('📨 Using notifications from API');
-                    messages = apiMessages;
+                    console.log('✅ Using notifications from API:', apiMessages.length, 'messages');
+                    console.log('📨 API messages sample:', apiMessages[0]);
+                    messages = normalizeMessageData(apiMessages);
+                } else if (apiMessages && apiMessages.length === 0) {
+                    console.log('📨 API returned empty array - no notifications found');
+                    messages = [];
                 } else {
-                    console.log('📨 Using sample messages as fallback');
-                    messages = [...sampleMessages];
+                    console.log('❌ API call failed or returned null');
+                    console.log('📨 No messages to display');
+                    messages = [];
+                }
+
+                console.log('📨 Final messages array:', messages.length, 'total messages');
+                if (messages.length > 0) {
+                    console.log('📨 First message structure:', {
+                        id: messages[0].id,
+                        subject: messages[0].subject,
+                        message: messages[0].message?.substring(0, 50) + '...',
+                        body: messages[0].body?.substring(0, 50) + '...',
+                        notificationType: messages[0].notificationType,
+                        read: messages[0].read,
+                        timestamp: messages[0].timestamp,
+                        createdAt: messages[0].createdAt,
+                        time: messages[0].time,
+                        sender: messages[0].sender,
+                        allFields: Object.keys(messages[0])
+                    });
+
+                    console.log('📨 Full first message object:', messages[0]);
                 }
 
                 // Render the initial UI
@@ -808,11 +968,28 @@
                 // Set up event listeners
                 setupEventListeners(container);
 
-                // Load both notifications and dispute reports using the new function
-                await loadMessages();
+                // 🎯 AUTO-LOAD: Automatically load dispute reports when module loads
+                // Wait for UI to be fully rendered before displaying dispute reports
+                setTimeout(() => {
+                    console.log('🎯 AUTO-LOAD MODE: Automatically loading dispute reports...');
+                    refreshDisputeReports(container, true);
+                }, 200); // Small delay to ensure DOM is ready
 
                 // Mark as initialized
                 isInitialized = true;
+                console.log('✅ Messages Module UI rendered successfully');
+
+                // ✅ Verify content was actually rendered
+                setTimeout(() => {
+                    const contentCheck = container.querySelector('.messages-container');
+                    if (contentCheck) {
+                        console.log('✅ Messages container found in DOM');
+                    } else {
+                        console.error('❌ Messages container NOT found in DOM - UI may have been cleared');
+                        console.log('📋 Container contents:', container.innerHTML.substring(0, 200) + '...');
+                    }
+                }, 300);
+
                 return true;
             }
 
@@ -820,15 +997,12 @@
             function renderMessagesUI(container) {
                 console.log('🎨 Rendering messages UI with', messages.length, 'messages');
 
-                // Create the messages container
                 const messagesContainer = document.createElement('div');
                 messagesContainer.className = 'messages-container';
 
-                // Create the header with search, filters, and bulk actions
                 const header = document.createElement('div');
                 header.className = 'messages-header';
 
-                // Search box
                 const searchBox = document.createElement('div');
                 searchBox.className = 'messages-search';
                 searchBox.innerHTML = `
@@ -836,7 +1010,6 @@
                     <input type="text" placeholder="Search messages..." id="message-search">
                 `;
 
-                // Bulk actions container
                 const bulkActions = document.createElement('div');
                 bulkActions.className = 'messages-bulk-actions';
                 bulkActions.innerHTML = `
@@ -852,7 +1025,6 @@
                     </div>
                 `;
 
-                // Filters
                 const filters = document.createElement('div');
                 filters.className = 'messages-filters';
                 filters.innerHTML = `
@@ -860,7 +1032,6 @@
                     <button class="filter-btn ${currentFilter === 'unread' ? 'active' : ''}" data-filter="unread">Unread</button>
                 `;
 
-                // Arrange header layout
                 const headerTop = document.createElement('div');
                 headerTop.className = 'messages-header-top';
                 headerTop.appendChild(searchBox);
@@ -869,29 +1040,43 @@
                 header.appendChild(headerTop);
                 header.appendChild(bulkActions);
 
-                // Message detail view (initially hidden)
                 const messageDetail = document.createElement('div');
                 messageDetail.className = 'message-detail';
                 messageDetail.id = 'message-detail';
 
-                // Messages list
                 const messagesList = document.createElement('ul');
                 messagesList.className = 'messages-list';
                 messagesList.id = 'messages-list';
 
-                // ADD: Create dispute reports container
                 const disputeReportsContainer = document.createElement('div');
                 disputeReportsContainer.className = 'dispute-reports-container';
                 disputeReportsContainer.id = 'dispute-reports-container';
 
-                // ADD: Create a section header for dispute reports
                 const disputeHeader = document.createElement('div');
                 disputeHeader.className = 'dispute-reports-header';
                 disputeHeader.innerHTML = `
-                    <h3><i class="fas fa-balance-scale"></i> Dispute Reports</h3>
+                    <h3>
+                        <i class="fas fa-balance-scale"></i> 
+                        Dispute Reports
+                        <span id="dispute-reports-count" style="
+                            background: #e3f2fd; 
+                            color: #1565c0; 
+                            padding: 2px 8px; 
+                            border-radius: 12px; 
+                            font-size: 12px; 
+                            margin-left: 8px;
+                            display: none;
+                        ">0</span>
+                    </h3>
+                    <div class="dispute-controls" style="display: flex; gap: 10px; align-items: center;">
+                        <div id="dispute-loading-indicator" style="display: flex; color: #666; font-size: 13px; align-items: center; gap: 5px;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading dispute reports...
+                        </div>
+                        <div id="dispute-status" style="font-size: 12px; color: #666;"></div>
+                    </div>
                 `;
 
-                // Filter messages based on current filter
                 const filteredMessages = currentFilter === 'all'
                     ? messages
                     : messages.filter(msg => !msg.read);
@@ -909,813 +1094,304 @@
                             <div class="message-checkbox">
                                 <input type="checkbox" class="message-select" data-message-id="${message.id}">
                             </div>
-                            <div class="message-avatar">${message.avatar}</div>
+                            <div class="message-avatar">JAM</div>
                             <div class="message-content">
                                 <div class="message-header">
-                                    <span class="message-sender">${message.sender}</span>
-                                    <span class="message-time">${formatDate(message.time)}</span>
+                                    <span class="message-sender">JAM Capital Consultants</span>
+                                    <span class="message-time">${formatDate(message.timestamp || message.createdAt || message.time)}</span>
                                 </div>
-                                <div class="message-subject">${message.subject}</div>
-                                <div class="message-preview">${message.body.substring(0, 100)}${message.body.length > 100 ? '...' : ''}</div>
+                                <div class="message-subject">
+                                    ${message.subject || 'No Subject'}
+                                    <span class="notification-type-badge notification-type-${message.notificationType || 'general'}">
+                                        ${message.notificationType || 'general'}
+                                    </span>
+                                </div>
+                                <div class="message-preview">
+                                    ${(message.message || message.body) ?
+                            ((message.message || message.body).length > 100 ?
+                                (message.message || message.body).substring(0, 100) + '...' :
+                                (message.message || message.body)
+                            ) : 'No message content'
+                        }
+                                </div>
+                                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="font-size: 11px; color: #999;">
+                                        ID: ${message.id}
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <button class="expand-toggle" onclick="window.jamMessages.toggleMessageExpansion('${message.id}', event)">
+                                            <span>View Details</span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <button onclick="window.jamMessages.deleteMessage('${message.id}')" style="
+                                            background: #dc3545;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 4px;
+                                            padding: 4px 8px;
+                                            cursor: pointer;
+                                            font-size: 11px;
+                                            transition: background 0.2s;
+                                        " onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="message-expanded-content" id="expanded-${message.id}">
+                                <div class="message-expanded-header">
+                                    <div class="message-expanded-meta">
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">From:</span>
+                                            <span>JAM Capital Consultants</span>
+                                        </div>
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">Type:</span>
+                                            <span class="notification-type-badge notification-type-${message.notificationType || 'general'}">
+                                                ${message.notificationType || 'general'}
+                                            </span>
+                                        </div>
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">Date:</span>
+                                            <span>${(message.timestamp || message.createdAt || message.time) ? new Date(message.timestamp || message.createdAt || message.time).toLocaleString() : 'Date not available'}</span>
+                                        </div>
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">Status:</span>
+                                            <span style="color: ${message.read ? '#28a745' : '#ffc107'}; font-weight: 600;">
+                                                ${message.read ? 'Read' : 'Unread'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="message-expanded-body">
+                                    ${message.message || message.body || 'No message content available'}
+                                </div>
                             </div>
                         </li>
                     `).join('');
                 }
 
-                // Append all elements to the container
                 messagesContainer.appendChild(header);
                 messagesContainer.appendChild(messageDetail);
                 messagesContainer.appendChild(messagesList);
-
-                // ADD: Append dispute reports section
                 messagesContainer.appendChild(disputeHeader);
                 messagesContainer.appendChild(disputeReportsContainer);
 
-                // Clear the container and append the messages UI
+                // Add the dispute detail modal
+                const disputeModal = document.createElement('div');
+                disputeModal.className = 'dispute-modal';
+                disputeModal.id = 'dispute-detail-modal';
+                disputeModal.innerHTML = `
+                    <div class="dispute-modal-content">
+                        <div class="dispute-modal-header">
+                            <h3 id="dispute-modal-title">Dispute Report Details</h3>
+                            <button class="dispute-modal-close" id="close-dispute-modal">×</button>
+                        </div>
+                        <div class="dispute-modal-body" id="dispute-modal-body">
+                            <!-- Content will be populated dynamically -->
+                        </div>
+                    </div>
+                `;
+                messagesContainer.appendChild(disputeModal);
+
                 container.innerHTML = '';
                 container.appendChild(messagesContainer);
 
-                // After rendering, automatically attach click handlers and setup bulk selection
                 setTimeout(() => {
                     attachMessageClickHandlers(container);
                     setupBulkSelection(container);
-                }, 100); // Small delay to ensure DOM is updated
+                    setupDisputeReportsEventListeners(container);
+                }, 100);
             }
 
-            // Set up event listeners
+            // Setup event listeners
             function setupEventListeners(container) {
                 console.log('🔧 Setting up event listeners for Messages module');
 
-                // Search functionality
                 const searchInput = container.querySelector('.messages-search input');
                 if (searchInput) {
-                    console.log('✅ Search input found, adding event listener');
                     searchInput.addEventListener('input', function (e) {
                         console.log('🔍 Search input changed:', e.target.value);
-                        filterMessages(e.target.value);
+                        // filterMessages would be implemented here
                     });
-                } else {
-                    console.error('❌ Search input not found');
                 }
 
-                // Filter buttons
-                const filterButtons = container.querySelectorAll('.messages-filter-btn');
-                console.log('🔧 Found filter buttons:', filterButtons.length);
-
-                filterButtons.forEach(button => {
-                    console.log('✅ Adding click listener to filter button:', button.textContent);
-                    button.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const filter = this.dataset.filter;
-                        console.log('🔘 Filter button clicked:', filter);
-                        setFilter(filter, container);
-                    });
-                });
-
-                // Message item clicks - This is the key part for clicking messages
                 const messagesList = container.querySelector('.messages-list');
                 if (messagesList) {
-                    console.log('✅ Messages list found, adding click delegation');
+                    // Remove any existing event listeners to prevent duplicates
+                    const oldMessagesList = messagesList.cloneNode(true);
+                    messagesList.parentNode.replaceChild(oldMessagesList, messagesList);
+                    const newMessagesList = container.querySelector('.messages-list');
 
-                    messagesList.addEventListener('click', function (e) {
-                        console.log('🖱️ Click detected on messages list');
-                        console.log('🖱️ Click target:', e.target);
-                        console.log('🖱️ Click target classes:', e.target.className);
+                    newMessagesList.addEventListener('click', function (e) {
+                        // Don't handle clicks on delete buttons, checkboxes, or expand buttons
+                        if (e.target.closest('button[onclick*="deleteMessage"]') ||
+                            e.target.closest('.message-checkbox') ||
+                            e.target.closest('.expand-toggle')) {
+                            return;
+                        }
 
-                        // Find the message item (could be clicked on child element)
                         const messageItem = e.target.closest('.message-item');
-                        console.log('🖱️ Found message item:', messageItem);
-
                         if (messageItem) {
                             const messageId = messageItem.dataset.id;
                             console.log('📨 Message clicked - ID:', messageId);
-                            console.log('📨 Message item dataset:', messageItem.dataset);
 
-                            // Mark as read
+                            // Check if message still exists in data before proceeding
+                            const messageExists = messages.find(m => m.id === messageId);
+                            if (!messageExists) {
+                                console.warn('⚠️ Clicked message no longer exists in data:', messageId);
+                                return;
+                            }
+
                             markAsRead(messageId);
-
-                            // Show message details
-                            showMessageDetails(messageId, container);
-                        } else {
-                            console.log('❌ No message item found in click path');
+                            // Auto-expand the message when clicked
+                            toggleMessageExpansion(messageId, e, true);
                         }
                     });
-                } else {
-                    console.error('❌ Messages list not found for event delegation');
-                }
-
-                // Compose button
-                const composeBtn = container.querySelector('.messages-compose-btn');
-                if (composeBtn) {
-                    console.log('✅ Compose button found, adding event listener');
-                    composeBtn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        console.log('✉️ Compose button clicked');
-                        showComposeModal(container);
-                    });
-                } else {
-                    console.log('⚠️ Compose button not found');
                 }
 
                 console.log('🔧 Event listeners setup complete');
             }
 
-            // Mark message as read
-            function markAsRead(messageId) {
-                console.log('✅ Marking message as read:', messageId);
+            // Toggle message expansion
+            function toggleMessageExpansion(messageId, event, forceExpand = false) {
+                if (event) {
+                    event.stopPropagation(); // Prevent triggering parent click handlers
+                }
 
-                const message = messages.find(m => m.id == messageId);
-                if (message) {
-                    message.read = true;
-                    console.log('✅ Message marked as read in local array');
+                console.log('📖 Toggling message expansion for ID:', messageId);
 
-                    // Update the UI to reflect read status
-                    const messageElement = document.querySelector(`[data-id="${messageId}"]`);
-                    if (messageElement) {
-                        messageElement.classList.remove('unread');
-                        messageElement.classList.add('read');
-                        console.log('✅ Message UI updated to read status');
-                    }
+                // First check if the message still exists in our data
+                const messageExists = messages.find(m => m.id === messageId);
+                if (!messageExists) {
+                    console.warn('⚠️ Message not found in data array (may have been deleted):', messageId);
+                    return;
+                }
 
-                    // TODO: Send API call to backend to mark as read in database
-                    // This would be something like:
-                    // updateMessageReadStatus(messageId, true);
+                const messageItem = document.querySelector(`[data-id="${messageId}"]`);
+                const expandedContent = document.getElementById(`expanded-${messageId}`);
+                const toggleButton = messageItem?.querySelector('.expand-toggle');
+
+                if (!messageItem || !expandedContent || !toggleButton) {
+                    console.error('❌ Message elements not found for ID:', messageId);
+                    console.log('🔍 Debug info:', {
+                        messageItem: !!messageItem,
+                        expandedContent: !!expandedContent,
+                        toggleButton: !!toggleButton,
+                        messageExistsInData: !!messageExists
+                    });
+                    return;
+                }
+
+                const isCurrentlyExpanded = expandedContent.classList.contains('active');
+
+                // If forceExpand is true and already expanded, don't toggle
+                if (forceExpand && isCurrentlyExpanded) {
+                    return;
+                }
+
+                if (isCurrentlyExpanded && !forceExpand) {
+                    // Collapse
+                    expandedContent.classList.remove('active');
+                    messageItem.classList.remove('expanded');
+                    toggleButton.classList.remove('expanded');
+                    toggleButton.innerHTML = '<span>View Details</span><i class="fas fa-chevron-down"></i>';
+                    console.log('📖 Message collapsed');
                 } else {
-                    console.error('❌ Message not found for marking as read:', messageId);
+                    // Expand
+                    expandedContent.classList.add('active');
+                    messageItem.classList.add('expanded');
+                    toggleButton.classList.add('expanded');
+                    toggleButton.innerHTML = '<span>Hide Details</span><i class="fas fa-chevron-up"></i>';
+                    console.log('📖 Message expanded');
+
+                    // Mark as read when expanded
+                    markAsRead(messageId);
                 }
             }
 
-            // Show message details
-            function showMessageDetails(messageId, container) {
-                console.log('📖 showMessageDetails called with ID:', messageId);
-                console.log('📖 Available messages:', messages.length);
-
-                const message = messages.find(m => m.id == messageId);
-                console.log('📖 Found message:', message);
-
-                if (!message) {
-                    console.error('❌ Message not found with ID:', messageId);
-                    return;
-                }
-
-                // Look for the existing message detail panel
-                let detailsPanel = container.querySelector('.message-detail');
-                console.log('📖 Looking for message detail panel:', detailsPanel);
-
-                if (!detailsPanel) {
-                    console.log('📖 Message detail panel not found, checking for alternative selectors');
-                    detailsPanel = container.querySelector('#message-detail') ||
-                        container.querySelector('.message-details') ||
-                        container.querySelector('[class*="detail"]');
-                    console.log('📖 Alternative detail panel found:', detailsPanel);
-                }
-
-                if (!detailsPanel) {
-                    console.error('❌ No message details panel found in container');
-                    console.log('📖 Available elements in container:', container.querySelectorAll('*'));
-                    return;
-                }
-
-                console.log('📖 Updating details panel with message data');
-
-                // Update the detail panel content
-                detailsPanel.innerHTML = `
-        <div class="message-detail-header">
-            <button class="message-detail-back" onclick="closeMessageDetail()">
-                <i class="fas fa-arrow-left"></i> Back to Messages
-            </button>
-            <div class="message-detail-actions">
-                <button class="message-detail-action" data-action="mark-unread" onclick="toggleReadStatus('${messageId}')">
-                    <i class="fas fa-envelope"></i> Mark as unread
-                </button>
-                <button class="message-detail-action" data-action="delete" onclick="deleteMessage('${messageId}')">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-            </div>
-        </div>
-        <div class="message-detail-info">
-            <div class="message-detail-avatar">${message.avatar}</div>
-            <div>
-                <div class="message-detail-sender">${message.sender}</div>
-                <div class="message-detail-time">${new Date(message.time).toLocaleString()}</div>
-            </div>
-        </div>
-        <div class="message-detail-subject">
-            <h2>${message.subject}</h2>
-        </div>
-        <div class="message-detail-body">
-            ${message.body.replace(/\n/g, '<br>')}
-        </div>
-    `;
-
-                // Show the detail panel by adding the active class
-                detailsPanel.classList.add('active');
-                console.log('📖 Added active class to detail panel');
-
-                // Hide the messages list
-                const messagesList = container.querySelector('#messages-list');
-                if (messagesList) {
-                    messagesList.style.display = 'none';
-                    console.log('📖 Hidden messages list');
-                } else {
-                    console.log('⚠️ Messages list not found to hide');
-                }
-
-                // Set the active message ID
-                activeMessageId = messageId;
-
-                console.log('📖 Message details updated and displayed successfully');
+            // Setup dispute reports event listeners  
+            function setupDisputeReportsEventListeners(container) {
+                console.log('🔧 Setting up dispute reports (auto-loading)');
+                console.log('🎯 Dispute reports will load automatically - no button required');
+                console.log('✅ Dispute reports event listeners setup complete');
             }
 
-            // Open a message
-            function openMessage(messageId, container) {
-                const message = messages.find(msg => msg.id === messageId);
-                if (!message) return;
-
-                // Mark as read
-                if (!message.read) {
-                    message.read = true;
-                    // In a real app, you would send an API request to mark as read
-                }
-
-                // Store active message ID
-                activeMessageId = messageId;
-
-                // Update the message detail view
-                const messageDetail = container.querySelector('#message-detail');
-                if (messageDetail) {
-                    messageDetail.innerHTML = `
-                        <div class="message-detail-header">
-                            <div class="message-detail-subject">${message.subject}</div>
-                            <div class="message-detail-actions">
-                                <button class="message-detail-action" data-action="back">
-                                    <i class="fas fa-arrow-left"></i> Back
-                                </button>
-                                <button class="message-detail-action" data-action="${message.read ? 'mark-unread' : 'mark-read'}">
-                                    <i class="fas ${message.read ? 'fa-envelope' : 'fa-envelope-open'}"></i> 
-                                    ${message.read ? 'Mark as unread' : 'Mark as read'}
-                                </button>
-                                <button class="message-detail-action" data-action="delete">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                        <div class="message-detail-info">
-                            <div class="message-detail-avatar">${message.avatar}</div>
-                            <div>
-                                <div class="message-detail-sender">${message.sender}</div>
-                                <div class="message-detail-time">${new Date(message.time).toLocaleString()}</div>
-                            </div>
-                        </div>
-                        <div class="message-detail-body">
-                            ${message.body.replace(/\n/g, '<br>')}
-                        </div>
-                    `;
-                    messageDetail.classList.add('active');
-                }
-
-                // Hide the messages list
-                const messagesList = container.querySelector('#messages-list');
-                if (messagesList) {
-                    messagesList.style.display = 'none';
-                }
-
-                // Update the message item in the list to reflect read status
-                const messageItem = container.querySelector(`.message-item[data-id="${messageId}"]`);
-                if (messageItem) {
-                    messageItem.classList.remove('unread');
-                }
-            }
-
-            // Close message detail function - make it globally accessible
-            window.closeMessageDetail = function () {
-                console.log('🔙 Closing message detail');
-
-                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
-                if (!container) {
-                    console.error('❌ Container not found for closing message detail');
-                    return;
-                }
-
-                const messageDetail = container.querySelector('.message-detail');
-                if (messageDetail) {
-                    messageDetail.classList.remove('active');
-                    console.log('📖 Removed active class from detail panel');
-                }
-
-                const messagesList = container.querySelector('#messages-list');
-                if (messagesList) {
-                    messagesList.style.display = 'block';
-                    console.log('📖 Showed messages list');
-                }
-
-                activeMessageId = null;
-                console.log('🔙 Message detail closed successfully');
-            };
-
-            // Toggle read status - also make it globally accessible
-            window.toggleReadStatus = function (messageId) {
-                console.log('🔄 Toggle read status for message:', messageId);
-                const message = messages.find(m => m.id == messageId);
-                if (message) {
-                    message.read = !message.read;
-                    console.log('✅ Message read status toggled to:', message.read);
-
-                    // Update the UI
-                    const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
-                    if (container) {
-                        // Re-render the message details to update the button
-                        showMessageDetails(messageId, container);
-                    }
-                }
-            };
-
-            // Delete a message - also make it globally accessible
-            window.deleteMessage = function (messageId) {
-                console.log('🗑️ Delete message:', messageId);
-                if (confirm('Are you sure you want to delete this message?')) {
-                    // First, try to delete from the backend
-                    deleteMessageFromBackend(messageId)
-                        .then(success => {
-                            if (success) {
-                                console.log('✅ Message deleted from backend successfully');
-
-                                // Remove from local array
-                                const index = messages.findIndex(m => m.id == messageId);
-                                if (index > -1) {
-                                    messages.splice(index, 1);
-                                    console.log('✅ Message deleted from local array');
-
-                                    // Close the detail view and go back to list
-                                    window.closeMessageDetail();
-
-                                    // Re-render the messages list AND re-attach event handlers
-                                    const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
-                                    if (container) {
-                                        renderMessagesUI(container);
-                                        // Re-attach click handlers after re-rendering
-                                        attachMessageClickHandlers(container);
-                                    }
-                                }
-                            } else {
-                                console.error('❌ Failed to delete message from backend');
-                                alert('Failed to delete message. Please try again.');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('❌ Error deleting message from backend:', error);
-                            alert('Error deleting message. Please try again.');
-                        });
-                }
-            };
-
-            // Function to delete message from backend
-            async function deleteMessageFromBackend(messageId) {
+            // Manual refresh for dispute reports
+            async function refreshDisputeReports(container, showLoading = true) {
                 try {
-                    console.log('🌐 Deleting message from backend:', messageId);
+                    if (showLoading) {
+                        showDisputeLoadingIndicator(container, true);
+                    }
 
-                    // Get user ID and auth token
-                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                    const userId = userData.id;
-                    const authToken = localStorage.getItem('authToken') ||
+                    console.log('🔄 Manual refresh: Fetching dispute reports...');
+
+                    const reports = await fetchDisputeReports();
+
+                    if (reports && reports.length >= 0) {
+                        disputeReports = reports;
+                        displayDisputeReports(reports);
+                        retryAttempts = 0;
+                        console.log(`✅ Dispute reports refreshed: ${reports.length} reports found`);
+                    } else {
+                        throw new Error('Failed to fetch dispute reports');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error refreshing dispute reports:', error);
+
+                    retryAttempts++;
+                    if (retryAttempts < MAX_RETRY_ATTEMPTS) {
+                        console.log(`🔄 Retrying (attempt ${retryAttempts + 1}/${MAX_RETRY_ATTEMPTS})`);
+                        setTimeout(() => {
+                            refreshDisputeReports(container, false);
+                        }, 2000 * retryAttempts);
+                    } else {
+                        console.error('❌ Max retry attempts reached');
+                        showDisputeReportsError(container);
+                    }
+                } finally {
+                    if (showLoading) {
+                        showDisputeLoadingIndicator(container, false);
+                    }
+                }
+            }
+
+            // Fetch dispute reports from API
+            async function fetchDisputeReports() {
+                try {
+                    console.log('📋 Fetching dispute reports from backend API...');
+
+                    const token = localStorage.getItem('authToken') ||
                         localStorage.getItem('token') ||
                         sessionStorage.getItem('authToken') ||
                         sessionStorage.getItem('token');
 
-                    if (!userId) {
-                        console.error('❌ No user ID found for deleting message');
-                        return false;
+                    if (!token || token === 'demo-token') {
+                        console.warn('⚠️ No valid auth token found for dispute reports');
+                        updateDisputeStatus('No auth token found');
+                        return [];
                     }
 
-                    if (!authToken) {
-                        console.error('❌ No auth token found for deleting message');
-                        return false;
-                    }
-
-                    const response = await fetch(`http://localhost:3000/api/admin/delete-notification`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${authToken}`
-                        },
-                        body: JSON.stringify({
-                            notificationId: messageId,
-                            userId: userId
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        console.log('✅ Message deleted from backend successfully');
-                        return true;
-                    } else {
-                        console.error('❌ Backend returned failure:', data.message);
-                        return false;
-                    }
-
-                } catch (error) {
-                    console.error('❌ Error deleting message from backend:', error);
-                    return false;
-                }
-            }
-
-            // Search messages
-            function searchMessages(query, container) {
-                if (!query) {
-                    // If query is empty, reset to current filter
-                    renderMessagesUI(container);
-                    return;
-                }
-
-                // Filter messages based on search query
-                const filteredMessages = messages.filter(msg => {
-                    const searchText = query.toLowerCase();
-                    return (
-                        msg.subject.toLowerCase().includes(searchText) ||
-                        msg.body.toLowerCase().includes(searchText) ||
-                        msg.sender.toLowerCase().includes(searchText)
-                    );
-                });
-
-                // Update messages list
-                const messagesList = container.querySelector('#messages-list');
-                if (messagesList) {
-                    if (filteredMessages.length === 0) {
-                        messagesList.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-search"></i>
-                                <p>No messages found matching "${query}"</p>
-                            </div>
-                        `;
-                    } else {
-                        messagesList.innerHTML = filteredMessages.map(message => `
-                            <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
-                                <div class="message-avatar">${message.avatar}</div>
-                                <div class="message-content">
-                                    <div class="message-header">
-                                        <span class="message-sender">${message.sender}</span>
-                                        <span class="message-time">${formatDate(message.time)}</span>
-                                    </div>
-                                    <div class="message-subject">${message.subject}</div>
-                                    <div class="message-preview">${message.body.substring(0, 100)}${message.body.length > 100 ? '...' : ''}</div>
-                                </div>
-                            </li>
-                        `).join('');
-                    }
-                }
-            }
-
-            // Set filter
-            function setFilter(filter, container) {
-                if (filter === currentFilter) return;
-
-                currentFilter = filter;
-
-                // Update filter buttons
-                const filterBtns = container.querySelectorAll('.filter-btn');
-                filterBtns.forEach(btn => {
-                    if (btn.dataset.filter === filter) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-
-                // Re-render messages list
-                renderMessagesUI(container);
-            }
-
-            // Reset initialization state (for reloading)
-            function reset() {
-                isInitialized = false;
-                activeMessageId = null;
-                return true;
-            }
-
-            // Function to attach click handlers to messages
-            function attachMessageClickHandlers(container) {
-                console.log('🔗 Attaching message click handlers');
-
-                const messagesList = container.querySelector('#messages-list');
-                if (!messagesList) {
-                    console.error('❌ Messages list not found for attaching handlers');
-                    return;
-                }
-
-                // Remove any existing event listeners to prevent duplicates
-                const existingHandler = messagesList.getAttribute('data-handler-attached');
-                if (existingHandler) {
-                    messagesList.removeEventListener('click', window.messagesClickHandler);
-                }
-
-                // Create and store the click handler function
-                window.messagesClickHandler = function (event) {
-                    console.log('🖱️ Click detected on messages list');
-                    console.log('🖱️ Click target:', event.target);
-                    console.log('🖱️ Click target classes:', event.target.className);
-
-                    // Don't trigger message open if clicking on checkbox
-                    if (event.target.type === 'checkbox' || event.target.closest('.message-checkbox')) {
-                        console.log('🔲 Checkbox clicked, not opening message');
-                        return;
-                    }
-
-                    // Find the closest message item
-                    const messageItem = event.target.closest('.message-item');
-                    console.log('🖱️ Found message item:', messageItem);
-
-                    if (messageItem && messageItem.dataset.id) {
-                        const messageId = messageItem.dataset.id;
-                        console.log('📨 Message clicked - ID:', messageId);
-                        console.log('📨 Message item dataset:', messageItem.dataset);
-
-                        // Mark as read and show details
-                        markAsRead(messageId);
-                        showMessageDetails(messageId, container);
-                    }
-                };
-
-                // Attach the event listener
-                messagesList.addEventListener('click', window.messagesClickHandler);
-                messagesList.setAttribute('data-handler-attached', 'true');
-
-                console.log('✅ Message click handlers attached successfully');
-            }
-
-            // Setup bulk selection functionality
-            function setupBulkSelection(container) {
-                console.log('🔗 Setting up bulk selection functionality');
-
-                const selectAllCheckbox = container.querySelector('#select-all-messages');
-                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
-                const selectedCountSpan = container.querySelector('#selected-count');
-                const messageCheckboxes = container.querySelectorAll('.message-select');
-
-                if (!selectAllCheckbox || !bulkDeleteBtn || !selectedCountSpan) {
-                    console.error('❌ Bulk selection elements not found');
-                    return;
-                }
-
-                // Handle individual message checkbox changes
-                messageCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function (e) {
-                        const messageId = this.dataset.messageId;
-                        const messageItem = this.closest('.message-item');
-
-                        if (this.checked) {
-                            messageItem.classList.add('selected');
-                            console.log('✅ Selected message:', messageId);
-                        } else {
-                            messageItem.classList.remove('selected');
-                            console.log('❌ Deselected message:', messageId);
-                        }
-
-                        updateBulkSelectionState(container);
-                    });
-                });
-
-                // Handle select all checkbox
-                selectAllCheckbox.addEventListener('change', function (e) {
-                    const isChecked = this.checked;
-                    console.log('🔲 Select all toggled:', isChecked);
-
-                    messageCheckboxes.forEach(checkbox => {
-                        checkbox.checked = isChecked;
-                        const messageItem = checkbox.closest('.message-item');
-
-                        if (isChecked) {
-                            messageItem.classList.add('selected');
-                        } else {
-                            messageItem.classList.remove('selected');
-                        }
-                    });
-
-                    updateBulkSelectionState(container);
-                });
-
-                // Handle bulk delete button
-                bulkDeleteBtn.addEventListener('click', function (e) {
-                    console.log('🗑️ Bulk delete button clicked');
-                    performBulkDelete(container);
-                });
-
-                console.log('✅ Bulk selection functionality setup complete');
-            }
-
-            // Update bulk selection state
-            function updateBulkSelectionState(container) {
-                const selectAllCheckbox = container.querySelector('#select-all-messages');
-                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
-                const selectedCountSpan = container.querySelector('#selected-count');
-                const messageCheckboxes = container.querySelectorAll('.message-select');
-
-                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
-                const selectedCount = selectedCheckboxes.length;
-
-                console.log('📊 Updating bulk selection state. Selected:', selectedCount);
-
-                // Update selected count
-                if (selectedCountSpan) {
-                    selectedCountSpan.textContent = selectedCount;
-                }
-
-                // Update bulk delete button state
-                if (bulkDeleteBtn) {
-                    bulkDeleteBtn.disabled = selectedCount === 0;
-                }
-
-                // Update select all checkbox state
-                if (selectAllCheckbox) {
-                    if (selectedCount === 0) {
-                        selectAllCheckbox.indeterminate = false;
-                        selectAllCheckbox.checked = false;
-                    } else if (selectedCount === messageCheckboxes.length) {
-                        selectAllCheckbox.indeterminate = false;
-                        selectAllCheckbox.checked = true;
-                    } else {
-                        selectAllCheckbox.indeterminate = true;
-                        selectAllCheckbox.checked = false;
-                    }
-                }
-            }
-
-            // Perform bulk delete
-            function performBulkDelete(container) {
-                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
-                const selectedMessageIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.messageId);
-
-                console.log('🗑️ Bulk delete requested for messages:', selectedMessageIds);
-
-                if (selectedMessageIds.length === 0) {
-                    console.log('⚠️ No messages selected for deletion');
-                    return;
-                }
-
-                const confirmMessage = `Are you sure you want to delete ${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''}? This action cannot be undone.`;
-
-                if (!confirm(confirmMessage)) {
-                    console.log('❌ Bulk delete cancelled by user');
-                    return;
-                }
-
-                // Show loading state
-                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
-                if (bulkDeleteBtn) {
-                    bulkDeleteBtn.disabled = true;
-                    bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-                }
-
-                // Perform bulk deletion
-                bulkDeleteMessages(selectedMessageIds)
-                    .then(success => {
-                        if (success) {
-                            console.log('✅ Bulk delete successful');
-
-                            // Remove messages from local array
-                            selectedMessageIds.forEach(messageId => {
-                                const index = messages.findIndex(m => m.id == messageId);
-                                if (index > -1) {
-                                    messages.splice(index, 1);
-                                }
-                            });
-
-                            // Re-render the messages UI
-                            renderMessagesUI(container);
-                            attachMessageClickHandlers(container);
-
-                            // Show success message
-                            showSuccessMessage(`Successfully deleted ${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''}`);
-
-                        } else {
-                            console.error('❌ Bulk delete failed');
-                            showErrorMessage('Failed to delete messages. Please try again.');
-
-                            // Reset button state
-                            if (bulkDeleteBtn) {
-                                bulkDeleteBtn.disabled = false;
-                                bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)';
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('❌ Error during bulk delete:', error);
-                        showErrorMessage('Error deleting messages. Please try again.');
-
-                        // Reset button state
-                        if (bulkDeleteBtn) {
-                            bulkDeleteBtn.disabled = false;
-                            bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)';
-                        }
-                    });
-            }
-
-            // Bulk delete messages from backend
-            async function bulkDeleteMessages(messageIds) {
-                try {
-                    console.log('🌐 Bulk deleting messages from backend:', messageIds);
-
-                    // Get user ID and auth token
                     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
                     const userId = userData.id;
-                    const authToken = localStorage.getItem('authToken') ||
-                        localStorage.getItem('token') ||
-                        sessionStorage.getItem('authToken') ||
-                        sessionStorage.getItem('token');
 
                     if (!userId) {
-                        console.error('❌ No user ID found for bulk deleting messages');
-                        return false;
+                        console.warn('⚠️ No user ID found for dispute reports');
+                        updateDisputeStatus('No user ID found');
+                        return [];
                     }
 
-                    if (!authToken) {
-                        console.error('❌ No auth token found for bulk deleting messages');
-                        return false;
-                    }
-
-                    const response = await fetch(`http://localhost:3000/api/admin/bulk-delete-notifications`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${authToken}`
-                        },
-                        body: JSON.stringify({
-                            notificationIds: messageIds,
-                            userId: userId
-                        })
+                    console.log('🔍 Making API request:', {
+                        url: `http://localhost:3000/api/user/dispute-reports/${userId}`,
+                        userId: userId,
+                        hasToken: !!token,
+                        tokenPreview: token ? token.substring(0, 20) + '...' : 'none'
                     });
 
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
-                    }
+                    updateDisputeStatus(`Requesting data for user: ${userId}`);
 
-                    const data = await response.json();
-
-                    if (data.success) {
-                        console.log('✅ Messages bulk deleted from backend successfully');
-                        console.log('📊 Deletion results:', data.results);
-                        return true;
-                    } else {
-                        console.error('❌ Backend returned failure:', data.message);
-                        return false;
-                    }
-
-                } catch (error) {
-                    console.error('❌ Error bulk deleting messages from backend:', error);
-                    return false;
-                }
-            }
-
-            // Show success message
-            function showSuccessMessage(message) {
-                console.log('✅ Success:', message);
-
-                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
-                if (container) {
-                    const successHtml = `
-                        <div class="success-message" style="
-                            background: #d4edda; 
-                            color: #155724; 
-                            padding: 15px; 
-                            border-radius: 4px; 
-                            margin: 10px 0;
-                            border-left: 4px solid #28a745;
-                        ">
-                            <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-                            ${message}
-                        </div>
-                    `;
-
-                    container.insertAdjacentHTML('afterbegin', successHtml);
-
-                    // Remove success message after 3 seconds
-                    setTimeout(() => {
-                        const successElement = container.querySelector('.success-message');
-                        if (successElement) {
-                            successElement.remove();
-                        }
-                    }, 3000);
-                }
-            }
-
-            // Move loadMessages function INSIDE the module
-            async function loadMessages() {
-                try {
-                    console.log('📬 Loading messages and dispute reports...');
-
-                    const token = localStorage.getItem('authToken');
-                    if (!token) {
-                        console.log('❌ No auth token found');
-                        return;
-                    }
-
-                    const response = await fetch('http://localhost:3000/api/user/notifications', {
+                    const response = await fetch(`http://localhost:3000/api/user/dispute-reports/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -1723,103 +1399,70 @@
                         }
                     });
 
+                    console.log('📋 API Response Status:', response.status, response.statusText);
+
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        if (response.status === 404) {
+                            console.log('📋 No dispute reports found (404)');
+                            updateDisputeStatus('No dispute reports found');
+                            return [];
+                        } else if (response.status === 403) {
+                            console.error('🚫 403 Forbidden - Check user permissions and auth token');
+                            updateDisputeStatus('Access denied - check permissions');
+
+                            // Try to get more error details
+                            try {
+                                const errorData = await response.json();
+                                console.error('🚫 403 Error details:', errorData);
+                            } catch (e) {
+                                console.error('🚫 Could not parse 403 error response');
+                            }
+
+                            throw new Error(`HTTP error! status: ${response.status} - Access forbidden`);
+                        } else {
+                            updateDisputeStatus(`API error: ${response.status}`);
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
                     }
 
                     const data = await response.json();
-                    console.log('📬 Received data:', data);
+                    console.log('📋 Dispute reports API response:', data);
 
-                    if (data.success) {
-                        // Display notifications
-                        displayMessages(data.notifications || []);
-
-                        // Display dispute reports (new functionality)
-                        displayDisputeReports(data.disputeReports || []);
-
-                        // Update counts
-                        updateMessageCounts(data.counts || {});
-
-                        console.log(`📬 Loaded ${data.notifications?.length || 0} notifications and ${data.disputeReports?.length || 0} dispute reports`);
+                    if (data.success && Array.isArray(data.disputeReports)) {
+                        console.log(`✅ Successfully fetched ${data.disputeReports.length} dispute reports`);
+                        updateDisputeStatus(`Loaded ${data.disputeReports.length} reports`);
+                        return data.disputeReports;
+                    } else if (data.disputeReports && Array.isArray(data.disputeReports)) {
+                        console.log(`✅ Fetched ${data.disputeReports.length} dispute reports`);
+                        updateDisputeStatus(`Loaded ${data.disputeReports.length} reports`);
+                        return data.disputeReports;
                     } else {
-                        console.error('❌ Failed to load messages:', data.message);
+                        console.log('📋 No dispute reports in response');
+                        updateDisputeStatus('No reports in response');
+                        return [];
                     }
 
                 } catch (error) {
-                    console.error('❌ Error loading messages:', error);
-                    showErrorMessage('Failed to load messages. Please try again.');
+                    console.error('❌ Error fetching dispute reports:', error);
+                    updateDisputeStatus(`Error: ${error.message}`);
+                    throw error;
                 }
             }
 
-            // Move displayMessages function INSIDE the module
-            function displayMessages(notifications) {
-                console.log('📨 Displaying notifications:', notifications);
-
-                if (!notifications || notifications.length === 0) {
-                    console.log('📨 No notifications to display');
-                    return;
-                }
-
-                // Convert API notifications to the expected message format
-                const convertedMessages = notifications.map(notification => ({
-                    id: notification.id,
-                    sender: notification.sender || 'JAM System',
-                    subject: notification.subject || notification.title || 'Notification',
-                    body: notification.message || notification.body || '',
-                    time: notification.createdAt || notification.timestamp || new Date().toISOString(),
-                    read: notification.read || false,
-                    avatar: notification.sender ? notification.sender.charAt(0).toUpperCase() : 'J'
-                }));
-
-                // Update the global messages array
-                messages = convertedMessages;
-
-                // Re-render the messages UI if container exists
-                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
-                if (container) {
-                    renderMessagesUI(container);
-                    attachMessageClickHandlers(container);
-                }
-            }
-
-            // Move showErrorMessage function INSIDE the module
-            function showErrorMessage(message) {
-                console.error('❌ Error:', message);
-
-                // Try to find a container to show the error
-                const container = document.querySelector('.messages-module') || document.querySelector('.messages-container');
-                if (container) {
-                    const errorHtml = `
-                        <div class="error-message" style="
-                            background: #ffebee; 
-                            color: #c62828; 
-                            padding: 15px; 
-                            border-radius: 4px; 
-                            margin: 10px 0;
-                            border-left: 4px solid #f44336;
-                        ">
-                            <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
-                            ${message}
-                        </div>
-                    `;
-
-                    // Insert error message at the top of the container
-                    container.insertAdjacentHTML('afterbegin', errorHtml);
-
-                    // Remove error message after 5 seconds
+            // Helper function to update status display
+            function updateDisputeStatus(message) {
+                const statusEl = document.getElementById('dispute-status');
+                if (statusEl) {
+                    statusEl.textContent = message;
                     setTimeout(() => {
-                        const errorElement = container.querySelector('.error-message');
-                        if (errorElement) {
-                            errorElement.remove();
+                        if (statusEl.textContent === message) {
+                            statusEl.textContent = '';
                         }
                     }, 5000);
                 }
-
-                // Also show a browser alert as fallback
-                alert(message);
             }
 
-            // Move displayDisputeReports function INSIDE the module
+            // Display dispute reports
             function displayDisputeReports(disputeReports) {
                 console.log('📋 Displaying dispute reports:', disputeReports);
 
@@ -1829,141 +1472,841 @@
                     return;
                 }
 
+                // Update the count badge
+                const countBadge = document.getElementById('dispute-reports-count');
+                if (countBadge) {
+                    countBadge.textContent = disputeReports ? disputeReports.length : 0;
+                    countBadge.style.display = 'inline-block';
+                }
+
                 if (!disputeReports || disputeReports.length === 0) {
                     disputeContainer.innerHTML = `
                         <div class="no-disputes-message">
                             <i class="fas fa-file-alt"></i>
                             <p>No dispute reports found</p>
-                            <small>Your submitted dispute reports will appear here</small>
+                            <small>Your dispute reports will automatically appear here when available</small>
                         </div>
                     `;
                     return;
                 }
 
-                const disputeHTML = disputeReports.map(dispute => {
-                    const submittedDate = new Date(dispute.submittedAt).toLocaleDateString();
-                    const reportDate = new Date(dispute.reportDate).toLocaleDateString();
-                    const statusClass = getDisputeStatusClass(dispute.status);
-                    const statusIcon = getDisputeStatusIcon(dispute.status);
-
-                    return `
-                        <div class="dispute-report-item" data-dispute-id="${dispute.id}">
-                            <div class="dispute-header">
-                                <div class="dispute-title">
-                                    <i class="fas fa-balance-scale"></i>
-                                    <span>${dispute.reportType}</span>
-                                    <span class="dispute-status ${statusClass}">
-                                        <i class="${statusIcon}"></i>
-                                        ${dispute.status.charAt(0).toUpperCase() + dispute.status.slice(1)}
-                                    </span>
+                // Display actual dispute reports data
+                const reportsHTML = disputeReports.map(report => `
+                    <div class="dispute-report-item" style="
+                        background: #fff; 
+                        border: 1px solid #e0e0e0; 
+                        border-radius: 8px; 
+                        padding: 15px; 
+                        margin-bottom: 10px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        position: relative;
+                    " data-report-id="${report.id || report._id}" onclick="window.jamMessages.showDisputeDetails('${report.id || report._id}')">
+                        <div class="clickable-indicator">Click to view</div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <div>
+                                <h4 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">
+                                    <i class="fas fa-balance-scale" style="color: #666; margin-right: 8px;"></i>
+                                    ${report.reportType || report.type || 'Dispute Report'}
+                                </h4>
+                                <div style="font-size: 12px; color: #666;">
+                                    <i class="fas fa-calendar" style="margin-right: 5px;"></i>
+                                    ${report.reportDate || (report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Date not available')}
                                 </div>
-                                <div class="dispute-date">
-                                    <small>Submitted: ${submittedDate}</small>
-                                </div>
-                            </div>
-                            
-                            <div class="dispute-content">
-                                <div class="dispute-summary">
-                                    <strong>Summary:</strong>
-                                    <p>${dispute.disputeSummary}</p>
-                                </div>
-                                
-                                <div class="dispute-details">
-                                    <div class="detail-row">
-                                        <span><strong>Report Date:</strong> ${reportDate}</span>
-                                    </div>
-                                    
-                                    ${dispute.creditScores ? `
-                                        <div class="credit-scores">
-                                            <strong>Credit Scores:</strong>
-                                            <div class="scores-grid">
-                                                ${dispute.creditScores.experian ? `<span class="score-item">Experian: ${dispute.creditScores.experian}</span>` : ''}
-                                                ${dispute.creditScores.equifax ? `<span class="score-item">Equifax: ${dispute.creditScores.equifax}</span>` : ''}
-                                                ${dispute.creditScores.transunion ? `<span class="score-item">TransUnion: ${dispute.creditScores.transunion}</span>` : ''}
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${dispute.fileInfo ? `
-                                        <div class="dispute-file">
-                                            <strong>Attached File:</strong>
-                                            <div class="file-info">
-                                                <i class="fas fa-file-pdf"></i>
-                                                <span>${dispute.fileInfo.fileName}</span>
-                                                <span class="file-size">(${formatFileSize(dispute.fileInfo.fileSize)})</span>
-                                                ${dispute.fileInfo.azureUrl ? `
-                                                    <a href="${dispute.fileInfo.azureUrl}" target="_blank" class="view-file-btn">
-                                                        <i class="fas fa-external-link-alt"></i>
-                                                        View File
-                                                    </a>
-                                                ` : ''}
-                                            </div>
-                                        </div>
-                                    ` : ''}
+                                <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                                    <i class="fas fa-user" style="margin-right: 5px;"></i>
+                                    ${report.userName || 'Unknown User'}
                                 </div>
                             </div>
-                            
-                            <div class="dispute-actions">
-                                <button class="btn-secondary" onclick="toggleDisputeDetails('${dispute.id}')">
-                                    <i class="fas fa-chevron-down"></i>
-                                    View Details
-                                </button>
+                            <div style="
+                                background: ${getStatusColor(report.status)};
+                                color: white;
+                                padding: 4px 10px;
+                                border-radius: 12px;
+                                font-size: 11px;
+                                font-weight: 500;
+                            ">
+                                ${report.status || 'Unknown'}
                             </div>
                         </div>
-                    `;
-                }).join('');
-
-                disputeContainer.innerHTML = disputeHTML;
-            }
-
-            // Move helper functions INSIDE the module
-            function updateMessageCounts(counts) {
-                const notificationCount = document.getElementById('notification-count');
-                const disputeCount = document.getElementById('dispute-count');
-
-                if (notificationCount) {
-                    notificationCount.textContent = counts.notifications || 0;
-                }
-
-                if (disputeCount) {
-                    disputeCount.textContent = counts.disputeReports || 0;
-                }
-
-                // Update unread notification badge
-                const unreadBadge = document.querySelector('.unread-badge');
-                if (unreadBadge) {
-                    const unreadCount = counts.unreadNotifications || 0;
-                    if (unreadCount > 0) {
-                        unreadBadge.textContent = unreadCount;
-                        unreadBadge.style.display = 'block';
-                    } else {
-                        unreadBadge.style.display = 'none';
+                        
+                        <div style="margin-bottom: 10px;">
+                            <div style="font-size: 13px; color: #555; line-height: 1.4;">
+                                ${report.disputeSummary ?
+                        (report.disputeSummary.length > 100 ?
+                            report.disputeSummary.substring(0, 100) + '...' :
+                            report.disputeSummary
+                        ) : 'No summary available'
                     }
+                            </div>
+                        </div>
+                        
+                        ${report.creditScores ? `
+                            <div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                                <div style="font-size: 11px; color: #666; margin-bottom: 4px; font-weight: 500;">Credit Scores:</div>
+                                <div style="display: flex; gap: 8px; font-size: 12px;">
+                                    <span style="color: ${getCreditScoreColor(report.creditScores.experian)}; font-weight: 600;">
+                                        EXP: ${report.creditScores.experian || 'N/A'}
+                                    </span>
+                                    <span style="color: ${getCreditScoreColor(report.creditScores.equifax)}; font-weight: 600;">
+                                        EQF: ${report.creditScores.equifax || 'N/A'}
+                                    </span>
+                                    <span style="color: ${getCreditScoreColor(report.creditScores.transunion)}; font-weight: 600;">
+                                        TU: ${report.creditScores.transunion || 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666;">
+                            <div style="display: flex; gap: 15px;">
+                                <span><strong>Submitted:</strong> ${report.submittedAt ? new Date(report.submittedAt).toLocaleDateString() : 'N/A'}</span>
+                                ${report.fileInfo && report.fileInfo.azureUrl ?
+                        `<span style="color: #007bff;"><i class="fas fa-file-pdf"></i> PDF Available</span>` :
+                        '<span style="color: #999;">No PDF</span>'
+                    }
+                            </div>
+                            <div style="color: #007bff; font-weight: 500;">
+                                <i class="fas fa-eye" style="margin-right: 5px;"></i>
+                                View Details
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                disputeContainer.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <div style="background: #e8f5e8; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <i class="fas fa-check-circle"></i>
+                            Successfully loaded ${disputeReports.length} dispute report${disputeReports.length !== 1 ? 's' : ''}
+                        </div>
+                        ${reportsHTML}
+                    </div>
+                `;
+            }
+
+            // Helper function to get status color
+            function getStatusColor(status) {
+                const statusColors = {
+                    'pending': '#f39c12',
+                    'submitted': '#3498db',
+                    'in-progress': '#e67e22',
+                    'under-review': '#9b59b6',
+                    'resolved': '#27ae60',
+                    'approved': '#27ae60',
+                    'rejected': '#e74c3c',
+                    'closed': '#95a5a6'
+                };
+                return statusColors[status?.toLowerCase()] || '#6c757d';
+            }
+
+            // Show dispute reports error
+            function showDisputeReportsError(container) {
+                const disputeContainer = document.getElementById('dispute-reports-container');
+                if (disputeContainer) {
+                    disputeContainer.innerHTML = `
+                        <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; text-align: center;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to load dispute reports automatically
+                            <br><small style="color: #666;">The system will retry automatically</small>
+                        </div>
+                    `;
                 }
             }
 
-            function getDisputeStatusClass(status) {
-                const statusClasses = {
-                    'submitted': 'status-submitted',
-                    'in-progress': 'status-progress',
-                    'under-review': 'status-review',
-                    'resolved': 'status-resolved',
-                    'rejected': 'status-rejected'
-                };
-                return statusClasses[status] || 'status-default';
+            // Show/hide loading indicator
+            function showDisputeLoadingIndicator(container, show) {
+                const indicator = container.querySelector('#dispute-loading-indicator');
+
+                if (indicator) {
+                    indicator.style.display = show ? 'flex' : 'none';
+                }
             }
 
-            function getDisputeStatusIcon(status) {
-                const statusIcons = {
-                    'submitted': 'fas fa-paper-plane',
-                    'in-progress': 'fas fa-spinner',
-                    'under-review': 'fas fa-search',
-                    'resolved': 'fas fa-check-circle',
-                    'rejected': 'fas fa-times-circle'
-                };
-                return statusIcons[status] || 'fas fa-info-circle';
+            // Helper functions
+            function markAsRead(messageId) {
+                const message = messages.find(m => m.id == messageId);
+                if (message && !message.read) {
+                    message.read = true;
+                    console.log('📨 Marked message as read:', messageId);
+
+                    // Update UI to reflect read status
+                    const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.classList.remove('unread');
+                        messageElement.classList.add('read');
+
+                        // Update the status in expanded view if visible
+                        const statusElement = messageElement.querySelector('.message-meta-row:last-child span:last-child');
+                        if (statusElement) {
+                            statusElement.textContent = 'Read';
+                            statusElement.style.color = '#28a745';
+                        }
+                    }
+
+                    // TODO: Here you could make an API call to update read status on backend
+                    // updateNotificationReadStatus(messageId, true);
+                }
             }
 
+            function showMessageDetails(messageId, container) {
+                console.log('📖 showMessageDetails called with ID:', messageId);
+                // This function is now replaced by toggleMessageExpansion
+                toggleMessageExpansion(messageId, null, true);
+            }
+
+            function attachMessageClickHandlers(container) {
+                console.log('🔗 Attaching message click handlers');
+                // Click handlers are now set up in setupEventListeners
+            }
+
+            function setupBulkSelection(container) {
+                console.log('🔗 Setting up bulk selection functionality');
+
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                const selectedCountSpan = container.querySelector('#selected-count');
+
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', function () {
+                        const messageCheckboxes = container.querySelectorAll('.message-select');
+                        const isChecked = this.checked;
+
+                        messageCheckboxes.forEach(checkbox => {
+                            checkbox.checked = isChecked;
+                            const messageItem = checkbox.closest('.message-item');
+                            if (messageItem) {
+                                if (isChecked) {
+                                    messageItem.classList.add('selected');
+                                } else {
+                                    messageItem.classList.remove('selected');
+                                }
+                            }
+                        });
+
+                        updateBulkSelectionUI(container);
+                    });
+                }
+
+                // Individual checkbox handlers
+                container.addEventListener('change', function (e) {
+                    if (e.target.classList.contains('message-select')) {
+                        const messageItem = e.target.closest('.message-item');
+                        if (messageItem) {
+                            if (e.target.checked) {
+                                messageItem.classList.add('selected');
+                            } else {
+                                messageItem.classList.remove('selected');
+                            }
+                        }
+                        updateBulkSelectionUI(container);
+                    }
+                });
+
+                // Bulk delete button
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.addEventListener('click', function () {
+                        handleBulkDelete(container);
+                    });
+                }
+            }
+
+            function updateBulkSelectionUI(container) {
+                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
+                const bulkDeleteBtn = container.querySelector('#bulk-delete-btn');
+                const selectedCountSpan = container.querySelector('#selected-count');
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                const allCheckboxes = container.querySelectorAll('.message-select');
+
+                if (selectedCountSpan) {
+                    selectedCountSpan.textContent = selectedCheckboxes.length;
+                }
+
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.disabled = selectedCheckboxes.length === 0;
+                }
+
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = selectedCheckboxes.length === allCheckboxes.length && allCheckboxes.length > 0;
+                    selectAllCheckbox.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < allCheckboxes.length;
+                }
+            }
+
+            function handleBulkDelete(container) {
+                const selectedCheckboxes = container.querySelectorAll('.message-select:checked');
+                const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.messageId);
+
+                if (selectedIds.length === 0) return;
+
+                if (confirm(`Are you sure you want to delete ${selectedIds.length} message(s)?`)) {
+                    console.log('🗑️ Bulk deleting messages:', selectedIds);
+
+                    // Remove from messages array
+                    messages = messages.filter(msg => !selectedIds.includes(msg.id));
+
+                    // Re-render only the messages list, not the entire UI
+                    renderMessagesList(container);
+
+                    console.log('✅ Messages deleted successfully, dispute reports unaffected');
+
+                    // Make API call to delete notifications on backend
+                    deleteNotifications(selectedIds);
+                }
+            }
+
+            // Function to render only the messages list (not dispute reports)
+            function renderMessagesList(container) {
+                console.log('🎨 Re-rendering messages list only (preserving dispute reports)');
+
+                const messagesList = container.querySelector('.messages-list');
+                if (!messagesList) {
+                    console.error('❌ Messages list container not found');
+                    return;
+                }
+
+                const filteredMessages = currentFilter === 'all'
+                    ? messages
+                    : messages.filter(msg => !msg.read);
+
+                if (filteredMessages.length === 0) {
+                    messagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No messages found</p>
+                        </div>
+                    `;
+                } else {
+                    messagesList.innerHTML = filteredMessages.map(message => `
+                        <li class="message-item ${message.read ? '' : 'unread'}" data-id="${message.id}">
+                            <div class="message-checkbox">
+                                <input type="checkbox" class="message-select" data-message-id="${message.id}">
+                            </div>
+                            <div class="message-avatar">JAM</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">JAM Capital Consultants</span>
+                                    <span class="message-time">${formatDate(message.timestamp || message.createdAt || message.time)}</span>
+                                </div>
+                                <div class="message-subject">
+                                    ${message.subject || 'No Subject'}
+                                    <span class="notification-type-badge notification-type-${message.notificationType || 'general'}">
+                                        ${message.notificationType || 'general'}
+                                    </span>
+                                </div>
+                                <div class="message-preview">
+                                    ${(message.message || message.body) ?
+                            ((message.message || message.body).length > 100 ?
+                                (message.message || message.body).substring(0, 100) + '...' :
+                                (message.message || message.body)
+                            ) : 'No message content'
+                        }
+                                </div>
+                                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="font-size: 11px; color: #999;">
+                                        ID: ${message.id}
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <button class="expand-toggle" onclick="window.jamMessages.toggleMessageExpansion('${message.id}', event)">
+                                            <span>View Details</span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <button onclick="window.jamMessages.deleteMessage('${message.id}')" style="
+                                            background: #dc3545;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 4px;
+                                            padding: 4px 8px;
+                                            cursor: pointer;
+                                            font-size: 11px;
+                                            transition: background 0.2s;
+                                        " onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="message-expanded-content" id="expanded-${message.id}">
+                                <div class="message-expanded-header">
+                                    <div class="message-expanded-meta">
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">From:</span>
+                                            <span>JAM Capital Consultants</span>
+                                        </div>
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">Type:</span>
+                                            <span class="notification-type-badge notification-type-${message.notificationType || 'general'}">
+                                                ${message.notificationType || 'general'}
+                                            </span>
+                                        </div>
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">Date:</span>
+                                            <span>${(message.timestamp || message.createdAt || message.time) ? new Date(message.timestamp || message.createdAt || message.time).toLocaleString() : 'Date not available'}</span>
+                                        </div>
+                                        <div class="message-meta-row">
+                                            <span class="message-meta-label">Status:</span>
+                                            <span style="color: ${message.read ? '#28a745' : '#ffc107'}; font-weight: 600;">
+                                                ${message.read ? 'Read' : 'Unread'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="message-expanded-body">
+                                    ${message.message || message.body || 'No message content available'}
+                                </div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+
+                // Re-setup event listeners for the new message elements
+                setupMessageEventListeners(container);
+
+                console.log('✅ Messages list re-rendered successfully');
+            }
+
+            // Function to setup event listeners specifically for messages (not dispute reports)
+            function setupMessageEventListeners(container) {
+                console.log('🔧 Setting up message-specific event listeners');
+
+                // Re-setup bulk selection for the new elements
+                const selectAllCheckbox = container.querySelector('#select-all-messages');
+                if (selectAllCheckbox) {
+                    // Remove existing listeners to prevent duplicates
+                    selectAllCheckbox.replaceWith(selectAllCheckbox.cloneNode(true));
+                    const newSelectAllCheckbox = container.querySelector('#select-all-messages');
+
+                    newSelectAllCheckbox.addEventListener('change', function () {
+                        const messageCheckboxes = container.querySelectorAll('.message-select');
+                        const isChecked = this.checked;
+
+                        messageCheckboxes.forEach(checkbox => {
+                            checkbox.checked = isChecked;
+                            const messageItem = checkbox.closest('.message-item');
+                            if (messageItem) {
+                                if (isChecked) {
+                                    messageItem.classList.add('selected');
+                                } else {
+                                    messageItem.classList.remove('selected');
+                                }
+                            }
+                        });
+
+                        updateBulkSelectionUI(container);
+                    });
+                }
+
+                // Clean up and re-setup message list click handlers
+                const messagesList = container.querySelector('.messages-list');
+                if (messagesList) {
+                    // Remove any old event listeners by cloning
+                    const oldMessagesList = messagesList.cloneNode(true);
+                    messagesList.parentNode.replaceChild(oldMessagesList, messagesList);
+                    const newMessagesList = container.querySelector('.messages-list');
+
+                    newMessagesList.addEventListener('click', function (e) {
+                        // Don't handle clicks on delete buttons, checkboxes, or expand buttons
+                        if (e.target.closest('button[onclick*="deleteMessage"]') ||
+                            e.target.closest('.message-checkbox') ||
+                            e.target.closest('.expand-toggle')) {
+                            return;
+                        }
+
+                        const messageItem = e.target.closest('.message-item');
+                        if (messageItem) {
+                            const messageId = messageItem.dataset.id;
+                            console.log('📨 Message clicked - ID:', messageId);
+
+                            // Check if message still exists in data before proceeding
+                            const messageExists = messages.find(m => m.id === messageId);
+                            if (!messageExists) {
+                                console.warn('⚠️ Clicked message no longer exists in data:', messageId);
+                                return;
+                            }
+
+                            markAsRead(messageId);
+                            // Auto-expand the message when clicked
+                            toggleMessageExpansion(messageId, e, true);
+                        }
+                    });
+                }
+
+                // Reset bulk selection state
+                updateBulkSelectionUI(container);
+
+                console.log('✅ Message-specific event listeners setup complete');
+            }
+
+            // Function to delete notification from backend
+            async function deleteNotification(messageId) {
+                try {
+                    console.log('🗑️ Deleting notification from backend:', messageId);
+
+                    const token = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!token || token === 'demo-token') {
+                        console.warn('⚠️ No valid auth token found for notification deletion');
+                        return;
+                    }
+
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+
+                    if (!userId) {
+                        console.warn('⚠️ No user ID found for notification deletion');
+                        return;
+                    }
+
+                    console.log('🔍 Making delete API request:', {
+                        url: `http://localhost:3000/api/admin/delete-notification`,
+                        messageId: messageId,
+                        userId: userId,
+                        hasToken: !!token
+                    });
+
+                    const response = await fetch(`http://localhost:3000/api/admin/delete-notification`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            notificationId: messageId,
+                            userId: userId
+                        })
+                    });
+
+                    console.log('🗑️ Delete API Response Status:', response.status, response.statusText);
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            console.log('⚠️ Notification not found in database (404) - may already be deleted');
+                            return;
+                        } else {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    }
+
+                    const data = await response.json();
+                    console.log('✅ Notification successfully deleted from backend:', data);
+
+                } catch (error) {
+                    console.error('❌ Error deleting notification from backend:', error);
+                    console.error('⚠️ Frontend deletion was successful, but backend deletion failed');
+                    // Don't throw error - frontend deletion was successful
+                }
+            }
+
+            // Function to delete multiple notifications from backend
+            async function deleteNotifications(messageIds) {
+                try {
+                    console.log('🗑️ Bulk deleting notifications from backend:', messageIds);
+
+                    const token = localStorage.getItem('authToken') ||
+                        localStorage.getItem('token') ||
+                        sessionStorage.getItem('authToken') ||
+                        sessionStorage.getItem('token');
+
+                    if (!token || token === 'demo-token') {
+                        console.warn('⚠️ No valid auth token found for bulk notification deletion');
+                        return;
+                    }
+
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userId = userData.id;
+
+                    if (!userId) {
+                        console.warn('⚠️ No user ID found for bulk notification deletion');
+                        return;
+                    }
+
+                    console.log('🔍 Making bulk delete API request:', {
+                        url: `http://localhost:3000/api/admin/bulk-delete-notifications`,
+                        messageIds: messageIds,
+                        userId: userId,
+                        count: messageIds.length,
+                        hasToken: !!token
+                    });
+
+                    const response = await fetch(`http://localhost:3000/api/admin/bulk-delete-notifications`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            notificationIds: messageIds
+                        })
+                    });
+
+                    console.log('🗑️ Bulk Delete API Response Status:', response.status, response.statusText);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('✅ Notifications successfully bulk deleted from backend:', data);
+
+                } catch (error) {
+                    console.error('❌ Error bulk deleting notifications from backend:', error);
+                    console.error('⚠️ Frontend deletion was successful, but backend deletion failed');
+                    // Don't throw error - frontend deletion was successful
+                }
+            }
+
+            // Function to delete individual message
+            function deleteMessage(messageId) {
+                console.log('🗑️ Deleting individual message:', messageId);
+                console.log('📊 Messages array before deletion:', messages.length, 'messages');
+                console.log('📋 Message IDs before deletion:', messages.map(m => m.id));
+
+                // Prevent double-deletion by checking if message still exists
+                const messageExists = messages.find(msg => msg.id === messageId);
+                if (!messageExists) {
+                    console.warn('⚠️ Message already deleted or not found:', messageId);
+                    return;
+                }
+
+                if (confirm('Are you sure you want to delete this message?')) {
+                    // Double-check message still exists before deletion
+                    const messageStillExists = messages.find(msg => msg.id === messageId);
+                    if (!messageStillExists) {
+                        console.error('❌ Message not found in array (may have been deleted already):', messageId);
+                        return;
+                    }
+
+                    // Remove from messages array
+                    const originalLength = messages.length;
+                    messages = messages.filter(msg => msg.id !== messageId);
+
+                    console.log('📊 Messages array after deletion:', messages.length, 'messages');
+                    console.log('📋 Message IDs after deletion:', messages.map(m => m.id));
+                    console.log('🗑️ Deletion successful:', originalLength - messages.length, 'message(s) removed');
+
+                    // Find the container
+                    const container = document.querySelector('.messages-container').closest('[id$="-content"]');
+                    if (!container) {
+                        console.error('❌ Container not found for re-rendering');
+                        return;
+                    }
+
+                    // Close any expanded message before re-rendering
+                    const expandedContent = document.getElementById(`expanded-${messageId}`);
+                    if (expandedContent) {
+                        expandedContent.classList.remove('active');
+                        console.log('🔽 Closed expanded content for deleted message');
+                    }
+
+                    // Re-render only the messages list
+                    renderMessagesList(container);
+
+                    console.log('✅ Individual message deleted successfully, dispute reports unaffected');
+
+                    // Make API call to delete notification on backend
+                    deleteNotification(messageId);
+                } else {
+                    console.log('❌ Message deletion cancelled by user');
+                }
+            }
+
+            // Show dispute details in modal
+            function showDisputeDetails(reportId) {
+                console.log('📋 Showing dispute details for report ID:', reportId);
+
+                // Find the report in our cached data
+                const report = disputeReports.find(r => (r.id || r._id) === reportId);
+
+                if (!report) {
+                    console.error('❌ Report not found:', reportId);
+                    return;
+                }
+
+                // Get modal elements
+                const modal = document.getElementById('dispute-detail-modal');
+                const modalTitle = document.getElementById('dispute-modal-title');
+                const modalBody = document.getElementById('dispute-modal-body');
+
+                if (!modal || !modalTitle || !modalBody) {
+                    console.error('❌ Modal elements not found');
+                    return;
+                }
+
+                // Set the modal title
+                modalTitle.innerHTML = `
+                    <i class="fas fa-balance-scale"></i>
+                    ${report.reportType || report.type || 'Dispute Report'}
+                `;
+
+                // Build the modal content with actual database structure
+                const modalContent = `
+                    <div class="dispute-detail-section">
+                        <span class="dispute-detail-label">Status</span>
+                        <div class="dispute-detail-value">
+                            <span class="dispute-status-badge" style="background: ${getStatusColor(report.status)}; color: white;">
+                                ${report.status || 'Unknown'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="dispute-detail-section">
+                        <span class="dispute-detail-label">Report ID</span>
+                        <div class="dispute-detail-value">${report.id || report._id || 'N/A'}</div>
+                    </div>
+
+                    <div class="dispute-detail-section">
+                        <span class="dispute-detail-label">Report Date</span>
+                        <div class="dispute-detail-value">
+                            ${report.reportDate || (report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Date not available')}
+                        </div>
+                    </div>
+
+                    <div class="dispute-detail-section">
+                        <span class="dispute-detail-label">User Information</span>
+                        <div class="dispute-detail-value">
+                            <strong>Name:</strong> ${report.userName || 'N/A'}<br>
+                            <strong>Email:</strong> ${report.userEmail || 'N/A'}<br>
+                            <strong>User ID:</strong> ${report.userId || 'N/A'}
+                        </div>
+                    </div>
+
+                    <div class="dispute-detail-section">
+                        <span class="dispute-detail-label">Dispute Summary</span>
+                        <div class="dispute-detail-value">
+                            ${report.disputeSummary || 'No summary available'}
+                        </div>
+                    </div>
+
+                    ${report.creditScores ? `
+                        <div class="dispute-detail-section">
+                            <span class="dispute-detail-label">Credit Scores</span>
+                            <div class="dispute-detail-value">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 8px;">
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid #e9ecef;">
+                                        <div style="font-weight: 600; color: #495057; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Experian</div>
+                                        <div style="font-size: 18px; font-weight: 700; color: ${getCreditScoreColor(report.creditScores.experian)}">${report.creditScores.experian || 'N/A'}</div>
+                                    </div>
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid #e9ecef;">
+                                        <div style="font-weight: 600; color: #495057; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Equifax</div>
+                                        <div style="font-size: 18px; font-weight: 700; color: ${getCreditScoreColor(report.creditScores.equifax)}">${report.creditScores.equifax || 'N/A'}</div>
+                                    </div>
+                                    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid #e9ecef;">
+                                        <div style="font-weight: 600; color: #495057; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">TransUnion</div>
+                                        <div style="font-size: 18px; font-weight: 700; color: ${getCreditScoreColor(report.creditScores.transunion)}">${report.creditScores.transunion || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="dispute-detail-section">
+                        <span class="dispute-detail-label">Submission Details</span>
+                        <div class="dispute-detail-value">
+                            <strong>Submitted:</strong> ${report.submittedAt ? new Date(report.submittedAt).toLocaleString() : 'N/A'}<br>
+                            <strong>Last Updated:</strong> ${report.updatedAt ? new Date(report.updatedAt).toLocaleString() : 'N/A'}
+                        </div>
+                    </div>
+
+                    <!-- PDF Document Section -->
+                    <div class="pdf-viewer-section">
+                        <div class="pdf-viewer-header">
+                            <h4><i class="fas fa-file-pdf"></i> Dispute Report Document</h4>
+                            ${report.fileInfo && report.fileInfo.azureUrl ? `
+                                <div class="pdf-actions">
+                                    <button class="pdf-btn" onclick="window.jamMessages.viewPDF('${report.fileInfo.azureUrl}', '${report.fileInfo.fileName}')">
+                                        <i class="fas fa-eye"></i> View PDF
+                                    </button>
+                                    <button class="pdf-btn download" onclick="window.jamMessages.downloadFile('${report.fileInfo.azureUrl}', '${report.fileInfo.fileName}')">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${buildFileInfoSection(report)}
+                    </div>
+                `;
+
+                modalBody.innerHTML = modalContent;
+
+                // Show the modal
+                modal.classList.add('active');
+
+                // Setup modal close handlers
+                setupModalCloseHandlers(modal);
+
+                console.log('✅ Dispute details modal opened');
+            }
+
+            // Build file info section for the actual database structure
+            function buildFileInfoSection(report) {
+                if (!report.fileInfo || !report.fileInfo.azureUrl) {
+                    return `
+                        <div class="no-pdf-message">
+                            <i class="fas fa-file-pdf"></i>
+                            <p>No document found</p>
+                            <small>No PDF file was uploaded with this dispute report</small>
+                        </div>
+                    `;
+                }
+
+                const fileInfo = report.fileInfo;
+                const fileName = fileInfo.fileName || 'Dispute Report';
+                const fileSize = fileInfo.fileSize ? formatFileSize(fileInfo.fileSize) : '';
+                const uploadedAt = fileInfo.uploadedAt ? new Date(fileInfo.uploadedAt).toLocaleString() : '';
+
+                return `
+                    <div style="
+                        background: white;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        padding: 15px;
+                        margin-bottom: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    ">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-file-pdf" style="font-size: 32px; color: #dc3545;"></i>
+                            <div>
+                                <div style="font-weight: 600; color: #333; margin-bottom: 4px;">${fileName}</div>
+                                <div style="font-size: 12px; color: #666;">
+                                    ${fileSize ? `<span>${fileSize}</span>` : ''}
+                                    ${fileSize && uploadedAt ? ' • ' : ''}
+                                    ${uploadedAt ? `<span>Uploaded: ${uploadedAt}</span>` : ''}
+                                </div>
+                                <div style="font-size: 11px; color: #999; margin-top: 2px;">
+                                    <i class="fas fa-cloud"></i> Azure Blob Storage
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="pdf-btn" onclick="window.jamMessages.viewPDF('${fileInfo.azureUrl}', '${fileName}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="pdf-btn download" onclick="window.jamMessages.downloadFile('${fileInfo.azureUrl}', '${fileName}')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Get credit score color based on score range
+            function getCreditScoreColor(score) {
+                const numScore = parseInt(score);
+                if (isNaN(numScore)) return '#6c757d';
+
+                if (numScore >= 750) return '#28a745'; // Excellent (green)
+                if (numScore >= 700) return '#20c997'; // Very Good (teal) 
+                if (numScore >= 650) return '#ffc107'; // Good (yellow)
+                if (numScore >= 600) return '#fd7e14'; // Fair (orange)
+                return '#dc3545'; // Poor (red)
+            }
+
+            // Format file size
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
                 const k = 1024;
@@ -1972,59 +2315,124 @@
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
 
-            function toggleDisputeDetails(disputeId) {
-                const disputeItem = document.querySelector(`[data-dispute-id="${disputeId}"]`);
-                if (disputeItem) {
-                    disputeItem.classList.toggle('expanded');
-                    const button = disputeItem.querySelector('.dispute-actions button');
-                    const icon = button.querySelector('i');
+            // Setup modal close handlers
+            function setupModalCloseHandlers(modal) {
+                const closeBtn = modal.querySelector('#close-dispute-modal');
 
-                    if (disputeItem.classList.contains('expanded')) {
-                        icon.className = 'fas fa-chevron-up';
-                        button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
-                    } else {
-                        icon.className = 'fas fa-chevron-down';
-                        button.innerHTML = '<i class="fas fa-chevron-down"></i> View Details';
-                    }
+                // Close button click
+                if (closeBtn) {
+                    closeBtn.onclick = () => {
+                        modal.classList.remove('active');
+                    };
                 }
+
+                // Click outside modal to close
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                };
+
+                // ESC key to close
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && modal.classList.contains('active')) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+
+            // View PDF in modal/new tab
+            function viewPDF(fileUrl, fileName) {
+                console.log('📄 Opening PDF:', fileName, fileUrl);
+
+                if (!fileUrl || fileUrl === '#') {
+                    alert('PDF file URL not available');
+                    return;
+                }
+
+                // Open PDF in new tab
+                window.open(fileUrl, '_blank');
+            }
+
+            // Download file
+            function downloadFile(fileUrl, fileName) {
+                console.log('⬇️ Downloading file:', fileName, fileUrl);
+
+                if (!fileUrl || fileUrl === '#') {
+                    alert('File URL not available');
+                    return;
+                }
+
+                // Create a temporary link and trigger download
+                const link = document.createElement('a');
+                link.href = fileUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // View all attachments (could open in new tab or show gallery)
+            function viewAllAttachments(reportId) {
+                console.log('📎 Viewing all attachments for report:', reportId);
+
+                const report = disputeReports.find(r => (r.id || r._id) === reportId);
+                if (!report || !report.attachments) {
+                    alert('No attachments found for this report');
+                    return;
+                }
+
+                // Open each PDF in a new tab
+                report.attachments.forEach(attachment => {
+                    if (attachment.filename && attachment.filename.toLowerCase().endsWith('.pdf')) {
+                        setTimeout(() => viewPDF(attachment.url || attachment.path, attachment.filename), 100);
+                    }
+                });
+            }
+
+            // Download all attachments
+            function downloadAllAttachments(reportId) {
+                console.log('⬇️ Downloading all attachments for report:', reportId);
+
+                const report = disputeReports.find(r => (r.id || r._id) === reportId);
+                if (!report || !report.attachments) {
+                    alert('No attachments found for this report');
+                    return;
+                }
+
+                // Download each attachment with a small delay
+                report.attachments.forEach((attachment, index) => {
+                    setTimeout(() => {
+                        downloadFile(
+                            attachment.url || attachment.path,
+                            attachment.filename || attachment.name || `Attachment_${index + 1}`
+                        );
+                    }, index * 500); // 500ms delay between downloads
+                });
             }
 
             // Public API
             return {
                 init: init,
-                reset: reset,
-                openMessage: openMessage,
-                closeMessageDetail: closeMessageDetail,
-                toggleReadStatus: toggleReadStatus,
+                refreshDisputeReports: refreshDisputeReports,
+                showDisputeDetails: showDisputeDetails,
+                viewPDF: viewPDF,
+                downloadFile: downloadFile,
+                viewAllAttachments: viewAllAttachments,
+                downloadAllAttachments: downloadAllAttachments,
+                toggleMessageExpansion: toggleMessageExpansion,
+                markAsRead: markAsRead,
                 deleteMessage: deleteMessage,
-                searchMessages: searchMessages,
-                setFilter: setFilter
+                renderMessagesList: renderMessagesList
             };
         })();
 
-        // Add this OUTSIDE the MessagesModule, after the module definition
-        function toggleDisputeDetails(disputeId) {
-            const disputeItem = document.querySelector(`[data-dispute-id="${disputeId}"]`);
-            if (disputeItem) {
-                disputeItem.classList.toggle('expanded');
-                const button = disputeItem.querySelector('.dispute-actions button');
-                const icon = button.querySelector('i');
-
-                if (disputeItem.classList.contains('expanded')) {
-                    icon.className = 'fas fa-chevron-up';
-                    button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
-                } else {
-                    icon.className = 'fas fa-chevron-down';
-                    button.innerHTML = '<i class="fas fa-chevron-down"></i> View Details';
-                }
-            }
-        }
-
-        // Make it globally accessible
-        window.toggleDisputeDetails = toggleDisputeDetails;
-
         // Expose the module globally
         window.jamMessages = MessagesModule;
+
+        // Log that module is loaded
+        console.log('🎯 AUTO-LOAD MODE: MessagesModule loaded successfully');
+        console.log('📋 Dispute reports will load automatically when module loads');
 
         // Signal that the module is loaded
         if (window.dispatchEvent) {
