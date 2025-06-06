@@ -333,6 +333,24 @@
             background-color: var(--primary-dark);
         }
 
+        .submit-btn {
+            background-color: #09ccfc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
         .form-note {
             text-align: center;
             font-size: 0.9rem;
@@ -872,7 +890,16 @@
                 // Clear the uploadedDocuments array to start fresh for this container
                 uploadedDocuments = [];
 
+                // DEBUGGING: Check container before HTML insertion
+                console.log('🔧 [DEBUG] Container before HTML insertion:', {
+                    id: container.id,
+                    className: container.className,
+                    innerHTML: container.innerHTML.length > 100 ?
+                        container.innerHTML.substring(0, 100) + '...' : container.innerHTML
+                });
+
                 // Insert the widget HTML
+                console.log('🔧 [DEBUG] Inserting HTML into container...');
                 container.innerHTML = `
                     <div class="document-upload-container">
                         <div class="document-upload-header">
@@ -1008,7 +1035,7 @@
                                 <p class="form-note">
                                     If you prefer not to provide login access, you can download and upload your credit reports manually below.
                                 </p>
-                            </div>
+                            </form>
                         </div>
 
                         <!-- IdentityIQ Access Section -->
@@ -1073,7 +1100,20 @@
                     </div>
                 `;
 
+                // DEBUGGING: Check container after HTML insertion
+                console.log('🔧 [DEBUG] Container after HTML insertion:', {
+                    id: container.id,
+                    className: container.className,
+                    childElementCount: container.childElementCount,
+                    hasDocumentUploadContainer: !!container.querySelector('.document-upload-container'),
+                    hasIdentityIQForm: !!container.querySelector('#identityiq-access-form'),
+                    allFormIds: Array.from(container.querySelectorAll('form')).map(f => f.id),
+                    innerHTML: container.innerHTML.length > 200 ?
+                        container.innerHTML.substring(0, 200) + '...' : container.innerHTML
+                });
+
                 // Set up event listeners and other initialization
+                console.log('🔧 [DEBUG] Calling setupEventListeners...');
                 setupEventListeners(container);
 
                 // Mark this container as initialized
@@ -1509,71 +1549,417 @@
                 });
             }
 
+            // Helper functions for authentication
+            function getUserId() {
+                // Get user ID from localStorage or session
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                return userData.id || userData.userId || null;
+            }
+
+            function getAuthToken() {
+                // Get auth token from localStorage or session
+                return localStorage.getItem('authToken') ||
+                    localStorage.getItem('token') ||
+                    sessionStorage.getItem('authToken') ||
+                    sessionStorage.getItem('token') ||
+                    null;
+            }
+
             // Set up event listeners
             function setupEventListeners(container) {
                 // SmartCredit form submission
                 const smartCreditForm = container.querySelector('#smartcredit-access-form');
                 if (smartCreditForm) {
-                    smartCreditForm.addEventListener('submit', function (e) {
+                    smartCreditForm.addEventListener('submit', async function (e) {
                         e.preventDefault();
                         const email = container.querySelector('#smartcredit-email').value;
                         const password = container.querySelector('#smartcredit-password').value;
+                        const submitButton = smartCreditForm.querySelector('button[type="submit"]');
 
-                        // Here you would normally send this data securely to your backend
-                        console.log('SmartCredit access submitted');
+                        // Show loading state
+                        const originalButtonText = submitButton.innerHTML;
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Storing Securely...';
+                        submitButton.disabled = true;
 
-                        // Show success message
-                        smartCreditForm.innerHTML = `
-                            <div style="text-align: center; padding: 20px;">
-                                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
-                                <p>Thank you for providing your SmartCredit access. Our team will use this to help with your credit repair process.</p>
-                            </div>
-                        `;
+                        try {
+                            // Get user ID from session/token
+                            const userId = getUserId(); // You'll need to implement this function
+
+                            const response = await fetch('http://localhost:3000/api/credentials/store', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${getAuthToken()}` // You'll need to implement this function
+                                },
+                                body: JSON.stringify({
+                                    userId: userId,
+                                    serviceType: 'smartcredit',
+                                    email: email,
+                                    password: password,
+                                    purpose: 'credit_monitoring'
+                                })
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                                // Show success message
+                                smartCreditForm.innerHTML = `
+                                    <div style="text-align: center; padding: 20px;">
+                                        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                                        <h3 style="color: var(--success); margin-bottom: 10px;">SmartCredit Access Stored Securely</h3>
+                                        <p>Your SmartCredit credentials have been encrypted and stored securely. Our team can now access your credit reports to provide faster service.</p>
+                                        <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
+                                            <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
+                                            <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
+                                        </div>
+                                    </div>
+                                `;
+                                console.log('✅ SmartCredit credentials stored securely');
+                            } else {
+                                throw new Error(result.message || 'Failed to store credentials');
+                            }
+
+                        } catch (error) {
+                            console.error('❌ Error storing SmartCredit credentials:', error);
+
+                            // Show error message
+                            const errorDiv = document.createElement('div');
+                            errorDiv.style.cssText = 'color: var(--danger); margin-top: 10px; padding: 10px; background-color: #f8d7da; border-radius: 5px;';
+                            errorDiv.innerHTML = `
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Error:</strong> ${error.message || 'Failed to store credentials securely. Please try again.'}
+                            `;
+
+                            // Reset button and show error
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
+                            smartCreditForm.appendChild(errorDiv);
+
+                            // Remove error message after 5 seconds
+                            setTimeout(() => {
+                                if (errorDiv.parentNode) {
+                                    errorDiv.remove();
+                                }
+                            }, 5000);
+                        }
                     });
                 }
 
-                // IdentityIQ form submission
+                // IdentityIQ form submission - WITH DEBUGGING
+                console.log('🔧 [DEBUG] Setting up IdentityIQ form submission...');
                 const identityIQForm = container.querySelector('#identityiq-access-form');
+                console.log('🔧 [DEBUG] IdentityIQ form found:', !!identityIQForm);
+                console.log('🔧 [DEBUG] IdentityIQ form element:', identityIQForm);
+
                 if (identityIQForm) {
-                    identityIQForm.addEventListener('submit', function (e) {
+                    console.log('✅ [DEBUG] IdentityIQ form found, attaching event listener...');
+
+                    // Also add a click listener to the button directly for debugging
+                    const identityIQButton = identityIQForm.querySelector('button[type="submit"]');
+                    console.log('🔧 [DEBUG] IdentityIQ button found:', !!identityIQButton);
+                    console.log('🔧 [DEBUG] IdentityIQ button element:', identityIQButton);
+
+                    if (identityIQButton) {
+                        identityIQButton.addEventListener('click', function (e) {
+                            console.log('🔧 [DEBUG] IdentityIQ button CLICKED!', e);
+                            console.log('🔧 [DEBUG] Click event target:', e.target);
+                            console.log('🔧 [DEBUG] Click event currentTarget:', e.currentTarget);
+                        });
+                    }
+
+                    identityIQForm.addEventListener('submit', async function (e) {
+                        console.log('🚀 [DEBUG] IdentityIQ form SUBMIT event triggered!', e);
+                        console.log('🔧 [DEBUG] Submit event target:', e.target);
+                        console.log('🔧 [DEBUG] Submit event currentTarget:', e.currentTarget);
+
                         e.preventDefault();
-                        const email = container.querySelector('#identityiq-email').value;
-                        const password = container.querySelector('#identityiq-password').value;
+                        console.log('🔧 [DEBUG] Default prevented, continuing with custom handler...');
 
-                        // Here you would normally send this data securely to your backend
-                        console.log('IdentityIQ access submitted');
+                        // Get form elements
+                        const emailField = container.querySelector('#identityiq-email');
+                        const passwordField = container.querySelector('#identityiq-password');
+                        const submitButton = identityIQForm.querySelector('button[type="submit"]');
 
-                        // Show success message
-                        identityIQForm.innerHTML = `
-                            <div style="text-align: center; padding: 20px;">
-                                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
-                                <p>Thank you for providing your IdentityIQ access. Our team will use this to enhance your credit monitoring and repair process.</p>
-                            </div>
-                        `;
+                        console.log('🔧 [DEBUG] Form elements found:', {
+                            emailField: !!emailField,
+                            passwordField: !!passwordField,
+                            submitButton: !!submitButton
+                        });
+
+                        const email = emailField ? emailField.value : '';
+                        const password = passwordField ? passwordField.value : '';
+
+                        console.log('🔧 [DEBUG] Form values:', {
+                            email: email ? 'PROVIDED' : 'EMPTY',
+                            password: password ? 'PROVIDED' : 'EMPTY',
+                            emailLength: email.length,
+                            passwordLength: password.length
+                        });
+
+                        if (!email || !password) {
+                            console.error('❌ [DEBUG] Missing email or password');
+                            alert('Please fill in both email and password fields.');
+                            return;
+                        }
+
+                        // Show loading state
+                        const originalButtonText = submitButton.innerHTML;
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Storing Securely...';
+                        submitButton.disabled = true;
+                        console.log('🔧 [DEBUG] Button updated to loading state');
+
+                        try {
+                            // Get user ID from session/token
+                            const userId = getUserId();
+                            const authToken = getAuthToken();
+
+                            console.log('🔧 [DEBUG] Authentication check:', {
+                                userId: userId ? 'FOUND' : 'MISSING',
+                                authToken: authToken ? 'FOUND' : 'MISSING',
+                                userIdLength: userId ? userId.length : 0,
+                                authTokenLength: authToken ? authToken.length : 0
+                            });
+
+                            if (!userId || !authToken) {
+                                throw new Error('Authentication required - please log in again');
+                            }
+
+                            const requestData = {
+                                userId: userId,
+                                serviceType: 'identityiq',
+                                email: email,
+                                password: password,
+                                purpose: 'credit_monitoring'
+                            };
+
+                            console.log('🔧 [DEBUG] Making API request with data:', {
+                                userId: requestData.userId,
+                                serviceType: requestData.serviceType,
+                                email: requestData.email ? 'PROVIDED' : 'MISSING',
+                                password: requestData.password ? 'PROVIDED' : 'MISSING',
+                                purpose: requestData.purpose
+                            });
+
+                            const response = await fetch('http://localhost:3000/api/credentials/store', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify(requestData)
+                            });
+
+                            console.log('🔧 [DEBUG] API response received:', {
+                                status: response.status,
+                                statusText: response.statusText,
+                                ok: response.ok
+                            });
+
+                            const result = await response.json();
+                            console.log('🔧 [DEBUG] API response data:', result);
+
+                            if (result.success) {
+                                console.log('✅ [DEBUG] IdentityIQ credentials stored successfully');
+                                // Show success message
+                                identityIQForm.innerHTML = `
+                                    <div style="text-align: center; padding: 20px;">
+                                        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                                        <h3 style="color: var(--success); margin-bottom: 10px;">IdentityIQ Access Stored Securely</h3>
+                                        <p>Your IdentityIQ credentials have been encrypted and stored securely. Our team can now access your identity monitoring data to enhance your credit repair process.</p>
+                                        <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
+                                            <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
+                                            <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
+                                        </div>
+                                    </div>
+                                `;
+                                console.log('✅ IdentityIQ credentials stored securely');
+                            } else {
+                                throw new Error(result.message || 'Failed to store credentials');
+                            }
+
+                        } catch (error) {
+                            console.error('❌ [DEBUG] Error in IdentityIQ form submission:', {
+                                message: error.message,
+                                stack: error.stack,
+                                name: error.name
+                            });
+
+                            // Show error message
+                            const errorDiv = document.createElement('div');
+                            errorDiv.style.cssText = 'color: var(--danger); margin-top: 10px; padding: 10px; background-color: #f8d7da; border-radius: 5px;';
+                            errorDiv.innerHTML = `
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Error:</strong> ${error.message || 'Failed to store credentials securely. Please try again.'}
+                            `;
+
+                            // Reset button and show error
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
+                            identityIQForm.appendChild(errorDiv);
+                            console.log('🔧 [DEBUG] Error message displayed and button reset');
+
+                            // Remove error message after 5 seconds
+                            setTimeout(() => {
+                                if (errorDiv.parentNode) {
+                                    errorDiv.remove();
+                                }
+                            }, 5000);
+                        }
+                    });
+
+                    console.log('✅ [DEBUG] IdentityIQ form event listener attached successfully');
+
+                    // Additional debugging - check button styles and visibility
+                    setTimeout(() => {
+                        const button = identityIQForm.querySelector('button[type="submit"]');
+                        if (button) {
+                            const buttonStyles = window.getComputedStyle(button);
+                            console.log('🔧 [DEBUG] IdentityIQ button computed styles:', {
+                                display: buttonStyles.display,
+                                visibility: buttonStyles.visibility,
+                                opacity: buttonStyles.opacity,
+                                pointerEvents: buttonStyles.pointerEvents,
+                                position: buttonStyles.position,
+                                zIndex: buttonStyles.zIndex,
+                                backgroundColor: buttonStyles.backgroundColor,
+                                color: buttonStyles.color,
+                                cursor: buttonStyles.cursor,
+                                disabled: button.disabled
+                            });
+
+                            const buttonRect = button.getBoundingClientRect();
+                            console.log('🔧 [DEBUG] IdentityIQ button position and size:', {
+                                width: buttonRect.width,
+                                height: buttonRect.height,
+                                top: buttonRect.top,
+                                left: buttonRect.left,
+                                right: buttonRect.right,
+                                bottom: buttonRect.bottom
+                            });
+
+                            // Check if button is actually visible
+                            const isVisible = buttonRect.width > 0 && buttonRect.height > 0 &&
+                                buttonStyles.display !== 'none' &&
+                                buttonStyles.visibility !== 'hidden' &&
+                                parseFloat(buttonStyles.opacity) > 0;
+
+                            console.log('🔧 [DEBUG] IdentityIQ button visibility check:', {
+                                isVisible: isVisible,
+                                hasSize: buttonRect.width > 0 && buttonRect.height > 0,
+                                notDisplayNone: buttonStyles.display !== 'none',
+                                notVisibilityHidden: buttonStyles.visibility !== 'hidden',
+                                opacityGreaterThanZero: parseFloat(buttonStyles.opacity) > 0
+                            });
+                        }
+                    }, 1000);
+
+                } else {
+                    console.error('❌ [DEBUG] IdentityIQ form NOT FOUND in container!');
+                    console.log('🔧 [DEBUG] Container innerHTML preview:', container.innerHTML.substring(0, 500) + '...');
+
+                    // Try to find it with different selectors
+                    const allForms = container.querySelectorAll('form');
+                    console.log('🔧 [DEBUG] All forms found in container:', allForms.length);
+                    allForms.forEach((form, index) => {
+                        console.log(`🔧 [DEBUG] Form ${index + 1}:`, {
+                            id: form.id,
+                            className: form.className,
+                            tagName: form.tagName
+                        });
+                    });
+
+                    const identityIQButtons = container.querySelectorAll('button');
+                    console.log('🔧 [DEBUG] All buttons found in container:', identityIQButtons.length);
+                    identityIQButtons.forEach((btn, index) => {
+                        if (btn.textContent && btn.textContent.includes('IdentityIQ')) {
+                            console.log(`🔧 [DEBUG] IdentityIQ-related button ${index + 1}:`, {
+                                id: btn.id,
+                                className: btn.className,
+                                type: btn.type,
+                                textContent: btn.textContent.trim(),
+                                parentElement: btn.parentElement ? btn.parentElement.tagName : 'none'
+                            });
+                        }
                     });
                 }
 
                 // MyScoreIQ form submission
                 const myScoreIQForm = container.querySelector('#myscoreiq-access-form');
                 if (myScoreIQForm) {
-                    myScoreIQForm.addEventListener('submit', function (e) {
+                    myScoreIQForm.addEventListener('submit', async function (e) {
                         e.preventDefault();
                         const email = container.querySelector('#myscoreiq-email').value;
                         const password = container.querySelector('#myscoreiq-password').value;
+                        const submitButton = myScoreIQForm.querySelector('button[type="submit"]');
 
-                        // Here you would normally send this data securely to your backend
-                        console.log('MyScoreIQ access submitted');
+                        // Show loading state
+                        const originalButtonText = submitButton.innerHTML;
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Storing Securely...';
+                        submitButton.disabled = true;
 
-                        // Show success message
-                        myScoreIQForm.innerHTML = `
-                            <div style="text-align: center; padding: 20px;">
-                                <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                <h3 style="color: var(--success); margin-bottom: 10px;">Access Information Received</h3>
-                                <p>Thank you for providing your MyScoreIQ access. Our team will use this to enhance our credit score analysis and tracking capabilities.</p>
-                            </div>
-                        `;
+                        try {
+                            // Get user ID from session/token
+                            const userId = getUserId();
+
+                            const response = await fetch('http://localhost:3000/api/credentials/store', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${getAuthToken()}`
+                                },
+                                body: JSON.stringify({
+                                    userId: userId,
+                                    serviceType: 'myscoreiq',
+                                    email: email,
+                                    password: password,
+                                    purpose: 'credit_monitoring'
+                                })
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                                // Show success message
+                                myScoreIQForm.innerHTML = `
+                                    <div style="text-align: center; padding: 20px;">
+                                        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                                        <h3 style="color: var(--success); margin-bottom: 10px;">MyScoreIQ Access Stored Securely</h3>
+                                        <p>Your MyScoreIQ credentials have been encrypted and stored securely. Our team can now access your credit score tracking data to enhance our analysis capabilities.</p>
+                                        <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
+                                            <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
+                                            <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
+                                        </div>
+                                    </div>
+                                `;
+                                console.log('✅ MyScoreIQ credentials stored securely');
+                            } else {
+                                throw new Error(result.message || 'Failed to store credentials');
+                            }
+
+                        } catch (error) {
+                            console.error('❌ Error storing MyScoreIQ credentials:', error);
+
+                            // Show error message
+                            const errorDiv = document.createElement('div');
+                            errorDiv.style.cssText = 'color: var(--danger); margin-top: 10px; padding: 10px; background-color: #f8d7da; border-radius: 5px;';
+                            errorDiv.innerHTML = `
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Error:</strong> ${error.message || 'Failed to store credentials securely. Please try again.'}
+                            `;
+
+                            // Reset button and show error
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
+                            myScoreIQForm.appendChild(errorDiv);
+
+                            // Remove error message after 5 seconds
+                            setTimeout(() => {
+                                if (errorDiv.parentNode) {
+                                    errorDiv.remove();
+                                }
+                            }, 5000);
+                        }
                     });
                 }
 
@@ -2830,9 +3216,49 @@
         // Expose the module globally
         window.jamDocumentUpload = DocumentUploadModule;
 
+        // Add debugging for module loading
+        console.log('🚀 [DEBUG] DocumentUploadModule loaded and exposed globally');
+        console.log('🚀 [DEBUG] window.jamDocumentUpload:', window.jamDocumentUpload);
+
         // Signal that the module is loaded
         if (window.dispatchEvent) {
             window.dispatchEvent(new CustomEvent('documentUploadLoaded'));
+            console.log('🚀 [DEBUG] documentUploadLoaded event dispatched');
+        }
+
+        // Add debugging for initialization calls
+        console.log('🚀 [DEBUG] Current page location:', window.location.href);
+        console.log('🚀 [DEBUG] Document ready state:', document.readyState);
+
+        // Check if we should auto-initialize
+        if (document.readyState === 'loading') {
+            console.log('🚀 [DEBUG] Document still loading, waiting for DOMContentLoaded');
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('🚀 [DEBUG] DOMContentLoaded fired, checking for auto-init containers');
+                checkForAutoInit();
+            });
+        } else {
+            console.log('🚀 [DEBUG] Document already loaded, checking for auto-init containers now');
+            checkForAutoInit();
+        }
+
+        function checkForAutoInit() {
+            // Look for common container IDs that might need the document uploader
+            const possibleContainerIds = [
+                'document-uploader',
+                'documents-container',
+                'main-content',
+                'content',
+                'dashboard-content'
+            ];
+
+            possibleContainerIds.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    console.log(`🚀 [DEBUG] Found potential container: ${containerId}`, container);
+                    // You might want to auto-initialize here depending on your setup
+                }
+            });
         }
 
         // Update your initialization code (add this after the existing setup)

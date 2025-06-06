@@ -817,6 +817,29 @@
 
             // Handle all card-related events using event delegation
             function handleCardEvents(e) {
+                // ONLY handle events that are actually related to dispute cards
+                // Check if the click is within a dispute card container or has dispute-related classes
+                const isDisputeRelated = e.target.closest('.dispute-card') ||
+                    e.target.closest('.letter-card') ||
+                    e.target.classList.contains('dispute-flip-btn') ||
+                    e.target.classList.contains('letter-flip-btn') ||
+                    e.target.classList.contains('dispute-copy-btn') ||
+                    e.target.closest('.dispute-flip-btn') ||
+                    e.target.closest('.letter-flip-btn') ||
+                    e.target.closest('.dispute-copy-btn');
+
+                // ENHANCED: Also check if this is within a document uploader form
+                const isDocumentUploaderRelated = e.target.closest('.document-upload-container') ||
+                    e.target.closest('.smartcredit-form') ||
+                    e.target.classList.contains('submit-btn') ||
+                    e.target.closest('form[id*="access-form"]');
+
+                // If this click is not dispute-related OR is document uploader related, ignore it
+                if (!isDisputeRelated || isDocumentUploaderRelated) {
+                    // Don't log anything for non-dispute events to reduce console spam
+                    return; // Let the event continue to other handlers
+                }
+
                 console.log('🔍 [DEBUG] Card event triggered:', e.type, e.target);
                 console.log('🔍 [DEBUG] Event target classes:', e.target.className);
                 console.log('🔍 [DEBUG] Event target closest dispute-copy-btn:', e.target.closest('.dispute-copy-btn'));

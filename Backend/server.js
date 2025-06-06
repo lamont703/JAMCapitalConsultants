@@ -10,6 +10,7 @@ import { GoHighLevelService } from './services/ghlService.js';
 import ghlRoutes from './routes/ghlRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import credentialRoutes from './routes/credentialRoutes.js';
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
 import adminRoutes from './routes/adminRoutes.js';
@@ -48,6 +49,7 @@ app.use('/api/ghl', ghlRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/credentials', credentialRoutes);
 
 // Serve the frontend
 app.get('*', (req, res) => {
