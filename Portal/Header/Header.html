@@ -267,6 +267,15 @@
             color: var(--danger);
         }
 
+        /* Admin access control */
+        .header-user-menu-item[href="#admin-panel"].admin-only {
+            display: none;
+        }
+
+        .header-user-menu-item[href="#admin-panel"].admin-allowed {
+            display: flex;
+        }
+
         /* Mobile menu button */
         .header-mobile-menu-button {
             display: flex;
@@ -349,6 +358,11 @@
                     showLoginState();
                     return;
                 }
+
+                // Check user role and show/hide admin features
+                const userRole = userData.role || userData.userRole || 'user'; // Default to 'user' if no role specified
+                console.log('👤 User role:', userRole);
+                updateAdminAccess(userRole);
 
                 // Wait for DOM elements to be available
                 setTimeout(() => {
@@ -485,6 +499,44 @@
                 if (userMenu) userMenu.style.display = 'none';
             }
 
+            // Function to update admin access based on user role
+            function updateAdminAccess(userRole) {
+                console.log('🔐 Updating admin access for role:', userRole);
+
+                const adminPanelButton = document.querySelector('.header-user-menu-item[href="#admin-panel"]');
+
+                if (adminPanelButton) {
+                    // Remove existing classes
+                    adminPanelButton.classList.remove('admin-only', 'admin-allowed');
+
+                    if (userRole === 'admin' || userRole === 'administrator' || userRole === 'super_admin') {
+                        // Show admin panel for admin users
+                        adminPanelButton.classList.add('admin-allowed');
+                        adminPanelButton.style.display = 'flex';
+                        console.log('✅ Admin panel access granted for role:', userRole);
+                    } else {
+                        // Hide admin panel for non-admin users
+                        adminPanelButton.classList.add('admin-only');
+                        adminPanelButton.style.display = 'none';
+                        console.log('🚫 Admin panel access denied for role:', userRole);
+                    }
+                } else {
+                    console.log('⚠️ Admin panel button not found in DOM');
+                }
+            }
+
+            // Check if user has admin role
+            function hasAdminRole() {
+                try {
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userRole = userData.role || userData.userRole || 'user';
+                    return userRole === 'admin' || userRole === 'administrator' || userRole === 'super_admin';
+                } catch (error) {
+                    console.error('Error checking admin role:', error);
+                    return false;
+                }
+            }
+
             // Toggle user menu
             function setupUserMenu() {
                 const userMenuTrigger = document.getElementById('header-userMenuTrigger');
@@ -535,6 +587,336 @@
                 console.log('✅ User logged out successfully');
             }
 
+            // Setup event listeners for header menu items
+            function setupEventListeners() {
+                console.log('🔧 Setting up header event listeners...');
+
+                // Manage Subscription button click handler
+                const manageSubscriptionButton = document.querySelector('.header-user-menu-item[href="#manage-subscription"]');
+                if (manageSubscriptionButton) {
+                    console.log('💳 Setting up Manage Subscription button listener');
+
+                    manageSubscriptionButton.addEventListener('click', function (e) {
+                        console.log('💳 Manage Subscription button clicked from header!');
+                        e.preventDefault();
+
+                        // Check if we're in the same window as the Interface
+                        const interfaceContainer = document.getElementById('interface-manage-subscription-content');
+                        if (interfaceContainer) {
+                            console.log('💳 Found Interface manage subscription container, loading directly');
+
+                            // First activate the tab
+                            const manageSubscriptionTab = document.getElementById('interface-manage-subscription');
+                            if (manageSubscriptionTab) {
+                                console.log('💳 Found manage subscription tab, activating it');
+                                // Hide all tabs
+                                document.querySelectorAll('.interface-tab').forEach(tab => {
+                                    tab.classList.remove('active');
+                                });
+                                // Show manage subscription tab
+                                manageSubscriptionTab.classList.add('active');
+                                console.log('💳 Manage subscription tab activated');
+                            }
+
+                            // Then load the module
+                            if (window.jamSubscriptionManager && typeof window.jamSubscriptionManager.init === 'function') {
+                                console.log('💳 jamSubscriptionManager found, calling init method');
+                                window.jamSubscriptionManager.init('interface-manage-subscription-content');
+                            } else {
+                                console.error('💳 jamSubscriptionManager not found');
+                                console.log('💳 Available jamSubscriptionManager:', !!window.jamSubscriptionManager);
+
+                                // Load the SubscriptionManager.html file if module not available
+                                const script = document.createElement('script');
+                                script.src = '../Header/SubscriptionManager.html';
+                                script.onload = function () {
+                                    console.log('💳 SubscriptionManager.html loaded, trying again...');
+                                    if (window.jamSubscriptionManager) {
+                                        window.jamSubscriptionManager.init('interface-manage-subscription-content');
+                                    }
+                                };
+                                document.head.appendChild(script);
+                            }
+                        } else if (window.parent && window.parent !== window) {
+                            console.log('💳 Sending loadTab message to parent window for manage-subscription');
+                            window.parent.postMessage({
+                                type: 'loadTab',
+                                tabId: 'interface-manage-subscription'
+                            }, '*');
+                        } else {
+                            console.log('💳 No Interface container found and no parent window');
+                            console.log('💳 Creating standalone subscription modal instead');
+                            createSubscriptionModal();
+                        }
+
+                        // Close the user menu
+                        const userMenu = document.querySelector('.header-user-menu');
+                        if (userMenu) {
+                            userMenu.classList.remove('active');
+                        }
+                    });
+                } else {
+                    console.log('💳 Manage Subscription button not found during header setup');
+                }
+
+                // Admin Panel button click handler
+                const adminPanelButton = document.querySelector('.header-user-menu-item[href="#admin-panel"]');
+                if (adminPanelButton) {
+                    console.log('🔧 Setting up Admin Panel button listener');
+
+                    adminPanelButton.addEventListener('click', function (e) {
+                        console.log('🔧 Admin Panel button clicked from header!');
+                        e.preventDefault();
+
+                        // Check if user has admin role before proceeding
+                        if (!hasAdminRole()) {
+                            console.log('🚫 Access denied: User does not have admin role');
+                            alert('Access Denied: You do not have permission to access the Admin Panel.');
+                            return;
+                        }
+
+                        // Check if we're in the same window as the Interface
+                        const interfaceContainer = document.getElementById('interface-admin-panel-content');
+                        if (interfaceContainer) {
+                            console.log('🔧 Found Interface admin panel container, loading directly');
+
+                            // First activate the tab
+                            const adminPanelTab = document.getElementById('interface-admin-panel');
+                            if (adminPanelTab) {
+                                document.querySelectorAll('.interface-tab').forEach(tab => {
+                                    tab.classList.remove('active');
+                                });
+                                adminPanelTab.classList.add('active');
+                            }
+
+                            // Then load the module
+                            if (window.jamAdminPanel && typeof window.jamAdminPanel.init === 'function') {
+                                console.log('🔧 jamAdminPanel found, calling init method');
+                                window.jamAdminPanel.init('interface-admin-panel-content');
+                            }
+                        } else if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'loadTab',
+                                tabId: 'interface-admin-panel'
+                            }, '*');
+                        }
+
+                        // Close the user menu
+                        const userMenu = document.querySelector('.header-user-menu');
+                        if (userMenu) {
+                            userMenu.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Settings button click handler
+                const settingsButton = document.querySelector('.header-user-menu-item[href="#settings"]');
+                if (settingsButton) {
+                    settingsButton.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'loadTab',
+                                tabId: 'interface-settings'
+                            }, '*');
+                        }
+
+                        // Close the user menu
+                        const userMenu = document.querySelector('.header-user-menu');
+                        if (userMenu) {
+                            userMenu.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Help Center button click handler
+                const helpCenterButton = document.querySelector('.header-user-menu-item[href="#help"]');
+                if (helpCenterButton) {
+                    helpCenterButton.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'loadTab',
+                                tabId: 'interface-help-center'
+                            }, '*');
+                        }
+
+                        // Close the user menu
+                        const userMenu = document.querySelector('.header-user-menu');
+                        if (userMenu) {
+                            userMenu.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Notification bell click handler
+                const notificationIcon = document.querySelector('.header-notification-icon');
+                if (notificationIcon) {
+                    notificationIcon.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'loadTab',
+                                tabId: 'interface-messages'
+                            }, '*');
+                        }
+                    });
+                }
+
+                console.log('✅ Header event listeners setup complete');
+            }
+
+            // Helper function to create a standalone subscription modal
+            function createSubscriptionModal() {
+                console.log('💳 Creating standalone subscription modal');
+
+                // Create modal overlay
+                const modalOverlay = document.createElement('div');
+                modalOverlay.id = 'subscription-modal-overlay';
+                modalOverlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    box-sizing: border-box;
+                `;
+
+                // Create modal content container
+                const modalContent = document.createElement('div');
+                modalContent.id = 'subscription-modal-content';
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    max-width: 1200px;
+                    width: 100%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    position: relative;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                `;
+
+                // Create close button
+                const closeButton = document.createElement('button');
+                closeButton.innerHTML = '&times;';
+                closeButton.style.cssText = `
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    background: none;
+                    border: none;
+                    font-size: 2rem;
+                    cursor: pointer;
+                    color: white;
+                    z-index: 1;
+                    padding: 0;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    transition: background-color 0.3s ease;
+                `;
+
+                closeButton.addEventListener('click', closeSubscriptionModal);
+                closeButton.addEventListener('mouseenter', function () {
+                    this.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                });
+                closeButton.addEventListener('mouseleave', function () {
+                    this.style.backgroundColor = 'transparent';
+                });
+
+                // Create content area for subscription manager
+                const contentArea = document.createElement('div');
+                contentArea.id = 'subscription-modal-manager-container';
+
+                modalContent.appendChild(closeButton);
+                modalContent.appendChild(contentArea);
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+
+                // Load the subscription manager into the modal
+                loadSubscriptionManagerInContainer('subscription-modal-manager-container');
+
+                // Close modal when clicking overlay
+                modalOverlay.addEventListener('click', function (e) {
+                    if (e.target === modalOverlay) {
+                        closeSubscriptionModal();
+                    }
+                });
+
+                // Prevent body scroll when modal is open
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Helper function to close the subscription modal
+            function closeSubscriptionModal() {
+                console.log('💳 Closing subscription modal');
+                const modal = document.getElementById('subscription-modal-overlay');
+                if (modal) {
+                    modal.remove();
+                }
+                // Restore body scroll
+                document.body.style.overflow = '';
+            }
+
+            // Helper function to load subscription manager in any container
+            function loadSubscriptionManagerInContainer(containerId) {
+                console.log('💳 Loading subscription manager in container:', containerId);
+
+                if (window.jamSubscriptionManager && typeof window.jamSubscriptionManager.init === 'function') {
+                    console.log('💳 jamSubscriptionManager found, calling init method');
+                    window.jamSubscriptionManager.init(containerId);
+                } else {
+                    console.log('💳 jamSubscriptionManager not found, loading SubscriptionManager.html');
+
+                    // Create a script element to load the subscription manager
+                    const iframe = document.createElement('iframe');
+                    iframe.src = './SubscriptionManager.html';
+                    iframe.style.cssText = `
+                        width: 100%;
+                        height: 100vh;
+                        border: none;
+                        border-radius: 12px;
+                    `;
+
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                        container.appendChild(iframe);
+                    }
+
+                    // Alternative: Try to load the script and then initialize
+                    const script = document.createElement('script');
+                    script.src = './SubscriptionManager.html';
+                    script.onload = function () {
+                        console.log('💳 SubscriptionManager.html loaded, trying again...');
+                        setTimeout(() => {
+                            if (window.jamSubscriptionManager) {
+                                // Remove iframe and use the module instead
+                                if (iframe.parentNode) {
+                                    iframe.parentNode.removeChild(iframe);
+                                }
+                                window.jamSubscriptionManager.init(containerId);
+                            }
+                        }, 500);
+                    };
+                    script.onerror = function () {
+                        console.log('💳 Script loading failed, iframe fallback in place');
+                    };
+                    document.head.appendChild(script);
+                }
+            }
+
             // Initialize header
             function init(containerId) {
                 const container = document.getElementById(containerId);
@@ -566,6 +948,9 @@
                                         <div class="header-user-menu-name" id="header-userMenuName"></div>
                                         <div class="header-user-menu-email" id="header-userMenuEmail"></div>
                                     </div>
+                                    <a href="#manage-subscription" class="header-user-menu-item">
+                                        <i class="fas fa-credit-card"></i> Manage Subscription
+                                    </a>
                                     <a href="#settings" class="header-user-menu-item">
                                         <i class="fas fa-cog"></i> Account Settings
                                     </a>
@@ -633,7 +1018,7 @@
                 }
             });
 
-            // Public API - Enhanced with notification management
+            // Public API - Enhanced with notification management and role checking
             return {
                 init: init,
                 updateUserData: function (newData) {
@@ -656,7 +1041,7 @@
                     // Save to localStorage
                     localStorage.setItem('userData', JSON.stringify(updatedData));
 
-                    // Update header display
+                    // Update header display (including admin access)
                     updateHeaderWithUserData();
                 },
                 setNotifications: function (count) {
@@ -673,6 +1058,12 @@
                             tabId: 'interface-messages'
                         }, '*');
                     }
+                },
+                hasAdminRole: hasAdminRole,
+                updateAdminAccess: function () {
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userRole = userData.role || userData.userRole || 'user';
+                    updateAdminAccess(userRole);
                 }
             };
         })();
@@ -737,6 +1128,19 @@
                 adminPanelButton.addEventListener('click', function (e) {
                     console.log('🔧 Admin Panel button clicked from DOMContentLoaded!');
                     e.preventDefault();
+
+                    // Check if user has admin role before proceeding
+                    if (!hasAdminRole()) {
+                        console.log('🚫 Access denied: User does not have admin role');
+                        alert('Access Denied: You do not have permission to access the Admin Panel.');
+
+                        // Close the user menu
+                        const userMenu = document.querySelector('.header-user-menu');
+                        if (userMenu) {
+                            userMenu.classList.remove('active');
+                        }
+                        return;
+                    }
 
                     console.log('🔧 Checking if we have a parent window...');
                     console.log('🔧 window.parent:', window.parent);
@@ -868,6 +1272,8 @@
                 console.log('🆘 Help Center button NOT found in DOMContentLoaded');
                 console.log('🆘 Available menu items:', Array.from(document.querySelectorAll('.header-user-menu-item')).map(item => item.getAttribute('href')));
             }
+
+            // Manage Subscription button is now handled in setupEventListeners function
 
             // Settings button click handler
             const settingsButton = document.querySelector('.header-user-menu-item[href="#settings"]');

@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Manage Subscription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .subscription-manager {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .manager-header {
+            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .manager-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .manager-subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .manager-content {
+            padding: 2rem;
+        }
+
+        .subscription-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .overview-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid #09ccfc;
+        }
+
+        .overview-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .overview-card.danger {
+            border-left-color: #dc3545;
+        }
+
+        .overview-card.success {
+            border-left-color: #28a745;
+        }
+
+        .overview-card h3 {
+            color: #343a40;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .overview-card h3 i {
+            margin-right: 0.5rem;
+            color: #09ccfc;
+        }
+
+        .plan-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .plan-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #09ccfc;
+        }
+
+        .plan-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .plan-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .plan-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .plan-status.expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .plan-status.expiring {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .usage-section {
+            margin-bottom: 2rem;
+        }
+
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .usage-stat {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .usage-stat .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .usage-stat .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .usage-bar {
+            background: #e9ecef;
+            border-radius: 20px;
+            height: 12px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .usage-fill.warning {
+            background: linear-gradient(90deg, #ffc107, #ffcd39);
+        }
+
+        .usage-fill.danger {
+            background: linear-gradient(90deg, #dc3545, #e55563);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: #08b5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: #6c757d;
+        }
+
+        .action-btn.secondary:hover {
+            background: #545b62;
+        }
+
+        .action-btn.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .action-btn.warning:hover {
+            background: #e0a800;
+        }
+
+        .action-btn.danger {
+            background: #dc3545;
+        }
+
+        .action-btn.danger:hover {
+            background: #c82333;
+        }
+
+        .billing-history {
+            margin-top: 2rem;
+        }
+
+        .billing-history h3 {
+            color: #343a40;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .billing-history h3 i {
+            margin-right: 0.5rem;
+            color: #09ccfc;
+        }
+
+        .billing-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .billing-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .billing-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .billing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .payment-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .payment-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            color: #09ccfc;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #dc3545;
+        }
+
+        .error i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .modal-close:hover {
+            color: #343a40;
+        }
+
+        @media (max-width: 768px) {
+            .subscription-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .manager-content {
+                padding: 1rem;
+            }
+
+            .billing-table {
+                font-size: 0.9rem;
+            }
+
+            .billing-table th,
+            .billing-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="subscription-manager-container">
+        <!-- Subscription Manager will be rendered here -->
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <p>Are you sure you want to perform this action?</p>
+            </div>
+            <div style="text-align: right; margin-top: 1.5rem;">
+                <button class="action-btn secondary" onclick="closeModal()" style="margin-right: 1rem;">Cancel</button>
+                <button class="action-btn" id="confirmBtn" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create a module for the subscription management functionality
+        const ManageSubscriptionModule = (function () {
+            let isInitialized = false;
+            let currentContainer = null;
+            let subscriptionData = null;
+            let pendingAction = null;
+
+            // HTML template for the subscription manager
+            const subscriptionManagerHTML = `
+                <div class="subscription-manager">
+                    <div class="manager-header">
+                        <h1 class="manager-title">Manage Subscription</h1>
+                        <p class="manager-subtitle">Control your credit repair subscription</p>
+                    </div>
+                    
+                    <div class="manager-content" id="manager-content">
+                        <!-- Content will be populated by render function -->
+                    </div>
+                </div>
+            `;
+
+            // Initialize the module
+            function init(containerIdOrElement) {
+                console.log('🚀 Initializing ManageSubscriptionModule...');
+                console.log('🚀 Container parameter:', containerIdOrElement);
+
+                let container;
+
+                // Handle both string ID and DOM element
+                if (typeof containerIdOrElement === 'string') {
+                    console.log('🚀 Container is string ID, finding element');
+                    container = document.getElementById(containerIdOrElement);
+                } else if (containerIdOrElement && containerIdOrElement.nodeType === 1) {
+                    console.log('🚀 Container is DOM element, using directly');
+                    container = containerIdOrElement;
+                } else {
+                    console.error('❌ Invalid container parameter:', containerIdOrElement);
+                    return false;
+                }
+
+                if (!container) {
+                    console.error('❌ Container not found');
+                    return false;
+                }
+
+                console.log('✅ Container found:', container);
+                currentContainer = container;
+
+                // Clear any existing content
+                container.innerHTML = '';
+
+                // Show loading state initially
+                showLoading();
+
+                // Load data and render
+                loadData()
+                    .then(() => {
+                        render();
+                        setupEventListeners();
+                        isInitialized = true;
+                        console.log('✅ ManageSubscriptionModule initialized successfully');
+                    })
+                    .catch(error => {
+                        console.error('❌ Error initializing module:', error);
+                        showError(error.message);
+                    });
+
+                return true;
+            }
+
+            // Load subscription data
+            async function loadData() {
+                console.log('📊 Loading subscription data...');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/subscriptions/dashboard', {
+                        headers: {
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to load subscription data');
+                    }
+
+                    const result = await response.json();
+                    subscriptionData = result.data;
+
+                    // Load payment history
+                    await loadPaymentHistory();
+
+                    console.log('✅ Subscription data loaded successfully');
+                } catch (error) {
+                    console.error('❌ Error loading subscription data:', error);
+                    throw error;
+                }
+            }
+
+            // Load payment history
+            async function loadPaymentHistory() {
+                try {
+                    // This would typically come from your payment history API
+                    // For now, we'll use mock data or what's available in the dashboard data
+                    if (!subscriptionData.paymentHistory) {
+                        subscriptionData.paymentHistory = [
+                            {
+                                id: 'pay_001',
+                                date: new Date().toISOString(),
+                                amount: 59.00,
+                                status: 'success',
+                                type: 'subscription',
+                                description: 'Monthly Subscription - DIY Professional'
+                            }
+                        ];
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading payment history:', error);
+                }
+            }
+
+            // Get authentication token
+            function getAuthToken() {
+                return localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || 'demo-token';
+            }
+
+            // Show loading state
+            function showLoading() {
+                if (!currentContainer) return;
+
+                currentContainer.innerHTML = `
+                    <div class="subscription-manager">
+                        <div class="manager-header">
+                            <h1 class="manager-title">Manage Subscription</h1>
+                            <p class="manager-subtitle">Loading your subscription information...</p>
+                        </div>
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Show error state
+            function showError(message) {
+                if (!currentContainer) return;
+
+                currentContainer.innerHTML = `
+                    <div class="subscription-manager">
+                        <div class="manager-header">
+                            <h1 class="manager-title">Manage Subscription</h1>
+                            <p class="manager-subtitle">Unable to load subscription information</p>
+                        </div>
+                        <div class="error">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>${message}</p>
+                            <button onclick="window.jamSubscriptionManager.refresh()" class="action-btn" style="margin-top: 1rem;">
+                                <i class="fas fa-redo"></i> Try Again
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render the subscription manager
+            function render() {
+                if (!subscriptionData || !currentContainer) return;
+
+                const tierName = subscriptionData.tierConfig?.name || 'No Active Plan';
+                const isActive = subscriptionData.isActive;
+                const remainingCredits = subscriptionData.remainingCredits;
+                const currentUsage = subscriptionData.currentUsage?.disputeLetters || 0;
+                const monthlyLimit = subscriptionData.tierConfig?.monthlyCredits || 0;
+                const tierPrice = subscriptionData.tierConfig?.price || 0;
+
+                // Calculate usage percentage
+                let usagePercentage = 0;
+                let usageClass = '';
+                if (monthlyLimit > 0) {
+                    usagePercentage = (currentUsage / monthlyLimit) * 100;
+                    if (usagePercentage >= 90) usageClass = 'danger';
+                    else if (usagePercentage >= 70) usageClass = 'warning';
+                }
+
+                // Determine subscription status
+                const daysRemaining = subscriptionData.daysUntilExpiration || 0;
+                let statusClass = 'active';
+                let statusText = 'Active';
+
+                if (!isActive) {
+                    statusClass = 'expired';
+                    statusText = 'Expired';
+                } else if (daysRemaining <= 7) {
+                    statusClass = 'expiring';
+                    statusText = 'Expiring Soon';
+                }
+
+                currentContainer.innerHTML = `
+                    <div class="subscription-manager">
+                        <div class="manager-header">
+                            <h1 class="manager-title">Manage Subscription</h1>
+                            <p class="manager-subtitle">Control your credit repair subscription</p>
+                        </div>
+                        
+                        <div class="manager-content">
+                            <!-- Subscription Overview -->
+                            <div class="subscription-overview">
+                                <div class="overview-card ${getCardClass(statusClass)}">
+                                    <h3><i class="fas fa-credit-card"></i>Current Plan</h3>
+                                    <div class="plan-details">
+                                        <div class="plan-name">${tierName}</div>
+                                        <div class="plan-price">$${tierPrice}/mo</div>
+                                    </div>
+                                    <div class="plan-status ${statusClass}">${statusText}</div>
+                                    ${isActive ? `<p style="margin-top: 0.5rem; color: #6c757d;">Renews on ${new Date(subscriptionData.subscriptionEndDate).toLocaleDateString()}</p>` : ''}
+                                </div>
+                                
+                                <div class="overview-card">
+                                    <h3><i class="fas fa-chart-line"></i>Usage Statistics</h3>
+                                    <div class="usage-stats">
+                                        <div class="usage-stat">
+                                            <div class="value">${currentUsage}</div>
+                                            <div class="label">Letters Used</div>
+                                        </div>
+                                        <div class="usage-stat">
+                                            <div class="value">${monthlyLimit === -1 ? '∞' : remainingCredits}</div>
+                                            <div class="label">Remaining</div>
+                                        </div>
+                                    </div>
+                                    ${monthlyLimit > 0 ? `
+                                        <div class="usage-bar">
+                                            <div class="usage-fill ${usageClass}" style="width: ${Math.min(usagePercentage, 100)}%"></div>
+                                        </div>
+                                        <p style="text-align: center; color: #6c757d; font-size: 0.9rem;">${usagePercentage.toFixed(1)}% of monthly limit used</p>
+                                    ` : '<p style="text-align: center; color: #28a745; font-weight: 600;">Unlimited Usage</p>'}
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                ${!isActive ? `
+                                    <button class="action-btn" id="renew-subscription-btn">
+                                        <i class="fas fa-redo"></i> Renew Subscription
+                                    </button>
+                                ` : `
+                                    <button class="action-btn" id="upgrade-subscription-btn">
+                                        <i class="fas fa-arrow-up"></i> Upgrade Plan
+                                    </button>
+                                `}
+                                
+                                <button class="action-btn secondary" id="download-invoices-btn">
+                                    <i class="fas fa-download"></i> Download Invoices
+                                </button>
+                                
+                                <button class="action-btn secondary" id="update-payment-btn">
+                                    <i class="fas fa-credit-card"></i> Update Payment
+                                </button>
+                                
+                                ${isActive ? `
+                                    <button class="action-btn danger" id="cancel-subscription-btn">
+                                        <i class="fas fa-times"></i> Cancel Subscription
+                                    </button>
+                                ` : ''}
+                            </div>
+
+                            <!-- Billing History -->
+                            <div class="billing-history">
+                                <h3><i class="fas fa-history"></i>Billing History</h3>
+                                <table class="billing-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${subscriptionData.paymentHistory?.map(payment => `
+                                            <tr>
+                                                <td>${new Date(payment.date).toLocaleDateString()}</td>
+                                                <td>${payment.description || payment.type}</td>
+                                                <td>$${payment.amount.toFixed(2)}</td>
+                                                <td><span class="payment-status ${payment.status}">${payment.status.toUpperCase()}</span></td>
+                                                <td>
+                                                    <button class="action-btn secondary download-receipt-btn" style="padding: 0.5rem; font-size: 0.8rem;" data-payment-id="${payment.id}">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `).join('') || '<tr><td colspan="5" style="text-align: center; color: #6c757d;">No billing history available</td></tr>'}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Setup event listeners
+            function setupEventListeners() {
+                console.log('🔧 Setting up ManageSubscriptionModule event listeners');
+
+                if (!currentContainer) {
+                    console.error('❌ No container reference available for setupEventListeners');
+                    return;
+                }
+
+                // Upgrade subscription button
+                const upgradeBtn = currentContainer.querySelector('#upgrade-subscription-btn');
+                if (upgradeBtn) {
+                    upgradeBtn.addEventListener('click', upgradeSubscription);
+                }
+
+                // Renew subscription button
+                const renewBtn = currentContainer.querySelector('#renew-subscription-btn');
+                if (renewBtn) {
+                    renewBtn.addEventListener('click', renewSubscription);
+                }
+
+                // Download invoices button
+                const downloadInvoicesBtn = currentContainer.querySelector('#download-invoices-btn');
+                if (downloadInvoicesBtn) {
+                    downloadInvoicesBtn.addEventListener('click', downloadInvoices);
+                }
+
+                // Update payment method button
+                const updatePaymentBtn = currentContainer.querySelector('#update-payment-btn');
+                if (updatePaymentBtn) {
+                    updatePaymentBtn.addEventListener('click', updatePaymentMethod);
+                }
+
+                // Cancel subscription button
+                const cancelBtn = currentContainer.querySelector('#cancel-subscription-btn');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', cancelSubscription);
+                }
+
+                // Download receipt buttons
+                const receiptBtns = currentContainer.querySelectorAll('.download-receipt-btn');
+                receiptBtns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const paymentId = this.getAttribute('data-payment-id');
+                        downloadReceipt(paymentId);
+                    });
+                });
+
+                console.log('✅ All event listeners set up successfully');
+            }
+
+            // Helper function to get card class
+            function getCardClass(status) {
+                switch (status) {
+                    case 'expired': return 'danger';
+                    case 'expiring': return 'warning';
+                    case 'active': return 'success';
+                    default: return '';
+                }
+            }
+
+            // Action methods
+            function upgradeSubscription() {
+                console.log('💳 Upgrade subscription clicked');
+                // Open upgrade modal or redirect to pricing
+                if (window.jamDIYPlan) {
+                    window.jamDIYPlan.openModal('professional');
+                } else {
+                    window.open('../Pricing Plans/DIYPlan.html', '_blank');
+                }
+            }
+
+            function renewSubscription() {
+                console.log('🔄 Renew subscription clicked');
+                // Similar to upgrade, but focus on current tier
+                if (window.jamDIYPlan) {
+                    const currentTier = subscriptionData.tier || 'professional';
+                    window.jamDIYPlan.openModal(currentTier);
+                } else {
+                    window.open('../Pricing Plans/DIYPlan.html', '_blank');
+                }
+            }
+
+            function updatePaymentMethod() {
+                console.log('💳 Update payment method clicked');
+                showConfirmation(
+                    'Update Payment Method',
+                    'You will be redirected to our secure payment processor to update your payment information.',
+                    () => {
+                        // Redirect to payment update page
+                        console.log('Redirecting to payment update...');
+                        alert('This would redirect to your payment method update page.');
+                    }
+                );
+            }
+
+            function cancelSubscription() {
+                console.log('❌ Cancel subscription clicked');
+                showConfirmation(
+                    'Cancel Subscription',
+                    'Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period.',
+                    () => {
+                        performCancellation();
+                    },
+                    'danger'
+                );
+            }
+
+            async function performCancellation() {
+                try {
+                    // This would call your cancellation API
+                    console.log('Processing subscription cancellation...');
+
+                    // Show success message
+                    alert('Your subscription has been cancelled. You will retain access until the end of your current billing period.');
+
+                    // Refresh the data
+                    await refresh();
+                } catch (error) {
+                    console.error('❌ Error cancelling subscription:', error);
+                    alert('Failed to cancel subscription. Please try again or contact support.');
+                }
+            }
+
+            function downloadInvoices() {
+                console.log('📄 Download invoices clicked');
+                alert('This would generate and download your invoices.');
+            }
+
+            function downloadReceipt(paymentId) {
+                console.log('📄 Download receipt for payment:', paymentId);
+                alert(`This would download the receipt for payment ${paymentId}.`);
+            }
+
+            // Show confirmation modal
+            function showConfirmation(title, message, onConfirm, type = 'primary') {
+                const modal = document.getElementById('confirmationModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalBody = document.getElementById('modalBody');
+                const confirmBtn = document.getElementById('confirmBtn');
+
+                if (!modal || !modalTitle || !modalBody || !confirmBtn) {
+                    console.error('❌ Modal elements not found');
+                    // Fallback to browser confirm
+                    if (confirm(message)) {
+                        onConfirm();
+                    }
+                    return;
+                }
+
+                modalTitle.textContent = title;
+                modalBody.innerHTML = `<p>${message}</p>`;
+
+                // Update confirm button style
+                confirmBtn.className = `action-btn ${type === 'danger' ? 'danger' : ''}`;
+
+                pendingAction = onConfirm;
+                modal.style.display = 'block';
+            }
+
+            // Refresh the module
+            async function refresh() {
+                console.log('🔄 Refreshing ManageSubscriptionModule...');
+                try {
+                    showLoading();
+                    await loadData();
+                    render();
+                    setupEventListeners();
+                    console.log('✅ Module refreshed successfully');
+                } catch (error) {
+                    console.error('❌ Error refreshing module:', error);
+                    showError(error.message);
+                }
+            }
+
+            // Reset function
+            function reset() {
+                isInitialized = false;
+                currentContainer = null;
+                subscriptionData = null;
+                pendingAction = null;
+                console.log('ManageSubscriptionModule reset');
+                return true;
+            }
+
+            // Public API
+            return {
+                init: init,
+                refresh: refresh,
+                reset: reset,
+                isInitialized: function () {
+                    return isInitialized;
+                },
+                showConfirmation: showConfirmation,
+                upgradeSubscription: upgradeSubscription,
+                renewSubscription: renewSubscription,
+                updatePaymentMethod: updatePaymentMethod,
+                cancelSubscription: cancelSubscription,
+                downloadInvoices: downloadInvoices,
+                downloadReceipt: downloadReceipt,
+                // Modal handlers for global access
+                confirmPendingAction: function () {
+                    if (pendingAction) {
+                        pendingAction();
+                        pendingAction = null;
+                    }
+                },
+                clearPendingAction: function () {
+                    pendingAction = null;
+                }
+            };
+        })();
+
+        // Global functions for modal handling
+        function closeModal() {
+            const modal = document.getElementById('confirmationModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.clearPendingAction();
+            }
+        }
+
+        function confirmAction() {
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.confirmPendingAction();
+            }
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('confirmationModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Global module loader function
+        function loadManageSubscriptionModule(containerId, forceReload = false) {
+            console.log('🔧 Loading ManageSubscriptionModule into:', containerId);
+
+            if (forceReload || !window.jamSubscriptionManager.isInitialized()) {
+                return window.jamSubscriptionManager.init(containerId);
+            } else {
+                window.jamSubscriptionManager.refresh();
+                return true;
+            }
+        }
+
+        // Expose the module globally
+        window.jamSubscriptionManager = ManageSubscriptionModule;
+        window.loadManageSubscriptionModule = loadManageSubscriptionModule;
+
+        // Auto-initialize on page load for standalone usage
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('subscription-manager-container');
+            if (container && window.jamSubscriptionManager) {
+                console.log('Found standalone subscription manager container, initializing');
+                window.jamSubscriptionManager.init('subscription-manager-container');
+            }
+        });
+
+        // Signal that the module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('manageSubscriptionModuleLoaded'));
+            console.log('ManageSubscriptionModule loaded and event dispatched');
+        }
+    </script>
+</body>
+
+</html>

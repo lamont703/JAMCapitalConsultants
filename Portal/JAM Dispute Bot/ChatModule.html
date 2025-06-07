@@ -1011,6 +1011,46 @@
                 try {
                     console.log('=== ANALYZING BACKEND REPORTS ===');
 
+                    // SUBSCRIPTION CHECK: Verify credits before expensive operation
+                    const parentBot = window.jamTipBot || window.parent?.jamTipBot;
+                    if (parentBot && typeof parentBot.checkBeforeExpensiveOperation === 'function') {
+                        const canProceed = parentBot.checkBeforeExpensiveOperation('credit_analysis');
+                        if (!canProceed) {
+                            hideTypingIndicator(container);
+
+                            // Show subscription-aware message
+                            const subscriptionInfo = parentBot.getSubscriptionInfo();
+                            let subscriptionMessage = '';
+
+                            if (subscriptionInfo.remainingLetters === 0) {
+                                subscriptionMessage = `🔒 **Upgrade Needed for Credit Analysis**\n\n` +
+                                    `You've used all ${subscriptionInfo.includedLetters} letters in your ${subscriptionInfo.tierName} plan.\n\n` +
+                                    `💡 **To analyze your credit reports and generate dispute letters, please upgrade to a paid plan.**\n\n` +
+                                    `✨ **Benefits of upgrading:**\n` +
+                                    `• Unlimited credit report analysis\n` +
+                                    `• AI-powered dispute strategies\n` +
+                                    `• Bureau-specific optimizations\n` +
+                                    `• Higher success rates\n\n` +
+                                    `Ready to boost your credit score?`;
+                            } else {
+                                subscriptionMessage = `⚠️ **Credit Analysis Uses Letter Credits**\n\n` +
+                                    `You have ${subscriptionInfo.remainingLetters} letter credits remaining.\n\n` +
+                                    `Credit analysis will help me create personalized dispute letters for you. Each letter generated will use 1 credit.\n\n` +
+                                    `Would you like to proceed with the analysis?`;
+                            }
+
+                            addBotMessageWithButtons(subscriptionMessage, [
+                                { text: "🚀 Upgrade Now", value: "upgrade_subscription" },
+                                { text: "📋 View Plans", value: "view_plans" },
+                                { text: "❌ Cancel", value: "cancel_analysis" }
+                            ]);
+
+                            updateMessagesDisplay(container);
+                            saveState();
+                            return;
+                        }
+                    }
+
                     // Try to get user email from multiple sources
                     let userEmail = null;
 
@@ -1606,6 +1646,36 @@
                     addUserMessage("▶️ Continue reviewing");
                     continueReview(container);
 
+                } else if (value === 'upgrade_subscription') {
+                    addUserMessage("🚀 Upgrade my subscription");
+
+                    // Trigger parent module's upgrade interface
+                    const parentBot = window.jamTipBot || window.parent?.jamTipBot;
+                    if (parentBot && typeof parentBot.showUpgradeModal === 'function') {
+                        parentBot.showUpgradeModal('free_trial_exhausted');
+                    } else {
+                        addBotMessage("Redirecting you to upgrade your subscription. This would integrate with Stripe or your payment processor.");
+                    }
+                    updateMessagesDisplay(container);
+                    saveState();
+
+                } else if (value === 'view_plans') {
+                    addUserMessage("📋 View subscription plans");
+                    showSubscriptionPlans(container);
+
+                } else if (value === 'cancel_analysis') {
+                    addUserMessage("❌ Cancel analysis");
+                    addBotMessage("No problem! Feel free to ask me other questions about credit repair. When you're ready to analyze your reports and create dispute letters, just let me know!");
+                    updateMessagesDisplay(container);
+                    saveState();
+
+                } else if (value === 'proceed_with_analysis') {
+                    addUserMessage("✅ Yes, proceed with analysis");
+                    addBotMessage("Great! Starting your credit report analysis...");
+                    showTypingIndicator(container);
+                    // Continue with normal analysis flow
+                    analyzeBackendReports(container);
+
                 } else if (value === 'generate_letters') {
                     addUserMessage("📄 Generate dispute letters");
                     generateDisputeLetters(container);
@@ -1871,6 +1941,38 @@
                 if (conversationState.selectedItems.length === 0) {
                     addBotMessage("You haven't selected any items to dispute yet. Please review and select items first.");
                     updateMessagesDisplay(container);
+                    return;
+                }
+
+                // SUBSCRIPTION CHECK: Verify credits before letter generation
+                const creditCheck = checkCreditsBeforeLetterGeneration();
+                if (!creditCheck.canUse) {
+                    let subscriptionMessage = '';
+
+                    if (creditCheck.reason === 'free_trial_exhausted') {
+                        subscriptionMessage = `🔒 **Free Trial Exhausted**\n\n` +
+                            `You've used all your free dispute letters! To generate professional dispute letters, please upgrade to a paid plan.\n\n` +
+                            `✨ **Your selected items are saved** - upgrade now to create letters for:\n` +
+                            `• ${conversationState.selectedItems.length} dispute items\n` +
+                            `• Estimated score boost: ${calculateScoreImpact(conversationState.selectedItems.length)} points\n\n` +
+                            `💡 Paid plans include unlimited analysis + premium features!`;
+                    } else if (creditCheck.reason === 'insufficient_credits') {
+                        subscriptionMessage = `⚠️ **Insufficient Credits**\n\n` +
+                            `You need letter credits to generate dispute letters.\n\n` +
+                            `• Selected items: ${conversationState.selectedItems.length}\n` +
+                            `• Credits needed: ${conversationState.selectedItems.length}\n` +
+                            `• Credits available: ${creditCheck.remainingAfter || 0}\n\n` +
+                            `Upgrade your plan or purchase additional letters to continue.`;
+                    }
+
+                    addBotMessageWithButtons(subscriptionMessage, [
+                        { text: "🚀 Upgrade Now", value: "upgrade_subscription" },
+                        { text: "📋 View Plans", value: "view_plans" },
+                        { text: "💰 Buy Credits", value: "buy_additional_credits" },
+                        { text: "🔙 Back", value: "show_progress" }
+                    ]);
+                    updateMessagesDisplay(container);
+                    saveState();
                     return;
                 }
 
@@ -2323,6 +2425,10 @@
                             { text: "📧 Email Letters to Me", value: "email_letters" }
                         ]);
 
+                        // CONSUME CREDITS: Letter generation was successful
+                        const creditsConsumed = consumeCreditsAfterLetterGeneration();
+                        console.log('💳 Credits consumed after letter generation:', creditsConsumed);
+
                         // Store generated letters data
                         localStorage.setItem('jamBotGeneratedLetters', JSON.stringify(result.letters || []));
                         localStorage.setItem('jamBotLastLetterGeneration', JSON.stringify({
@@ -2330,7 +2436,8 @@
                             selectedItemsCount: selectedItems.length,
                             letterCount: result.letters?.length || 0,
                             bureaus: result.summary?.bureaus || [],
-                            success: true
+                            success: true,
+                            creditsConsumed: creditsConsumed
                         }));
 
                     } else {
@@ -2833,6 +2940,69 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                     console.error('Error initializing ChatModule:', error);
                     return false;
                 }
+            }
+
+            // Subscription-related functions
+            function showSubscriptionPlans(container) {
+                const plansMessage = `💳 **JAM Dispute Bot Subscription Plans**
+
+🆓 **Free Trial** - $0/month
+• 2 dispute letters (lifetime)
+• Basic templates only
+• Email support
+• Limited AI analysis
+
+💼 **DIY Starter** - $29/month  
+• 5 dispute letters included
+• All templates + AI optimization
+• Priority email support
+• $4.99 per additional letter
+
+🚀 **DIY Professional** - $59/month
+• 15 dispute letters included  
+• Advanced letter customization
+• Multi-bureau coordination
+• Phone + email support
+• $3.99 per additional letter
+
+⭐ **DIY Premium** - $99/month
+• 50 dispute letters included
+• Custom letter templates
+• Legal review option
+• Dedicated support line
+• $2.99 per additional letter
+
+💡 **Which plan fits your credit repair goals?**`;
+
+                addBotMessageWithButtons(plansMessage, [
+                    { text: "🆓 Stay on Free", value: "keep_free_plan" },
+                    { text: "💼 Choose Starter ($29)", value: "select_starter_plan" },
+                    { text: "🚀 Choose Professional ($59)", value: "select_professional_plan" },
+                    { text: "⭐ Choose Premium ($99)", value: "select_premium_plan" },
+                    { text: "❌ Not Now", value: "cancel_upgrade" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            function checkCreditsBeforeLetterGeneration() {
+                const parentBot = window.jamTipBot || window.parent?.jamTipBot;
+                if (parentBot && typeof parentBot.checkCredits === 'function') {
+                    const creditCheck = parentBot.checkCredits(1);
+                    return creditCheck;
+                }
+
+                // Fallback: assume credits are available if parent module not found
+                return { canUse: true };
+            }
+
+            function consumeCreditsAfterLetterGeneration() {
+                const parentBot = window.jamTipBot || window.parent?.jamTipBot;
+                if (parentBot && typeof parentBot.consumeCredits === 'function') {
+                    return parentBot.consumeCredits(1);
+                }
+                return true;
             }
 
             // Public API

@@ -145,6 +145,98 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Subscription Badge Styles */
+        .Bot-subscription-badge {
+            margin-top: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .subscription-tier {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .subscription-credits {
+            background: rgba(255, 255, 255, 0.9);
+            color: #09ccfc;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Subscription Modal Styles */
+        .subscription-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .subscription-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .subscription-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .subscription-plan {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .subscription-plan:hover {
+            border-color: #09ccfc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.2);
+        }
+
+        .subscription-plan.recommended {
+            border-color: #09ccfc;
+            position: relative;
+        }
+
+        .subscription-plan.recommended::before {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #09ccfc;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -344,6 +436,57 @@
             let chatModule = null;
             let lettersModule = null;
 
+            // Subscription Management Configuration
+            const SUBSCRIPTION_TIERS = {
+                free: {
+                    name: 'Free Trial',
+                    monthlyPrice: 0,
+                    includedLetters: 2,
+                    additionalLetterPrice: null,
+                    features: ['Basic templates only', 'Email support', 'Limited AI analysis'],
+                    limitations: ['No advanced customization', 'Basic dispute strategies only'],
+                    isActive: true
+                },
+                starter: {
+                    name: 'DIY Starter',
+                    monthlyPrice: 29,
+                    includedLetters: 5,
+                    additionalLetterPrice: 4.99,
+                    features: ['All templates + AI optimization', 'Priority email support', 'Full credit analysis', 'Bureau-specific strategies'],
+                    limitations: ['No phone support', 'Standard letter customization'],
+                    isActive: true
+                },
+                professional: {
+                    name: 'DIY Professional',
+                    monthlyPrice: 59,
+                    includedLetters: 15,
+                    additionalLetterPrice: 3.99,
+                    features: ['Advanced letter customization', 'Multi-bureau coordination', 'Phone + email support', 'Priority processing', 'Follow-up strategies'],
+                    limitations: ['No legal review', 'Standard support hours'],
+                    isActive: true
+                },
+                premium: {
+                    name: 'DIY Premium',
+                    monthlyPrice: 99,
+                    includedLetters: 50,
+                    additionalLetterPrice: 2.99,
+                    features: ['Custom letter templates', 'Legal review option', 'Dedicated support line', '24/7 priority support', 'Advanced AI strategies', 'Compliance monitoring'],
+                    limitations: [],
+                    isActive: true
+                }
+            };
+
+            // User subscription state
+            let userSubscription = {
+                tier: 'free',
+                remainingLetters: 2,
+                totalLettersUsed: 0,
+                subscriptionStartDate: null,
+                subscriptionEndDate: null,
+                isActive: true,
+                hasTrialUsed: false
+            };
+
             // Function to save the current tab state
             function saveTabState(tabId) {
                 activeTab = tabId;
@@ -363,6 +506,554 @@
                 const savedTab = localStorage.getItem('jamBotActiveTab') || 'workflow';
                 switchTab(savedTab);
                 return savedTab;
+            }
+
+            // Backend API Configuration
+            const API_BASE_URL = window.location.origin; // Assumes backend on same origin
+
+            // Subscription Management Functions (Backend Integration)
+            async function loadUserSubscription() {
+                try {
+                    // Get current user ID (you'll need to implement user authentication)
+                    const userId = getCurrentUserId();
+                    if (!userId) {
+                        console.warn('⚠️ No user ID found, using guest mode');
+                        initializeGuestSubscription();
+                        return;
+                    }
+
+                    console.log('📋 Loading subscription from backend for user:', userId);
+
+                    const response = await fetch(`${API_BASE_URL}/api/subscriptions/dashboard`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        // Convert new backend subscription format to frontend format
+                        const data = result.data;
+                        userSubscription = {
+                            tier: data.tier,
+                            tierName: data.tierConfig?.name || 'Unknown',
+                            remainingLetters: data.remainingCredits === 'Unlimited' ? 999999 : parseInt(data.remainingCredits) || 0,
+                            totalLettersUsed: data.currentUsage?.disputeLetters || 0,
+                            subscriptionStartDate: data.subscriptionEndDate ? new Date(new Date(data.subscriptionEndDate).getTime() - (6 * 30 * 24 * 60 * 60 * 1000)).toISOString() : new Date().toISOString(),
+                            subscriptionEndDate: data.subscriptionEndDate,
+                            isActive: data.isActive,
+                            canGenerateDispute: data.canGenerateDispute?.allowed || false,
+                            disputeGenerationReason: data.canGenerateDispute?.reason || '',
+                            features: data.features || [],
+                            limits: data.limits || {},
+                            daysUntilExpiration: data.daysUntilExpiration || 0,
+                            needsRenewal: data.needsRenewal || false,
+                            hasTrialUsed: false // Legacy field for compatibility
+                        };
+                        console.log('✅ Loaded user subscription from backend:', userSubscription);
+                    } else {
+                        throw new Error(result.message || 'Failed to load subscription');
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading subscription from backend:', error);
+                    // Fallback to localStorage for offline mode
+                    await loadUserSubscriptionFallback();
+                }
+            }
+
+            async function loadUserSubscriptionFallback() {
+                try {
+                    const savedSubscription = localStorage.getItem('jamBotUserSubscription');
+                    if (savedSubscription) {
+                        const parsed = JSON.parse(savedSubscription);
+                        userSubscription = { ...userSubscription, ...parsed };
+                        console.log('📋 Loaded subscription from localStorage (fallback):', userSubscription);
+                    } else {
+                        initializeGuestSubscription();
+                    }
+                } catch (error) {
+                    console.error('❌ Error in fallback subscription loading:', error);
+                    initializeGuestSubscription();
+                }
+            }
+
+            function initializeGuestSubscription() {
+                // Initialize guest/demo mode with limited access
+                userSubscription = {
+                    tier: 'free',
+                    remainingLetters: 2,
+                    totalLettersUsed: 0,
+                    subscriptionStartDate: new Date().toISOString(),
+                    subscriptionEndDate: null,
+                    isActive: true,
+                    hasTrialUsed: false
+                };
+                saveUserSubscriptionLocal(); // Save locally for guest mode
+                console.log('🆕 Initialized guest subscription mode');
+            }
+
+            function saveUserSubscriptionLocal() {
+                try {
+                    localStorage.setItem('jamBotUserSubscription', JSON.stringify(userSubscription));
+                    console.log('💾 Saved subscription locally:', userSubscription);
+                } catch (error) {
+                    console.error('❌ Error saving subscription locally:', error);
+                }
+            }
+
+            // Helper functions for authentication (you'll need to implement these)
+            function getCurrentUserId() {
+                // Implement your user authentication logic here
+                // This should return the current user's ID or null if not authenticated
+                const userData = localStorage.getItem('jamBotUserData');
+                if (userData) {
+                    try {
+                        const parsed = JSON.parse(userData);
+                        return parsed.id || parsed.userId;
+                    } catch (e) {
+                        console.error('Error parsing user data:', e);
+                    }
+                }
+                return null;
+            }
+
+            function getAuthToken() {
+                // Implement your authentication token logic here
+                // This should return the current user's auth token or null
+                return localStorage.getItem('jamBotAuthToken') || '';
+            }
+
+            function checkSubscriptionStatus() {
+                const tier = SUBSCRIPTION_TIERS[userSubscription.tier];
+                if (!tier) {
+                    console.error('❌ Invalid subscription tier:', userSubscription.tier);
+                    return false;
+                }
+
+                // Check if subscription is active
+                if (!userSubscription.isActive) {
+                    return false;
+                }
+
+                // For paid subscriptions, check if they're expired
+                if (userSubscription.tier !== 'free' && userSubscription.subscriptionEndDate) {
+                    const endDate = new Date(userSubscription.subscriptionEndDate);
+                    const now = new Date();
+                    if (now > endDate) {
+                        // Subscription expired, downgrade to free
+                        console.log('⏰ Subscription expired, downgrading to free tier');
+                        userSubscription.tier = 'free';
+                        userSubscription.remainingLetters = 0; // No more free letters after paid expires
+                        userSubscription.hasTrialUsed = true;
+                        userSubscription.isActive = true;
+                        saveUserSubscriptionLocal();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            async function canUseLetterCredits(requiredCredits = 1) {
+                // Check if we can generate dispute letters using the backend API
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/subscriptions/can-generate-dispute`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${getAuthToken()}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            const canGenerate = result.data.canGenerate;
+                            const reason = result.data.reason;
+                            const remainingCredits = result.data.remainingCredits;
+                            const tier = result.data.tier;
+
+                            if (!canGenerate) {
+                                // Determine the type of restriction
+                                if (reason.includes('expired')) {
+                                    return {
+                                        canUse: false,
+                                        reason: 'subscription_expired',
+                                        message: 'Your subscription has expired. Please renew to continue creating dispute letters.',
+                                        upgradeRequired: true,
+                                        needsRenewal: true
+                                    };
+                                } else if (reason.includes('limit') && tier === 'starter') {
+                                    return {
+                                        canUse: false,
+                                        reason: 'monthly_limit_reached',
+                                        message: 'You\'ve reached your monthly dispute letter limit. Upgrade to Professional or Premium for unlimited letters.',
+                                        upgradeRequired: true,
+                                        currentTier: tier
+                                    };
+                                } else {
+                                    return {
+                                        canUse: false,
+                                        reason: 'subscription_restriction',
+                                        message: reason,
+                                        upgradeRequired: tier === 'starter'
+                                    };
+                                }
+                            }
+
+                            return {
+                                canUse: true,
+                                remainingAfter: remainingCredits === 'Unlimited' ? 'Unlimited' : Math.max(0, parseInt(remainingCredits) - requiredCredits)
+                            };
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking dispute generation capability:', error);
+                }
+
+                // Fallback to local check if API fails
+                return canUseLetterCreditsLocal(requiredCredits);
+            }
+
+            function canUseLetterCreditsLocal(requiredCredits = 1) {
+                if (!checkSubscriptionStatus()) {
+                    return {
+                        canUse: false,
+                        reason: 'subscription_inactive',
+                        message: 'Your subscription is not active. Please upgrade to continue.'
+                    };
+                }
+
+                // Check using the new canGenerateDispute flag from backend
+                if (!userSubscription.canGenerateDispute) {
+                    const tier = userSubscription.tier;
+                    if (tier === 'starter' && userSubscription.disputeGenerationReason.includes('limit')) {
+                        return {
+                            canUse: false,
+                            reason: 'monthly_limit_reached',
+                            message: 'You\'ve reached your monthly dispute letter limit. Upgrade to Professional or Premium for unlimited letters.',
+                            upgradeRequired: true,
+                            currentTier: tier
+                        };
+                    } else if (userSubscription.disputeGenerationReason.includes('expired')) {
+                        return {
+                            canUse: false,
+                            reason: 'subscription_expired',
+                            message: 'Your subscription has expired. Please renew to continue creating dispute letters.',
+                            upgradeRequired: true,
+                            needsRenewal: true
+                        };
+                    } else {
+                        return {
+                            canUse: false,
+                            reason: 'subscription_restriction',
+                            message: userSubscription.disputeGenerationReason || 'Unable to generate dispute letters at this time.',
+                            upgradeRequired: tier === 'starter'
+                        };
+                    }
+                }
+
+                return {
+                    canUse: true,
+                    remainingAfter: userSubscription.remainingLetters === 999999 ? 'Unlimited' : Math.max(0, userSubscription.remainingLetters - requiredCredits)
+                };
+            }
+
+            async function consumeLetterCredits(creditsUsed = 1) {
+                try {
+                    // Log usage to backend (this will be handled by middleware in the dispute generation endpoint)
+                    // For now, just update local state and reload subscription data
+                    if (userSubscription.remainingLetters >= creditsUsed || userSubscription.remainingLetters === 999999) {
+                        // Update local state
+                        if (userSubscription.remainingLetters !== 999999) {
+                            userSubscription.remainingLetters -= creditsUsed;
+                        }
+                        userSubscription.totalLettersUsed += creditsUsed;
+                        saveUserSubscriptionLocal();
+
+                        console.log(`📝 Consumed ${creditsUsed} letter credits. Remaining: ${userSubscription.remainingLetters === 999999 ? 'Unlimited' : userSubscription.remainingLetters}`);
+
+                        // Reload subscription data from backend to get accurate usage
+                        setTimeout(() => {
+                            loadUserSubscription();
+                        }, 1000);
+
+                        return true;
+                    } else {
+                        console.error('❌ Attempted to consume more credits than available');
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error consuming letter credits:', error);
+                    return false;
+                }
+            }
+
+            function getSubscriptionDisplayInfo() {
+                return {
+                    tierName: userSubscription.tierName || userSubscription.tier,
+                    remainingLetters: userSubscription.remainingLetters === 999999 ? 'Unlimited' : userSubscription.remainingLetters,
+                    totalLettersUsed: userSubscription.totalLettersUsed,
+                    subscriptionEndDate: userSubscription.subscriptionEndDate,
+                    daysUntilExpiration: userSubscription.daysUntilExpiration,
+                    isActive: userSubscription.isActive,
+                    features: userSubscription.features || [],
+                    limits: userSubscription.limits || {},
+                    canUpgrade: userSubscription.tier === 'starter' || !userSubscription.isActive,
+                    needsRenewal: userSubscription.needsRenewal || false,
+                    nextTier: getNextTierRecommendation()
+                };
+            }
+
+            function getNextTierRecommendation() {
+                const currentTier = userSubscription.tier;
+                switch (currentTier) {
+                    case 'free':
+                        return 'starter';
+                    case 'starter':
+                        return userSubscription.totalLettersUsed > 8 ? 'professional' : 'starter';
+                    case 'professional':
+                        return userSubscription.totalLettersUsed > 20 ? 'premium' : 'professional';
+                    default:
+                        return null;
+                }
+            }
+
+            function showSubscriptionUpgradeModal(reason = 'insufficient_credits') {
+                const subscriptionInfo = getSubscriptionDisplayInfo();
+                const nextTier = subscriptionInfo.nextTier ? SUBSCRIPTION_TIERS[subscriptionInfo.nextTier] : null;
+
+                let modalContent = '';
+
+                if (reason === 'free_trial_exhausted') {
+                    modalContent = `
+                        <div class="subscription-modal-content">
+                            <h3>🚀 Ready to Unlock Your Credit Potential?</h3>
+                            <p>You've used your ${subscriptionInfo.includedLetters} free dispute letters! You're just getting started on your credit repair journey.</p>
+                            <div class="subscription-benefits">
+                                <h4>Upgrade to continue with:</h4>
+                                <ul>
+                                    <li>✅ AI-powered dispute optimization</li>
+                                    <li>✅ Bureau-specific strategies</li>
+                                    <li>✅ Priority support</li>
+                                    <li>✅ Advanced templates</li>
+                                </ul>
+                            </div>
+                        `;
+                } else if (reason === 'insufficient_credits') {
+                    modalContent = `
+                        <div class="subscription-modal-content">
+                            <h3>💳 Need More Letter Credits?</h3>
+                            <p>You need more letter credits to continue. Choose an option:</p>
+                        `;
+                }
+
+                // Show modal (simplified version - in production you'd want a proper modal)
+                if (confirm(modalContent + '\n\nWould you like to upgrade your subscription now?')) {
+                    // Redirect to subscription upgrade page
+                    showSubscriptionPlans();
+                }
+            }
+
+            async function showSubscriptionPlans() {
+                try {
+                    // Get available subscription tiers from backend
+                    const response = await fetch(`${API_BASE_URL}/api/subscription/tiers`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        displaySubscriptionPlansModal(result.data);
+                    } else {
+                        console.error('Failed to load subscription plans:', result.message);
+                        // Fallback to static display
+                        displaySubscriptionPlansModal(SUBSCRIPTION_TIERS);
+                    }
+                } catch (error) {
+                    console.error('Error loading subscription plans:', error);
+                    // Fallback to static display
+                    displaySubscriptionPlansModal(SUBSCRIPTION_TIERS);
+                }
+            }
+
+            function displaySubscriptionPlansModal(tiers) {
+                // Create modal overlay
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    z-index: 10000;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 20px;
+                `;
+
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 30px;
+                    max-width: 900px;
+                    width: 100%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                `;
+
+                // Build plans HTML
+                let plansHTML = `
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h2 style="color: #333; margin-bottom: 10px;">🚀 Choose Your Credit Repair Plan</h2>
+                        <p style="color: #666;">Unlock the full potential of AI-powered dispute letters</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                `;
+
+                Object.entries(tiers).forEach(([tierKey, tier]) => {
+                    if (tierKey === 'free') return; // Skip free tier in upgrade modal
+
+                    const isRecommended = tierKey === 'professional';
+                    plansHTML += `
+                        <div style="
+                            border: 2px solid ${isRecommended ? '#09ccfc' : '#e9ecef'};
+                            border-radius: 12px;
+                            padding: 25px;
+                            text-align: center;
+                            position: relative;
+                            background: ${isRecommended ? '#f8fcff' : 'white'};
+                        ">
+                            ${isRecommended ? '<div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #09ccfc; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">RECOMMENDED</div>' : ''}
+                            
+                            <h3 style="color: #333; margin-bottom: 10px;">${tier.name || tier.tierName}</h3>
+                            <div style="font-size: 2rem; font-weight: bold; color: #09ccfc; margin-bottom: 5px;">
+                                $${tier.monthlyPrice || tier.price}/mo
+                            </div>
+                            <div style="color: #666; margin-bottom: 20px;">
+                                ${tier.creditsIncluded || tier.includedLetters} letters included
+                            </div>
+                            
+                            <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 25px;">
+                                ${(tier.features || []).map(feature =>
+                        `<li style="padding: 4px 0; color: #555;">✅ ${feature}</li>`
+                    ).join('')}
+                            </ul>
+                            
+                            <button onclick="upgradeToTier('${tierKey}')" style="
+                                width: 100%;
+                                background: ${isRecommended ? '#09ccfc' : '#6c757d'};
+                                color: white;
+                                border: none;
+                                padding: 12px 20px;
+                                border-radius: 6px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: background 0.3s ease;
+                            ">
+                                Choose ${tier.name || tier.tierName}
+                            </button>
+                        </div>
+                    `;
+                });
+
+                plansHTML += `
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeSubscriptionModal()" style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">
+                            Maybe Later
+                        </button>
+                    </div>
+                `;
+
+                modalContent.innerHTML = plansHTML;
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                // Store modal reference for closing
+                window.currentSubscriptionModal = modal;
+            }
+
+            // Global functions for subscription modal
+            window.upgradeToTier = async function (tier) {
+                try {
+                    console.log(`🚀 Redirecting to payment for ${tier} tier`);
+
+                    // Get payment links from backend
+                    const response = await fetch(`${API_BASE_URL}/api/subscription/payment-links/${tier}`);
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success && result.paymentLink) {
+                            // Redirect to GoHighLevel payment page
+                            window.open(result.paymentLink, '_blank');
+                            closeSubscriptionModal();
+                            return;
+                        }
+                    }
+
+                    // Fallback: Show message about contacting support
+                    alert(`To upgrade to ${tier.toUpperCase()}, please contact our support team or visit our website.`);
+                    closeSubscriptionModal();
+
+                } catch (error) {
+                    console.error('Error redirecting to payment:', error);
+                    alert('There was an issue redirecting to payment. Please try again or contact support.');
+                }
+            };
+
+            window.closeSubscriptionModal = function () {
+                if (window.currentSubscriptionModal) {
+                    document.body.removeChild(window.currentSubscriptionModal);
+                    window.currentSubscriptionModal = null;
+                }
+            };
+
+            // Continue with existing code
+            if (false) { // Disabled old code
+                Object.entries(SUBSCRIPTION_TIERS).forEach(([key, tier]) => {
+                    if (tier.isActive) {
+                        console.log(`${tier.name}: $${tier.monthlyPrice}/month - ${tier.includedLetters} letters included`);
+                    }
+                });
+
+                alert('Subscription upgrade interface would open here. This would integrate with your payment processor (Stripe, etc.)');
+            }
+
+            // Enhanced function to check before expensive operations
+            async function checkBeforeExpensiveOperation(operationType = 'credit_analysis') {
+                const creditCheck = await canUseLetterCredits(1);
+
+                if (!creditCheck.canUse) {
+                    console.log(`🚫 Blocking ${operationType} - Reason: ${creditCheck.reason}`);
+
+                    // Show appropriate upgrade prompt
+                    if (creditCheck.reason === 'free_trial_exhausted') {
+                        showSubscriptionUpgradeModal('free_trial_exhausted');
+                    } else if (creditCheck.reason === 'insufficient_credits') {
+                        showSubscriptionUpgradeModal('insufficient_credits');
+                    }
+
+                    return false;
+                }
+
+                console.log(`✅ ${operationType} approved - ${creditCheck.remainingAfter} credits will remain after`);
+                return true;
             }
 
             // Function to set up event listeners
@@ -646,16 +1337,34 @@
                         chatModule.setChatMessages(savedMessages);
                         chatModule.updateView(chatContainer);
                     } else if (success) {
-                        // Add welcome message if no saved messages
+                        // Add subscription-aware welcome message if no saved messages
                         setTimeout(() => {
-                            chatModule.addBotMessage(`👋 Hi there! I'm your JAM Dispute Bot. I can help you with:
+                            const subscriptionInfo = getSubscriptionDisplayInfo();
+                            let welcomeMessage = `👋 Hi there! I'm your JAM Dispute Bot. I can help you with:
 
 - Creating dispute letters
 - Understanding your credit report
 - Explaining credit laws and your rights
 - Providing credit improvement strategies
 
-What can I help you with today?`, chatContainer);
+💳 **Your Plan:** ${subscriptionInfo.tierName}
+📝 **Remaining Letters:** ${subscriptionInfo.remainingLetters}
+
+`;
+
+                            if (subscriptionInfo.remainingLetters === 0) {
+                                welcomeMessage += `🔒 **Note:** You've used all your letter credits. Upgrade to continue creating dispute letters.
+
+`;
+                            } else if (subscriptionInfo.remainingLetters <= 1) {
+                                welcomeMessage += `⚠️ **Note:** You have limited letter credits remaining. Consider upgrading for unlimited access.
+
+`;
+                            }
+
+                            welcomeMessage += `What can I help you with today?`;
+
+                            chatModule.addBotMessage(welcomeMessage, chatContainer);
                         }, 500);
                     }
 
@@ -818,6 +1527,28 @@ What can I help you with today?`, chatContainer);
                 }, 1500);
             }
 
+            // Function to update subscription display in header
+            function updateSubscriptionDisplay() {
+                const headerText = document.querySelector('.Bot-header-text');
+                if (headerText) {
+                    const subscriptionInfo = getSubscriptionDisplayInfo();
+                    const existingBadge = headerText.querySelector('.Bot-subscription-badge');
+
+                    if (existingBadge) {
+                        existingBadge.remove();
+                    }
+
+                    const badge = document.createElement('div');
+                    badge.className = 'Bot-subscription-badge';
+                    badge.innerHTML = `
+                        <span class="subscription-tier">${subscriptionInfo.tierName}</span>
+                        <span class="subscription-credits">${subscriptionInfo.remainingLetters} letters left</span>
+                    `;
+
+                    headerText.appendChild(badge);
+                }
+            }
+
             // Function to update the letters list
             function updateLettersList() {
                 const lettersList = document.getElementById('lettersList');
@@ -958,6 +1689,9 @@ What can I help you with today?`, chatContainer);
 
                     // Set up event listeners
                     setTimeout(async () => {
+                        // Load user subscription first
+                        loadUserSubscription();
+
                         setupEventListeners();
 
                         // Initialize the workflow module
@@ -974,6 +1708,9 @@ What can I help you with today?`, chatContainer);
 
                         // Restore the previous tab state or default to 'workflow'
                         restoreTabState();
+
+                        // Update UI with subscription info
+                        updateSubscriptionDisplay();
                     }, 100);
 
                     // Mark as initialized
@@ -1002,7 +1739,32 @@ What can I help you with today?`, chatContainer);
                     }
                 },
 
-                switchTab: switchTab
+                switchTab: switchTab,
+
+                // Subscription Management API
+                getSubscriptionInfo: function () {
+                    return getSubscriptionDisplayInfo();
+                },
+
+                checkCredits: function (requiredCredits = 1) {
+                    return canUseLetterCredits(requiredCredits);
+                },
+
+                consumeCredits: function (creditsUsed = 1) {
+                    const success = consumeLetterCredits(creditsUsed);
+                    if (success) {
+                        updateSubscriptionDisplay();
+                    }
+                    return success;
+                },
+
+                checkBeforeExpensiveOperation: checkBeforeExpensiveOperation,
+
+                showUpgradeModal: function (reason = 'insufficient_credits') {
+                    showSubscriptionUpgradeModal(reason);
+                },
+
+                updateSubscriptionDisplay: updateSubscriptionDisplay
             };
         })();
 

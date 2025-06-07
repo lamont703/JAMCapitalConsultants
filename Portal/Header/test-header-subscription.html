@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Header Subscription Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-header {
+            height: 80px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .test-content {
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .interface-tab {
+            display: none;
+        }
+
+        .interface-tab.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Header Subscription Integration Test</h1>
+
+        <!-- Simulate the header container -->
+        <div class="test-section">
+            <h2>Header</h2>
+            <div id="header-container" class="test-header"></div>
+        </div>
+
+        <!-- Simulate the interface tabs -->
+        <div class="test-section">
+            <h2>Interface Tab Content</h2>
+
+            <!-- Simulate the manage subscription tab -->
+            <div id="interface-manage-subscription" class="interface-tab">
+                <h3>Manage Subscription Tab Content</h3>
+                <div id="interface-manage-subscription-content" class="test-content">
+                    <!-- SubscriptionManager will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Status and debugging info -->
+        <div class="test-section">
+            <h2>Test Status</h2>
+            <div id="status-messages"></div>
+
+            <h3>Debug Information</h3>
+            <div id="debug-info"></div>
+
+            <h3>Test Steps</h3>
+            <ol>
+                <li>Header should load with JAM branding</li>
+                <li>Click the user avatar to open the dropdown menu</li>
+                <li>Click "Manage Subscription" in the dropdown</li>
+                <li>The subscription manager should load in the content area below</li>
+            </ol>
+
+            <button onclick="runTests()"
+                style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 10px 0;">
+                Run Automated Tests
+            </button>
+        </div>
+    </div>
+
+    <!-- Load the SubscriptionManager module -->
+    <script src="SubscriptionManager.html"></script>
+
+    <!-- Load the Header module -->
+    <script src="Header.html"></script>
+
+    <script>
+        // Set up test user data
+        localStorage.setItem('userData', JSON.stringify({
+            firstName: 'Test',
+            lastName: 'User',
+            email: 'test@example.com',
+            role: 'user',
+            status: 'Active Client'
+        }));
+
+        // Status logging
+        function logStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status-messages');
+            const statusElement = document.createElement('div');
+            statusElement.className = `status ${type}`;
+            statusElement.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            statusDiv.appendChild(statusElement);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Debug information
+        function updateDebugInfo() {
+            const debugDiv = document.getElementById('debug-info');
+            debugDiv.innerHTML = `
+                <strong>Available Modules:</strong><br>
+                - jamDashboardHeader: ${!!window.jamDashboardHeader}<br>
+                - jamSubscriptionManager: ${!!window.jamSubscriptionManager}<br>
+                - loadManageSubscriptionModule: ${typeof window.loadManageSubscriptionModule === 'function'}<br><br>
+                
+                <strong>DOM Elements:</strong><br>
+                - Header container: ${!!document.getElementById('header-container')}<br>
+                - Manage subscription content: ${!!document.getElementById('interface-manage-subscription-content')}<br>
+                - Manage subscription tab: ${!!document.getElementById('interface-manage-subscription')}<br><br>
+                
+                <strong>Event Listeners:</strong><br>
+                - Manage subscription button: ${!!document.querySelector('.header-user-menu-item[href="#manage-subscription"]')}<br>
+            `;
+        }
+
+        // Initialize the test
+        function initializeTest() {
+            logStatus('Initializing test environment...', 'info');
+
+            // Wait for modules to load
+            setTimeout(() => {
+                if (window.jamDashboardHeader) {
+                    logStatus('Header module found, initializing...', 'success');
+                    const headerResult = window.jamDashboardHeader.init('header-container');
+
+                    if (headerResult) {
+                        logStatus('Header initialized successfully', 'success');
+                        updateDebugInfo();
+
+                        // Check if subscription manager is available
+                        if (window.jamSubscriptionManager) {
+                            logStatus('Subscription manager module found', 'success');
+                        } else {
+                            logStatus('Subscription manager module not found', 'error');
+                        }
+                    } else {
+                        logStatus('Header initialization failed', 'error');
+                    }
+                } else {
+                    logStatus('Header module not found', 'error');
+                }
+            }, 1000);
+        }
+
+        // Automated test function
+        function runTests() {
+            logStatus('Starting automated tests...', 'info');
+
+            // Test 1: Check if modules are loaded
+            setTimeout(() => {
+                if (window.jamDashboardHeader && window.jamSubscriptionManager) {
+                    logStatus('✓ Test 1 PASSED: Both modules are loaded', 'success');
+                } else {
+                    logStatus('✗ Test 1 FAILED: Missing modules', 'error');
+                    return;
+                }
+
+                // Test 2: Simulate clicking the manage subscription button
+                const manageButton = document.querySelector('.header-user-menu-item[href="#manage-subscription"]');
+                if (manageButton) {
+                    logStatus('✓ Test 2 PASSED: Manage subscription button found', 'success');
+
+                    // Test 3: Simulate click
+                    setTimeout(() => {
+                        logStatus('Simulating click on manage subscription button...', 'info');
+                        manageButton.click();
+
+                        // Check if content loaded
+                        setTimeout(() => {
+                            const content = document.getElementById('interface-manage-subscription-content');
+                            const tab = document.getElementById('interface-manage-subscription');
+
+                            if (tab && tab.classList.contains('active') && content && content.innerHTML.trim()) {
+                                logStatus('✓ Test 3 PASSED: Subscription manager loaded successfully', 'success');
+                            } else {
+                                logStatus('✗ Test 3 FAILED: Subscription manager did not load', 'error');
+                            }
+
+                            updateDebugInfo();
+                        }, 2000);
+                    }, 1000);
+                } else {
+                    logStatus('✗ Test 2 FAILED: Manage subscription button not found', 'error');
+                }
+            }, 2000);
+        }
+
+        // Listen for module load events
+        window.addEventListener('dashboardHeaderLoaded', function () {
+            logStatus('Dashboard header loaded event received', 'success');
+        });
+
+        window.addEventListener('manageSubscriptionModuleLoaded', function () {
+            logStatus('Manage subscription module loaded event received', 'success');
+        });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            logStatus('DOM Content Loaded', 'info');
+            initializeTest();
+        });
+
+        // Update debug info periodically
+        setInterval(updateDebugInfo, 5000);
+    </script>
+</body>
+
+</html>

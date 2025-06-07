@@ -16,7 +16,18 @@ export class CosmosService {
 
     async createDocument(document, partitionKey) {
         try {
+            // Ensure initialization before any operation
+            await this.initialize();
+            
             const container = this.cosmosConfig.getContainer();
+            if (!container) {
+                throw new Error('Cosmos DB container not initialized');
+            }
+            
+            if (!container.items) {
+                throw new Error('Cosmos DB container.items is null - container not properly initialized');
+            }
+            
             const { resource } = await container.items.create(document);
             console.log(`Document created with id: ${resource.id}`);
             return resource;
@@ -28,7 +39,14 @@ export class CosmosService {
 
     async getDocument(id, partitionKey) {
         try {
+            // Ensure initialization before any operation
+            await this.initialize();
+            
             const container = this.cosmosConfig.getContainer();
+            if (!container) {
+                throw new Error('Cosmos DB container not initialized');
+            }
+            
             const { resource } = await container.item(id, partitionKey).read();
             return resource;
         } catch (error) {
@@ -42,7 +60,14 @@ export class CosmosService {
 
     async updateDocument(id, partitionKey, updates) {
         try {
+            // Ensure initialization before any operation
+            await this.initialize();
+            
             const container = this.cosmosConfig.getContainer();
+            if (!container) {
+                throw new Error('Cosmos DB container not initialized');
+            }
+            
             const { resource: existingDoc } = await container.item(id, partitionKey).read();
             
             const updatedDoc = { ...existingDoc, ...updates };
@@ -58,7 +83,14 @@ export class CosmosService {
 
     async deleteDocument(id, partitionKey) {
         try {
+            // Ensure initialization before any operation
+            await this.initialize();
+            
             const container = this.cosmosConfig.getContainer();
+            if (!container) {
+                throw new Error('Cosmos DB container not initialized');
+            }
+            
             await container.item(id, partitionKey).delete();
             console.log(`Document deleted with id: ${id}`);
             return true;
@@ -70,7 +102,14 @@ export class CosmosService {
 
     async queryDocuments(query, parameters = []) {
         try {
+            // Ensure initialization before any operation
+            await this.initialize();
+            
             const container = this.cosmosConfig.getContainer();
+            if (!container) {
+                throw new Error('Cosmos DB container not initialized');
+            }
+            
             const { resources } = await container.items.query({
                 query: query,
                 parameters: parameters
@@ -200,6 +239,70 @@ export class CosmosService {
         };
 
         return await this.createDocument(document, 'user_activity');
+    }
+
+    // Subscription-specific methods
+    async logCreditUsage(userId, userEmail, creditsUsed, operation, remainingCreditsAfter, subscriptionTier) {
+        const document = {
+            id: `credit_log_${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            type: 'credit_usage',
+            userId: userId,
+            userEmail: userEmail,
+            creditsUsed: creditsUsed,
+            operation: operation,
+            remainingCreditsAfter: remainingCreditsAfter,
+            subscriptionTier: subscriptionTier,
+            timestamp: new Date().toISOString()
+        };
+
+        return await this.createDocument(document, 'credit_usage');
+    }
+
+    async getSubscriptionAnalytics(userId = null) {
+        let query, parameters;
+
+        if (userId) {
+            // Get analytics for specific user
+            query = `
+                SELECT * FROM c 
+                WHERE c.type = @type 
+                AND c.userId = @userId 
+                ORDER BY c.timestamp DESC
+            `;
+            parameters = [
+                { name: '@type', value: 'credit_usage' },
+                { name: '@userId', value: userId }
+            ];
+        } else {
+            // Get analytics for all users
+            query = `
+                SELECT * FROM c 
+                WHERE c.type = @type 
+                ORDER BY c.timestamp DESC
+            `;
+            parameters = [
+                { name: '@type', value: 'credit_usage' }
+            ];
+        }
+
+        return await this.queryDocuments(query, parameters);
+    }
+
+    async getExpiredSubscriptions() {
+        const now = new Date().toISOString();
+        const query = `
+            SELECT * FROM c 
+            WHERE c.type = @type 
+            AND c.subscription.subscriptionEndDate < @now
+            AND c.subscription.status = @status
+        `;
+        const parameters = [
+            { name: '@type', value: 'user' },
+            { name: '@now', value: now },
+            { name: '@status', value: 'active' }
+        ];
+
+        return await this.queryDocuments(query, parameters);
     }
 
     async getUserByResetToken(resetToken) {

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Subscription Modules</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .module-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .module-title {
+            color: #09ccfc;
+            margin-bottom: 15px;
+        }
+
+        .test-buttons {
+            margin: 10px 0;
+        }
+
+        .test-btn {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .test-btn:hover {
+            background: #08b5e0;
+        }
+
+        .module-container {
+            border: 1px solid #ddd;
+            min-height: 400px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Subscription Modules Test Page</h1>
+
+        <div class="module-section">
+            <h2 class="module-title">Subscription Dashboard Module</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="loadDashboard()">Load Dashboard</button>
+                <button class="test-btn" onclick="refreshDashboard()">Refresh Dashboard</button>
+                <button class="test-btn" onclick="clearDashboard()">Clear</button>
+            </div>
+            <div id="dashboard-container" class="module-container"></div>
+        </div>
+
+        <div class="module-section">
+            <h2 class="module-title">Manage Subscription Module</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="loadManager()">Load Manager</button>
+                <button class="test-btn" onclick="refreshManager()">Refresh Manager</button>
+                <button class="test-btn" onclick="clearManager()">Clear</button>
+            </div>
+            <div id="manager-container" class="module-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load the modules dynamically
+        function loadModule(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = callback;
+            document.head.appendChild(script);
+        }
+
+        let dashboardLoaded = false;
+        let managerLoaded = false;
+
+        function loadDashboard() {
+            if (!dashboardLoaded) {
+                loadModule('./subscription-dashboard.html', () => {
+                    console.log('Dashboard script loaded');
+                    dashboardLoaded = true;
+                    initDashboard();
+                });
+            } else {
+                initDashboard();
+            }
+        }
+
+        function initDashboard() {
+            const container = document.getElementById('dashboard-container');
+            container.innerHTML = '<div id="dashboard-content"></div>';
+
+            if (window.SubscriptionDashboard) {
+                window.testDashboard = new window.SubscriptionDashboard('dashboard-content');
+                console.log('Dashboard initialized');
+            } else {
+                console.error('SubscriptionDashboard not found');
+            }
+        }
+
+        function refreshDashboard() {
+            if (window.testDashboard) {
+                window.testDashboard.refresh();
+            }
+        }
+
+        function clearDashboard() {
+            document.getElementById('dashboard-container').innerHTML = '';
+        }
+
+        function loadManager() {
+            if (!managerLoaded) {
+                loadModule('./SubscriptionManager.html', () => {
+                    console.log('Manager script loaded');
+                    managerLoaded = true;
+                    initManager();
+                });
+            } else {
+                initManager();
+            }
+        }
+
+        function initManager() {
+            const container = document.getElementById('manager-container');
+            container.innerHTML = '<div id="manager-content"></div>';
+
+            if (window.ManageSubscriptionModule) {
+                window.testManager = new window.ManageSubscriptionModule('manager-content');
+                console.log('Manager initialized');
+            } else if (window.loadManageSubscriptionModule) {
+                window.loadManageSubscriptionModule('manager-content', true);
+                console.log('Manager loaded via function');
+            } else {
+                console.error('ManageSubscriptionModule not found');
+            }
+        }
+
+        function refreshManager() {
+            if (window.testManager) {
+                window.testManager.refresh();
+            } else if (window.subscriptionManager) {
+                window.subscriptionManager.refresh();
+            }
+        }
+
+        function clearManager() {
+            document.getElementById('manager-container').innerHTML = '';
+        }
+
+        // Test API endpoints
+        function testAPI() {
+            fetch('http://localhost:3000/api/subscriptions/dashboard', {
+                headers: {
+                    'Authorization': 'Bearer demo-token'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API Test Result:', data);
+                    alert('API working! Check console for details.');
+                })
+                .catch(error => {
+                    console.error('API Test Error:', error);
+                    alert('API Error: ' + error.message);
+                });
+        }
+
+        // Add API test button
+        document.addEventListener('DOMContentLoaded', () => {
+            const apiTestBtn = document.createElement('button');
+            apiTestBtn.className = 'test-btn';
+            apiTestBtn.textContent = 'Test API';
+            apiTestBtn.onclick = testAPI;
+            apiTestBtn.style.position = 'fixed';
+            apiTestBtn.style.top = '20px';
+            apiTestBtn.style.right = '20px';
+            apiTestBtn.style.zIndex = '1000';
+            document.body.appendChild(apiTestBtn);
+        });
+    </script>
+</body>
+
+</html>

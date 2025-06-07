@@ -42,12 +42,35 @@ const authMiddleware = {
     verifyToken: (req, res, next) => {
         // Same function with different name for consistency
         return authMiddleware.authenticateToken(req, res, next);
+    },
+    
+    requireAdmin: (req, res, next) => {
+        // Check if user has admin role
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication required'
+            });
+        }
+        
+        // Check if user is admin (you can customize this logic)
+        const isAdmin = req.user.role === 'admin' || req.user.isAdmin === true;
+        
+        if (!isAdmin) {
+            return res.status(403).json({
+                success: false,
+                error: 'Admin access required'
+            });
+        }
+        
+        next();
     }
 };
 
 // Export the function directly for named import
 export const authenticateToken = authMiddleware.authenticateToken;
 export const verifyToken = authMiddleware.verifyToken;
+export const requireAdmin = authMiddleware.requireAdmin;
 
 // Export the object as default
 export default authMiddleware;

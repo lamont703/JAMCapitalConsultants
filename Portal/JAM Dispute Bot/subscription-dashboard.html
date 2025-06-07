@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Credit Solutions - Subscription Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .subscription-dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            border-left: 4px solid #09ccfc;
+        }
+
+        .status-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .status-card.danger {
+            border-left-color: #dc3545;
+        }
+
+        .status-card.success {
+            border-left-color: #28a745;
+        }
+
+        .status-card h3 {
+            color: #343a40;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .status-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-card.warning .value {
+            color: #ffc107;
+        }
+
+        .status-card.danger .value {
+            color: #dc3545;
+        }
+
+        .status-card.success .value {
+            color: #28a745;
+        }
+
+        .status-card .description {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .subscription-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .info-section h3 {
+            color: #343a40;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-section h3 i {
+            margin-right: 0.5rem;
+            color: #09ccfc;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            color: #495057;
+        }
+
+        .feature-list li i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .usage-bar {
+            background: #e9ecef;
+            border-radius: 20px;
+            height: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .usage-fill.warning {
+            background: linear-gradient(90deg, #ffc107, #ffcd39);
+        }
+
+        .usage-fill.danger {
+            background: linear-gradient(90deg, #dc3545, #e55563);
+        }
+
+        .upgrade-section {
+            background: #e6f9ff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+            border: 2px solid #09ccfc;
+        }
+
+        .upgrade-title {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .upgrade-description {
+            color: #495057;
+            margin-bottom: 1.5rem;
+        }
+
+        .upgrade-btn {
+            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            color: #09ccfc;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #dc3545;
+        }
+
+        .error i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .recent-payments {
+            margin-top: 2rem;
+        }
+
+        .recent-payments h3 {
+            color: #343a40;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .recent-payments h3 i {
+            margin-right: 0.5rem;
+            color: #09ccfc;
+        }
+
+        .payment-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .payment-item {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .payment-info i {
+            color: #28a745;
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .payment-amount {
+            font-weight: 600;
+            color: #09ccfc;
+        }
+
+        .payment-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .subscription-info {
+                grid-template-columns: 1fr;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="subscription-dashboard-container">
+        <!-- Dashboard will be rendered here -->
+    </div>
+
+    <script>
+        class SubscriptionDashboard {
+            constructor(containerId) {
+                this.containerId = containerId;
+                this.container = document.getElementById(containerId);
+                this.data = null;
+                this.init();
+            }
+
+            async init() {
+                await this.loadData();
+                this.render();
+            }
+
+            async loadData() {
+                try {
+                    this.showLoading();
+
+                    // Load subscription dashboard data
+                    const response = await fetch('http://localhost:3000/api/subscriptions/dashboard', {
+                        headers: {
+                            'Authorization': `Bearer ${this.getAuthToken()}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to load subscription data');
+                    }
+
+                    const result = await response.json();
+                    this.data = result.data;
+
+                } catch (error) {
+                    console.error('Error loading subscription data:', error);
+                    this.showError(error.message);
+                }
+            }
+
+            getAuthToken() {
+                // This should be replaced with your actual auth token retrieval
+                return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            }
+
+            showLoading() {
+                this.container.innerHTML = `
+                    <div class="subscription-dashboard">
+                        <div class="dashboard-header">
+                            <h1 class="dashboard-title">Subscription Dashboard</h1>
+                            <p class="dashboard-subtitle">Loading your subscription information...</p>
+                        </div>
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showError(message) {
+                this.container.innerHTML = `
+                    <div class="subscription-dashboard">
+                        <div class="dashboard-header">
+                            <h1 class="dashboard-title">Subscription Dashboard</h1>
+                            <p class="dashboard-subtitle">Unable to load subscription information</p>
+                        </div>
+                        <div class="error">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>${message}</p>
+                            <button onclick="location.reload()" class="upgrade-btn" style="margin-top: 1rem;">
+                                <i class="fas fa-redo"></i> Try Again
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            render() {
+                if (!this.data) return;
+
+                const tierName = this.data.tierConfig?.name || 'No Active Plan';
+                const isActive = this.data.isActive;
+                const remainingCredits = this.data.remainingCredits;
+                const currentUsage = this.data.currentUsage?.disputeLetters || 0;
+                const monthlyLimit = this.data.tierConfig?.monthlyCredits || 0;
+
+                // Calculate usage percentage
+                let usagePercentage = 0;
+                let usageClass = '';
+                if (monthlyLimit > 0) {
+                    usagePercentage = (currentUsage / monthlyLimit) * 100;
+                    if (usagePercentage >= 90) usageClass = 'danger';
+                    else if (usagePercentage >= 70) usageClass = 'warning';
+                }
+
+                this.container.innerHTML = `
+                    <div class="subscription-dashboard">
+                        <div class="dashboard-header">
+                            <h1 class="dashboard-title">Subscription Dashboard</h1>
+                            <p class="dashboard-subtitle">Manage your credit repair subscription</p>
+                        </div>
+                        
+                        <div class="dashboard-content">
+                            <!-- Status Cards -->
+                            <div class="status-grid">
+                                <div class="status-card ${isActive ? 'success' : 'danger'}">
+                                    <h3>Subscription Status</h3>
+                                    <div class="value">${isActive ? 'Active' : 'Expired'}</div>
+                                    <div class="description">${tierName}</div>
+                                </div>
+                                
+                                <div class="status-card ${this.getDaysClass(this.data.daysUntilExpiration)}">
+                                    <h3>Days Remaining</h3>
+                                    <div class="value">${this.data.daysUntilExpiration || 0}</div>
+                                    <div class="description">Until ${new Date(this.data.subscriptionEndDate).toLocaleDateString()}</div>
+                                </div>
+                                
+                                <div class="status-card ${usageClass}">
+                                    <h3>Dispute Letters</h3>
+                                    <div class="value">${monthlyLimit === -1 ? 'Unlimited' : remainingCredits}</div>
+                                    <div class="description">${monthlyLimit === -1 ? 'Used this month: ' + currentUsage : 'Remaining this month'}</div>
+                                </div>
+                                
+                                <div class="status-card">
+                                    <h3>Current Tier</h3>
+                                    <div class="value">$${this.data.tierConfig?.price || 0}</div>
+                                    <div class="description">Monthly subscription</div>
+                                </div>
+                            </div>
+
+                            <!-- Subscription Info -->
+                            <div class="subscription-info">
+                                <!-- Current Plan Features -->
+                                <div class="info-section">
+                                    <h3><i class="fas fa-star"></i>Current Plan Features</h3>
+                                    <ul class="feature-list">
+                                        ${this.data.features?.map(feature => `
+                                            <li><i class="fas fa-check"></i> ${feature}</li>
+                                        `).join('') || '<li>No features available</li>'}
+                                    </ul>
+                                </div>
+
+                                <!-- Usage This Month -->
+                                <div class="info-section">
+                                    <h3><i class="fas fa-chart-bar"></i>Usage This Month</h3>
+                                    <p>Dispute Letters Generated: <strong>${currentUsage}</strong> ${monthlyLimit > 0 ? `of ${monthlyLimit}` : ''}</p>
+                                    ${monthlyLimit > 0 ? `
+                                        <div class="usage-bar">
+                                            <div class="usage-fill ${usageClass}" style="width: ${Math.min(usagePercentage, 100)}%"></div>
+                                        </div>
+                                        <p class="description">${usagePercentage.toFixed(1)}% of monthly limit used</p>
+                                    ` : '<p class="description">Unlimited usage</p>'}
+                                </div>
+                            </div>
+
+                            <!-- Upgrade Section -->
+                            ${this.data.tier === 'starter' || !isActive ? `
+                                <div class="upgrade-section">
+                                    <h3 class="upgrade-title">
+                                        <i class="fas fa-arrow-up"></i>
+                                        ${!isActive ? 'Renew Your Subscription' : 'Upgrade Your Plan'}
+                                    </h3>
+                                    <p class="upgrade-description">
+                                        ${!isActive
+                            ? 'Your subscription has expired. Renew now to continue accessing your credit repair tools.'
+                            : 'Unlock unlimited dispute letters and advanced features with our Professional or Premium plans.'
+                        }
+                                    </p>
+                                    <button class="upgrade-btn" onclick="this.showUpgradeOptions()">
+                                        <i class="fas fa-crown"></i>
+                                        ${!isActive ? 'Renew Now' : 'View Upgrade Options'}
+                                    </button>
+                                </div>
+                            ` : ''}
+
+                            <!-- Recent Payments -->
+                            ${this.data.paymentHistory?.length ? `
+                                <div class="recent-payments">
+                                    <h3><i class="fas fa-credit-card"></i>Recent Payments</h3>
+                                    <div class="payment-list">
+                                        ${this.data.paymentHistory.map(payment => `
+                                            <div class="payment-item">
+                                                <div class="payment-info">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <div>
+                                                        <div class="payment-amount">$${payment.amount}</div>
+                                                        <div class="payment-date">${new Date(payment.timestamp).toLocaleDateString()}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="payment-date">${payment.type}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            getDaysClass(days) {
+                if (days <= 3) return 'danger';
+                if (days <= 7) return 'warning';
+                return 'success';
+            }
+
+            showUpgradeOptions() {
+                // This would open the DIY plans modal or redirect to upgrade page
+                if (window.jamDIYPlan) {
+                    // If current tier is starter, show professional/premium options
+                    if (this.data.tier === 'starter') {
+                        window.jamDIYPlan.openModal('professional');
+                    } else {
+                        // Show all plans for expired subscriptions
+                        window.jamDIYPlan.openModal('professional');
+                    }
+                } else {
+                    // Fallback to redirect
+                    window.open('/pricing-plans', '_blank');
+                }
+            }
+
+            async refresh() {
+                await this.loadData();
+                this.render();
+            }
+        }
+
+        // Initialize dashboard when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            window.subscriptionDashboard = new SubscriptionDashboard('subscription-dashboard-container');
+        });
+
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            if (window.subscriptionDashboard) {
+                window.subscriptionDashboard.refresh();
+            }
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+
+</html>

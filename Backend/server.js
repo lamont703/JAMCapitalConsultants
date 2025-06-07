@@ -11,6 +11,9 @@ import ghlRoutes from './routes/ghlRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import credentialRoutes from './routes/credentialRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
+import disputeRoutes from './routes/disputeRoutes.js';
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
 import adminRoutes from './routes/adminRoutes.js';
@@ -50,6 +53,9 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/credentials', credentialRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/webhooks', webhookRoutes);
+app.use('/api/dispute', disputeRoutes);
 
 // Serve the frontend
 app.get('*', (req, res) => {

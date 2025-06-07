@@ -14,6 +14,22 @@ export class User {
         this.createdAt = userData.createdAt || new Date().toISOString();
         this.updatedAt = userData.updatedAt || new Date().toISOString();
         
+        // NEW: Subscription and Credit Tracking Fields
+        this.subscription = {
+            tier: userData.subscription?.tier || 'free',
+            status: userData.subscription?.status || 'active',
+            remainingCredits: userData.subscription?.remainingCredits || 2, // Free trial starts with 2 credits
+            totalCreditsUsed: userData.subscription?.totalCreditsUsed || 0,
+            creditsIncluded: userData.subscription?.creditsIncluded || 2,
+            subscriptionStartDate: userData.subscription?.subscriptionStartDate || new Date().toISOString(),
+            subscriptionEndDate: userData.subscription?.subscriptionEndDate || null,
+            lastCreditResetDate: userData.subscription?.lastCreditResetDate || new Date().toISOString(),
+            hasTrialUsed: userData.subscription?.hasTrialUsed || false,
+            paymentProvider: userData.subscription?.paymentProvider || null,
+            externalSubscriptionId: userData.subscription?.externalSubscriptionId || null,
+            planHistory: userData.subscription?.planHistory || []
+        };
+        
         // Initialize CosmosService
         this.cosmosService = new CosmosService();
     }
@@ -37,6 +53,21 @@ export class User {
         if (!this.password || this.password.length < 6) {
             errors.push('Password must be at least 6 characters');
         }
+
+        // Validate subscription fields
+        const validTiers = ['free', 'starter', 'professional', 'premium'];
+        if (!validTiers.includes(this.subscription.tier)) {
+            errors.push('Invalid subscription tier');
+        }
+
+        const validStatuses = ['active', 'expired', 'cancelled', 'suspended'];
+        if (!validStatuses.includes(this.subscription.status)) {
+            errors.push('Invalid subscription status');
+        }
+
+        if (this.subscription.remainingCredits < 0) {
+            errors.push('Remaining credits cannot be negative');
+        }
         
         return {
             isValid: errors.length === 0,
@@ -58,6 +89,9 @@ export class User {
                 throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
             }
 
+            // Ensure CosmosService is initialized
+            await this.cosmosService.initialize();
+
             // Update timestamp
             this.updatedAt = new Date().toISOString();
             
@@ -73,7 +107,8 @@ export class User {
                 ghlContactId: this.ghlContactId,
                 ghlSyncStatus: this.ghlSyncStatus,
                 createdAt: this.createdAt,
-                updatedAt: this.updatedAt
+                updatedAt: this.updatedAt,
+                subscription: this.subscription
             };
 
             // Save to CosmosDB
@@ -101,7 +136,8 @@ export class User {
             ghlContactId: this.ghlContactId,
             ghlSyncStatus: this.ghlSyncStatus,
             createdAt: this.createdAt,
-            updatedAt: this.updatedAt
+            updatedAt: this.updatedAt,
+            subscription: this.subscription
         };
     }
 
@@ -241,6 +277,228 @@ export class User {
         } catch (error) {
             console.error('Error updating last login:', error);
             throw error;
+        }
+    }
+
+    // NEW: Subscription Management Methods
+    
+    /**
+     * Check if user has sufficient credits for an operation
+     * @param {number} requiredCredits - Number of credits needed
+     * @returns {Object} Result with canUse boolean and details
+     */
+    checkCredits(requiredCredits = 1) {
+        const subscription = this.subscription;
+        
+        // Check if subscription is active
+        if (subscription.status !== 'active') {
+            return {
+                canUse: false,
+                reason: 'subscription_inactive',
+                message: 'Your subscription is not active.',
+                remainingCredits: subscription.remainingCredits
+            };
+        }
+
+        // Check for expired paid subscriptions
+        if (subscription.tier !== 'free' && subscription.subscriptionEndDate) {
+            const endDate = new Date(subscription.subscriptionEndDate);
+            const now = new Date();
+            if (now > endDate) {
+                return {
+                    canUse: false,
+                    reason: 'subscription_expired',
+                    message: 'Your subscription has expired.',
+                    remainingCredits: subscription.remainingCredits
+                };
+            }
+        }
+
+        // Check if sufficient credits available
+        if (subscription.remainingCredits < requiredCredits) {
+            return {
+                canUse: false,
+                reason: subscription.tier === 'free' ? 'free_trial_exhausted' : 'insufficient_credits',
+                message: `You need ${requiredCredits} credits but only have ${subscription.remainingCredits}.`,
+                remainingCredits: subscription.remainingCredits
+            };
+        }
+
+        return {
+            canUse: true,
+            remainingCredits: subscription.remainingCredits,
+            remainingAfter: subscription.remainingCredits - requiredCredits
+        };
+    }
+
+    /**
+     * Consume credits after successful operation
+     * @param {number} creditsUsed - Number of credits to consume
+     * @param {string} operation - Description of operation
+     * @returns {boolean} Success status
+     */
+    async consumeCredits(creditsUsed = 1, operation = 'dispute_letter_generation') {
+        try {
+            const creditCheck = this.checkCredits(creditsUsed);
+            if (!creditCheck.canUse) {
+                throw new Error(`Cannot consume credits: ${creditCheck.message}`);
+            }
+
+            // Update credit counts
+            this.subscription.remainingCredits -= creditsUsed;
+            this.subscription.totalCreditsUsed += creditsUsed;
+            this.updatedAt = new Date().toISOString();
+
+            // Log the credit usage
+            await this.logCreditUsage(creditsUsed, operation);
+
+            // Save updated user data
+            await this.save();
+
+            console.log(`✅ Consumed ${creditsUsed} credits for user ${this.email}. Remaining: ${this.subscription.remainingCredits}`);
+            return true;
+
+        } catch (error) {
+            console.error('Error consuming credits:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update user's subscription tier
+     * @param {string} newTier - New subscription tier
+     * @param {Object} options - Additional options
+     */
+    async updateSubscriptionTier(newTier, options = {}) {
+        try {
+            const validTiers = ['free', 'starter', 'professional', 'premium'];
+            if (!validTiers.includes(newTier)) {
+                throw new Error(`Invalid subscription tier: ${newTier}`);
+            }
+
+            const tierCredits = {
+                free: 2,
+                starter: 5,
+                professional: 15,
+                premium: 50
+            };
+
+            // Store old tier in history
+            this.subscription.planHistory.push({
+                tier: this.subscription.tier,
+                changedAt: new Date().toISOString(),
+                reason: options.reason || 'manual_update'
+            });
+
+            // Update subscription details
+            this.subscription.tier = newTier;
+            this.subscription.creditsIncluded = tierCredits[newTier];
+            this.subscription.subscriptionStartDate = options.startDate || new Date().toISOString();
+            this.subscription.subscriptionEndDate = options.endDate || null;
+            this.subscription.externalSubscriptionId = options.externalSubscriptionId || this.subscription.externalSubscriptionId;
+            this.subscription.paymentProvider = options.paymentProvider || this.subscription.paymentProvider;
+            
+            // Reset credits to tier amount (unless specified otherwise)
+            if (options.resetCredits !== false) {
+                this.subscription.remainingCredits = tierCredits[newTier];
+                this.subscription.lastCreditResetDate = new Date().toISOString();
+            }
+
+            this.updatedAt = new Date().toISOString();
+
+            // Save updated user data
+            await this.save();
+
+            console.log(`✅ Updated subscription tier for user ${this.email} to ${newTier}`);
+            return this;
+
+        } catch (error) {
+            console.error('Error updating subscription tier:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Replenish credits (for monthly renewals)
+     * @param {number} creditsToAdd - Number of credits to add
+     */
+    async replenishCredits(creditsToAdd = null) {
+        try {
+            const tierCredits = {
+                free: 2,
+                starter: 5,
+                professional: 15,
+                premium: 50
+            };
+
+            const creditsAmount = creditsToAdd || tierCredits[this.subscription.tier] || 0;
+            
+            this.subscription.remainingCredits = creditsAmount;
+            this.subscription.lastCreditResetDate = new Date().toISOString();
+            this.updatedAt = new Date().toISOString();
+
+            await this.save();
+
+            console.log(`✅ Replenished ${creditsAmount} credits for user ${this.email}`);
+            return this;
+
+        } catch (error) {
+            console.error('Error replenishing credits:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get subscription display information
+     */
+    getSubscriptionInfo() {
+        const tierInfo = {
+            free: { name: 'Free Trial', monthlyPrice: 0 },
+            starter: { name: 'DIY Starter', monthlyPrice: 29 },
+            professional: { name: 'DIY Professional', monthlyPrice: 59 },
+            premium: { name: 'DIY Premium', monthlyPrice: 99 }
+        };
+
+        const tier = tierInfo[this.subscription.tier] || tierInfo.free;
+
+        return {
+            tierName: tier.name,
+            tierCode: this.subscription.tier,
+            monthlyPrice: tier.monthlyPrice,
+            remainingCredits: this.subscription.remainingCredits,
+            totalCreditsUsed: this.subscription.totalCreditsUsed,
+            creditsIncluded: this.subscription.creditsIncluded,
+            subscriptionStatus: this.subscription.status,
+            subscriptionStartDate: this.subscription.subscriptionStartDate,
+            subscriptionEndDate: this.subscription.subscriptionEndDate,
+            hasTrialUsed: this.subscription.hasTrialUsed,
+            canUpgrade: this.subscription.tier !== 'premium'
+        };
+    }
+
+    /**
+     * Log credit usage for analytics
+     */
+    async logCreditUsage(creditsUsed, operation) {
+        try {
+            await this.cosmosService.initialize();
+            
+            const logEntry = {
+                id: `credit_log_${this.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'credit_usage',
+                userId: this.id,
+                userEmail: this.email,
+                creditsUsed: creditsUsed,
+                operation: operation,
+                remainingCreditsAfter: this.subscription.remainingCredits - creditsUsed,
+                subscriptionTier: this.subscription.tier,
+                timestamp: new Date().toISOString()
+            };
+
+            await this.cosmosService.createDocument(logEntry, 'credit_usage');
+        } catch (error) {
+            console.error('Error logging credit usage:', error);
+            // Don't throw - this is just for analytics
         }
     }
 }
