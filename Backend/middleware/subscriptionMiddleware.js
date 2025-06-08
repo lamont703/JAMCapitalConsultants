@@ -155,8 +155,15 @@ export function logUsageAfterSuccess(usageType) {
 // Get user subscription status (for dashboard/API calls)
 export async function getSubscriptionStatus(req, res) {
     try {
-        const userId = req.user?.id;
+        console.log('🔍 === SUBSCRIPTION MIDDLEWARE DEBUG START ===');
+        console.log('🔍 req.user object:', JSON.stringify(req.user, null, 2));
+        
+        const userId = req.user?.id || req.user?.userId; // Try both properties
+        console.log('🔍 Extracted userId:', userId);
+        console.log('🔍 req.user.email:', req.user?.email);
+        
         if (!userId) {
+            console.log('❌ No userId found in req.user');
             return res.status(401).json({
                 success: false,
                 message: 'User authentication required'
@@ -164,7 +171,9 @@ export async function getSubscriptionStatus(req, res) {
         }
 
         const subscriptionService = new SubscriptionService();
+        console.log('🔍 Calling getSubscriptionDashboard with userId:', userId);
         const dashboard = await subscriptionService.getSubscriptionDashboard(userId);
+        console.log('🔍 === SUBSCRIPTION MIDDLEWARE DEBUG END ===');
 
         res.json({
             success: true,

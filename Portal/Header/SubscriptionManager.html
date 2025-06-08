@@ -491,6 +491,12 @@
                 // Show loading state initially
                 showLoading();
 
+                // Validate user session before loading data
+                if (!validateUserSession()) {
+                    showError('Please log in to view your subscription information.');
+                    return true;
+                }
+
                 // Load data and render
                 loadData()
                     .then(() => {
@@ -507,59 +513,195 @@
                 return true;
             }
 
-            // Load subscription data
+            // Load subscription data for the current user
             async function loadData() {
-                console.log('📊 Loading subscription data...');
+                console.log('📊 Loading subscription data for current user...');
 
                 try {
+                    // Get current user info
+                    const currentUser = getCurrentUser();
+                    console.log('👤 Current user:', currentUser?.email || 'Unknown');
+
+                    // Get authentication token
+                    const authToken = getAuthToken();
+
+                    // Make API request with proper authentication
                     const response = await fetch('http://localhost:3000/api/subscriptions/dashboard', {
+                        method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${getAuthToken()}`
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json',
+                            // Include user identification if available
+                            ...(currentUser?.email && { 'X-User-Email': currentUser.email }),
+                            ...(currentUser?.id && { 'X-User-ID': currentUser.id })
                         }
                     });
 
                     if (!response.ok) {
-                        throw new Error('Failed to load subscription data');
+                        if (response.status === 401) {
+                            throw new Error('Authentication failed. Please log in again.');
+                        } else if (response.status === 404) {
+                            throw new Error('Subscription data not found. You may not have an active subscription.');
+                        } else {
+                            throw new Error(`Failed to load subscription data (${response.status})`);
+                        }
                     }
 
                     const result = await response.json();
+
+                    if (!result.success) {
+                        throw new Error(result.message || 'Failed to load subscription data');
+                    }
+
                     subscriptionData = result.data;
+
+                    // Ensure paymentHistory is always an array
+                    if (!Array.isArray(subscriptionData.paymentHistory)) {
+                        console.log('⚠️ paymentHistory is not an array, initializing as empty array');
+                        subscriptionData.paymentHistory = [];
+                    }
+
+                    // Validate that we got real user data (not demo data)
+                    if (subscriptionData && currentUser) {
+                        console.log('✅ Real user subscription data loaded successfully');
+                        console.log('📊 Subscription tier:', subscriptionData.tierConfig?.name || 'Unknown');
+                        console.log('📊 User email:', currentUser.email);
+                        console.log('📊 Payment history items:', subscriptionData.paymentHistory.length);
+                    }
 
                     // Load payment history
                     await loadPaymentHistory();
 
-                    console.log('✅ Subscription data loaded successfully');
+                    console.log('✅ All subscription data loaded successfully');
                 } catch (error) {
                     console.error('❌ Error loading subscription data:', error);
+
+                    // Provide user-friendly error messages
+                    if (error.message.includes('log in')) {
+                        console.log('🔄 Redirecting to login...');
+                        // You might want to redirect to login page here
+                        // window.location.href = '/login';
+                    }
+
                     throw error;
                 }
             }
 
-            // Load payment history
+            // Load payment history for the current user
             async function loadPaymentHistory() {
                 try {
-                    // This would typically come from your payment history API
-                    // For now, we'll use mock data or what's available in the dashboard data
-                    if (!subscriptionData.paymentHistory) {
-                        subscriptionData.paymentHistory = [
-                            {
-                                id: 'pay_001',
-                                date: new Date().toISOString(),
-                                amount: 59.00,
-                                status: 'success',
-                                type: 'subscription',
-                                description: 'Monthly Subscription - DIY Professional'
-                            }
-                        ];
+                    // If payment history is already included in dashboard data, use it
+                    if (subscriptionData.paymentHistory && subscriptionData.paymentHistory.length > 0) {
+                        console.log('💳 Using payment history from dashboard data');
+                        return;
+                    }
+
+                    // Otherwise, try to load it separately
+                    const authToken = getAuthToken();
+                    const currentUser = getCurrentUser();
+
+                    console.log('💳 Loading payment history for user...');
+
+                    const response = await fetch('http://localhost:3000/api/subscriptions/payment-history', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json',
+                            ...(currentUser?.email && { 'X-User-Email': currentUser.email }),
+                            ...(currentUser?.id && { 'X-User-ID': currentUser.id })
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success && result.data) {
+                            subscriptionData.paymentHistory = result.data;
+                            console.log('✅ Payment history loaded successfully');
+                        } else {
+                            console.log('ℹ️ No payment history available');
+                            subscriptionData.paymentHistory = [];
+                        }
+                    } else {
+                        console.log('ℹ️ Payment history endpoint not available, using empty history');
+                        subscriptionData.paymentHistory = [];
                     }
                 } catch (error) {
                     console.error('❌ Error loading payment history:', error);
+                    // Don't fail the whole operation if payment history fails
+                    subscriptionData.paymentHistory = [];
                 }
             }
 
-            // Get authentication token
+            // Get authentication token from real user session
             function getAuthToken() {
-                return localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || 'demo-token';
+                // Try multiple sources for the auth token
+                const authToken = localStorage.getItem('authToken') ||
+                    sessionStorage.getItem('authToken') ||
+                    localStorage.getItem('userToken') ||
+                    sessionStorage.getItem('userToken');
+
+                if (!authToken) {
+                    console.warn('⚠️ No authentication token found - user may not be logged in');
+                    throw new Error('Please log in to view your subscription information');
+                }
+
+                console.log('🔑 Using auth token for subscription data');
+                return authToken;
+            }
+
+            // Get current user data from localStorage/sessionStorage
+            function getCurrentUser() {
+                try {
+                    const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+                    if (userData) {
+                        return JSON.parse(userData);
+                    }
+
+                    // Fallback - try individual user properties
+                    const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail');
+                    const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName');
+                    const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+
+                    if (userEmail || userName || userId) {
+                        return {
+                            email: userEmail,
+                            name: userName,
+                            id: userId
+                        };
+                    }
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                }
+
+                return null;
+            }
+
+            // Validate that user is properly logged in
+            function validateUserSession() {
+                try {
+                    const authToken = localStorage.getItem('authToken') ||
+                        sessionStorage.getItem('authToken') ||
+                        localStorage.getItem('userToken') ||
+                        sessionStorage.getItem('userToken');
+
+                    const currentUser = getCurrentUser();
+
+                    if (!authToken) {
+                        console.warn('⚠️ No authentication token found');
+                        return false;
+                    }
+
+                    if (!currentUser || !currentUser.email) {
+                        console.warn('⚠️ No valid user data found');
+                        return false;
+                    }
+
+                    console.log('✅ User session validated for:', currentUser.email);
+                    return true;
+                } catch (error) {
+                    console.error('❌ Error validating user session:', error);
+                    return false;
+                }
             }
 
             // Show loading state
@@ -603,14 +745,80 @@
 
             // Render the subscription manager
             function render() {
-                if (!subscriptionData || !currentContainer) return;
+                if (!subscriptionData || !currentContainer) {
+                    console.error('❌ Cannot render: missing subscriptionData or container');
+                    return;
+                }
 
+                console.log('🎨 Rendering subscription manager with data:', subscriptionData);
+
+                // Safely extract data with fallbacks
                 const tierName = subscriptionData.tierConfig?.name || 'No Active Plan';
-                const isActive = subscriptionData.isActive;
-                const remainingCredits = subscriptionData.remainingCredits;
+                const isActive = subscriptionData.isActive || false;
+                const remainingCredits = subscriptionData.remainingCredits || 0;
                 const currentUsage = subscriptionData.currentUsage?.disputeLetters || 0;
                 const monthlyLimit = subscriptionData.tierConfig?.monthlyCredits || 0;
                 const tierPrice = subscriptionData.tierConfig?.price || 0;
+
+                // Determine if this is a free tier early for usage calculations
+                const isFreeTier = subscriptionData?.tier === 'free';
+
+                // Extract dispute letter usage data
+                const disputeLetterUsage = subscriptionData.disputeLetterUsage || {};
+                const totalLettersGenerated = disputeLetterUsage.totalLettersGenerated || 0;
+                const monthlyLettersUsed = disputeLetterUsage.monthlyLettersUsed || 0;
+                const monthlyLetterLimit = disputeLetterUsage.monthlyLimit || 0;
+
+                // Calculate monthly remaining - use the backend calculation primarily
+                let monthlyLettersRemaining = disputeLetterUsage.monthlyRemaining || 0;
+
+                // For free tier, calculate remaining based on lifetime usage
+                if (isFreeTier) {
+                    // Free tier gets 2 lifetime credits total
+                    const freeTrialLifetimeLimit = 2;
+                    monthlyLettersRemaining = Math.max(0, freeTrialLifetimeLimit - totalLettersGenerated);
+
+                    console.log(`🆓 Free tier calculation:`, {
+                        lifetimeLimit: freeTrialLifetimeLimit,
+                        totalGenerated: totalLettersGenerated,
+                        remaining: monthlyLettersRemaining,
+                        backendRemainingCredits: remainingCredits
+                    });
+                } else {
+                    // For paid tiers, trust the backend calculation but verify it makes sense
+                    const calculatedRemaining = Math.max(0, monthlyLetterLimit - monthlyLettersUsed);
+
+                    // Use backend calculation first, but ensure it's not negative
+                    monthlyLettersRemaining = Math.max(0, disputeLetterUsage.monthlyRemaining || calculatedRemaining);
+
+                    // Debug logging for paid tiers
+                    console.log(`🔍 Paid tier monthly calculation for ${subscriptionData.tier}:`, {
+                        monthlyLimit: monthlyLetterLimit,
+                        monthlyUsed: monthlyLettersUsed,
+                        backendRemaining: disputeLetterUsage.monthlyRemaining,
+                        calculatedRemaining: calculatedRemaining,
+                        finalRemaining: monthlyLettersRemaining,
+                        remainingCredits: remainingCredits
+                    });
+                }
+
+                console.log('✅ isFreeTier resolved successfully:', isFreeTier);
+                console.log('📊 Subscription Usage Breakdown:', {
+                    tier: subscriptionData.tier,
+                    isFreeTier: isFreeTier,
+                    totalGenerated: totalLettersGenerated,
+                    monthlyUsed: monthlyLettersUsed,
+                    monthlyLimit: monthlyLetterLimit,
+                    monthlyRemaining: monthlyLettersRemaining,
+                    remainingCredits: remainingCredits,
+                    backendCalculation: disputeLetterUsage.monthlyRemaining
+                });
+
+                // Ensure payment history is an array
+                if (!Array.isArray(subscriptionData.paymentHistory)) {
+                    console.warn('⚠️ paymentHistory is not an array in render, fixing...');
+                    subscriptionData.paymentHistory = [];
+                }
 
                 // Calculate usage percentage
                 let usagePercentage = 0;
@@ -622,16 +830,26 @@
                 }
 
                 // Determine subscription status
-                const daysRemaining = subscriptionData.daysUntilExpiration || 0;
+                const daysRemaining = subscriptionData.daysUntilExpiration;
                 let statusClass = 'active';
                 let statusText = 'Active';
 
                 if (!isActive) {
                     statusClass = 'expired';
                     statusText = 'Expired';
-                } else if (daysRemaining <= 7) {
+                } else if (!isFreeTier && daysRemaining !== null && daysRemaining <= 7) {
                     statusClass = 'expiring';
                     statusText = 'Expiring Soon';
+                } else if (isFreeTier) {
+                    statusText = 'Lifetime Access';
+                }
+
+                // Format renewal date display
+                let renewalDateDisplay = '';
+                if (isActive && !isFreeTier && subscriptionData.subscriptionEndDate) {
+                    renewalDateDisplay = `<p style="margin-top: 0.5rem; color: #6c757d;">Renews on ${new Date(subscriptionData.subscriptionEndDate).toLocaleDateString()}</p>`;
+                } else if (isFreeTier) {
+                    renewalDateDisplay = `<p style="margin-top: 0.5rem; color: #6c757d;">No expiration date</p>`;
                 }
 
                 currentContainer.innerHTML = `
@@ -651,27 +869,31 @@
                                         <div class="plan-price">$${tierPrice}/mo</div>
                                     </div>
                                     <div class="plan-status ${statusClass}">${statusText}</div>
-                                    ${isActive ? `<p style="margin-top: 0.5rem; color: #6c757d;">Renews on ${new Date(subscriptionData.subscriptionEndDate).toLocaleDateString()}</p>` : ''}
+                                    ${renewalDateDisplay}
                                 </div>
                                 
                                 <div class="overview-card">
-                                    <h3><i class="fas fa-chart-line"></i>Usage Statistics</h3>
+                                    <h3><i class="fas fa-chart-line"></i>Dispute Letter Usage</h3>
                                     <div class="usage-stats">
                                         <div class="usage-stat">
-                                            <div class="value">${currentUsage}</div>
-                                            <div class="label">Letters Used</div>
+                                            <div class="value">${totalLettersGenerated}</div>
+                                            <div class="label">Total Generated</div>
                                         </div>
                                         <div class="usage-stat">
-                                            <div class="value">${monthlyLimit === -1 ? '∞' : remainingCredits}</div>
-                                            <div class="label">Remaining</div>
+                                            <div class="value">${monthlyLettersUsed}</div>
+                                            <div class="label">${isFreeTier ? 'Lifetime Used' : 'Monthly Used'}</div>
                                         </div>
+                                        <div class="usage-stat">
+                                            <div class="value">${monthlyLettersRemaining}</div>
+                                            <div class="label">${isFreeTier ? 'Remaining' : 'Monthly Remaining'}</div>
                                     </div>
-                                    ${monthlyLimit > 0 ? `
+                                    </div>
+                                    ${monthlyLetterLimit > 0 ? `
                                         <div class="usage-bar">
-                                            <div class="usage-fill ${usageClass}" style="width: ${Math.min(usagePercentage, 100)}%"></div>
+                                            <div class="usage-fill ${usageClass}" style="width: ${Math.min((monthlyLettersUsed / monthlyLetterLimit) * 100, 100)}%"></div>
                                         </div>
-                                        <p style="text-align: center; color: #6c757d; font-size: 0.9rem;">${usagePercentage.toFixed(1)}% of monthly limit used</p>
-                                    ` : '<p style="text-align: center; color: #28a745; font-weight: 600;">Unlimited Usage</p>'}
+                                        <p style="text-align: center; color: #6c757d; font-size: 0.9rem;">${((monthlyLettersUsed / monthlyLetterLimit) * 100).toFixed(1)}% of ${isFreeTier ? 'lifetime' : 'monthly'} limit used</p>
+                                    ` : ''}
                                 </div>
                             </div>
 
@@ -680,6 +902,10 @@
                                 ${!isActive ? `
                                     <button class="action-btn" id="renew-subscription-btn">
                                         <i class="fas fa-redo"></i> Renew Subscription
+                                    </button>
+                                ` : isFreeTier ? `
+                                    <button class="action-btn" id="upgrade-subscription-btn">
+                                        <i class="fas fa-arrow-up"></i> Upgrade to Paid Plan
                                     </button>
                                 ` : `
                                     <button class="action-btn" id="upgrade-subscription-btn">
@@ -693,6 +919,10 @@
                                 
                                 <button class="action-btn secondary" id="update-payment-btn">
                                     <i class="fas fa-credit-card"></i> Update Payment
+                                </button>
+                                
+                                <button class="action-btn secondary" id="fix-credits-btn" title="Fix credit calculation if it seems incorrect">
+                                    <i class="fas fa-wrench"></i> Fix Credits
                                 </button>
                                 
                                 ${isActive ? `
@@ -716,19 +946,22 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${subscriptionData.paymentHistory?.map(payment => `
+                                        ${Array.isArray(subscriptionData.paymentHistory) && subscriptionData.paymentHistory.length > 0
+                        ? subscriptionData.paymentHistory.map(payment => `
                                             <tr>
                                                 <td>${new Date(payment.date).toLocaleDateString()}</td>
                                                 <td>${payment.description || payment.type}</td>
                                                 <td>$${payment.amount.toFixed(2)}</td>
                                                 <td><span class="payment-status ${payment.status}">${payment.status.toUpperCase()}</span></td>
                                                 <td>
-                                                    <button class="action-btn secondary download-receipt-btn" style="padding: 0.5rem; font-size: 0.8rem;" data-payment-id="${payment.id}">
+                                                        <button class="action-btn secondary download-receipt-btn" style="padding: 0.5rem; font-size: 0.8rem;" data-payment-id="${payment.id}">
                                                         <i class="fas fa-download"></i>
                                                     </button>
                                                 </td>
                                             </tr>
-                                        `).join('') || '<tr><td colspan="5" style="text-align: center; color: #6c757d;">No billing history available</td></tr>'}
+                                            `).join('')
+                        : '<tr><td colspan="5" style="text-align: center; color: #6c757d;">No billing history available</td></tr>'
+                    }
                                     </tbody>
                                 </table>
                             </div>
@@ -768,6 +1001,12 @@
                 const updatePaymentBtn = currentContainer.querySelector('#update-payment-btn');
                 if (updatePaymentBtn) {
                     updatePaymentBtn.addEventListener('click', updatePaymentMethod);
+                }
+
+                // Fix credits button
+                const fixCreditsBtn = currentContainer.querySelector('#fix-credits-btn');
+                if (fixCreditsBtn) {
+                    fixCreditsBtn.addEventListener('click', fixCredits);
                 }
 
                 // Cancel subscription button
@@ -831,6 +1070,51 @@
                         alert('This would redirect to your payment method update page.');
                     }
                 );
+            }
+
+            // Function to fix credits calculation
+            async function fixCredits() {
+                try {
+                    console.log('🔧 Fix credits clicked');
+                    showLoading('Fixing credit calculation...');
+
+                    const authToken = getAuthToken();
+                    const response = await fetch('http://localhost:3000/api/subscriptions/fix-credits', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        console.log('✅ Credits fixed successfully:', result.data);
+                        alert(`Credits fixed! Changed from ${result.data.oldCredits} to ${result.data.newCredits} for ${result.data.tier} plan`);
+
+                        // Refresh the subscription data
+                        await loadData();
+                        render();
+
+                        // Trigger global sync
+                        if (window.dispatchEvent) {
+                            window.dispatchEvent(new CustomEvent('globalSubscriptionUpdated', {
+                                detail: {
+                                    oldData: null,
+                                    newData: subscriptionData,
+                                    source: 'ManageSubscriptionModule'
+                                }
+                            }));
+                        }
+                    } else {
+                        console.error('❌ Failed to fix credits:', result.message);
+                        showError(result.message || 'Failed to fix credits');
+                    }
+                } catch (error) {
+                    console.error('❌ Error fixing credits:', error);
+                    showError('Error fixing credits: ' + error.message);
+                }
             }
 
             function cancelSubscription() {
@@ -922,8 +1206,304 @@
                 return true;
             }
 
+            // Global Subscription Access Control API
+            async function checkUserAccess(operation = 'general', requiredCredits = 1) {
+                try {
+                    // Ensure we have current subscription data
+                    if (!subscriptionData) {
+                        console.log('🔄 No subscription data cached, loading...');
+                        await loadData();
+                    }
+
+                    const result = {
+                        allowed: false,
+                        reason: '',
+                        subscriptionData: subscriptionData,
+                        upgradeRequired: false,
+                        renewalRequired: false
+                    };
+
+                    // Check if user has valid subscription data
+                    if (!subscriptionData) {
+                        result.reason = 'No subscription data available';
+                        result.upgradeRequired = true;
+                        return result;
+                    }
+
+                    // Check if subscription is active
+                    if (!subscriptionData.isActive) {
+                        result.reason = 'Subscription expired or inactive';
+                        result.renewalRequired = true;
+                        result.upgradeRequired = true;
+                        return result;
+                    }
+
+                    // Check specific operations
+                    switch (operation) {
+                        case 'dispute_letter_generation':
+                            if (!subscriptionData.canGenerateDispute?.allowed) {
+                                result.reason = subscriptionData.canGenerateDispute?.reason || 'Cannot generate dispute letters';
+                                result.upgradeRequired = subscriptionData.tier === 'starter' || subscriptionData.tier === 'free';
+                                return result;
+                            }
+
+                            // Check remaining credits
+                            if (subscriptionData.remainingCredits < requiredCredits && subscriptionData.remainingCredits !== 'Unlimited') {
+                                result.reason = `Insufficient credits. Need ${requiredCredits}, have ${subscriptionData.remainingCredits}`;
+                                result.upgradeRequired = subscriptionData.tier === 'starter' || subscriptionData.tier === 'free';
+                                return result;
+                            }
+                            break;
+
+                        case 'chat_access':
+                            // Chat is available to all active subscriptions
+                            break;
+
+                        case 'reports_upload':
+                            // Report upload is available to all active subscriptions
+                            break;
+
+                        case 'letters_view':
+                            // Viewing letters is available to all active subscriptions
+                            break;
+
+                        case 'premium_features':
+                            if (subscriptionData.tier === 'free' || subscriptionData.tier === 'starter') {
+                                result.reason = 'Premium features require Professional or Premium plan';
+                                result.upgradeRequired = true;
+                                return result;
+                            }
+                            break;
+
+                        default:
+                            // General access check
+                            break;
+                    }
+
+                    // If we get here, access is allowed
+                    result.allowed = true;
+                    result.reason = 'Access granted';
+                    return result;
+
+                } catch (error) {
+                    console.error('❌ Error checking user access:', error);
+                    return {
+                        allowed: false,
+                        reason: 'Error checking subscription status',
+                        subscriptionData: null,
+                        upgradeRequired: true,
+                        renewalRequired: false
+                    };
+                }
+            }
+
+            async function consumeCredits(amount = 1, operation = 'dispute_letter_generation') {
+                try {
+                    console.log(`💳 Consuming ${amount} credits for ${operation}`);
+
+                    // Check if we can consume credits
+                    const accessCheck = await checkUserAccess(operation, amount);
+                    if (!accessCheck.allowed) {
+                        console.warn('❌ Cannot consume credits:', accessCheck.reason);
+                        return {
+                            success: false,
+                            message: accessCheck.reason,
+                            upgradeRequired: accessCheck.upgradeRequired
+                        };
+                    }
+
+                    // Make API call to consume credits
+                    const authToken = getAuthToken();
+                    const currentUser = getCurrentUser();
+
+                    const response = await fetch('http://localhost:3000/api/subscriptions/consume-credits', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json',
+                            ...(currentUser?.email && { 'X-User-Email': currentUser.email }),
+                            ...(currentUser?.id && { 'X-User-ID': currentUser.id })
+                        },
+                        body: JSON.stringify({
+                            creditsToConsume: amount,
+                            operation: operation
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to consume credits: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Update local subscription data
+                        await loadData();
+                        console.log(`✅ Successfully consumed ${amount} credits`);
+
+                        // Trigger global synchronization
+                        if (window.dispatchEvent) {
+                            window.dispatchEvent(new CustomEvent('globalSubscriptionUpdated', {
+                                detail: {
+                                    oldData: null,
+                                    newData: subscriptionData,
+                                    source: 'ManageSubscriptionModule'
+                                }
+                            }));
+                        }
+
+                        return {
+                            success: true,
+                            message: `Consumed ${amount} credits`,
+                            remainingCredits: result.data?.remainingCredits || subscriptionData?.remainingCredits
+                        };
+                    } else {
+                        throw new Error(result.message || 'Failed to consume credits');
+                    }
+
+                } catch (error) {
+                    console.error('❌ Error consuming credits:', error);
+                    return {
+                        success: false,
+                        message: error.message || 'Error consuming credits',
+                        upgradeRequired: true
+                    };
+                }
+            }
+
+            function getSubscriptionStatus() {
+                if (!subscriptionData) {
+                    return {
+                        tier: 'unknown',
+                        isActive: false,
+                        remainingCredits: 0,
+                        tierName: 'No Subscription',
+                        canGenerateDispute: false,
+                        daysUntilExpiration: 0,
+                        needsUpgrade: true,
+                        features: [],
+                        disputeLetterUsage: {
+                            totalLettersGenerated: 0,
+                            monthlyLettersUsed: 0,
+                            monthlyLimit: 0,
+                            monthlyRemaining: 0
+                        }
+                    };
+                }
+
+                return {
+                    tier: subscriptionData.tier,
+                    isActive: subscriptionData.isActive,
+                    remainingCredits: subscriptionData.remainingCredits,
+                    tierName: subscriptionData.tierConfig?.name || 'Unknown Plan',
+                    canGenerateDispute: subscriptionData.canGenerateDispute?.allowed || false,
+                    daysUntilExpiration: subscriptionData.daysUntilExpiration,
+                    needsUpgrade: subscriptionData.tier === 'free' || !subscriptionData.isActive,
+                    features: subscriptionData.features || [],
+                    limits: subscriptionData.limits || {},
+                    currentUsage: subscriptionData.currentUsage || {},
+                    disputeLetterUsage: subscriptionData.disputeLetterUsage || {
+                        totalLettersGenerated: 0,
+                        monthlyLettersUsed: 0,
+                        monthlyLimit: 0,
+                        monthlyRemaining: 0
+                    }
+                };
+            }
+
+            function showUpgradeModal(reason = 'access_required') {
+                console.log('💳 Showing upgrade modal for reason:', reason);
+
+                let title = 'Upgrade Required';
+                let message = 'You need to upgrade your subscription to access this feature.';
+
+                switch (reason) {
+                    case 'dispute_letter_generation':
+                        title = 'More Credits Needed';
+                        message = 'You\'ve used all your dispute letter credits. Upgrade to continue generating letters.';
+                        break;
+                    case 'subscription_expired':
+                        title = 'Subscription Expired';
+                        message = 'Your subscription has expired. Please renew to continue using JAM Dispute Bot.';
+                        break;
+                    case 'premium_features':
+                        title = 'Premium Feature';
+                        message = 'This feature requires a Professional or Premium subscription.';
+                        break;
+                    case 'insufficient_credits':
+                        title = 'Credits Exhausted';
+                        message = 'You don\'t have enough credits for this action. Upgrade for more credits.';
+                        break;
+                }
+
+                // Use the existing showConfirmation modal
+                showConfirmation(
+                    title,
+                    message + '<br><br>Would you like to view upgrade options?',
+                    () => {
+                        upgradeSubscription();
+                    }
+                );
+            }
+
+            // Event system for subscription changes
+            const subscriptionEventListeners = [];
+
+            function addEventListener(event, callback) {
+                if (!subscriptionEventListeners[event]) {
+                    subscriptionEventListeners[event] = [];
+                }
+                subscriptionEventListeners[event].push(callback);
+            }
+
+            function removeEventListener(event, callback) {
+                if (subscriptionEventListeners[event]) {
+                    const index = subscriptionEventListeners[event].indexOf(callback);
+                    if (index > -1) {
+                        subscriptionEventListeners[event].splice(index, 1);
+                    }
+                }
+            }
+
+            function dispatchEvent(event, data) {
+                if (subscriptionEventListeners[event]) {
+                    subscriptionEventListeners[event].forEach(callback => {
+                        try {
+                            callback(data);
+                        } catch (error) {
+                            console.error('Error in subscription event listener:', error);
+                        }
+                    });
+                }
+            }
+
+            // Override refresh to dispatch events
+            const originalRefresh = refresh;
+            refresh = async function () {
+                const oldData = subscriptionData;
+                await originalRefresh();
+
+                // Dispatch subscription updated event
+                dispatchEvent('subscriptionUpdated', {
+                    oldData: oldData,
+                    newData: subscriptionData
+                });
+
+                // Also dispatch global window event for cross-module communication
+                if (window.dispatchEvent) {
+                    window.dispatchEvent(new CustomEvent('globalSubscriptionUpdated', {
+                        detail: {
+                            oldData: oldData,
+                            newData: subscriptionData,
+                            source: 'ManageSubscriptionModule'
+                        }
+                    }));
+                }
+            };
+
             // Public API
             return {
+                // Existing methods
                 init: init,
                 refresh: refresh,
                 reset: reset,
@@ -934,9 +1514,11 @@
                 upgradeSubscription: upgradeSubscription,
                 renewSubscription: renewSubscription,
                 updatePaymentMethod: updatePaymentMethod,
+                fixCredits: fixCredits,
                 cancelSubscription: cancelSubscription,
                 downloadInvoices: downloadInvoices,
                 downloadReceipt: downloadReceipt,
+
                 // Modal handlers for global access
                 confirmPendingAction: function () {
                     if (pendingAction) {
@@ -946,6 +1528,21 @@
                 },
                 clearPendingAction: function () {
                     pendingAction = null;
+                },
+
+                // Global Subscription Management API
+                checkUserAccess: checkUserAccess,
+                consumeCredits: consumeCredits,
+                getSubscriptionStatus: getSubscriptionStatus,
+                showUpgradeModal: showUpgradeModal,
+
+                // Event system
+                addEventListener: addEventListener,
+                removeEventListener: removeEventListener,
+
+                // Direct data access (read-only)
+                getSubscriptionData: function () {
+                    return subscriptionData ? { ...subscriptionData } : null;
                 }
             };
         })();
@@ -992,13 +1589,33 @@
         window.jamSubscriptionManager = ManageSubscriptionModule;
         window.loadManageSubscriptionModule = loadManageSubscriptionModule;
 
-        // Auto-initialize on page load for standalone usage
+        // Auto-initialize only if specifically requested (not when loaded as a module)
         document.addEventListener('DOMContentLoaded', function () {
-            const container = document.getElementById('subscription-manager-container');
-            if (container && window.jamSubscriptionManager) {
-                console.log('Found standalone subscription manager container, initializing');
-                window.jamSubscriptionManager.init('subscription-manager-container');
+            // Only auto-initialize if this page is loaded directly (not in an iframe or modal)
+            if (window === window.top && window.location.pathname.includes('SubscriptionManager.html')) {
+                const container = document.getElementById('subscription-manager-container');
+                if (container && window.jamSubscriptionManager) {
+                    console.log('Found standalone subscription manager container, initializing');
+                    window.jamSubscriptionManager.init('subscription-manager-container');
+                }
             }
+
+            // Listen for global subscription updates from other modules (like JamDisputeBot)
+            window.addEventListener('globalSubscriptionUpdated', (event) => {
+                if (event.detail.source !== 'ManageSubscriptionModule') {
+                    console.log('🔄 ManageSubscriptionModule received sync from:', event.detail.source);
+
+                    // Refresh our data to stay in sync
+                    if (window.jamSubscriptionManager && window.jamSubscriptionManager.isInitialized()) {
+                        console.log('🔄 Refreshing ManageSubscriptionModule data...');
+                        window.jamSubscriptionManager.refresh().then(() => {
+                            console.log('✅ ManageSubscriptionModule synchronized with', event.detail.source);
+                        }).catch(error => {
+                            console.error('❌ Error synchronizing ManageSubscriptionModule:', error);
+                        });
+                    }
+                }
+            });
         });
 
         // Signal that the module is loaded

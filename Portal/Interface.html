@@ -437,58 +437,58 @@
     </div>
 
     <script>
-               // Handle "View All" links. This is our MAIN INTERFACE INITIALIZATION.
-                document.addEventListener('DOMContentLoaded', function () {
-                    // Initialize components
-                    setupTabNavigation();
-                    console.log('🔧 Setup Tab Navigation Fired!');
-                    loadHeaderComponent();
-                    console.log('🔧 Load Header Component Fired!');
-                    
-                    //initializeSidebar();
-                    //loadWidgetsForActiveTab();
+        // Handle "View All" links. This is our MAIN INTERFACE INITIALIZATION.
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize components
+            setupTabNavigation();
+            console.log('🔧 Setup Tab Navigation Fired!');
+            loadHeaderComponent();
+            console.log('🔧 Load Header Component Fired!');
 
-                    console.log('🔍 Mont DOMContentLoaded Fired!');
-                    const viewAllLinks = document.querySelectorAll('.interface-view-all');
-                    console.log('🔍 Mont Found view all links:', viewAllLinks.length);
+            //initializeSidebar();
+            //loadWidgetsForActiveTab();
 
-                    viewAllLinks.forEach(link => {
-                        link.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            const tabId = this.getAttribute('data-tab');
-                            console.log('🔍 Mont Found tab ID:', tabId);
-                            // Find and click the corresponding nav link
-                            const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
-                            if (navLink) {
-                                navLink.click();
-                            }
-                        });
-                    });
+            console.log('🔍 Mont DOMContentLoaded Fired!');
+            const viewAllLinks = document.querySelectorAll('.interface-view-all');
+            console.log('🔍 Mont Found view all links:', viewAllLinks.length);
 
-                    // Check URL hash on page load
-                    if (window.location.hash) {
-                        const tabId = window.location.hash.substring(1);
-                        const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
-                        console.log('🔍 Mont Found nav link:', navLink);
-                        if (navLink) {
-                            navLink.click();
-                            console.log('🔍 Mont Found nav link:', navLink);
-                        }
+            viewAllLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+                    console.log('🔍 Mont Found tab ID:', tabId);
+                    // Find and click the corresponding nav link
+                    const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                    if (navLink) {
+                        navLink.click();
                     }
-
-                    // Handle iframe height adjustments
-                    window.addEventListener('message', function (e) {
-                        // Check if message is from our iframe
-                        if (e.data && e.data.type === 'iframe-height') {
-                            const iframe = document.getElementById(e.data.frameId);
-                            if (iframe) {
-                                iframe.style.height = `${e.data.height}px`;
-                            }
-                        }
-                    });
-
-                    
                 });
+            });
+
+            // Check URL hash on page load
+            if (window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                const navLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                console.log('🔍 Mont Found nav link:', navLink);
+                if (navLink) {
+                    navLink.click();
+                    console.log('🔍 Mont Found nav link:', navLink);
+                }
+            }
+
+            // Handle iframe height adjustments
+            window.addEventListener('message', function (e) {
+                // Check if message is from our iframe
+                if (e.data && e.data.type === 'iframe-height') {
+                    const iframe = document.getElementById(e.data.frameId);
+                    if (iframe) {
+                        iframe.style.height = `${e.data.height}px`;
+                    }
+                }
+            });
+
+
+        });
 
 
 
@@ -544,41 +544,41 @@
         }
 
         // Function to initialize sidebar navigation
- /*       function initializeSidebar() {
-            console.log('🔧 Initializing sidebar functionality');
-
-            const sidebarLinks = document.querySelectorAll('.interface-sidebar-nav-link');
-            console.log('🔍 Found sidebar links:', sidebarLinks.length);
-
-            sidebarLinks.forEach((link, index) => {
-                console.log(`🔗 Setting up link ${index + 1}:`, link.textContent.trim(), 'href:', link.getAttribute('href'));
-
-                link.addEventListener('click', function (e) {
-                    console.log('🖱️ Sidebar link clicked:', this.textContent.trim());
-                    console.log('🔍 Link href:', this.getAttribute('href'));
-                    console.log('🔍 Event target:', e.target);
-                    console.log('🔍 Current target:', e.currentTarget);
-
-                    e.preventDefault();
-
-                    const href = this.getAttribute('href');
-                    console.log('📍 Processing href:', href);
-
-                    if (href === '#admin-panel') {
-                        console.log('🔧 Admin panel link detected - calling loadAdminPanel()');
-                        loadAdminPanel();
-                    } else if (href && href !== '#') {
-                        console.log('🌐 Regular navigation to:', href);
-                        window.location.href = href;
-                    } else {
-                        console.log('⚠️ No valid href found or href is #');
-                    }
-                });
-            });
-
-            console.log('✅ Sidebar initialization complete');
-        }
-*/
+        /*       function initializeSidebar() {
+                   console.log('🔧 Initializing sidebar functionality');
+       
+                   const sidebarLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+                   console.log('🔍 Found sidebar links:', sidebarLinks.length);
+       
+                   sidebarLinks.forEach((link, index) => {
+                       console.log(`🔗 Setting up link ${index + 1}:`, link.textContent.trim(), 'href:', link.getAttribute('href'));
+       
+                       link.addEventListener('click', function (e) {
+                           console.log('🖱️ Sidebar link clicked:', this.textContent.trim());
+                           console.log('🔍 Link href:', this.getAttribute('href'));
+                           console.log('🔍 Event target:', e.target);
+                           console.log('🔍 Current target:', e.currentTarget);
+       
+                           e.preventDefault();
+       
+                           const href = this.getAttribute('href');
+                           console.log('📍 Processing href:', href);
+       
+                           if (href === '#admin-panel') {
+                               console.log('🔧 Admin panel link detected - calling loadAdminPanel()');
+                               loadAdminPanel();
+                           } else if (href && href !== '#') {
+                               console.log('🌐 Regular navigation to:', href);
+                               window.location.href = href;
+                           } else {
+                               console.log('⚠️ No valid href found or href is #');
+                           }
+                       });
+                   });
+       
+                   console.log('✅ Sidebar initialization complete');
+               }
+       */
         // Function to find the active tab
         function getActiveTab() {
             return document.querySelector('.interface-tab.active');
@@ -767,7 +767,7 @@
                 });
         }
 
- 
+
         // Function to load the CreditReportModule with option to force reload
         function loadCreditReportModule(containerId, forceReload = false) {
             const container = document.getElementById(containerId);
@@ -1802,6 +1802,29 @@
                         } else {
                             console.error('📨 Admin panel container NOT found!');
                         }
+                    } else if (e.data.tabId === 'interface-pricing') {
+                        console.log('📨 Loading Pricing Plans module');
+
+                        // Update active nav item
+                        document.querySelectorAll('.interface-sidebar-nav-link').forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        const pricingNavLink = document.querySelector('.interface-sidebar-nav-link[data-tab="interface-pricing"]');
+                        if (pricingNavLink) {
+                            pricingNavLink.classList.add('active');
+                        }
+
+                        loadPricingTiersModule('interface-pricing-widget', true);
+
+                        // If there's a specific plan to select, handle it after module loads
+                        if (e.data.selectedPlan) {
+                            setTimeout(() => {
+                                if (window.jamDIYPlan && typeof window.jamDIYPlan.openModal === 'function') {
+                                    console.log(`📨 Opening modal for plan: ${e.data.selectedPlan}`);
+                                    window.jamDIYPlan.openModal(e.data.selectedPlan);
+                                }
+                            }, 1500);
+                        }
                     } else {
                         console.log(`📨 Unknown tab ID: ${e.data.tabId}`);
                     }
@@ -1809,8 +1832,27 @@
                     console.error(`📨 Tab ${e.data.tabId} NOT found in DOM!`);
                     console.log('📨 Available tabs:', Array.from(document.querySelectorAll('.interface-tab')).map(t => t.id));
                 }
+
+            } else if (e.data && e.data.type === 'selectPlan') {
+                console.log(`📨 Request to select plan: ${e.data.planType}`);
+
+                // Try to open the plan modal directly
+                if (window.jamDIYPlan && typeof window.jamDIYPlan.openModal === 'function') {
+                    console.log('📨 Opening DIY Plan modal for plan selection');
+                    window.jamDIYPlan.openModal(e.data.planType);
+                } else {
+                    console.log('📨 DIY Plan module not available, will retry after loading');
+                    // Try to load the pricing module first, then select the plan
+                    loadPricingTiersModule('interface-pricing-widget', true);
+                    setTimeout(() => {
+                        if (window.jamDIYPlan && typeof window.jamDIYPlan.openModal === 'function') {
+                            window.jamDIYPlan.openModal(e.data.planType);
+                        }
+                    }, 2000);
+                }
+
             } else {
-                console.log('📨 Message ignored - not a loadTab message');
+                console.log('📨 Message ignored - not a recognized message type');
             }
         });
     </script>

@@ -150,6 +150,13 @@
         .Bot-subscription-badge {
             margin-top: 8px;
             display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .Bot-subscription-badge .subscription-main {
+            display: flex;
             gap: 10px;
             align-items: center;
         }
@@ -171,6 +178,25 @@
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 600;
+        }
+
+        .Bot-subscription-badge .usage-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 0.65rem;
+            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .Bot-subscription-badge .usage-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 500;
         }
 
         /* Subscription Modal Styles */
@@ -511,58 +537,113 @@
             // Backend API Configuration
             const API_BASE_URL = window.location.origin; // Assumes backend on same origin
 
-            // Subscription Management Functions (Backend Integration)
+            // Global Subscription Manager Integration
+            let globalSubscriptionManager = null;
+
+            // Function to initialize or get the global subscription manager
+            async function initializeGlobalSubscriptionManager() {
+                try {
+                    // Check if ManageSubscriptionModule is available
+                    if (window.jamSubscriptionManager) {
+                        globalSubscriptionManager = window.jamSubscriptionManager;
+                        console.log('✅ Using existing global subscription manager');
+                        return true;
+                    }
+
+                    // If not available, try to load it
+                    if (!document.querySelector('script[src*="SubscriptionManager.html"]')) {
+                        console.log('📋 Loading ManageSubscriptionModule...');
+                        await loadManageSubscriptionModule();
+                    }
+
+                    // Wait for it to be available
+                    let attempts = 0;
+                    while (!window.jamSubscriptionManager && attempts < 10) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        attempts++;
+                    }
+
+                    if (window.jamSubscriptionManager) {
+                        globalSubscriptionManager = window.jamSubscriptionManager;
+                        console.log('✅ Global subscription manager loaded successfully');
+                        return true;
+                    } else {
+                        throw new Error('Failed to load global subscription manager');
+                    }
+                } catch (error) {
+                    console.error('❌ Error initializing global subscription manager:', error);
+                    return false;
+                }
+            }
+
+            // Function to load the ManageSubscriptionModule script
+            function loadManageSubscriptionModule() {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'Portal/Header/SubscriptionManager.html';
+                    script.async = true;
+
+                    script.onload = function () {
+                        console.log('ManageSubscriptionModule script loaded');
+                        // Wait for the module to be initialized
+                        const checkModule = setInterval(() => {
+                            if (window.jamSubscriptionManager) {
+                                clearInterval(checkModule);
+                                resolve();
+                            }
+                        }, 50);
+
+                        // Timeout after 5 seconds
+                        setTimeout(() => {
+                            clearInterval(checkModule);
+                            reject(new Error('Timeout loading ManageSubscriptionModule'));
+                        }, 5000);
+                    };
+
+                    script.onerror = function () {
+                        reject(new Error('Failed to load ManageSubscriptionModule script'));
+                    };
+
+                    document.head.appendChild(script);
+                });
+            }
+
+            // Subscription Management Functions (Using Global Manager)
             async function loadUserSubscription() {
                 try {
-                    // Get current user ID (you'll need to implement user authentication)
-                    const userId = getCurrentUserId();
-                    if (!userId) {
-                        console.warn('⚠️ No user ID found, using guest mode');
-                        initializeGuestSubscription();
+                    // Initialize global subscription manager if needed
+                    const initialized = await initializeGlobalSubscriptionManager();
+                    if (!initialized) {
+                        console.warn('⚠️ Could not initialize global subscription manager, using fallback');
+                        await loadUserSubscriptionFallback();
                         return;
                     }
 
-                    console.log('📋 Loading subscription from backend for user:', userId);
+                    // Get subscription status from global manager
+                    const status = globalSubscriptionManager.getSubscriptionStatus();
 
-                    const response = await fetch(`${API_BASE_URL}/api/subscriptions/dashboard`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${getAuthToken()}`
-                        }
-                    });
+                    // Convert to legacy format for compatibility
+                    userSubscription = {
+                        tier: status.tier,
+                        tierName: status.tierName,
+                        remainingLetters: status.remainingCredits === 'Unlimited' ? 999999 : parseInt(status.remainingCredits) || 0,
+                        totalLettersUsed: status.currentUsage?.disputeLetters || 0,
+                        subscriptionStartDate: new Date().toISOString(),
+                        subscriptionEndDate: null,
+                        isActive: status.isActive,
+                        canGenerateDispute: status.canGenerateDispute,
+                        disputeGenerationReason: status.canGenerateDispute ? 'Access granted' : 'Access restricted',
+                        features: status.features || [],
+                        limits: status.limits || {},
+                        daysUntilExpiration: status.daysUntilExpiration || 0,
+                        needsRenewal: status.needsUpgrade || false,
+                        hasTrialUsed: false // Legacy field for compatibility
+                    };
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    if (result.success) {
-                        // Convert new backend subscription format to frontend format
-                        const data = result.data;
-                        userSubscription = {
-                            tier: data.tier,
-                            tierName: data.tierConfig?.name || 'Unknown',
-                            remainingLetters: data.remainingCredits === 'Unlimited' ? 999999 : parseInt(data.remainingCredits) || 0,
-                            totalLettersUsed: data.currentUsage?.disputeLetters || 0,
-                            subscriptionStartDate: data.subscriptionEndDate ? new Date(new Date(data.subscriptionEndDate).getTime() - (6 * 30 * 24 * 60 * 60 * 1000)).toISOString() : new Date().toISOString(),
-                            subscriptionEndDate: data.subscriptionEndDate,
-                            isActive: data.isActive,
-                            canGenerateDispute: data.canGenerateDispute?.allowed || false,
-                            disputeGenerationReason: data.canGenerateDispute?.reason || '',
-                            features: data.features || [],
-                            limits: data.limits || {},
-                            daysUntilExpiration: data.daysUntilExpiration || 0,
-                            needsRenewal: data.needsRenewal || false,
-                            hasTrialUsed: false // Legacy field for compatibility
-                        };
-                        console.log('✅ Loaded user subscription from backend:', userSubscription);
-                    } else {
-                        throw new Error(result.message || 'Failed to load subscription');
-                    }
+                    console.log('✅ Loaded subscription via global manager:', userSubscription);
                 } catch (error) {
-                    console.error('❌ Error loading subscription from backend:', error);
-                    // Fallback to localStorage for offline mode
+                    console.error('❌ Error loading subscription from global manager:', error);
+                    // Fallback to local subscription loading
                     await loadUserSubscriptionFallback();
                 }
             }
@@ -661,64 +742,31 @@
             }
 
             async function canUseLetterCredits(requiredCredits = 1) {
-                // Check if we can generate dispute letters using the backend API
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/subscriptions/can-generate-dispute`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${getAuthToken()}`
-                        }
-                    });
+                    // Use global subscription manager if available
+                    if (globalSubscriptionManager) {
+                        const accessCheck = await globalSubscriptionManager.checkUserAccess('dispute_letter_generation', requiredCredits);
 
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            const canGenerate = result.data.canGenerate;
-                            const reason = result.data.reason;
-                            const remainingCredits = result.data.remainingCredits;
-                            const tier = result.data.tier;
-
-                            if (!canGenerate) {
-                                // Determine the type of restriction
-                                if (reason.includes('expired')) {
-                                    return {
-                                        canUse: false,
-                                        reason: 'subscription_expired',
-                                        message: 'Your subscription has expired. Please renew to continue creating dispute letters.',
-                                        upgradeRequired: true,
-                                        needsRenewal: true
-                                    };
-                                } else if (reason.includes('limit') && tier === 'starter') {
-                                    return {
-                                        canUse: false,
-                                        reason: 'monthly_limit_reached',
-                                        message: 'You\'ve reached your monthly dispute letter limit. Upgrade to Professional or Premium for unlimited letters.',
-                                        upgradeRequired: true,
-                                        currentTier: tier
-                                    };
-                                } else {
-                                    return {
-                                        canUse: false,
-                                        reason: 'subscription_restriction',
-                                        message: reason,
-                                        upgradeRequired: tier === 'starter'
-                                    };
-                                }
-                            }
-
-                            return {
-                                canUse: true,
-                                remainingAfter: remainingCredits === 'Unlimited' ? 'Unlimited' : Math.max(0, parseInt(remainingCredits) - requiredCredits)
-                            };
-                        }
+                        return {
+                            canUse: accessCheck.allowed,
+                            reason: accessCheck.reason,
+                            message: accessCheck.reason,
+                            upgradeRequired: accessCheck.upgradeRequired,
+                            needsRenewal: accessCheck.renewalRequired,
+                            remainingAfter: accessCheck.allowed ?
+                                (accessCheck.subscriptionData?.remainingCredits === 'Unlimited' ? 'Unlimited' :
+                                    Math.max(0, parseInt(accessCheck.subscriptionData?.remainingCredits || 0) - requiredCredits))
+                                : 0
+                        };
                     }
+
+                    // Fallback to local check if global manager not available
+                    return canUseLetterCreditsLocal(requiredCredits);
                 } catch (error) {
                     console.error('Error checking dispute generation capability:', error);
+                    // Fallback to local check if API fails
+                    return canUseLetterCreditsLocal(requiredCredits);
                 }
-
-                // Fallback to local check if API fails
-                return canUseLetterCreditsLocal(requiredCredits);
             }
 
             function canUseLetterCreditsLocal(requiredCredits = 1) {
@@ -767,8 +815,39 @@
 
             async function consumeLetterCredits(creditsUsed = 1) {
                 try {
-                    // Log usage to backend (this will be handled by middleware in the dispute generation endpoint)
-                    // For now, just update local state and reload subscription data
+                    // Use global subscription manager if available
+                    if (globalSubscriptionManager) {
+                        const result = await globalSubscriptionManager.consumeCredits(creditsUsed, 'dispute_letter_generation');
+
+                        if (result.success) {
+                            // Update local userSubscription for backward compatibility
+                            const status = globalSubscriptionManager.getSubscriptionStatus();
+                            userSubscription.remainingLetters = status.remainingCredits === 'Unlimited' ? 999999 : parseInt(status.remainingCredits) || 0;
+                            userSubscription.totalLettersUsed = status.currentUsage?.disputeLetters || 0;
+                            saveUserSubscriptionLocal();
+
+                            console.log(`📝 Consumed ${creditsUsed} letter credits via global manager. Remaining: ${status.remainingCredits}`);
+
+                            // Update subscription display
+                            updateSubscriptionDisplay();
+
+                            // Trigger global synchronization
+                            triggerGlobalSubscriptionSync();
+
+                            return true;
+                        } else {
+                            console.error('❌ Failed to consume credits via global manager:', result.message);
+
+                            // Show upgrade modal if needed
+                            if (result.upgradeRequired) {
+                                globalSubscriptionManager.showUpgradeModal('dispute_letter_generation');
+                            }
+
+                            return false;
+                        }
+                    }
+
+                    // Fallback to local consumption if global manager not available
                     if (userSubscription.remainingLetters >= creditsUsed || userSubscription.remainingLetters === 999999) {
                         // Update local state
                         if (userSubscription.remainingLetters !== 999999) {
@@ -777,7 +856,7 @@
                         userSubscription.totalLettersUsed += creditsUsed;
                         saveUserSubscriptionLocal();
 
-                        console.log(`📝 Consumed ${creditsUsed} letter credits. Remaining: ${userSubscription.remainingLetters === 999999 ? 'Unlimited' : userSubscription.remainingLetters}`);
+                        console.log(`📝 Consumed ${creditsUsed} letter credits locally. Remaining: ${userSubscription.remainingLetters === 999999 ? 'Unlimited' : userSubscription.remainingLetters}`);
 
                         // Reload subscription data from backend to get accurate usage
                         setTimeout(() => {
@@ -796,6 +875,41 @@
             }
 
             function getSubscriptionDisplayInfo() {
+                // Use global subscription manager data if available
+                if (globalSubscriptionManager) {
+                    const status = globalSubscriptionManager.getSubscriptionStatus();
+                    const usage = status.disputeLetterUsage;
+
+                    if (status && usage) {
+                        const isFreeTier = status.tier === 'free';
+                        let remainingLetters = 0;
+
+                        if (isFreeTier) {
+                            // Free tier: calculate remaining using SAME logic as ManageSubscriptionModule
+                            const freeTrialLifetimeLimit = 2;
+                            remainingLetters = Math.max(0, freeTrialLifetimeLimit - (usage.totalLettersGenerated || 0));
+                        } else {
+                            // Paid tiers: use remaining credits from backend
+                            remainingLetters = status.remainingCredits === 'Unlimited' ? 'Unlimited' : (status.remainingCredits || 0);
+                        }
+
+                        return {
+                            tierName: status.tierName || status.tier,
+                            remainingLetters: remainingLetters,
+                            totalLettersUsed: usage.totalLettersGenerated || 0,
+                            subscriptionEndDate: status.subscriptionEndDate,
+                            daysUntilExpiration: status.daysUntilExpiration,
+                            isActive: status.isActive,
+                            features: status.features || [],
+                            limits: status.limits || {},
+                            canUpgrade: status.tier === 'starter' || !status.isActive,
+                            needsRenewal: status.needsUpgrade || false,
+                            nextTier: getNextTierRecommendation()
+                        };
+                    }
+                }
+
+                // Fallback to local userSubscription data
                 return {
                     tierName: userSubscription.tierName || userSubscription.tier,
                     remainingLetters: userSubscription.remainingLetters === 999999 ? 'Unlimited' : userSubscription.remainingLetters,
@@ -864,7 +978,7 @@
             async function showSubscriptionPlans() {
                 try {
                     // Get available subscription tiers from backend
-                    const response = await fetch(`${API_BASE_URL}/api/subscription/tiers`);
+                    const response = await fetch(`${API_BASE_URL}/api/subscriptions/tiers`);
                     const result = await response.json();
 
                     if (result.success) {
@@ -995,7 +1109,7 @@
                     console.log(`🚀 Redirecting to payment for ${tier} tier`);
 
                     // Get payment links from backend
-                    const response = await fetch(`${API_BASE_URL}/api/subscription/payment-links/${tier}`);
+                    const response = await fetch(`${API_BASE_URL}/api/subscriptions/payment-links/${tier}`);
 
                     if (response.ok) {
                         const result = await response.json();
@@ -1037,23 +1151,54 @@
 
             // Enhanced function to check before expensive operations
             async function checkBeforeExpensiveOperation(operationType = 'credit_analysis') {
-                const creditCheck = await canUseLetterCredits(1);
+                try {
+                    // Use global subscription manager if available
+                    if (globalSubscriptionManager) {
+                        const accessCheck = await globalSubscriptionManager.checkUserAccess('dispute_letter_generation', 1);
 
-                if (!creditCheck.canUse) {
-                    console.log(`🚫 Blocking ${operationType} - Reason: ${creditCheck.reason}`);
+                        if (!accessCheck.allowed) {
+                            console.log(`🚫 Blocking ${operationType} - Reason: ${accessCheck.reason}`);
 
-                    // Show appropriate upgrade prompt
-                    if (creditCheck.reason === 'free_trial_exhausted') {
-                        showSubscriptionUpgradeModal('free_trial_exhausted');
-                    } else if (creditCheck.reason === 'insufficient_credits') {
-                        showSubscriptionUpgradeModal('insufficient_credits');
+                            // Show upgrade modal with appropriate reason
+                            let modalReason = 'access_required';
+                            if (accessCheck.reason.includes('expired')) {
+                                modalReason = 'subscription_expired';
+                            } else if (accessCheck.reason.includes('credits')) {
+                                modalReason = 'insufficient_credits';
+                            } else if (accessCheck.reason.includes('limit')) {
+                                modalReason = 'dispute_letter_generation';
+                            }
+
+                            globalSubscriptionManager.showUpgradeModal(modalReason);
+                            return false;
+                        }
+
+                        console.log(`✅ ${operationType} approved via global manager - Access granted`);
+                        return true;
                     }
 
+                    // Fallback to local credit check
+                    const creditCheck = await canUseLetterCredits(1);
+
+                    if (!creditCheck.canUse) {
+                        console.log(`🚫 Blocking ${operationType} - Reason: ${creditCheck.reason}`);
+
+                        // Show appropriate upgrade prompt
+                        if (creditCheck.reason === 'free_trial_exhausted') {
+                            showSubscriptionUpgradeModal('free_trial_exhausted');
+                        } else if (creditCheck.reason === 'insufficient_credits') {
+                            showSubscriptionUpgradeModal('insufficient_credits');
+                        }
+
+                        return false;
+                    }
+
+                    console.log(`✅ ${operationType} approved - ${creditCheck.remainingAfter} credits will remain after`);
+                    return true;
+                } catch (error) {
+                    console.error('❌ Error checking before expensive operation:', error);
                     return false;
                 }
-
-                console.log(`✅ ${operationType} approved - ${creditCheck.remainingAfter} credits will remain after`);
-                return true;
             }
 
             // Function to set up event listeners
@@ -1074,6 +1219,83 @@
                         switchTab('workflow');
                     });
                 }
+            }
+
+            // Function to check tab access using global subscription manager
+            async function checkTabAccess(operation) {
+                try {
+                    if (globalSubscriptionManager) {
+                        const accessCheck = await globalSubscriptionManager.checkUserAccess(operation);
+                        return accessCheck.allowed;
+                    }
+
+                    // Fallback - allow access if no global manager
+                    return true;
+                } catch (error) {
+                    console.error('Error checking tab access:', error);
+                    return true; // Allow access on error
+                }
+            }
+
+            // Function to show access denied message for tabs
+            function showTabAccessDenied(tabId) {
+                const tabContent = document.getElementById(`Bot-tab-${tabId}`);
+                if (!tabContent) return;
+
+                const tabNames = {
+                    'reports': 'Credit Reports',
+                    'chat': 'Chat Assistant',
+                    'letters': 'My Letters',
+                    'workflow': 'Dispute Workflow'
+                };
+
+                const tabName = tabNames[tabId] || 'This Feature';
+
+                tabContent.innerHTML = `
+                    <div style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100%;
+                        text-align: center;
+                        padding: 2rem;
+                        color: #6c757d;
+                    ">
+                        <div style="
+                            width: 80px;
+                            height: 80px;
+                            border-radius: 50%;
+                            background: #ffeaa7;
+                            color: #e17055;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 2rem;
+                            margin-bottom: 1.5rem;
+                        ">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 style="color: #343a40; margin-bottom: 1rem;">Subscription Required</h3>
+                        <p style="margin-bottom: 1.5rem; max-width: 400px;">
+                            ${tabName} requires an active subscription. Please upgrade to access this feature.
+                        </p>
+                        <button onclick="window.jamTipBot.showUpgradeModal('access_required')" 
+                                style="
+                                    background: #09ccfc;
+                                    color: white;
+                                    border: none;
+                                    padding: 12px 24px;
+                                    border-radius: 6px;
+                                    font-size: 1rem;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.3s ease;
+                                ">
+                            <i class="fas fa-arrow-up"></i> Upgrade Now
+                        </button>
+                    </div>
+                `;
             }
 
             // Function to switch tabs
@@ -1101,13 +1323,31 @@
                 // Save the current tab state
                 saveTabState(tabId);
 
-                // Initialize modules if needed
+                // Initialize modules if needed with subscription checks
                 if (tabId === 'reports' && !creditReportUploaderModule) {
-                    initReportsModule();
+                    checkTabAccess('reports_upload').then(allowed => {
+                        if (allowed) {
+                            initReportsModule();
+                        } else {
+                            showTabAccessDenied('reports');
+                        }
+                    });
                 } else if (tabId === 'chat' && !chatModule) {
-                    initChatModule();
+                    checkTabAccess('chat_access').then(allowed => {
+                        if (allowed) {
+                            initChatModule();
+                        } else {
+                            showTabAccessDenied('chat');
+                        }
+                    });
                 } else if (tabId === 'letters' && !lettersModule) {
-                    initLettersModule();
+                    checkTabAccess('letters_view').then(allowed => {
+                        if (allowed) {
+                            initLettersModule();
+                        } else {
+                            showTabAccessDenied('letters');
+                        }
+                    });
                 }
             }
 
@@ -1527,22 +1767,91 @@
                 }, 1500);
             }
 
+            // Function to trigger global subscription synchronization
+            function triggerGlobalSubscriptionSync() {
+                if (window.dispatchEvent) {
+                    window.dispatchEvent(new CustomEvent('globalSubscriptionUpdated', {
+                        detail: {
+                            oldData: null,
+                            newData: globalSubscriptionManager ? globalSubscriptionManager.getSubscriptionStatus() : null,
+                            source: 'JamDisputeBot'
+                        }
+                    }));
+                    console.log('🔄 JamDisputeBot triggered global subscription sync');
+                }
+            }
+
             // Function to update subscription display in header
             function updateSubscriptionDisplay() {
                 const headerText = document.querySelector('.Bot-header-text');
                 if (headerText) {
-                    const subscriptionInfo = getSubscriptionDisplayInfo();
                     const existingBadge = headerText.querySelector('.Bot-subscription-badge');
 
                     if (existingBadge) {
                         existingBadge.remove();
                     }
 
+                    // Get subscription data from global subscription manager
+                    let subscriptionInfo = getSubscriptionDisplayInfo();
+                    let disputeUsageInfo = '';
+
+                    if (globalSubscriptionManager) {
+                        const status = globalSubscriptionManager.getSubscriptionStatus();
+                        const usage = status.disputeLetterUsage;
+
+                        if (usage && status.tier) {
+                            const isFreeTier = status.tier === 'free';
+                            const totalLettersGenerated = usage.totalLettersGenerated || 0;
+
+                            // Calculate remaining credits using SAME logic as ManageSubscriptionModule
+                            let actualRemaining = 0;
+                            if (isFreeTier) {
+                                // Free tier gets exactly 2 lifetime credits - calculate remaining the same way as ManageSubscriptionModule
+                                const freeTrialLifetimeLimit = 2;
+                                actualRemaining = Math.max(0, freeTrialLifetimeLimit - totalLettersGenerated);
+                            } else {
+                                // For paid tiers, use backend calculation
+                                actualRemaining = Math.max(0, usage.monthlyRemaining || 0);
+                            }
+
+                            // Override subscriptionInfo with accurate data from global manager
+                            subscriptionInfo = {
+                                tierName: status.tierName || status.tier,
+                                remainingLetters: actualRemaining
+                            };
+
+                            disputeUsageInfo = `
+                                <div class="usage-details">
+                                    <span class="usage-stat">📄 ${totalLettersGenerated} generated</span>
+                                    <span class="usage-stat">📊 ${usage.monthlyLettersUsed || totalLettersGenerated}/${usage.monthlyLimit || 2} ${isFreeTier ? 'lifetime' : 'monthly'}</span>
+                                    <span class="usage-stat">⚡ ${actualRemaining} ${isFreeTier ? 'remaining' : 'monthly left'}</span>
+                                </div>
+                            `;
+
+                            console.log('📊 JamDisputeBot display aligned with ManageSubscriptionModule:', {
+                                tier: status.tier,
+                                isFreeTier: isFreeTier,
+                                totalGenerated: totalLettersGenerated,
+                                monthlyUsed: usage.monthlyLettersUsed,
+                                monthlyLimit: usage.monthlyLimit,
+                                actualRemaining: actualRemaining,
+                                tierName: subscriptionInfo.tierName
+                            });
+                        } else {
+                            console.warn('⚠️ No usage data available from global subscription manager');
+                        }
+                    } else {
+                        console.warn('⚠️ Global subscription manager not available');
+                    }
+
                     const badge = document.createElement('div');
                     badge.className = 'Bot-subscription-badge';
                     badge.innerHTML = `
-                        <span class="subscription-tier">${subscriptionInfo.tierName}</span>
-                        <span class="subscription-credits">${subscriptionInfo.remainingLetters} letters left</span>
+                        <div class="subscription-main">
+                            <span class="subscription-tier">${subscriptionInfo.tierName || 'No Subscription'}</span>
+                            <span class="subscription-credits">${subscriptionInfo.remainingLetters} letters left</span>
+                        </div>
+                        ${disputeUsageInfo}
                     `;
 
                     headerText.appendChild(badge);
@@ -1689,22 +1998,57 @@
 
                     // Set up event listeners
                     setTimeout(async () => {
-                        // Load user subscription first
-                        loadUserSubscription();
+                        // Initialize global subscription manager first
+                        console.log('🔧 Initializing global subscription manager...');
+                        await initializeGlobalSubscriptionManager();
+
+                        // Load user subscription
+                        await loadUserSubscription();
+
+                        // Set up event listeners for subscription changes
+                        if (globalSubscriptionManager) {
+                            globalSubscriptionManager.addEventListener('subscriptionUpdated', (data) => {
+                                console.log('📡 Subscription updated, refreshing UI...');
+                                loadUserSubscription();
+                                updateSubscriptionDisplay();
+                            });
+                        }
+
+                        // Listen for global subscription updates from ManageSubscriptionModule
+                        window.addEventListener('globalSubscriptionUpdated', (event) => {
+                            console.log('🔄 Global subscription update received from:', event.detail.source);
+                            console.log('🔄 New subscription data:', event.detail.newData);
+
+                            // Update local subscription data to stay in sync
+                            if (globalSubscriptionManager && event.detail.newData) {
+                                // Force refresh from the updated data
+                                loadUserSubscription();
+                                updateSubscriptionDisplay();
+
+                                console.log('✅ JamDisputeBot synchronized with ManageSubscriptionModule');
+                            }
+                        });
 
                         setupEventListeners();
 
-                        // Initialize the workflow module
+                        // Initialize the workflow module (always initialize)
                         await initWorkflowModule();
 
-                        // Initialize the reports module
-                        await initReportsModule();
+                        // Initialize other modules based on subscription
+                        const reportsAccess = await checkTabAccess('reports_upload');
+                        if (reportsAccess) {
+                            await initReportsModule();
+                        }
 
-                        // Initialize the chat module
-                        await initChatModule();
+                        const chatAccess = await checkTabAccess('chat_access');
+                        if (chatAccess) {
+                            await initChatModule();
+                        }
 
-                        // Initialize the letters module
-                        await initLettersModule();
+                        const lettersAccess = await checkTabAccess('letters_view');
+                        if (lettersAccess) {
+                            await initLettersModule();
+                        }
 
                         // Restore the previous tab state or default to 'workflow'
                         restoreTabState();
@@ -1741,8 +2085,11 @@
 
                 switchTab: switchTab,
 
-                // Subscription Management API
+                // Subscription Management API (now delegated to global manager)
                 getSubscriptionInfo: function () {
+                    if (globalSubscriptionManager) {
+                        return globalSubscriptionManager.getSubscriptionStatus();
+                    }
                     return getSubscriptionDisplayInfo();
                 },
 
@@ -1751,20 +2098,28 @@
                 },
 
                 consumeCredits: function (creditsUsed = 1) {
-                    const success = consumeLetterCredits(creditsUsed);
-                    if (success) {
-                        updateSubscriptionDisplay();
-                    }
-                    return success;
+                    return consumeLetterCredits(creditsUsed);
                 },
 
                 checkBeforeExpensiveOperation: checkBeforeExpensiveOperation,
 
                 showUpgradeModal: function (reason = 'insufficient_credits') {
-                    showSubscriptionUpgradeModal(reason);
+                    if (globalSubscriptionManager) {
+                        globalSubscriptionManager.showUpgradeModal(reason);
+                    } else {
+                        showSubscriptionUpgradeModal(reason);
+                    }
                 },
 
-                updateSubscriptionDisplay: updateSubscriptionDisplay
+                updateSubscriptionDisplay: updateSubscriptionDisplay,
+
+                // Global subscription manager access
+                getGlobalSubscriptionManager: function () {
+                    return globalSubscriptionManager;
+                },
+
+                // Tab access control
+                checkTabAccess: checkTabAccess
             };
         })();
 

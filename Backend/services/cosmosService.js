@@ -81,6 +81,26 @@ export class CosmosService {
         }
     }
 
+    async upsertDocument(document, partitionKey) {
+        try {
+            // Ensure initialization before any operation
+            await this.initialize();
+            
+            const container = this.cosmosConfig.getContainer();
+            if (!container) {
+                throw new Error('Cosmos DB container not initialized');
+            }
+            
+            // Use Cosmos DB's native upsert functionality
+            const { resource } = await container.items.upsert(document);
+            console.log(`Document upserted with id: ${resource.id}`);
+            return resource;
+        } catch (error) {
+            console.error('Error upserting document:', error);
+            throw error;
+        }
+    }
+
     async deleteDocument(id, partitionKey) {
         try {
             // Ensure initialization before any operation

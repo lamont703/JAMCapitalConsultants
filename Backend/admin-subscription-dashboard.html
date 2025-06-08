@@ -275,6 +275,24 @@
                                 <option value="premium">DIY Premium ($99/month)</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="subscriptionStatus">Status:</label>
+                            <select id="subscriptionStatus">
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subscriptionDuration">Duration (for paid tiers):</label>
+                            <select id="subscriptionDuration">
+                                <option value="30">30 Days</option>
+                                <option value="60">60 Days</option>
+                                <option value="90">90 Days</option>
+                                <option value="180">6 Months</option>
+                                <option value="365">1 Year</option>
+                            </select>
+                        </div>
                         <button class="btn" onclick="updateUserTier()">Update Subscription</button>
                     </div>
 
@@ -436,10 +454,23 @@
         async function updateUserTier() {
             const userId = document.getElementById('userId').value.trim();
             const newTier = document.getElementById('newTier').value;
+            const status = document.getElementById('subscriptionStatus').value;
+            const duration = parseInt(document.getElementById('subscriptionDuration').value);
 
             if (!userId) {
                 showAlert('userManagementAlert', 'error', 'Please enter a user ID');
                 return;
+            }
+
+            // Calculate subscription dates for paid tiers
+            let subscriptionStartDate = null;
+            let subscriptionEndDate = null;
+
+            if (newTier !== 'free' && status === 'active') {
+                subscriptionStartDate = new Date().toISOString();
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + duration);
+                subscriptionEndDate = endDate.toISOString();
             }
 
             try {
@@ -450,6 +481,9 @@
                     },
                     body: JSON.stringify({
                         tier: newTier,
+                        status: status,
+                        subscriptionStartDate: subscriptionStartDate,
+                        subscriptionEndDate: subscriptionEndDate,
                         reason: 'admin_manual_update'
                     })
                 });

@@ -6,6 +6,348 @@ import { authenticateToken, requireAdmin } from '../middleware/authMiddleware.js
 const router = express.Router();
 const subscriptionService = new SubscriptionService();
 
+// IMPORTANT: Specific routes must come BEFORE generic /:userId routes
+
+// Get user subscription dashboard
+router.get('/dashboard', authenticateToken, subscriptionMiddleware.getSubscriptionStatus);
+
+// Get payment history
+router.get('/payment-history', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { limit = 10 } = req.query;
+        
+        const subscriptionService = new SubscriptionService();
+        const paymentHistory = await subscriptionService.getPaymentHistory(userId);
+        
+        res.json({
+            success: true,
+            data: paymentHistory.slice(0, parseInt(limit))
+        });
+    } catch (error) {
+        console.error('Error getting payment history:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving payment history'
+        });
+    }
+});
+
+// Check if user can generate dispute letters
+router.get('/can-generate-dispute', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const subscriptionService = new SubscriptionService();
+        const subscription = await subscriptionService.getUserSubscription(userId);
+        
+        res.json({
+            success: true,
+            data: {
+                canGenerate: subscription.canGenerateDispute.allowed,
+                reason: subscription.canGenerateDispute.reason,
+                remainingCredits: subscription.remainingCredits,
+                currentUsage: subscription.currentUsage,
+                tier: subscription.tier,
+                limits: subscription.limits
+            }
+        });
+    } catch (error) {
+        console.error('Error checking dispute generation capability:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error checking dispute generation capability'
+        });
+    }
+});
+
+// Get subscription tier information
+router.get('/tiers', (req, res) => {
+    try {
+        const subscriptionService = new SubscriptionService();
+        res.json({
+            success: true,
+            data: subscriptionService.SUBSCRIPTION_TIERS
+        });
+    } catch (error) {
+        console.error('Error getting subscription tiers:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get subscription tiers'
+        });
+    }
+});
+
+// Get monthly usage
+router.get('/usage', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { month, year } = req.query;
+        
+        let monthStart = new Date();
+        if (month && year) {
+            monthStart = new Date(parseInt(year), parseInt(month) - 1, 1);
+        } else {
+            monthStart.setDate(1);
+            monthStart.setHours(0, 0, 0, 0);
+        }
+        
+        const subscriptionService = new SubscriptionService();
+        const usage = await subscriptionService.getMonthlyUsage(userId, monthStart);
+        
+        res.json({
+            success: true,
+            data: usage
+        });
+    } catch (error) {
+        console.error('Error getting usage:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving usage data'
+        });
+    }
+});
+
+// Upgrade subscription (this would typically be called after payment)
+router.post('/upgrade', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { newTier, paymentData } = req.body;
+        
+        if (!newTier) {
+            return res.status(400).json({
+                success: false,
+                message: 'New subscription tier is required'
+            });
+        }
+        
+        const subscriptionService = new SubscriptionService();
+        const result = await subscriptionService.upgradeSubscription(userId, newTier, paymentData);
+        
+        res.json({
+            success: true,
+            message: 'Subscription upgraded successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Error upgrading subscription:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error upgrading subscription'
+        });
+    }
+});
+
+// Check subscription expiration warnings (admin only)
+router.post('/check-expirations', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const subscriptionService = new SubscriptionService();
+        const processed = await subscriptionService.checkSubscriptionExpirations();
+        
+        res.json({
+            success: true,
+            message: `Processed ${processed} expiration warnings`,
+            data: { processedCount: processed }
+        });
+    } catch (error) {
+        console.error('Error checking expirations:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error checking subscription expirations'
+        });
+    }
+});
+
+/**
+ * GET /api/subscription/payment-links/:tier - Get payment link for specific tier
+ */
+router.get('/payment-links/:tier', (req, res) => {
+    try {
+        const { tier } = req.params;
+        
+        // Payment links configuration (replace with your actual GoHighLevel links)
+        const paymentLinks = {
+            starter: process.env.GHL_STARTER_PAYMENT_LINK || 'https://your-ghl-domain.com/diy-starter-payment',
+            professional: process.env.GHL_PROFESSIONAL_PAYMENT_LINK || 'https://your-ghl-domain.com/diy-professional-payment',
+            premium: process.env.GHL_PREMIUM_PAYMENT_LINK || 'https://your-ghl-domain.com/diy-premium-payment'
+        };
+        
+        const paymentLink = paymentLinks[tier];
+        
+        if (!paymentLink) {
+            return res.status(404).json({
+                success: false,
+                message: `Payment link not found for tier: ${tier}`
+            });
+        }
+        
+        res.json({
+            success: true,
+            paymentLink: paymentLink,
+            tier: tier
+        });
+    } catch (error) {
+        console.error('Error getting payment link:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get payment link'
+        });
+    }
+});
+
+/**
+ * POST /api/subscription/consume-credits - Consume credits for an operation
+ */
+router.post('/consume-credits', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { creditsToConsume = 1, operation = 'dispute_letter_generation' } = req.body;
+        
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
+
+        if (creditsToConsume <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Credits to consume must be greater than 0'
+            });
+        }
+
+        // Consume the credits
+        const result = await subscriptionService.consumeUserCredits(userId, creditsToConsume, operation);
+        
+        res.json({
+            success: true,
+            message: `Successfully consumed ${creditsToConsume} credits`,
+            data: result
+        });
+    } catch (error) {
+        console.error('Error consuming credits:', error);
+        res.status(400).json({
+            success: false,
+            message: error.message || 'Failed to consume credits'
+        });
+    }
+});
+
+/**
+ * GET /api/subscription/dispute-letter-usage - Get dispute letter usage statistics
+ */
+router.get('/dispute-letter-usage', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
+
+        const subscriptionService = new SubscriptionService();
+        const usage = await subscriptionService.getDisputeLetterUsage(userId);
+        
+        res.json({
+            success: true,
+            data: usage
+        });
+    } catch (error) {
+        console.error('Error getting dispute letter usage:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get dispute letter usage'
+        });
+    }
+});
+
+/**
+ * POST /api/subscription/fix-credits - Fix remaining credits for current user based on their subscription tier
+ */
+router.post('/fix-credits', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
+
+        const subscriptionService = new SubscriptionService();
+        
+        // Get current subscription
+        const subscription = await subscriptionService.getUserSubscription(userId);
+        const usage = await subscriptionService.getDisputeLetterUsage(userId);
+        
+        // Get tier configuration (subscription.tier is the correct property)
+        const userTier = subscription.tier || 'free';
+        const tierConfig = subscriptionService.SUBSCRIPTION_TIERS[userTier] || subscriptionService.SUBSCRIPTION_TIERS['free'];
+        const monthlyLimit = tierConfig.limits?.disputeLettersPerMonth || 0;
+        
+        console.log(`🔧 Fix credits debug: userTier=${userTier}, monthlyLimit=${monthlyLimit}, usage=${usage.monthlyLettersUsed}`);
+        
+        // Calculate correct remaining credits
+        let correctRemainingCredits;
+        if (userTier === 'free') {
+            // Free tier: lifetime credits minus total used
+            correctRemainingCredits = Math.max(0, monthlyLimit - usage.totalLettersGenerated);
+        } else {
+            // Paid tier: monthly limit minus current month usage
+            correctRemainingCredits = Math.max(0, monthlyLimit - usage.monthlyLettersUsed);
+        }
+        
+        // Update user's remaining credits - use the User model for proper access
+        await subscriptionService.initialize(); // Ensure service is initialized
+        
+        const User = await import('../models/User.js').then(module => module.User);
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        
+        // Update the user's subscription data with corrected credits
+        const updatedUserData = {
+            ...user,
+            subscription: {
+                ...user.subscription,
+                remainingCredits: correctRemainingCredits,
+                lastCreditFix: new Date().toISOString()
+            },
+            lastModified: new Date().toISOString()
+        };
+        
+        // Use User.save() method for proper saving
+        const userInstance = new User(updatedUserData);
+        await userInstance.save();
+        
+        console.log(`🔧 Fixed credits for user ${userId}: ${subscription.remainingCredits} → ${correctRemainingCredits}`);
+        
+        res.json({
+            success: true,
+            message: 'Credits fixed successfully',
+            data: {
+                oldCredits: subscription.remainingCredits,
+                newCredits: correctRemainingCredits,
+                tier: userTier,
+                monthlyLimit: monthlyLimit,
+                monthlyUsed: usage.monthlyLettersUsed,
+                totalGenerated: usage.totalLettersGenerated
+            }
+        });
+    } catch (error) {
+        console.error('Error fixing credits:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fixing credits',
+            error: error.message
+        });
+    }
+});
+
 /**
  * GET /api/subscription/:userId - Get user's subscription information
  */
@@ -379,155 +721,6 @@ router.get('/payment-links/:tier', (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to get payment link'
-        });
-    }
-});
-
-// Get user subscription dashboard
-router.get('/dashboard', authenticateToken, subscriptionMiddleware.getSubscriptionStatus);
-
-// Check if user can generate dispute letters
-router.get('/can-generate-dispute', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const subscriptionService = new SubscriptionService();
-        const subscription = await subscriptionService.getUserSubscription(userId);
-        
-        res.json({
-            success: true,
-            data: {
-                canGenerate: subscription.canGenerateDispute.allowed,
-                reason: subscription.canGenerateDispute.reason,
-                remainingCredits: subscription.remainingCredits,
-                currentUsage: subscription.currentUsage,
-                tier: subscription.tier,
-                limits: subscription.limits
-            }
-        });
-    } catch (error) {
-        console.error('Error checking dispute generation capability:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error checking dispute generation capability'
-        });
-    }
-});
-
-// Get subscription tier information
-router.get('/tiers', (req, res) => {
-    try {
-        const subscriptionService = new SubscriptionService();
-        res.json({
-            success: true,
-            data: subscriptionService.SUBSCRIPTION_TIERS
-        });
-    } catch (error) {
-        console.error('Error getting subscription tiers:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error retrieving subscription tiers'
-        });
-    }
-});
-
-// Upgrade subscription (this would typically be called after payment)
-router.post('/upgrade', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { newTier, paymentData } = req.body;
-        
-        if (!newTier) {
-            return res.status(400).json({
-                success: false,
-                message: 'New subscription tier is required'
-            });
-        }
-        
-        const subscriptionService = new SubscriptionService();
-        const result = await subscriptionService.upgradeSubscription(userId, newTier, paymentData);
-        
-        res.json({
-            success: true,
-            message: 'Subscription upgraded successfully',
-            data: result
-        });
-    } catch (error) {
-        console.error('Error upgrading subscription:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error upgrading subscription'
-        });
-    }
-});
-
-// Get monthly usage
-router.get('/usage', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { month, year } = req.query;
-        
-        let monthStart = new Date();
-        if (month && year) {
-            monthStart = new Date(parseInt(year), parseInt(month) - 1, 1);
-        } else {
-            monthStart.setDate(1);
-            monthStart.setHours(0, 0, 0, 0);
-        }
-        
-        const subscriptionService = new SubscriptionService();
-        const usage = await subscriptionService.getMonthlyUsage(userId, monthStart);
-        
-        res.json({
-            success: true,
-            data: usage
-        });
-    } catch (error) {
-        console.error('Error getting usage:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error retrieving usage data'
-        });
-    }
-});
-
-// Get payment history
-router.get('/payment-history', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { limit = 10 } = req.query;
-        
-        const subscriptionService = new SubscriptionService();
-        const paymentHistory = await subscriptionService.getPaymentHistory(userId);
-        
-        res.json({
-            success: true,
-            data: paymentHistory.slice(0, parseInt(limit))
-        });
-    } catch (error) {
-        console.error('Error getting payment history:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error retrieving payment history'
-        });
-    }
-});
-
-// Check subscription expiration warnings (admin only)
-router.post('/check-expirations', authenticateToken, requireAdmin, async (req, res) => {
-    try {
-        const subscriptionService = new SubscriptionService();
-        const processed = await subscriptionService.checkSubscriptionExpirations();
-        
-        res.json({
-            success: true,
-            message: `Processed ${processed} expiration warnings`,
-            data: { processedCount: processed }
-        });
-    } catch (error) {
-        console.error('Error checking expirations:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error checking subscription expirations'
         });
     }
 });

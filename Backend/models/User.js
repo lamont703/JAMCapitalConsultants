@@ -111,8 +111,8 @@ export class User {
                 subscription: this.subscription
             };
 
-            // Save to CosmosDB
-            const result = await this.cosmosService.createDocument(document, 'user');
+            // Save to CosmosDB (use upsert to handle both create and update)
+            const result = await this.cosmosService.upsertDocument(document, 'user');
             
             // Update this instance with the saved data
             Object.assign(this, result);
@@ -184,6 +184,25 @@ export class User {
             return results.length > 0 ? results[0] : null;
         } catch (error) {
             console.error('Error finding user by ID:', error);
+            throw error;
+        }
+    }
+
+    static async findByEmail(email) {
+        try {
+            const cosmosService = new CosmosService();
+            await cosmosService.initialize();
+
+            const query = 'SELECT * FROM c WHERE c.email = @email AND c.type = @type';
+            const parameters = [
+                { name: '@email', value: email.toLowerCase().trim() },
+                { name: '@type', value: 'user' }
+            ];
+
+            const results = await cosmosService.queryDocuments(query, parameters);
+            return results.length > 0 ? results[0] : null;
+        } catch (error) {
+            console.error('Error finding user by email:', error);
             throw error;
         }
     }
@@ -393,8 +412,28 @@ export class User {
             // Update subscription details
             this.subscription.tier = newTier;
             this.subscription.creditsIncluded = tierCredits[newTier];
-            this.subscription.subscriptionStartDate = options.startDate || new Date().toISOString();
-            this.subscription.subscriptionEndDate = options.endDate || null;
+            
+            // Handle status update
+            if (options.status) {
+                this.subscription.status = options.status;
+            }
+            
+            // Handle subscription dates
+            if (options.subscriptionStartDate) {
+                this.subscription.subscriptionStartDate = options.subscriptionStartDate;
+            } else if (newTier !== 'free') {
+                // For paid tiers, set start date to now if not provided
+                this.subscription.subscriptionStartDate = new Date().toISOString();
+            }
+            
+            if (options.subscriptionEndDate) {
+                this.subscription.subscriptionEndDate = options.subscriptionEndDate;
+            } else if (newTier === 'free') {
+                // Free tier has no end date
+                this.subscription.subscriptionEndDate = null;
+            }
+            
+            // Handle external subscription data
             this.subscription.externalSubscriptionId = options.externalSubscriptionId || this.subscription.externalSubscriptionId;
             this.subscription.paymentProvider = options.paymentProvider || this.subscription.paymentProvider;
             
@@ -409,7 +448,7 @@ export class User {
             // Save updated user data
             await this.save();
 
-            console.log(`✅ Updated subscription tier for user ${this.email} to ${newTier}`);
+            console.log(`✅ Updated subscription tier for user ${this.email} to ${newTier} (status: ${this.subscription.status})`);
             return this;
 
         } catch (error) {

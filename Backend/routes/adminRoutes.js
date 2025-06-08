@@ -253,7 +253,14 @@ router.get('/subscriptions/users', async (req, res) => {
 router.put('/subscriptions/user/:userId/tier', async (req, res) => {
     try {
         const { userId } = req.params;
-        const { tier, reason = 'admin_update', resetCredits = true } = req.body;
+        const { 
+            tier, 
+            status = 'active', 
+            subscriptionStartDate, 
+            subscriptionEndDate, 
+            reason = 'admin_update', 
+            resetCredits = true 
+        } = req.body;
         
         if (!userId || !tier) {
             return res.status(400).json({
@@ -270,12 +277,27 @@ router.put('/subscriptions/user/:userId/tier', async (req, res) => {
             });
         }
         
-        const options = { reason, resetCredits };
+        const validStatuses = ['active', 'expired', 'cancelled'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+            });
+        }
+        
+        const options = { 
+            reason, 
+            resetCredits, 
+            status, 
+            subscriptionStartDate, 
+            subscriptionEndDate 
+        };
+        
         const updatedSubscription = await subscriptionService.updateUserSubscriptionTier(userId, tier, options);
         
         res.json({
             success: true,
-            message: `Successfully updated user subscription to ${tier}`,
+            message: `Successfully updated user subscription to ${tier} (${status})`,
             data: updatedSubscription
         });
     } catch (error) {

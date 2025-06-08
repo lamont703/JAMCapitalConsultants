@@ -338,8 +338,18 @@
                 this.render();
             }
 
-            async loadData() {
+            async loadData(forceRefresh = false) {
                 try {
+                    // Check cache first (unless forced refresh)
+                    if (!forceRefresh) {
+                        const cachedData = this.getCachedData();
+                        if (cachedData) {
+                            console.log('Using cached subscription data');
+                            this.data = cachedData;
+                            return;
+                        }
+                    }
+
                     this.showLoading();
 
                     // Load subscription dashboard data
@@ -356,8 +366,26 @@
                     const result = await response.json();
                     this.data = result.data;
 
+                    // Cache the data
+                    this.setCachedData(this.data);
+                    localStorage.setItem('subscriptionDashboardLastRefresh', Date.now().toString());
+
+                    console.log('Fresh subscription data loaded and cached');
+
                 } catch (error) {
                     console.error('Error loading subscription data:', error);
+
+                    // Try to fall back to cached data if available
+                    const cachedData = this.getCachedData();
+                    if (cachedData && !forceRefresh) {
+                        console.log('Using cached data as fallback');
+                        this.data = cachedData;
+                        this.render();
+                        // Show a warning about using cached data
+                        this.showCacheWarning();
+                        return;
+                    }
+
                     this.showError(error.message);
                 }
             }
@@ -365,6 +393,38 @@
             getAuthToken() {
                 // This should be replaced with your actual auth token retrieval
                 return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            }
+
+            getCachedData() {
+                try {
+                    const cached = localStorage.getItem('subscriptionDashboardData');
+                    const timestamp = localStorage.getItem('subscriptionDashboardCacheTime');
+
+                    if (cached && timestamp) {
+                        const age = Date.now() - parseInt(timestamp);
+                        const maxAge = 10 * 60 * 1000; // 10 minutes
+
+                        if (age < maxAge) {
+                            return JSON.parse(cached);
+                        } else {
+                            // Cache expired, remove it
+                            localStorage.removeItem('subscriptionDashboardData');
+                            localStorage.removeItem('subscriptionDashboardCacheTime');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error reading cached data:', error);
+                }
+                return null;
+            }
+
+            setCachedData(data) {
+                try {
+                    localStorage.setItem('subscriptionDashboardData', JSON.stringify(data));
+                    localStorage.setItem('subscriptionDashboardCacheTime', Date.now().toString());
+                } catch (error) {
+                    console.error('Error caching data:', error);
+                }
             }
 
             showLoading() {
@@ -392,12 +452,34 @@
                         <div class="error">
                             <i class="fas fa-exclamation-triangle"></i>
                             <p>${message}</p>
-                            <button onclick="location.reload()" class="upgrade-btn" style="margin-top: 1rem;">
+                            <button onclick="window.subscriptionDashboard.refresh(true)" class="upgrade-btn" style="margin-top: 1rem;">
                                 <i class="fas fa-redo"></i> Try Again
                             </button>
                         </div>
                     </div>
                 `;
+            }
+
+            showCacheWarning() {
+                // Add a warning banner to the rendered content
+                const dashboard = this.container.querySelector('.subscription-dashboard');
+                if (dashboard) {
+                    const warning = document.createElement('div');
+                    warning.style.cssText = `
+                        background: #fff3cd;
+                        border: 1px solid #ffeaa7;
+                        color: #856404;
+                        padding: 10px 15px;
+                        margin: 0;
+                        text-align: center;
+                        font-size: 0.9rem;
+                    `;
+                    warning.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Showing cached data. <button onclick="window.subscriptionDashboard.refresh(true)" style="background: none; border: none; color: #0066cc; text-decoration: underline; cursor: pointer;">Click here to refresh</button>
+                    `;
+                    dashboard.insertBefore(warning, dashboard.firstChild.nextSibling);
+                }
             }
 
             render() {
@@ -422,7 +504,12 @@
                     <div class="subscription-dashboard">
                         <div class="dashboard-header">
                             <h1 class="dashboard-title">Subscription Dashboard</h1>
-                            <p class="dashboard-subtitle">Manage your credit repair subscription</p>
+                            <p class="dashboard-subtitle">
+                                Manage your credit repair subscription
+                                <button onclick="window.subscriptionDashboard.refresh(true)" class="upgrade-btn" style="margin-left: 15px; padding: 8px 16px; font-size: 0.9rem;">
+                                    <i class="fas fa-redo"></i> Refresh
+                                </button>
+                            </p>
                         </div>
                         
                         <div class="dashboard-content">
@@ -545,8 +632,9 @@
                 }
             }
 
-            async refresh() {
-                await this.loadData();
+            async refresh(forceRefresh = false) {
+                console.log('Refreshing subscription dashboard...', forceRefresh ? '(forced)' : '(checking cache)');
+                await this.loadData(forceRefresh);
                 this.render();
             }
         }
@@ -556,12 +644,39 @@
             window.subscriptionDashboard = new SubscriptionDashboard('subscription-dashboard-container');
         });
 
-        // Auto-refresh every 5 minutes
-        setInterval(() => {
-            if (window.subscriptionDashboard) {
-                window.subscriptionDashboard.refresh();
+        // Smart refresh when page becomes visible (user switches back to tab)
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden && window.subscriptionDashboard) {
+                // Only refresh if data is older than 2 minutes
+                const lastRefresh = localStorage.getItem('subscriptionDashboardLastRefresh');
+                const now = Date.now();
+                const twoMinutes = 2 * 60 * 1000;
+
+                if (!lastRefresh || (now - parseInt(lastRefresh)) > twoMinutes) {
+                    console.log('Page became visible and data is stale, refreshing...');
+                    window.subscriptionDashboard.refresh();
+                }
             }
-        }, 5 * 60 * 1000);
+        });
+
+        // Refresh when user clicks on the window (indicates active engagement)
+        let lastClickRefresh = 0;
+        document.addEventListener('click', function () {
+            if (window.subscriptionDashboard) {
+                const now = Date.now();
+                const fiveMinutes = 5 * 60 * 1000;
+
+                // Only refresh on click if data is older than 5 minutes
+                if ((now - lastClickRefresh) > fiveMinutes) {
+                    const lastRefresh = localStorage.getItem('subscriptionDashboardLastRefresh');
+                    if (!lastRefresh || (now - parseInt(lastRefresh)) > fiveMinutes) {
+                        console.log('User interaction detected and data is stale, refreshing...');
+                        window.subscriptionDashboard.refresh();
+                        lastClickRefresh = now;
+                    }
+                }
+            }
+        });
     </script>
 </body>
 

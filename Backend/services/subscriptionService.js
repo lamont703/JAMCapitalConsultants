@@ -24,11 +24,25 @@ export class SubscriptionService {
         try {
             await this.initialize();
             
+            console.log(`🔍 Looking up user with ID: "${userId}" (type: ${typeof userId})`);
             const user = await User.findById(userId);
             if (!user) {
+                console.log(`❌ User not found in database: "${userId}"`);
+                
+                // Try to find user by email if userId looks like an email
+                if (userId && userId.includes('@')) {
+                    console.log(`🔄 Attempting to find user by email: ${userId}`);
+                    const userByEmail = await User.findByEmail(userId);
+                    if (userByEmail) {
+                        console.log(`✅ Found user by email: ${userByEmail.id}`);
+                        // Recursively call with the correct user ID
+                        return await this.getUserSubscription(userByEmail.id);
+                    }
+                }
+                
                 // For development/testing - provide a demo user experience
                 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-                    console.log(`User ${userId} not found, returning demo subscription data for development`);
+                    console.log(`⚠️ User ${userId} not found, returning demo subscription data for development`);
                     return {
                         userId: userId,
                         tier: 'demo',
@@ -51,28 +65,68 @@ export class SubscriptionService {
                 throw new Error('User not found');
             }
 
-            const subscriptionTier = user.subscriptionTier || 'none';
-            const tierConfig = SUBSCRIPTION_TIERS[subscriptionTier];
+            // Get subscription data from the user's subscription object
+            const subscription = user.subscription || {};
+            const subscriptionTier = subscription.tier || user.subscriptionTier || 'none';
+            const tierConfig = this.SUBSCRIPTION_TIERS[subscriptionTier];
+            
+            console.log(`🔍 User subscription data:`, subscription);
+            console.log(`🔍 Subscription tier: "${subscriptionTier}"`);
+            console.log(`🔍 Tier config found:`, tierConfig ? 'Yes' : 'No');
+            
+            // Use subscription end date from the subscription object
+            const subscriptionEndDate = subscription.subscriptionEndDate || user.subscriptionEndDate;
             
             // Calculate current period usage
-            const currentPeriodStart = new Date(user.subscriptionEndDate);
-            currentPeriodStart.setMonth(currentPeriodStart.getMonth() - 6); // 6-month subscription
-            
             const monthStart = new Date();
             monthStart.setDate(1);
             monthStart.setHours(0, 0, 0, 0);
             
             const usage = await this.getMonthlyUsage(userId, monthStart);
             
+            // Calculate remaining credits and active status based on tier type
+            let remainingCredits;
+            let isActive;
+            let daysUntilExpiration = null;
+            
+            if (subscriptionTier === 'free') {
+                // Free tier: lifetime credits, no expiration
+                remainingCredits = subscription.remainingCredits || 0;
+                isActive = subscription.status === 'active';
+                daysUntilExpiration = null; // No expiration for free tier
+            } else {
+                // Paid tiers: monthly credits with expiration
+                const monthlyLimit = tierConfig?.monthlyCredits || 0;
+                remainingCredits = Math.max(0, monthlyLimit - usage.disputeLetters);
+                
+                if (subscriptionEndDate) {
+                    const endDate = new Date(subscriptionEndDate);
+                    const now = new Date();
+                    isActive = now < endDate;
+                    
+                    if (isActive) {
+                        const timeDiff = endDate.getTime() - now.getTime();
+                        daysUntilExpiration = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    } else {
+                        daysUntilExpiration = 0;
+                    }
+                } else {
+                    isActive = false;
+                    daysUntilExpiration = 0;
+                }
+            }
+            
+            console.log(`🔍 Final values: tier=${subscriptionTier}, isActive=${isActive}, remainingCredits=${remainingCredits}, daysUntilExpiration=${daysUntilExpiration}`);
+            
             return {
                 userId,
                 tier: subscriptionTier,
                 tierConfig,
-                subscriptionEndDate: user.subscriptionEndDate,
-                isActive: new Date() < new Date(user.subscriptionEndDate),
+                subscriptionEndDate,
+                isActive,
                 currentUsage: usage,
-                remainingCredits: tierConfig?.monthlyCredits === -1 ? 'Unlimited' : 
-                                 Math.max(0, (tierConfig?.monthlyCredits || 0) - usage.disputeLetters),
+                remainingCredits,
+                daysUntilExpiration,
                 canGenerateDispute: this.canUserGenerateDispute(user, usage, tierConfig),
                 features: tierConfig?.features || [],
                 limits: tierConfig?.limits || {},
@@ -525,67 +579,89 @@ export class SubscriptionService {
 
     // Subscription tier configurations matching the payment plans
     SUBSCRIPTION_TIERS = {
+        free: {
+            name: 'Free Trial',
+            price: 0,
+            monthlyCredits: 2, // Lifetime total, not monthly
+            isLifetime: true,
+            features: [
+                '2 dispute letters (lifetime)',
+                'Basic templates only',
+                'Email support',
+                'Limited AI analysis'
+            ],
+            limits: {
+                disputeLettersPerMonth: 2,
+                advancedFeatures: false,
+                prioritySupport: false,
+                creditMonitoring: false,
+                premiumTemplates: false,
+                phoneSupport: false,
+                analytics: false
+            }
+        },
         starter: {
             name: 'DIY Starter',
             price: 29,
             monthlyCredits: 5,
+            additionalLetterCost: 4.99,
             features: [
-                'Basic JAM Dispute Bot access',
-                'Generate 5 dispute letters/month',
-                'Basic progress tracking',
-                'Email support',
-                'Credit education resources'
+                '5 dispute letters included',
+                'All templates + AI optimization',
+                'Priority email support',
+                '$4.99 per additional letter'
             ],
             limits: {
                 disputeLettersPerMonth: 5,
-                advancedFeatures: false,
-                prioritySupport: false,
-                creditMonitoring: false
+                advancedFeatures: true,
+                prioritySupport: true,
+                creditMonitoring: false,
+                premiumTemplates: false,
+                phoneSupport: false
             }
         },
         professional: {
             name: 'DIY Professional',
             price: 59,
-            monthlyCredits: -1, // Unlimited
+            monthlyCredits: 15,
+            additionalLetterCost: 3.99,
             features: [
-                'Full JAM Dispute Bot access',
-                'Unlimited custom dispute letters',
-                'Advanced progress tracking',
-                'Credit score monitoring & alerts',
-                'Priority email support',
-                'Professional dispute templates',
-                'Automated follow-up reminders'
+                '15 dispute letters included',
+                'Advanced letter customization',
+                'Multi-bureau coordination',
+                'Phone + email support',
+                '$3.99 per additional letter'
             ],
             limits: {
-                disputeLettersPerMonth: -1, // Unlimited
+                disputeLettersPerMonth: 15,
                 advancedFeatures: true,
                 prioritySupport: true,
-                creditMonitoring: true
+                creditMonitoring: true,
+                premiumTemplates: true,
+                phoneSupport: true
             }
         },
         premium: {
             name: 'DIY Premium',
             price: 99,
-            monthlyCredits: -1, // Unlimited
+            monthlyCredits: 50,
+            additionalLetterCost: 2.99,
             features: [
-                'Full JAM Dispute Bot access',
-                'Unlimited dispute letters',
-                'Real-time credit monitoring',
-                'Advanced analytics & reporting',
-                'Phone & email support',
-                'Premium dispute templates',
-                'Automated workflows',
-                'Credit building strategies',
-                'Debt validation letters'
+                '50 dispute letters included',
+                'Custom letter templates',
+                'Legal review option',
+                'Dedicated support line',
+                '$2.99 per additional letter'
             ],
             limits: {
-                disputeLettersPerMonth: -1, // Unlimited
+                disputeLettersPerMonth: 50,
                 advancedFeatures: true,
                 prioritySupport: true,
                 creditMonitoring: true,
                 premiumTemplates: true,
                 phoneSupport: true,
-                analytics: true
+                analytics: true,
+                legalReview: true
             }
         }
     };
@@ -634,12 +710,14 @@ export class SubscriptionService {
                 AND c.timestamp < @endDate
             `;
             
-            const activities = await this.cosmosService.queryDocuments('activities', query, {
-                userId,
-                type: 'dispute_letter_generated',
-                startDate: monthStart.toISOString(),
-                endDate: monthEnd.toISOString()
-            });
+            const parameters = [
+                { name: '@userId', value: userId },
+                { name: '@type', value: 'dispute_letter_generated' },
+                { name: '@startDate', value: monthStart.toISOString() },
+                { name: '@endDate', value: monthEnd.toISOString() }
+            ];
+
+            const activities = await this.cosmosService.queryDocuments(query, parameters);
             
             return {
                 disputeLetters: activities.length,
@@ -704,10 +782,12 @@ export class SubscriptionService {
                 AND (c.expirationWarningPent != true OR NOT IS_DEFINED(c.expirationWarningPent))
             `;
             
-            const expiringUsers = await this.cosmosService.queryDocuments('users', query, {
-                warningDate: warningDate.toISOString(),
-                now: new Date().toISOString()
-            });
+            const parameters = [
+                { name: '@warningDate', value: warningDate.toISOString() },
+                { name: '@now', value: new Date().toISOString() }
+            ];
+
+            const expiringUsers = await this.cosmosService.queryDocuments(query, parameters);
             
             for (const user of expiringUsers) {
                 // Send expiration warning
@@ -799,21 +879,132 @@ export class SubscriptionService {
         }
     }
 
+    /**
+     * Get dispute letter usage statistics for user
+     * @param {string} userId - User ID
+     * @returns {Object} Usage statistics
+     */
+    async getDisputeLetterUsage(userId) {
+        try {
+            await this.initialize();
+            
+            // Calculate current month boundaries
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            monthStart.setHours(0, 0, 0, 0);
+            
+            const monthEnd = new Date(monthStart);
+            monthEnd.setMonth(monthEnd.getMonth() + 1);
+            
+            // Get all-time dispute letters
+            const allTimeQuery = `
+                SELECT * FROM c 
+                WHERE c.type = @type 
+                AND (c.userId = @userId OR c.letterData.userInfo.userId = @userId)
+                ORDER BY c.createdAt DESC
+            `;
+            
+            const allTimeParams = [
+                { name: '@type', value: 'dispute_letter' },
+                { name: '@userId', value: userId }
+            ];
+            
+            const allLetters = await this.cosmosService.queryDocuments(allTimeQuery, allTimeParams);
+            
+            // Get current month's dispute letters
+            const monthlyQuery = `
+                SELECT * FROM c 
+                WHERE c.type = @type 
+                AND (c.userId = @userId OR c.letterData.userInfo.userId = @userId)
+                AND c.createdAt >= @monthStart 
+                AND c.createdAt < @monthEnd
+                ORDER BY c.createdAt DESC
+            `;
+            
+            const monthlyParams = [
+                { name: '@type', value: 'dispute_letter' },
+                { name: '@userId', value: userId },
+                { name: '@monthStart', value: monthStart.toISOString() },
+                { name: '@monthEnd', value: monthEnd.toISOString() }
+            ];
+            
+            const monthlyLetters = await this.cosmosService.queryDocuments(monthlyQuery, monthlyParams);
+            
+            console.log(`📊 Dispute letter usage for user ${userId}:`, {
+                totalCount: allLetters.length,
+                monthlyCount: monthlyLetters.length,
+                monthStart: monthStart.toISOString(),
+                monthEnd: monthEnd.toISOString()
+            });
+            
+            return {
+                totalLettersGenerated: allLetters.length,
+                monthlyLettersUsed: monthlyLetters.length,
+                monthStart: monthStart.toISOString(),
+                monthEnd: monthEnd.toISOString(),
+                letters: allLetters,
+                monthlyLetters: monthlyLetters
+            };
+        } catch (error) {
+            console.error('Error getting dispute letter usage:', error);
+            return {
+                totalLettersGenerated: 0,
+                monthlyLettersUsed: 0,
+                monthStart: new Date().toISOString(),
+                monthEnd: new Date().toISOString(),
+                letters: [],
+                monthlyLetters: []
+            };
+        }
+    }
+
     // Get subscription status for dashboard
     async getSubscriptionDashboard(userId) {
         try {
             const subscription = await this.getUserSubscription(userId);
             const paymentHistory = await this.getPaymentHistory(userId);
+            const disputeLetterUsage = await this.getDisputeLetterUsage(userId);
             
             // Calculate days until expiration
             const daysUntilExpiration = Math.ceil(
                 (new Date(subscription.subscriptionEndDate) - new Date()) / (1000 * 60 * 60 * 24)
             );
+
+            // Calculate monthly remaining letters with enhanced debugging - use subscription.tier not subscriptionTier
+            const userTier = subscription.tier || 'free';
+            const tierConfig = this.SUBSCRIPTION_TIERS[userTier] || this.SUBSCRIPTION_TIERS['free'];
+            const monthlyLimit = tierConfig.limits?.disputeLettersPerMonth || 0;
+            const monthlyRemaining = Math.max(0, monthlyLimit - disputeLetterUsage.monthlyLettersUsed);
+            
+            // Enhanced debugging for monthly calculation
+            console.log(`🔍 Monthly Remaining Calculation Debug for user ${userId}:`, {
+                userTier: userTier,
+                tierConfig: tierConfig,
+                monthlyLimit: monthlyLimit,
+                monthlyLettersUsed: disputeLetterUsage.monthlyLettersUsed,
+                calculatedRemaining: monthlyRemaining,
+                remainingCredits: subscription.remainingCredits
+            });
+            
+            // Make sure monthly remaining doesn't exceed remaining credits for paid plans
+            let finalMonthlyRemaining = monthlyRemaining;
+            if (userTier !== 'free') {
+                finalMonthlyRemaining = Math.min(monthlyRemaining, subscription.remainingCredits || 0);
+                console.log(`🔄 Adjusted monthly remaining for ${userTier}: ${finalMonthlyRemaining}`);
+            }
             
             return {
                 ...subscription,
                 daysUntilExpiration,
                 paymentHistory: paymentHistory.slice(0, 5), // Last 5 payments
+                disputeLetterUsage: {
+                    totalLettersGenerated: disputeLetterUsage.totalLettersGenerated,
+                    monthlyLettersUsed: disputeLetterUsage.monthlyLettersUsed,
+                    monthlyLimit: monthlyLimit,
+                    monthlyRemaining: finalMonthlyRemaining,
+                    monthStart: disputeLetterUsage.monthStart,
+                    monthEnd: disputeLetterUsage.monthEnd
+                },
                 needsRenewal: daysUntilExpiration <= 7,
                 status: subscription.isActive ? 'active' : 'expired'
             };

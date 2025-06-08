@@ -214,6 +214,354 @@
                 console.log(`[ChatModule] ${functionName} - ${status}`, data);
             }
 
+            // NEW: Subscription-aware conversation starter
+            async function startSubscriptionAwareConversation(container) {
+                try {
+                    console.log('🔍 ChatModule: Starting subscription-aware conversation...');
+
+                    // Get subscription status from global manager
+                    const subscriptionStatus = await getGlobalSubscriptionStatus();
+
+                    if (!subscriptionStatus) {
+                        // Fallback welcome message if subscription check fails
+                        showFallbackWelcomeMessage(container);
+                        return;
+                    }
+
+                    console.log('📊 ChatModule subscription status:', subscriptionStatus);
+
+                    // Create subscription-aware welcome message
+                    showSubscriptionAwareWelcome(subscriptionStatus, container);
+
+                } catch (error) {
+                    console.error('❌ Error in subscription-aware conversation start:', error);
+                    showFallbackWelcomeMessage(container);
+                }
+            }
+
+            // NEW: Get subscription status from global manager
+            async function getGlobalSubscriptionStatus() {
+                try {
+                    // Try to get global subscription manager
+                    let globalManager = null;
+
+                    // Check if available via parent module
+                    if (parentModule && parentModule.getGlobalSubscriptionManager) {
+                        globalManager = parentModule.getGlobalSubscriptionManager();
+                    }
+
+                    // Check if available via window
+                    if (!globalManager && window.jamSubscriptionManager) {
+                        globalManager = window.jamSubscriptionManager;
+                    }
+
+                    // Check if available via parent bot
+                    if (!globalManager && window.jamTipBot && window.jamTipBot.getGlobalSubscriptionManager) {
+                        globalManager = window.jamTipBot.getGlobalSubscriptionManager();
+                    }
+
+                    if (globalManager && typeof globalManager.getSubscriptionStatus === 'function') {
+                        const status = globalManager.getSubscriptionStatus();
+                        console.log('✅ Got subscription status from global manager:', {
+                            tier: status.tier,
+                            isActive: status.isActive,
+                            remainingCredits: status.remainingCredits,
+                            tierName: status.tierName
+                        });
+                        return status;
+                    } else {
+                        console.warn('⚠️ Global subscription manager not available');
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('❌ Error getting subscription status:', error);
+                    return null;
+                }
+            }
+
+            // NEW: Show subscription-aware welcome message
+            function showSubscriptionAwareWelcome(subscriptionStatus, container) {
+                const isFreeTier = subscriptionStatus.tier === 'free';
+                const remainingCredits = subscriptionStatus.remainingCredits;
+                const tierName = subscriptionStatus.tierName;
+
+                // Calculate dispute letter usage for free tier
+                let actualRemaining = remainingCredits;
+                if (isFreeTier && subscriptionStatus.disputeLetterUsage) {
+                    const totalGenerated = subscriptionStatus.disputeLetterUsage.totalLettersGenerated || 0;
+                    const freeTrialLimit = 2;
+                    actualRemaining = Math.max(0, freeTrialLimit - totalGenerated);
+                }
+
+                let welcomeMessage = `👋 **Welcome to JAM Dispute Bot!**\n\n`;
+                welcomeMessage += `💳 **Your Plan:** ${tierName}\n`;
+
+                if (isFreeTier) {
+                    welcomeMessage += `📝 **Dispute Letters:** ${actualRemaining} remaining (lifetime)\n\n`;
+                } else {
+                    welcomeMessage += `📝 **Dispute Letters:** ${remainingCredits} remaining this month\n\n`;
+                }
+
+                // Create appropriate conversation flow based on subscription
+                if (actualRemaining === 0) {
+                    // No credits remaining - guide to upgrade
+                    welcomeMessage += `🔒 **No Credits Remaining**\n\n`;
+                    welcomeMessage += `You've used all your dispute letter credits. To analyze credit reports and generate dispute letters, you'll need to upgrade.\n\n`;
+                    welcomeMessage += `💡 **I can still help you with:**\n`;
+                    welcomeMessage += `• Credit repair advice\n`;
+                    welcomeMessage += `• Understanding your credit report\n`;
+                    welcomeMessage += `• Explaining dispute strategies\n`;
+                    welcomeMessage += `• General credit questions`;
+
+                    addBotMessageWithButtons(welcomeMessage, [
+                        { text: "🚀 Upgrade My Plan", value: "upgrade_subscription" },
+                        { text: "📋 View Pricing Plans", value: "view_plans" },
+                        { text: "💬 Ask General Questions", value: "general_chat_mode" },
+                        { text: "ℹ️ Learn About Credit Repair", value: "learn_credit_repair" }
+                    ]);
+
+                } else {
+                    // Has credits - can proceed with normal flow
+                    if (isFreeTier) {
+                        welcomeMessage += `⚡ **Ready to boost your credit score?** You have ${actualRemaining} dispute letters to use wisely!\n\n`;
+                        welcomeMessage += `💡 **Tip:** Each dispute letter counts, so let's make sure we target the right items for maximum impact.`;
+                    } else {
+                        welcomeMessage += `⚡ **Ready to boost your credit score?** Let's find the best items to dispute in your credit reports.`;
+                    }
+
+                    addBotMessageWithButtons(welcomeMessage, [
+                        { text: "📊 Check My Credit Reports", value: "check_for_reports" },
+                        { text: "📤 Upload Reports First", value: "no_reports_uploaded" },
+                        { text: "💬 Ask Questions First", value: "general_chat_mode" },
+                        { text: "📚 Learn About Disputes", value: "learn_credit_repair" }
+                    ]);
+                }
+
+                updateMessagesDisplay(container);
+            }
+
+            // NEW: Fallback welcome message when subscription check fails
+            function showFallbackWelcomeMessage(container) {
+                console.log('🔄 Using fallback welcome message');
+
+                addBotMessageWithButtons(
+                    "👋 **Welcome to JAM Dispute Bot!**\n\nI'm here to help you improve your credit score! What would you like to do?",
+                    [
+                        { text: "📊 Check My Credit Reports", value: "check_for_reports" },
+                        { text: "📤 Upload Reports First", value: "no_reports_uploaded" },
+                        { text: "💬 Ask Questions", value: "general_chat_mode" },
+                        { text: "📚 Learn About Credit Repair", value: "learn_credit_repair" }
+                    ]
+                );
+
+                updateMessagesDisplay(container);
+            }
+
+            // NEW: Handle report checking with subscription validation
+            async function handleReportCheckingFlow(container) {
+                try {
+                    // First, check subscription status again to be sure
+                    const subscriptionStatus = await getGlobalSubscriptionStatus();
+
+                    if (subscriptionStatus) {
+                        const isFreeTier = subscriptionStatus.tier === 'free';
+                        let actualRemaining = subscriptionStatus.remainingCredits;
+
+                        // For free tier, calculate actual remaining based on usage
+                        if (isFreeTier && subscriptionStatus.disputeLetterUsage) {
+                            const totalGenerated = subscriptionStatus.disputeLetterUsage.totalLettersGenerated || 0;
+                            const freeTrialLimit = 2;
+                            actualRemaining = Math.max(0, freeTrialLimit - totalGenerated);
+                        }
+
+                        console.log('📊 Report checking flow - subscription check:', {
+                            tier: subscriptionStatus.tier,
+                            isFreeTier: isFreeTier,
+                            remainingCredits: subscriptionStatus.remainingCredits,
+                            actualRemaining: actualRemaining
+                        });
+
+                        // Check if user has enough credits before proceeding
+                        if (actualRemaining === 0) {
+                            // No credits - block analysis and guide to upgrade
+                            addBotMessageWithButtons(
+                                `🔒 **Credit Analysis Requires Dispute Letter Credits**\n\n` +
+                                `You've used all your dispute letter credits (${isFreeTier ? 'lifetime' : 'monthly'} limit). To analyze credit reports and generate dispute letters, you'll need to upgrade.\n\n` +
+                                `💡 **Why upgrade?**\n` +
+                                `• Unlimited credit report analysis\n` +
+                                `• AI-powered dispute strategies\n` +
+                                `• Professional dispute letters\n` +
+                                `• Higher success rates\n\n` +
+                                `Ready to boost your credit score?`,
+                                [
+                                    { text: "🚀 Upgrade Now", value: "upgrade_subscription" },
+                                    { text: "📋 View Plans", value: "view_plans" },
+                                    { text: "💬 Ask Questions Instead", value: "general_chat_mode" },
+                                    { text: "🔄 Check Credits Again", value: "refresh_subscription" }
+                                ]
+                            );
+                            updateMessagesDisplay(container);
+                            return;
+                        }
+                    }
+
+                    // Has credits or couldn't check - proceed with report checking
+                    addBotMessage("🔍 Let me check for your uploaded credit reports...");
+                    showTypingIndicator(container);
+
+                    checkForUploadedReports().then(hasReports => {
+                        hideTypingIndicator(container);
+
+                        if (hasReports.hasReports && hasReports.count > 0) {
+                            // Found reports - offer analysis with credit warning
+                            let analysisMessage = `✅ Great! I found ${hasReports.count} credit report${hasReports.count > 1 ? 's' : ''} in your account.\n\n`;
+
+                            if (subscriptionStatus) {
+                                const isFreeTier = subscriptionStatus.tier === 'free';
+                                let actualRemaining = subscriptionStatus.remainingCredits;
+
+                                if (isFreeTier && subscriptionStatus.disputeLetterUsage) {
+                                    const totalGenerated = subscriptionStatus.disputeLetterUsage.totalLettersGenerated || 0;
+                                    actualRemaining = Math.max(0, 2 - totalGenerated);
+                                }
+
+                                if (isFreeTier) {
+                                    analysisMessage += `💡 **Important:** You have ${actualRemaining} dispute letters remaining. Analysis will help me create targeted dispute letters for maximum impact.\n\n`;
+                                } else {
+                                    analysisMessage += `💡 **Credit Status:** ${actualRemaining} dispute letters remaining this month.\n\n`;
+                                }
+                            }
+
+                            analysisMessage += `Would you like me to analyze them for potential items to dispute?`;
+
+                            addBotMessageWithButtons(analysisMessage, [
+                                { text: "✅ Yes, analyze my reports", value: "analyze_reports" },
+                                { text: "📊 Show Report Details First", value: "show_report_details" },
+                                { text: "💬 Ask Questions First", value: "general_chat_mode" },
+                                { text: "❌ Not now", value: "skip_analysis" }
+                            ]);
+                        } else {
+                            addBotMessage(`❌ I couldn't find any credit reports in your account. Please upload your credit reports first in the Reports tab, then come back and I'll help you analyze them for dispute opportunities.`);
+                        }
+                        updateMessagesDisplay(container);
+                    }).catch(error => {
+                        hideTypingIndicator(container);
+                        addBotMessage("❌ I encountered an error checking for your reports. Please try again or upload your reports if you haven't already.");
+                        updateMessagesDisplay(container);
+                        console.error('Error checking for reports:', error);
+                    });
+
+                } catch (error) {
+                    console.error('❌ Error in report checking flow:', error);
+                    hideTypingIndicator(container);
+                    addBotMessage("❌ I encountered an error. Please try again or contact support.");
+                    updateMessagesDisplay(container);
+                }
+            }
+
+            // NEW: Show credit repair education
+            function showCreditRepairEducation(container) {
+                let educationMessage = `📚 **Credit Repair Fundamentals**\n\n`;
+                educationMessage += `**🎯 What Affects Your Credit Score:**\n`;
+                educationMessage += `• Payment History (35%) - Late payments hurt most\n`;
+                educationMessage += `• Credit Utilization (30%) - Keep below 30%\n`;
+                educationMessage += `• Length of History (15%) - Older accounts help\n`;
+                educationMessage += `• Credit Mix (10%) - Variety is good\n`;
+                educationMessage += `• New Credit (10%) - Too many inquiries hurt\n\n`;
+
+                educationMessage += `**⚖️ Dispute Process:**\n`;
+                educationMessage += `1. **Identify** inaccurate items\n`;
+                educationMessage += `2. **Document** the errors\n`;
+                educationMessage += `3. **Dispute** with bureaus (30-day response)\n`;
+                educationMessage += `4. **Follow up** if needed\n`;
+                educationMessage += `5. **Monitor** for removals\n\n`;
+
+                educationMessage += `**📈 Timeline:** Most disputes resolve in 30-45 days, with score improvements visible immediately after removal.`;
+
+                addBotMessageWithButtons(educationMessage, [
+                    { text: "📊 Now Check My Reports", value: "check_for_reports" },
+                    { text: "💬 Ask Specific Questions", value: "general_chat_mode" },
+                    { text: "📤 Upload Reports First", value: "no_reports_uploaded" },
+                    { text: "🔄 Back to Start", value: "restart_conversation" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Refresh subscription and restart conversation
+            async function refreshSubscriptionAndRestart(container) {
+                try {
+                    addBotMessage("🔄 Refreshing your subscription status...");
+                    showTypingIndicator(container);
+
+                    // Force refresh subscription data
+                    if (window.jamSubscriptionManager && typeof window.jamSubscriptionManager.refresh === 'function') {
+                        await window.jamSubscriptionManager.refresh();
+                    }
+
+                    // Also refresh global subscription state if available
+                    if (window.dispatchEvent) {
+                        window.dispatchEvent(new CustomEvent('refreshSubscriptionData'));
+                    }
+
+                    hideTypingIndicator(container);
+
+                    // Wait a moment then restart conversation with fresh data
+                    setTimeout(() => {
+                        this.clearChatHistory();
+                        startSubscriptionAwareConversation(container);
+                    }, 1000);
+
+                } catch (error) {
+                    console.error('❌ Error refreshing subscription:', error);
+                    hideTypingIndicator(container);
+                    addBotMessage("❌ Error refreshing subscription data. Please try again or contact support.");
+                    updateMessagesDisplay(container);
+                }
+            }
+
+            // NEW: Show uploaded report details
+            async function showUploadedReportDetails(container) {
+                try {
+                    addBotMessage("📊 Let me get details about your uploaded reports...");
+                    showTypingIndicator(container);
+
+                    const hasReports = await checkForUploadedReports();
+                    hideTypingIndicator(container);
+
+                    if (hasReports.hasReports && hasReports.reports && hasReports.reports.length > 0) {
+                        let detailsMessage = `📄 **Your Uploaded Reports:**\n\n`;
+
+                        hasReports.reports.forEach((report, index) => {
+                            const uploadDate = new Date(report.createdAt).toLocaleDateString();
+                            detailsMessage += `${index + 1}. **${report.fileName}**\n`;
+                            if (report.bureau) detailsMessage += `   Bureau: ${report.bureau}\n`;
+                            detailsMessage += `   Uploaded: ${uploadDate}\n`;
+                            detailsMessage += `   Status: Ready for analysis\n\n`;
+                        });
+
+                        detailsMessage += `Ready to analyze these reports for dispute opportunities?`;
+
+                        addBotMessageWithButtons(detailsMessage, [
+                            { text: "✅ Yes, analyze now", value: "analyze_reports" },
+                            { text: "📤 Upload more reports", value: "no_reports_uploaded" },
+                            { text: "💬 Ask questions first", value: "general_chat_mode" },
+                            { text: "🔄 Back", value: "check_for_reports" }
+                        ]);
+                    } else {
+                        addBotMessage("❌ No report details found. Please upload your reports first.");
+                    }
+
+                    updateMessagesDisplay(container);
+                } catch (error) {
+                    console.error('❌ Error showing report details:', error);
+                    hideTypingIndicator(container);
+                    addBotMessage("❌ Error getting report details. Please try again.");
+                    updateMessagesDisplay(container);
+                }
+            }
+
             function formatMessageContent(content) {
                 if (!content) return '';
                 content = content.replace(
@@ -1011,35 +1359,64 @@
                 try {
                     console.log('=== ANALYZING BACKEND REPORTS ===');
 
-                    // SUBSCRIPTION CHECK: Verify credits before expensive operation
+                    // ENHANCED SUBSCRIPTION CHECK: Verify credits using global manager
+                    const subscriptionStatus = await getGlobalSubscriptionStatus();
+                    if (subscriptionStatus) {
+                        const isFreeTier = subscriptionStatus.tier === 'free';
+                        let actualRemaining = subscriptionStatus.remainingCredits;
+
+                        // For free tier, calculate actual remaining based on usage
+                        if (isFreeTier && subscriptionStatus.disputeLetterUsage) {
+                            const totalGenerated = subscriptionStatus.disputeLetterUsage.totalLettersGenerated || 0;
+                            const freeTrialLimit = 2;
+                            actualRemaining = Math.max(0, freeTrialLimit - totalGenerated);
+                        }
+
+                        console.log('📊 Analysis subscription check:', {
+                            tier: subscriptionStatus.tier,
+                            isFreeTier: isFreeTier,
+                            remainingCredits: subscriptionStatus.remainingCredits,
+                            actualRemaining: actualRemaining
+                        });
+
+                        // Block analysis if no credits remaining
+                        if (actualRemaining === 0) {
+                            hideTypingIndicator(container);
+
+                            let subscriptionMessage = `🔒 **Analysis Blocked - No Credits Remaining**\n\n`;
+                            subscriptionMessage += `You've used all your dispute letter credits (${isFreeTier ? 'lifetime' : 'monthly'} limit).\n\n`;
+                            subscriptionMessage += `💡 **To analyze credit reports and generate dispute letters:**\n`;
+                            subscriptionMessage += `• Upgrade to a paid plan\n`;
+                            subscriptionMessage += `• Get unlimited analysis\n`;
+                            subscriptionMessage += `• Access professional dispute strategies\n`;
+                            subscriptionMessage += `• Higher success rates\n\n`;
+                            subscriptionMessage += `Ready to boost your credit score?`;
+
+                            addBotMessageWithButtons(subscriptionMessage, [
+                                { text: "🚀 Upgrade Now", value: "upgrade_subscription" },
+                                { text: "📋 View Plans", value: "view_plans" },
+                                { text: "💬 Ask Questions Instead", value: "general_chat_mode" },
+                                { text: "🔄 Check Credits Again", value: "refresh_subscription" }
+                            ]);
+
+                            updateMessagesDisplay(container);
+                            saveState();
+                            return;
+                        } else if (isFreeTier && actualRemaining > 0) {
+                            // Show warning for free tier users
+                            addBotMessage(`💡 **Free Trial Notice:** You have ${actualRemaining} dispute letters remaining. This analysis will help target the best items to dispute for maximum credit score impact.`);
+                            updateMessagesDisplay(container);
+                        }
+                    }
+
+                    // Legacy fallback check for compatibility
                     const parentBot = window.jamTipBot || window.parent?.jamTipBot;
                     if (parentBot && typeof parentBot.checkBeforeExpensiveOperation === 'function') {
                         const canProceed = parentBot.checkBeforeExpensiveOperation('credit_analysis');
                         if (!canProceed) {
                             hideTypingIndicator(container);
 
-                            // Show subscription-aware message
-                            const subscriptionInfo = parentBot.getSubscriptionInfo();
-                            let subscriptionMessage = '';
-
-                            if (subscriptionInfo.remainingLetters === 0) {
-                                subscriptionMessage = `🔒 **Upgrade Needed for Credit Analysis**\n\n` +
-                                    `You've used all ${subscriptionInfo.includedLetters} letters in your ${subscriptionInfo.tierName} plan.\n\n` +
-                                    `💡 **To analyze your credit reports and generate dispute letters, please upgrade to a paid plan.**\n\n` +
-                                    `✨ **Benefits of upgrading:**\n` +
-                                    `• Unlimited credit report analysis\n` +
-                                    `• AI-powered dispute strategies\n` +
-                                    `• Bureau-specific optimizations\n` +
-                                    `• Higher success rates\n\n` +
-                                    `Ready to boost your credit score?`;
-                            } else {
-                                subscriptionMessage = `⚠️ **Credit Analysis Uses Letter Credits**\n\n` +
-                                    `You have ${subscriptionInfo.remainingLetters} letter credits remaining.\n\n` +
-                                    `Credit analysis will help me create personalized dispute letters for you. Each letter generated will use 1 credit.\n\n` +
-                                    `Would you like to proceed with the analysis?`;
-                            }
-
-                            addBotMessageWithButtons(subscriptionMessage, [
+                            addBotMessageWithButtons("🔒 **Analysis Requires Credits**\n\nYou need dispute letter credits to analyze reports. Please upgrade your subscription.", [
                                 { text: "🚀 Upgrade Now", value: "upgrade_subscription" },
                                 { text: "📋 View Plans", value: "view_plans" },
                                 { text: "❌ Cancel", value: "cancel_analysis" }
@@ -1468,37 +1845,24 @@
                     saveState();
 
                 } else if (value === 'check_for_reports') {
-                    addUserMessage("Yes, check for my reports");
-                    addBotMessage("🔍 Let me check for your uploaded credit reports...");
-                    showTypingIndicator(container);
-
-                    checkForUploadedReports().then(hasReports => {
-                        hideTypingIndicator(container);
-
-                        if (hasReports.hasReports && hasReports.count > 0) {
-                            addBotMessageWithButtons(
-                                `✅ Great! I found ${hasReports.count} credit report${hasReports.count > 1 ? 's' : ''} in your account. Would you like me to analyze them for potential items to dispute?`,
-                                [
-                                    { text: "Yes, analyze my reports", value: "analyze_reports" },
-                                    { text: "No, I'll ask something else", value: "skip_analysis" }
-                                ]
-                            );
-                        } else {
-                            addBotMessage(`❌ I couldn't find any credit reports in your account. Please upload your credit reports first in the Reports tab, then come back and I'll help you analyze them for dispute opportunities.`);
-                        }
-                        updateMessagesDisplay(container);
-                    }).catch(error => {
-                        hideTypingIndicator(container);
-                        addBotMessage("❌ I encountered an error checking for your reports. Please try again or upload your reports if you haven't already.");
-                        updateMessagesDisplay(container);
-                        console.error('Error checking for reports:', error);
-                    });
+                    addUserMessage("📊 Check my credit reports");
+                    handleReportCheckingFlow(container);
 
                 } else if (value === 'no_reports_uploaded') {
-                    addUserMessage("No, I haven't uploaded them yet");
+                    addUserMessage("📤 I need to upload reports first");
                     addBotMessage("No problem! Here's what you need to do:\n\n📄 **Step 1:** Go to the **Reports tab** and upload your credit reports from all three bureaus (Experian, Equifax, TransUnion)\n\n🔍 **Step 2:** Come back to this chat and I'll analyze them for dispute opportunities\n\n💡 **Tip:** You can get free credit reports from annualcreditreport.com or through your credit monitoring service.");
                     updateMessagesDisplay(container);
                     saveState();
+
+                } else if (value === 'general_chat_mode') {
+                    addUserMessage("💬 I want to ask questions first");
+                    addBotMessage("Perfect! I'm here to help with any credit repair questions. Ask me about:\n\n• How credit scores work\n• What items hurt your score most\n• Credit repair strategies\n• Understanding your credit report\n• Dispute letter basics\n• Timeline for credit improvement\n\nWhat would you like to know?");
+                    updateMessagesDisplay(container);
+                    saveState();
+
+                } else if (value === 'learn_credit_repair') {
+                    addUserMessage("📚 Teach me about credit repair");
+                    showCreditRepairEducation(container);
 
                 } else if (value === 'start_dispute') {
                     addUserMessage("Yes, let's start the dispute process");
@@ -1676,6 +2040,18 @@
                     // Continue with normal analysis flow
                     analyzeBackendReports(container);
 
+                } else if (value === 'refresh_subscription') {
+                    addUserMessage("🔄 Check my credits again");
+                    refreshSubscriptionAndRestart(container);
+
+                } else if (value === 'show_report_details') {
+                    addUserMessage("📊 Show me my report details first");
+                    showUploadedReportDetails(container);
+
+                } else if (value === 'restart_conversation') {
+                    addUserMessage("🔄 Start over");
+                    this.restartConversation(container);
+
                 } else if (value === 'generate_letters') {
                     addUserMessage("📄 Generate dispute letters");
                     generateDisputeLetters(container);
@@ -1723,6 +2099,31 @@
                 } else if (value.startsWith('edit_field_')) {
                     const field = value.replace('edit_field_', '');
                     editSpecificField(field, container);
+
+                    // NEW: Subscription plan selection handlers
+                } else if (value === 'select_starter_plan') {
+                    addUserMessage("💼 I want the DIY Starter plan");
+                    navigateToDIYPlanModule('starter', container);
+
+                } else if (value === 'select_professional_plan') {
+                    addUserMessage("🚀 I want the DIY Professional plan");
+                    navigateToDIYPlanModule('professional', container);
+
+                } else if (value === 'select_premium_plan') {
+                    addUserMessage("⭐ I want the DIY Premium plan");
+                    navigateToDIYPlanModule('premium', container);
+
+                } else if (value === 'keep_free_plan') {
+                    addUserMessage("🆓 I'll stay on the free plan");
+                    addBotMessage("No problem! You'll stay on the free plan with your 2 lifetime dispute letters. Remember, you can upgrade anytime when you're ready for more features and letters.");
+                    updateMessagesDisplay(container);
+                    saveState();
+
+                } else if (value === 'cancel_upgrade') {
+                    addUserMessage("❌ Not now, maybe later");
+                    addBotMessage("That's perfectly fine! I'm here whenever you need help with credit repair questions. Feel free to ask me anything about improving your credit score!");
+                    updateMessagesDisplay(container);
+                    saveState();
 
                 } else {
                     // Fallback for unhandled button clicks
@@ -2892,42 +3293,11 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                     localStorage.removeItem('jamBotChatMessages');
                     localStorage.removeItem('jamBotChatState');
 
-                    // Always start with welcome message
-                    addBotMessageWithButtons(
-                        "👋 **Welcome to JAM Dispute Bot!**\n\nDid you upload your credit reports? Would you like me to check for your credit reports?",
-                        [
-                            { text: "Yes, check for my reports", value: "check_for_reports" },
-                            { text: "No, I haven't uploaded them yet", value: "no_reports_uploaded" }
-                        ]
-                    );
-
                     // Always render the interface (even if already initialized)
                     renderChatInterface(container);
 
-                    // Users will now manually check for reports using the button
-                    updateMessagesDisplay(container);
-
-                    // Check for uploaded reports and add prompt if needed
-                    checkForUploadedReports().then(hasReports => {
-                        console.log('🔍 Upload check result:', hasReports);
-
-                        if (hasReports.hasReports && hasReports.count > 0) {
-                            console.log(`✅ Found ${hasReports.count} credit reports from ${hasReports.source} - showing analysis prompt`);
-
-                            addBotMessageWithButtons(
-                                `I see you've uploaded ${hasReports.count} credit report${hasReports.count > 1 ? 's' : ''}. Would you like me to analyze them for potential items to dispute?`,
-                                [
-                                    { text: "Yes, analyze my reports", value: "analyze_reports" },
-                                    { text: "No, I'll ask something else", value: "skip_analysis" }
-                                ]
-                            );
-                            updateMessagesDisplay(container);
-                        } else {
-                            console.log(`❌ No credit reports found (source: ${hasReports.source}) - not showing analysis prompt`);
-                        }
-                    }).catch(error => {
-                        console.error('❌ Error checking for reports in init:', error);
-                    });
+                    // NEW: Start with subscription-aware welcome message
+                    startSubscriptionAwareConversation(container);
 
                     updateMessagesDisplay(container);
                     isInitialized = true;
@@ -2940,6 +3310,182 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                     console.error('Error initializing ChatModule:', error);
                     return false;
                 }
+            }
+
+            // NEW: Navigate to DIY Plan Module for plan selection and purchase
+            function navigateToDIYPlanModule(planType, container) {
+                console.log(`🚀 Navigating user to DIY Plan Module for plan: ${planType}`);
+
+                // Show confirmation message in chat
+                const planNames = {
+                    'starter': 'DIY Starter ($29/month)',
+                    'professional': 'DIY Professional ($59/month)',
+                    'premium': 'DIY Premium ($99/month)'
+                };
+
+                addBotMessage(`Excellent choice! I'm taking you to complete your ${planNames[planType]} purchase. You'll be redirected to our secure payment page.`);
+                updateMessagesDisplay(container);
+                saveState();
+
+                // PRIORITY METHOD: Navigate via parent interface first (most reliable)
+                console.log('🔍 Checking navigation options...', {
+                    hasParent: window.parent && window.parent !== window,
+                    hasTop: window.top && window.top !== window,
+                    parentType: typeof window.parent,
+                    topType: typeof window.top
+                });
+
+                // Try multiple approaches to navigate to pricing tab
+                let navigationAttempted = false;
+
+                // Method 1: Direct parent navigation
+                if (window.parent && window.parent !== window) {
+                    console.log('🔄 Method 1: Navigating via parent interface to pricing tab');
+
+                    // Send message to parent to switch to pricing tab
+                    window.parent.postMessage({
+                        type: 'loadTab',
+                        tabId: 'interface-pricing',
+                        selectedPlan: planType
+                    }, '*');
+
+                    // Also try clicking the pricing nav link directly if available
+                    try {
+                        const pricingNavLink = window.parent.document.querySelector('.interface-sidebar-nav-link[data-tab="interface-pricing"]');
+                        if (pricingNavLink) {
+                            console.log('🖱️ Found pricing nav link in parent, clicking it');
+                            pricingNavLink.click();
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not access parent document directly:', e.message);
+                    }
+
+                    // Give the pricing module time to load, then select the specific plan
+                    setTimeout(() => {
+                        console.log(`🎯 Sending selectPlan message for: ${planType}`);
+                        window.parent.postMessage({
+                            type: 'selectPlan',
+                            planType: planType
+                        }, '*');
+                    }, 2000);
+
+                    navigationAttempted = true;
+                }
+
+                // Method 2: Try top-level window navigation
+                if (!navigationAttempted && window.top && window.top !== window) {
+                    console.log('🔄 Method 2: Navigating via top-level window');
+
+                    window.top.postMessage({
+                        type: 'loadTab',
+                        tabId: 'interface-pricing',
+                        selectedPlan: planType
+                    }, '*');
+
+                    setTimeout(() => {
+                        window.top.postMessage({
+                            type: 'selectPlan',
+                            planType: planType
+                        }, '*');
+                    }, 2000);
+
+                    navigationAttempted = true;
+                }
+
+                // Method 3: Try global function calls
+                if (!navigationAttempted) {
+                    console.log('🔄 Method 3: Trying global function calls');
+
+                    // Try to call global navigation functions
+                    try {
+                        if (typeof switchToTab === 'function') {
+                            console.log('📞 Calling global switchToTab function');
+                            switchToTab('interface-pricing');
+                            navigationAttempted = true;
+                        } else if (window.parent && typeof window.parent.switchToTab === 'function') {
+                            console.log('📞 Calling parent switchToTab function');
+                            window.parent.switchToTab('interface-pricing');
+                            navigationAttempted = true;
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Global function call failed:', e.message);
+                    }
+                }
+
+                if (navigationAttempted) {
+                    console.log('✅ Navigation attempted via parent/top interface');
+                    return;
+                }
+
+                // FALLBACK METHOD: Try direct DIY Plan Module access
+                console.log('🔄 Method 4: Fallback - Direct DIY Plan Module access');
+
+                if (window.jamDIYPlan) {
+                    console.log('✅ Found DIY Plan Module globally - trying direct access');
+
+                    // Check if the module is initialized first
+                    const diyContainer = document.getElementById('diy-plan-container');
+                    if (!diyContainer) {
+                        console.log('📦 DIY container not found, trying to initialize');
+                        // Try to initialize it in the interface
+                        if (window.jamPricingTiers && typeof window.jamPricingTiers.init === 'function') {
+                            window.jamPricingTiers.init('interface-pricing-widget');
+                        }
+                    }
+
+                    // Try to open the modal
+                    if (typeof window.jamDIYPlan.openModal === 'function') {
+                        setTimeout(() => {
+                            console.log(`🔓 Attempting to open modal for plan: ${planType}`);
+                            const success = window.jamDIYPlan.openModal(planType);
+
+                            if (success) {
+                                console.log('✅ Modal opened successfully');
+                                // Add additional message to chat about modal opening
+                                setTimeout(() => {
+                                    addBotMessage(`🎉 Great! I've opened the payment page for your ${planNames[planType]} plan. If you don't see the payment window, please check for pop-up blockers or navigate to the **Pricing Plans** tab.`);
+                                    updateMessagesDisplay(container);
+                                }, 500);
+                            } else {
+                                console.log('❌ Failed to open modal directly');
+                                showManualNavigationInstructions(planNames[planType], container);
+                            }
+                        }, 1000);
+                        return;
+                    }
+
+                    console.log('⚠️ DIY Plan Module found but no openModal method available');
+                } else {
+                    console.log('❌ DIY Plan Module not found globally');
+                }
+
+                // THIRD OPTION: Try via top-level interface navigation
+                if (window.top && window.top.jamPricingTiers) {
+                    console.log('🔄 Using top-level interface navigation');
+                    setTimeout(() => {
+                        if (typeof window.top.jamPricingTiers.selectPlan === 'function') {
+                            window.top.jamPricingTiers.selectPlan(planType);
+                        }
+                    }, 1000);
+                    return;
+                }
+
+                // FINAL FALLBACK: Show manual instructions
+                console.log('⚠️ Could not automatically navigate - showing manual instructions');
+                showManualNavigationInstructions(planNames[planType], container);
+            }
+
+            // Helper function for manual navigation instructions
+            function showManualNavigationInstructions(planName, container) {
+                setTimeout(() => {
+                    addBotMessage(`🧭 **Manual Navigation Required**\n\n` +
+                        `Please follow these steps to complete your ${planName} purchase:\n\n` +
+                        `1️⃣ Click the **"Pricing Plans"** tab in the sidebar\n` +
+                        `2️⃣ Look for the **${planName}** option\n` +
+                        `3️⃣ Click **"Get Started Now"** to begin payment\n\n` +
+                        `💡 **Tip:** I've pre-configured everything for you - just navigate to the pricing page!`);
+                    updateMessagesDisplay(container);
+                }, 1000);
             }
 
             // Subscription-related functions
