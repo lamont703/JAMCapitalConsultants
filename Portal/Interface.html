@@ -3,10 +3,233 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Interface - JAM Credit Solutions</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- JAM Capital Auth Manager - Embedded Global Module -->
+    <script>
+        /**
+         * JAM Capital Consultants - Authentication Utility
+         * Embedded as global module to ensure availability
+         */
+        class AuthManager {
+            constructor() {
+                this.API_BASE_URL = 'https://jam-capital-backend.azurewebsites.net';
+                this.TOKEN_KEY = 'authToken';
+                this.USER_DATA_KEY = 'userData';
+                this.listeners = [];
+                this._initialized = false;
+            }
+
+            getAuthToken() {
+                const token = localStorage.getItem(this.TOKEN_KEY) ||
+                    sessionStorage.getItem(this.TOKEN_KEY) ||
+                    localStorage.getItem('userToken') ||
+                    sessionStorage.getItem('userToken');
+
+                if (!token) {
+                    console.warn('⚠️ No authentication token found');
+                    return null;
+                }
+
+                if (!token.includes('.')) {
+                    console.warn('⚠️ Invalid token format found');
+                    this.clearAuth();
+                    return null;
+                }
+
+                return token;
+            }
+
+            setAuthToken(token) {
+                if (!token) {
+                    console.error('❌ Cannot store empty token');
+                    return;
+                }
+                localStorage.setItem(this.TOKEN_KEY, token);
+                console.log('✅ Auth token stored successfully');
+                this.notifyListeners('tokenUpdated', token);
+            }
+
+            getUserData() {
+                try {
+                    const userData = localStorage.getItem(this.USER_DATA_KEY) ||
+                        sessionStorage.getItem(this.USER_DATA_KEY);
+
+                    if (!userData) {
+                        console.warn('⚠️ No user data found');
+                        return null;
+                    }
+                    return JSON.parse(userData);
+                } catch (error) {
+                    console.error('❌ Error parsing user data:', error);
+                    this.clearAuth();
+                    return null;
+                }
+            }
+
+            setUserData(userData) {
+                if (!userData) {
+                    console.error('❌ Cannot store empty user data');
+                    return;
+                }
+                localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userData));
+                console.log('✅ User data stored successfully');
+                this.notifyListeners('userDataUpdated', userData);
+            }
+
+            getUserId() {
+                const userData = this.getUserData();
+                return userData?.id || null;
+            }
+
+            isAuthenticated() {
+                const token = this.getAuthToken();
+                const userData = this.getUserData();
+
+                const isAuth = !!(token && userData?.id);
+                console.log('🔍 Authentication check:', isAuth ? 'AUTHENTICATED' : 'NOT AUTHENTICATED');
+
+                return isAuth;
+            }
+
+            isAdmin() {
+                const userData = this.getUserData();
+                const role = userData?.role || userData?.userRole || userData?.type;
+                return role === 'admin' || role === 'administrator' || role === 'super_admin';
+            }
+
+            clearAuth() {
+                localStorage.removeItem(this.TOKEN_KEY);
+                localStorage.removeItem(this.USER_DATA_KEY);
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem(this.TOKEN_KEY);
+                sessionStorage.removeItem(this.USER_DATA_KEY);
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('user');
+
+                console.log('🧹 Authentication data cleared');
+                this.notifyListeners('authCleared');
+            }
+
+            async authenticatedFetch(endpoint, options = {}) {
+                const token = this.getAuthToken();
+
+                if (!token) {
+                    throw new Error('No authentication token available');
+                }
+
+                const url = endpoint.startsWith('http') ? endpoint : `${this.API_BASE_URL}${endpoint}`;
+
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`
+                };
+
+                console.log('🌐 Making authenticated request to:', endpoint);
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    console.error('❌ Authentication failed - clearing auth data');
+                    this.clearAuth();
+                    window.location.href = '/login';
+                    throw new Error('Authentication failed');
+                }
+
+                return response;
+            }
+
+            handleLoginSuccess(data) {
+                if (data.token && data.user) {
+                    this.setAuthToken(data.token);
+                    this.setUserData(data.user);
+                    console.log('✅ Login success handled');
+                    this.notifyListeners('loginSuccess', data);
+                } else {
+                    console.error('❌ Invalid login response data');
+                    throw new Error('Invalid login response');
+                }
+            }
+
+            handleLogout() {
+                this.clearAuth();
+                console.log('👋 User logged out');
+                this.notifyListeners('logout');
+                window.location.href = '/';
+            }
+
+            addListener(callback) {
+                this.listeners.push(callback);
+            }
+
+            removeListener(callback) {
+                const index = this.listeners.indexOf(callback);
+                if (index > -1) {
+                    this.listeners.splice(index, 1);
+                }
+            }
+
+            notifyListeners(event, data) {
+                this.listeners.forEach(callback => {
+                    try {
+                        callback(event, data);
+                    } catch (error) {
+                        console.error('❌ Error in auth listener:', error);
+                    }
+                });
+            }
+
+            init() {
+                console.log('🚀 AuthManager initialized');
+
+                if (this.isAuthenticated()) {
+                    console.log('✅ User is authenticated');
+                } else {
+                    console.log('ℹ️ User is not authenticated');
+                }
+
+                this._initialized = true;
+            }
+        }
+
+        // Create global instance immediately 
+        window.authManager = new AuthManager();
+
+        // Legacy function support for backwards compatibility
+        window.getAuthToken = () => window.authManager.getAuthToken();
+        window.getUserId = () => window.authManager.getUserId();
+        window.getUserData = () => window.authManager.getUserData();
+        window.isAuthenticated = () => window.authManager.isAuthenticated();
+
+        // Initialize immediately
+        window.authManager.init();
+
+        // Add listener to update header when auth state changes
+        window.authManager.addListener(function (event, data) {
+            console.log('🔄 AuthManager event received:', event, data);
+
+            if (event === 'userDataUpdated' || event === 'loginSuccess') {
+                // Delay to ensure header is loaded
+                setTimeout(() => {
+                    if (window.jamDashboardHeader && typeof window.jamDashboardHeader.updateUserData === 'function') {
+                        console.log('🔄 Updating header with new user data from AuthManager');
+                        window.jamDashboardHeader.updateUserData(data);
+                        window.jamDashboardHeader.updateAdminAccess();
+                    }
+                }, 500);
+            }
+        });
+
+        console.log('🔧 JAM Capital Auth Manager embedded and globally available');
+    </script>
     <style>
         :root {
             --primary: #008080;
@@ -41,6 +264,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            position: relative;
         }
 
         /* Header placeholder - will be replaced with dashboardHeader.html */
@@ -205,51 +429,1027 @@
             font-size: 1.25rem;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .mobile-menu-toggle i {
+            font-size: 18px;
+        }
+
+        /* Enhanced Mobile Sidebar */
+        .interface-sidebar {
+            width: 250px;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            height: calc(100vh - 70px);
+            position: sticky;
+            top: 70px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Header Actions in Sidebar */
+        .mobile-header-actions {
+            display: none;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
+        }
+
+        .mobile-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 600;
+            border: 2px solid var(--primary);
+        }
+
+        .mobile-user-details h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+        }
+
+        .mobile-user-details p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .mobile-quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-quick-action {
+            flex: 1;
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .mobile-quick-action:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .mobile-quick-action i {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .mobile-notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Enhanced Mobile Styles */
+        @media (max-width: 575.98px) {
+            body {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1001;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 12px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                transition: all 0.2s ease;
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation;
+            }
+
+            .mobile-menu-toggle:active {
+                transform: scale(0.95);
+                background: var(--primary-dark);
+            }
+
+            .interface-header-placeholder {
+                position: sticky;
+                top: 0;
+                z-index: 900;
+                height: 60px;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .interface-container {
+                padding-top: 0;
+            }
+
             .interface-content {
                 flex-direction: column;
+                padding: 0;
             }
 
             .interface-sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
+                width: 85vw;
+                max-width: 320px;
+                position: fixed;
                 top: 0;
-                padding: 0.5rem 0;
+                left: -85vw;
+                height: 100vh;
+                z-index: 1000;
+                background: white;
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 80px 0 20px 0;
             }
 
-            .interface-sidebar-nav {
-                display: flex;
-                overflow-x: auto;
-                padding: 0.5rem;
+            .interface-sidebar.mobile-open {
+                left: 0;
             }
 
-            .interface-sidebar-nav-item {
-                margin-bottom: 0;
-                margin-right: 0.5rem;
+            /* Show mobile header actions in sidebar */
+            .mobile-header-actions {
+                display: block;
             }
 
             .interface-sidebar-nav-link {
-                padding: 0.5rem 1rem;
-                border-left: none;
-                border-bottom: 3px solid transparent;
+                padding: 1rem 1.5rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                touch-action: manipulation;
+                border-left: 4px solid transparent;
+                transition: all 0.2s ease;
             }
 
-            .interface-sidebar-nav-link:hover,
+            .interface-sidebar-nav-link:active {
+                background-color: var(--primary-light);
+                transform: scale(0.98);
+            }
+
             .interface-sidebar-nav-link.active {
-                border-left-color: transparent;
-                border-bottom-color: var(--primary);
+                background-color: var(--primary-light);
+                border-left-color: var(--primary);
+                color: var(--primary-dark);
+                font-weight: 600;
+            }
+
+            .interface-sidebar-nav-icon {
+                margin-right: 1rem;
+                font-size: 18px;
+                width: 24px;
+                text-align: center;
+                color: var(--primary);
             }
 
             .interface-main {
-                padding: 1rem;
+                padding: 0.5rem;
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            /* Close button for mobile sidebar */
+            .interface-sidebar::before {
+                content: '×';
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 24px;
+                color: var(--gray-600);
+                cursor: pointer;
+                z-index: 1001;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: var(--gray-100);
+                transition: all 0.2s ease;
+            }
+
+            .interface-sidebar::before:hover {
+                background: var(--gray-200);
+                color: var(--gray-800);
+            }
+        }
+
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .mobile-menu-toggle {
+                display: block;
+                top: 18px;
+                left: 18px;
+            }
+
+            .interface-sidebar {
+                width: 320px;
+                max-width: 320px;
+                left: -320px;
+            }
+
+            .interface-sidebar.mobile-open {
+                left: 0;
+            }
+
+            .interface-main {
+                padding: 0.75rem;
+            }
+
+            .interface-widget {
+                margin-bottom: 1.25rem;
+            }
+
+            .interface-widget-header {
+                padding: 1.25rem;
+            }
+
+            .interface-widget-body {
+                padding: 1.25rem;
+            }
+
+            .interface-widget-footer {
+                padding: 1.25rem;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+
+            .interface-content {
+                flex-direction: row;
+            }
+
+            .interface-sidebar {
+                position: sticky;
+                top: 70px;
+                width: 220px;
+                height: calc(100vh - 70px);
+                left: 0;
+                padding: 1.5rem 0;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+                transition: none;
+            }
+
+            .interface-main {
+                flex: 1;
+                padding: 1.5rem;
+            }
+
+            .interface-widget {
+                margin-bottom: 1.5rem;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+
+            .interface-sidebar {
+                width: 250px;
+                position: sticky;
+                top: 70px;
+                height: calc(100vh - 70px);
+            }
+
+            .interface-main {
+                flex: 1;
+                padding: 2rem;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        /* Extra Large Devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .interface-main {
+                padding: 2.5rem;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        /* Landscape Orientation Adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .interface-sidebar {
+                width: 70vw;
+                max-width: 280px;
+                left: -70vw;
+            }
+
+            .interface-main {
+                padding: 0.25rem 0.5rem;
+                padding-bottom: 70px;
+                /* Smaller bottom padding for landscape */
+            }
+
+            /* Compress widgets more in landscape */
+            .interface-widget {
+                margin-bottom: 0.5rem;
+            }
+
+            .interface-widget-header {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .interface-widget-body {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .interface-widget-footer {
+                padding: 0.5rem 0.75rem;
+            }
+
+            /* Make better use of horizontal space */
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            /* Adjust bottom nav for landscape */
+            .bottom-nav-items {
+                padding: 0.25rem 0;
+            }
+
+            .bottom-nav-item {
+                padding: 0.25rem;
+                font-size: 0.65rem;
+            }
+
+            .bottom-nav-item i {
+                font-size: 1.1rem;
+                margin-bottom: 0.125rem;
+            }
+
+            .interface-widget {
+                margin-bottom: 0.75rem;
+            }
+
+            .interface-widget-header {
+                padding: 0.75rem;
+            }
+
+            .interface-widget-body {
+                padding: 0.75rem;
+            }
+
+            .interface-widget-footer {
+                padding: 0.75rem;
+            }
+
+            .interface-widget-title {
+                font-size: 0.95rem;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .interface-sidebar-nav-link:hover {
+                background-color: transparent;
+            }
+
+            .interface-sidebar-nav-link:active {
+                background-color: var(--primary-light);
+            }
+
+            .mobile-menu-toggle:hover {
+                background: var(--primary);
+                transform: none;
+            }
+
+            .interface-widget {
+                transition: none;
+            }
+
+            /* Prevent text selection on interactive elements */
+            .interface-sidebar-nav-link,
+            .mobile-menu-toggle,
+            button {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            /* Enhanced tap highlight */
+            .interface-sidebar-nav-link,
+            button,
+            .btn {
+                -webkit-tap-highlight-color: rgba(0, 128, 128, 0.2);
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .interface-widget {
+                will-change: transform;
+            }
+
+            .interface-sidebar {
+                will-change: transform;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .interface-main {
+                min-height: -webkit-fill-available;
+            }
+
+            .interface-sidebar {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Safe area adjustments for iPhone X+ */
+            .mobile-menu-toggle {
+                top: max(15px, env(safe-area-inset-top));
+                left: max(15px, env(safe-area-inset-left));
+            }
+
+            .interface-sidebar {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .interface-sidebar {
+                transition: none;
+            }
+
+            .mobile-overlay {
+                transition: none;
+            }
+
+            .interface-sidebar-nav-link,
+            .mobile-menu-toggle {
+                transition: none;
+            }
+
+            .interface-sidebar-nav-link:active,
+            .mobile-menu-toggle:active {
+                transform: none;
+            }
+
+            .interface-loading-spinner {
+                animation: none;
+                border: 3px solid var(--gray-300);
+                border-top: 3px solid var(--primary);
+            }
+        }
+
+        /* Dark Mode Support 
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gray-100: #2d2d2d;
+                --gray-200: #3a3a3a;
+                --gray-300: #4a4a4a;
+                --gray-600: #cccccc;
+                --gray-800: #ffffff;
+                --primary-light: rgba(0, 128, 128, 0.2);
+            }
+
+            body {
+                background: #1a1a1a;
+                color: #ffffff;
+            }
+
+            .interface-sidebar {
+                background: #2d2d2d;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            }
+
+            .interface-widget {
+                background: #2d2d2d;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            .interface-widget-header {
+                background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
+                border-color: #4a4a4a;
+            }
+
+            .interface-widget-footer {
+                background: #3a3a3a;
+                border-color: #4a4a4a;
+            }
+
+            .interface-error-message {
+                background-color: rgba(220, 53, 69, 0.2);
+                color: #ff6b6b;
+            }
+
+            input,
+            select,
+            textarea {
+                background: #3a3a3a;
+                border-color: #4a4a4a;
+                color: #ffffff;
+            }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.2);
+            }
+        }*/
+
+        /* Bottom Navigation Bar for Mobile */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--gray-300);
+            display: none;
+            z-index: 999;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.5rem 0;
+            max-width: 100%;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 0.7rem;
+            min-width: 0;
+            flex: 1;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-nav-item:active {
+            transform: scale(0.95);
+            color: var(--primary);
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .bottom-nav-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.5rem;
+            background: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Show bottom nav on small screens */
+        @media (max-width: 575.98px) {
+            .bottom-nav {
+                display: block;
+            }
+
+            .interface-main {
+                padding-bottom: 80px;
+                /* Account for bottom nav height */
+            }
+
+            /* Mobile Widget Optimizations */
+            .interface-widget {
+                margin-bottom: 0.75rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                overflow: hidden;
+                background: white;
+            }
+
+            .interface-widget-header {
+                padding: 0.75rem;
+                border-bottom: 1px solid var(--gray-200);
+                background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            }
+
+            .interface-widget-title {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--gray-800);
+                margin: 0;
+                line-height: 1.3;
+            }
+
+            .interface-widget-actions {
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .interface-widget-actions button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                border-radius: 6px;
+                min-height: 36px;
+                touch-action: manipulation;
+            }
+
+            .interface-widget-body {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            .interface-widget-footer {
+                padding: 0.75rem;
+                border-top: 1px solid var(--gray-200);
+                background: var(--gray-50);
+                font-size: 0.85rem;
+            }
+
+            .interface-widget-loading {
+                padding: 1.5rem 0.75rem;
+                text-align: center;
+            }
+
+            .interface-loading-spinner {
+                width: 24px;
+                height: 24px;
+                margin-bottom: 0.75rem;
+            }
+
+            .interface-error-message {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                border-radius: 8px;
+                margin: 0.75rem 0;
+            }
+
+            /* Enhanced touch targets */
+            button,
+            .btn,
+            .interface-sidebar-nav-link,
+            input,
+            select,
+            textarea {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            /* Improved form elements */
+            input,
+            select,
+            textarea {
+                padding: 12px;
+                border-radius: 8px;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                border: 2px solid var(--gray-300);
+                transition: border-color 0.2s ease;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                border-color: var(--primary);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+            }
+
+            /* Responsive tables */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -0.5rem;
+                padding: 0 0.5rem;
+            }
+
+            table {
+                min-width: 600px;
+                font-size: 0.85rem;
+            }
+
+            th,
+            td {
+                padding: 8px 12px;
+                white-space: nowrap;
+            }
+
+            /* Card grids - Full width on mobile */
+            .card-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                margin: 0;
+            }
+
+            /* Status indicators */
+            .status-indicator {
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Full-width buttons on mobile */
+            .btn-primary,
+            .btn-secondary,
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+
+            /* Optimize content spacing */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                margin-top: 0;
+                margin-bottom: 0.75rem;
+                line-height: 1.3;
+            }
+
+            p {
+                margin-bottom: 0.75rem;
+                line-height: 1.5;
+            }
+
+            /* Lists optimization */
+            ul,
+            ol {
+                margin-bottom: 0.75rem;
+                padding-left: 1.25rem;
+            }
+
+            li {
+                margin-bottom: 0.25rem;
+            }
+
+            /* Make iframes and embedded content responsive */
+            iframe {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            /* Responsive images */
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+
+            /* Tab-specific optimizations */
+            .interface-tab {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* Dashboard tab optimizations */
+            #interface-dashboard .interface-widget {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Credit report tab optimizations */
+            #interface-credit-report .interface-widget,
+            #interface-credit-report-full-widget {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Documents tab optimizations */
+            #interface-documents .interface-widget,
+            #interface-documents-document-upload-widget {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Messages tab optimizations */
+            #interface-messages .interface-widget,
+            #interface-messages-content {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Remove any potential horizontal margins on containers */
+            .interface-widget-container {
+                margin-left: 0;
+                margin-right: 0;
+                width: 100%;
+            }
+
+            /* Ensure full-width usage for specific content types */
+            .content-grid,
+            .dashboard-grid,
+            .report-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                margin: 0;
+                width: 100%;
+            }
+
+            /* Optimize progress bars and charts for mobile */
+            .progress-bar,
+            .chart-container,
+            .graph-container {
+                width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Forms optimization */
+            .form-group {
+                margin-bottom: 1rem;
+                width: 100%;
+            }
+
+            .form-row {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .form-row .form-group {
+                flex: 1;
+                margin-bottom: 0;
+            }
+
+            /* Modal and popup optimizations */
+            .modal-content,
+            .popup-content {
+                margin: 0.5rem;
+                max-width: calc(100vw - 1rem);
+                width: calc(100vw - 1rem);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+
+            .mobile-menu-toggle,
+            .mobile-overlay,
+            .interface-sidebar,
+            .bottom-nav {
+                display: none;
+            }
+
+            .interface-main {
+                width: 100%;
+                padding: 0;
+            }
+
+            .interface-widget {
+                box-shadow: none;
+                border: 1px solid #000;
+                margin-bottom: 1rem;
+                page-break-inside: avoid;
+            }
+
+            .interface-widget-header {
+                background: white;
+                border-bottom: 1px solid #000;
+            }
+
+            .interface-widget-footer {
+                background: white;
+                border-top: 1px solid #000;
+            }
+
+            .interface-content {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
     <div class="interface-container">
         <!-- Header will be loaded dynamically -->
         <div id="dashboardHeader"></div>
@@ -258,6 +1458,38 @@
         <div class="interface-content">
             <!-- Sidebar navigation -->
             <div class="interface-sidebar">
+                <!-- Mobile Header Actions (visible only on mobile) -->
+                <div class="mobile-header-actions">
+                    <div class="mobile-user-info">
+                        <div class="mobile-user-avatar" id="mobile-user-avatar">U</div>
+                        <div class="mobile-user-details">
+                            <h4 id="mobile-user-name">Loading...</h4>
+                            <p id="mobile-user-status">Active Client</p>
+                        </div>
+                    </div>
+
+                    <div class="mobile-quick-actions">
+                        <a href="#" class="mobile-quick-action" id="mobile-messages-action">
+                            <i class="fas fa-envelope"></i>
+                            <span>Messages</span>
+                            <div class="mobile-notification-badge" id="mobile-notification-badge"
+                                style="display: none;">3</div>
+                        </a>
+                        <a href="#" class="mobile-quick-action" id="mobile-settings-action">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="mobile-quick-action" id="mobile-help-action">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help</span>
+                        </a>
+                        <a href="#" class="mobile-quick-action" id="mobile-logout-action">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+
                 <ul class="interface-sidebar-nav">
                     <li class="interface-sidebar-nav-item">
                         <a href="#interface-dashboard" class="interface-sidebar-nav-link active"
@@ -434,16 +1666,89 @@
                 </div>
             </div>
         </div>
+
+        <!-- Bottom Navigation for Mobile -->
+        <div class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="#" class="bottom-nav-item" data-tab="interface-dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-tab="interface-credit-report">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Credit</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-tab="interface-disputes">
+                    <i class="fas fa-tasks"></i>
+                    <span>Disputes</span>
+                </a>
+                <a href="#" class="bottom-nav-item" data-tab="interface-messages">
+                    <i class="fas fa-envelope"></i>
+                    <span>Messages</span>
+                    <div class="bottom-nav-badge" id="bottom-nav-messages-badge" style="display: none;">3</div>
+                </a>
+                <a href="#" class="bottom-nav-item" id="bottom-nav-menu">
+                    <i class="fas fa-bars"></i>
+                    <span>Menu</span>
+                </a>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Authentication check - redirect to login if not authenticated
+        function checkAuthentication() {
+            console.log('🔍 Checking authentication status...');
+
+            // Auth manager should be available now (with fallback)
+            if (typeof window.authManager === 'undefined') {
+                console.error('❌ Auth manager completely unavailable - this should not happen');
+                alert('Authentication system failed to load. Please refresh the page.');
+                return false;
+            }
+
+            const isAuth = window.authManager.isAuthenticated();
+
+            if (!isAuth) {
+                console.log('❌ User not authenticated, redirecting to login');
+                alert('Please log in to access the dashboard');
+                window.location.href = '/login';
+                return false;
+            }
+
+            console.log('✅ User authenticated, proceeding with dashboard initialization');
+
+            // Schedule a header update after components are loaded
+            setTimeout(() => {
+                if (window.jamDashboardHeader && window.authManager) {
+                    console.log('🔄 Final sync of header with AuthManager after initialization');
+                    const userData = window.authManager.getUserData();
+                    if (userData && window.jamDashboardHeader.updateUserData) {
+                        window.jamDashboardHeader.updateUserData(userData);
+                        window.jamDashboardHeader.updateAdminAccess();
+                    }
+                }
+            }, 2000);
+
+            return true;
+        }
+
         // Handle "View All" links. This is our MAIN INTERFACE INITIALIZATION.
         document.addEventListener('DOMContentLoaded', function () {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return; // Stop execution if not authenticated
+            }
+
             // Initialize components
             setupTabNavigation();
             console.log('🔧 Setup Tab Navigation Fired!');
             loadHeaderComponent();
             console.log('🔧 Load Header Component Fired!');
+            setupMobileActions();
+            console.log('🔧 Setup Mobile Actions Fired!');
+            setupBottomNavigation();
+            console.log('🔧 Setup Bottom Navigation Fired!');
 
             //initializeSidebar();
             //loadWidgetsForActiveTab();
@@ -507,7 +1812,10 @@
             if (window.jamDashboardHeader) {
                 // Initialize the header directly
                 const success = window.jamDashboardHeader.init('dashboardHeader');
-                if (!success) {
+                if (success) {
+                    // After successful initialization, sync with AuthManager
+                    syncHeaderWithAuthManager();
+                } else {
                     headerContainer.innerHTML = `
                         <div class="interface-error-message">
                             <i class="fas fa-exclamation-triangle"></i>
@@ -519,7 +1827,10 @@
                 // If not available, wait for it to load
                 window.addEventListener('dashboardHeaderLoaded', function () {
                     const success = window.jamDashboardHeader.init('dashboardHeader');
-                    if (!success) {
+                    if (success) {
+                        // After successful initialization, sync with AuthManager
+                        syncHeaderWithAuthManager();
+                    } else {
                         headerContainer.innerHTML = `
                             <div class="interface-error-message">
                                 <i class="fas fa-exclamation-triangle"></i>
@@ -540,6 +1851,35 @@
                         `;
                     }
                 }, 5000);
+            }
+        }
+
+        // Function to sync header with AuthManager user data
+        function syncHeaderWithAuthManager() {
+            console.log('🔄 Syncing header with AuthManager...');
+
+            try {
+                if (window.authManager && window.jamDashboardHeader) {
+                    const userData = window.authManager.getUserData();
+
+                    if (userData) {
+                        console.log('✅ Found user data from AuthManager:', userData);
+
+                        // Update header with user data and admin access
+                        window.jamDashboardHeader.updateUserData(userData);
+
+                        // Explicitly update admin access
+                        window.jamDashboardHeader.updateAdminAccess();
+
+                        console.log('✅ Header synced with AuthManager successfully');
+                    } else {
+                        console.log('⚠️ No user data found in AuthManager');
+                    }
+                } else {
+                    console.log('⚠️ AuthManager or DashboardHeader not available for sync');
+                }
+            } catch (error) {
+                console.error('❌ Error syncing header with AuthManager:', error);
             }
         }
 
@@ -1258,6 +2598,11 @@
 
                 // Load widgets for the tab
                 loadWidgetsForTab(tabId);
+
+                // Emit tab change event for bottom nav
+                window.dispatchEvent(new CustomEvent('tabChanged', {
+                    detail: { tabId: tabId }
+                }));
             }
         }
 
@@ -1750,6 +3095,253 @@
             }
         });
 
+        // Function to setup mobile actions in sidebar
+        function setupMobileActions() {
+            console.log('📱 Setting up mobile actions...');
+
+            // Update mobile user info when user data changes
+            updateMobileUserInfo();
+
+            // Messages action
+            const mobileMessagesAction = document.getElementById('mobile-messages-action');
+            if (mobileMessagesAction) {
+                mobileMessagesAction.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('📱 Mobile Messages clicked');
+
+                    // Activate messages tab
+                    const messagesNavLink = document.querySelector('.interface-sidebar-nav-link[data-tab="interface-messages"]');
+                    if (messagesNavLink) {
+                        messagesNavLink.click();
+                    }
+
+                    // Close mobile menu
+                    closeMobileMenu();
+                });
+            }
+
+            // Settings action
+            const mobileSettingsAction = document.getElementById('mobile-settings-action');
+            if (mobileSettingsAction) {
+                mobileSettingsAction.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('📱 Mobile Settings clicked');
+
+                    // Activate settings tab
+                    const settingsNavLink = document.querySelector('.interface-sidebar-nav-link[data-tab="interface-settings"]');
+                    if (settingsNavLink) {
+                        settingsNavLink.click();
+                    }
+
+                    // Close mobile menu
+                    closeMobileMenu();
+                });
+            }
+
+            // Help action
+            const mobileHelpAction = document.getElementById('mobile-help-action');
+            if (mobileHelpAction) {
+                mobileHelpAction.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('📱 Mobile Help clicked');
+
+                    // Activate help center tab
+                    const helpNavLink = document.querySelector('.interface-sidebar-nav-link[data-tab="interface-help-center"]');
+                    if (helpNavLink) {
+                        helpNavLink.click();
+                    }
+
+                    // Close mobile menu
+                    closeMobileMenu();
+                });
+            }
+
+            // Logout action
+            const mobileLogoutAction = document.getElementById('mobile-logout-action');
+            if (mobileLogoutAction) {
+                mobileLogoutAction.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('📱 Mobile Logout clicked');
+
+                    if (confirm('Are you sure you want to logout?')) {
+                        // Clear auth data
+                        if (window.authManager) {
+                            window.authManager.handleLogout();
+                        } else {
+                            // Fallback
+                            localStorage.clear();
+                            window.location.href = '/';
+                        }
+                    }
+                });
+            }
+
+            // Listen for user data updates
+            window.addEventListener('userDataUpdated', function (e) {
+                updateMobileUserInfo(e.detail);
+            });
+
+            console.log('✅ Mobile actions setup complete');
+        }
+
+        // Function to update mobile user info
+        function updateMobileUserInfo(userData = null) {
+            console.log('📱 Updating mobile user info...');
+
+            if (!userData) {
+                // Get user data from localStorage with error handling
+                try {
+                    const storedData = localStorage.getItem('userData');
+                    if (storedData) {
+                        userData = JSON.parse(storedData);
+                    }
+                } catch (error) {
+                    console.error('❌ Error parsing userData for mobile:', error);
+                    return;
+                }
+            }
+
+            if (!userData || !userData.email) {
+                console.log('❌ No valid user data for mobile display');
+                return;
+            }
+
+            // Update mobile user name
+            const mobileUserName = document.getElementById('mobile-user-name');
+            if (mobileUserName) {
+                const displayName = userData.firstName && userData.lastName
+                    ? `${userData.firstName} ${userData.lastName}`
+                    : userData.name || userData.firstName || userData.lastName || userData.email.split('@')[0] || 'User';
+                mobileUserName.textContent = displayName;
+            }
+
+            // Update mobile user status
+            const mobileUserStatus = document.getElementById('mobile-user-status');
+            if (mobileUserStatus) {
+                const status = userData.status || userData.accountStatus || 'Active Client';
+                mobileUserStatus.textContent = status;
+            }
+
+            // Update mobile user avatar
+            const mobileUserAvatar = document.getElementById('mobile-user-avatar');
+            if (mobileUserAvatar) {
+                if (userData.profilePicture) {
+                    mobileUserAvatar.innerHTML = `<img src="${userData.profilePicture}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    const firstName = userData.firstName || userData.name?.split(' ')[0] || userData.email.split('@')[0];
+                    const lastName = userData.lastName || userData.name?.split(' ')[1] || '';
+                    const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
+                    mobileUserAvatar.textContent = initials;
+                }
+            }
+
+            // Update notification badge
+            const mobileNotificationBadge = document.getElementById('mobile-notification-badge');
+            if (mobileNotificationBadge && userData.notifications !== undefined) {
+                if (userData.notifications > 0) {
+                    mobileNotificationBadge.textContent = userData.notifications > 99 ? '99+' : userData.notifications;
+                    mobileNotificationBadge.style.display = 'flex';
+                } else {
+                    mobileNotificationBadge.style.display = 'none';
+                }
+            }
+
+            console.log('✅ Mobile user info updated');
+        }
+
+        // Function to close mobile menu
+        function closeMobileMenu() {
+            const sidebar = document.querySelector('.interface-sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+
+            if (sidebar) sidebar.classList.remove('mobile-open');
+            if (overlay) overlay.classList.remove('active');
+            if (mobileMenuToggle) {
+                const icon = mobileMenuToggle.querySelector('i');
+                if (icon) icon.className = 'fas fa-bars';
+            }
+        }
+
+        // Function to setup bottom navigation
+        function setupBottomNavigation() {
+            console.log('📱 Setting up bottom navigation...');
+
+            // Handle bottom nav item clicks
+            const bottomNavItems = document.querySelectorAll('.bottom-nav-item[data-tab]');
+            bottomNavItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+                    console.log('📱 Bottom nav clicked:', tabId);
+
+                    // Find corresponding sidebar nav link and click it
+                    const sidebarNavLink = document.querySelector(`.interface-sidebar-nav-link[data-tab="${tabId}"]`);
+                    if (sidebarNavLink) {
+                        sidebarNavLink.click();
+                    }
+
+                    // Update bottom nav active state
+                    updateBottomNavActiveState(tabId);
+                });
+            });
+
+            // Handle bottom nav menu button (opens sidebar)
+            const bottomNavMenu = document.getElementById('bottom-nav-menu');
+            if (bottomNavMenu) {
+                bottomNavMenu.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('📱 Bottom nav menu clicked');
+
+                    // Toggle mobile sidebar
+                    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                    if (mobileMenuToggle) {
+                        mobileMenuToggle.click();
+                    }
+                });
+            }
+
+            // Listen for tab changes to update bottom nav
+            window.addEventListener('tabChanged', function (e) {
+                if (e.detail && e.detail.tabId) {
+                    updateBottomNavActiveState(e.detail.tabId);
+                }
+            });
+
+            // Listen for notification updates
+            window.addEventListener('notificationCountChanged', function (e) {
+                updateBottomNavNotifications(e.detail.count);
+            });
+
+            console.log('✅ Bottom navigation setup complete');
+        }
+
+        // Function to update bottom nav active state
+        function updateBottomNavActiveState(activeTabId) {
+            const bottomNavItems = document.querySelectorAll('.bottom-nav-item[data-tab]');
+            bottomNavItems.forEach(item => {
+                const tabId = item.getAttribute('data-tab');
+                if (tabId === activeTabId) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Function to update bottom nav notifications
+        function updateBottomNavNotifications(count) {
+            const bottomNavBadge = document.getElementById('bottom-nav-messages-badge');
+            if (bottomNavBadge) {
+                if (count > 0) {
+                    bottomNavBadge.textContent = count > 99 ? '99+' : count;
+                    bottomNavBadge.style.display = 'flex';
+                } else {
+                    bottomNavBadge.style.display = 'none';
+                }
+            }
+        }
+
         // Enhanced message event listener with detailed debugging
         window.addEventListener('message', function (e) {
             console.log('📨 Message received in dashboardInterface:', e.data);
@@ -1856,6 +3448,66 @@
             }
         });
     </script>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const sidebar = document.querySelector('.interface-sidebar');
+
+            function toggleMobileMenu() {
+                sidebar.classList.toggle('mobile-open');
+                mobileOverlay.classList.toggle('active');
+
+                // Update button icon
+                const icon = mobileMenuToggle.querySelector('i');
+                if (sidebar.classList.contains('mobile-open')) {
+                    icon.className = 'fas fa-times';
+                } else {
+                    icon.className = 'fas fa-bars';
+                }
+            }
+
+            function closeMobileMenu() {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                mobileMenuToggle.querySelector('i').className = 'fas fa-bars';
+            }
+
+            // Toggle menu on button click
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+
+            // Close menu on overlay click
+            mobileOverlay.addEventListener('click', closeMobileMenu);
+
+            // Close menu when clicking sidebar links on mobile
+            const sidebarLinks = document.querySelectorAll('.interface-sidebar-nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 991.98) {
+                        closeMobileMenu();
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 991.98) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Handle escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('mobile-open')) {
+                    closeMobileMenu();
+                }
+            });
+        });
+    </script>
 </body>
+
+</html>
 
 </html>

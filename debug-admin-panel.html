@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+
+        .debug-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .debug-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .debug-section h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .status-good {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .debug-data {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .test-button:hover {
+            background: #0056b3;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .warning {
+            color: #ffc107;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="debug-container">
+        <h1>🔧 Admin Panel Debug Tool</h1>
+        <p>This tool will help diagnose why the Admin Panel tab isn't showing for admin users.</p>
+
+        <div id="debug-results">
+            <div class="debug-section">
+                <h3>🔄 Running Diagnostics...</h3>
+                <p>Please wait while we check your setup...</p>
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <h3>🛠️ Manual Tests</h3>
+            <button class="test-button" onclick="testUserRole()">Test Current User Role</button>
+            <button class="test-button" onclick="testSetAdminRole()">Set Admin Role (Test)</button>
+            <button class="test-button" onclick="testUpdateHeader()">Force Header Update</button>
+            <button class="test-button" onclick="refreshDiagnostics()">Refresh Diagnostics</button>
+        </div>
+    </div>
+
+    <script>
+        function runDiagnostics() {
+            const results = document.getElementById('debug-results');
+            let html = '';
+
+            // Check 1: LocalStorage userData
+            html += checkUserData();
+
+            // Check 2: AuthManager availability
+            html += checkAuthManager();
+
+            // Check 3: Header module availability
+            html += checkHeaderModule();
+
+            // Check 4: Admin panel button in DOM
+            html += checkAdminPanelButton();
+
+            // Check 5: CSS visibility rules
+            html += checkCSSRules();
+
+            results.innerHTML = html;
+        }
+
+        function checkUserData() {
+            try {
+                const userData = localStorage.getItem('userData');
+                if (!userData) {
+                    return createSection('User Data Check', 'error', 'No userData found in localStorage', 'Make sure you are logged in');
+                }
+
+                const parsed = JSON.parse(userData);
+                const role = parsed.role || parsed.userRole || 'not specified';
+                const isAdmin = role === 'admin' || role === 'administrator' || role === 'super_admin';
+
+                const status = isAdmin ? 'good' : 'warning';
+                const message = isAdmin ?
+                    `✅ User has admin role: ${role}` :
+                    `⚠️ User does not have admin role: ${role}`;
+
+                return createSection('User Data Check', status, message, JSON.stringify(parsed, null, 2));
+            } catch (error) {
+                return createSection('User Data Check', 'error', `Error parsing userData: ${error.message}`, '');
+            }
+        }
+
+        function checkAuthManager() {
+            if (typeof window.authManager === 'undefined') {
+                return createSection('AuthManager Check', 'error', 'AuthManager not found', 'Make sure you are on a page with the AuthManager loaded');
+            }
+
+            try {
+                const userData = window.authManager.getUserData();
+                const isAuth = window.authManager.isAuthenticated();
+                const isAdmin = window.authManager.isAdmin ? window.authManager.isAdmin() : 'Method not available';
+
+                const status = isAuth ? 'good' : 'error';
+                const message = `AuthManager Status: ${isAuth ? 'Authenticated' : 'Not Authenticated'}`;
+                const details = `
+Authenticated: ${isAuth}
+Is Admin: ${isAdmin}
+User Data: ${JSON.stringify(userData, null, 2)}`;
+
+                return createSection('AuthManager Check', status, message, details);
+            } catch (error) {
+                return createSection('AuthManager Check', 'error', `AuthManager error: ${error.message}`, '');
+            }
+        }
+
+        function checkHeaderModule() {
+            if (typeof window.jamDashboardHeader === 'undefined') {
+                return createSection('Header Module Check', 'error', 'jamDashboardHeader not found', 'Make sure the header module is loaded');
+            }
+
+            const hasUpdateUserData = typeof window.jamDashboardHeader.updateUserData === 'function';
+            const hasUpdateAdminAccess = typeof window.jamDashboardHeader.updateAdminAccess === 'function';
+            const hasAdminRole = typeof window.jamDashboardHeader.hasAdminRole === 'function';
+
+            const status = (hasUpdateUserData && hasUpdateAdminAccess) ? 'good' : 'warning';
+            const message = 'Header module found';
+            const details = `
+updateUserData: ${hasUpdateUserData ? '✅' : '❌'}
+updateAdminAccess: ${hasUpdateAdminAccess ? '✅' : '❌'}  
+hasAdminRole: ${hasAdminRole ? '✅' : '❌'}`;
+
+            return createSection('Header Module Check', status, message, details);
+        }
+
+        function checkAdminPanelButton() {
+            const button = document.querySelector('.header-user-menu-item[href="#admin-panel"]');
+
+            if (!button) {
+                return createSection('Admin Panel Button Check', 'error', 'Admin panel button not found in DOM', 'The button element is not present in the page');
+            }
+
+            const isVisible = button.style.display !== 'none';
+            const computedStyle = window.getComputedStyle(button);
+            const computedDisplay = computedStyle.display;
+            const computedVisibility = computedStyle.visibility;
+            const hasAdminAllowed = button.classList.contains('admin-allowed');
+            const hasAdminOnly = button.classList.contains('admin-only');
+
+            const status = isVisible && computedDisplay !== 'none' ? 'good' : 'error';
+            const message = `Admin panel button found - ${isVisible ? 'Visible' : 'Hidden'}`;
+            const details = `
+Element found: ✅
+Style display: ${button.style.display || 'not set'}
+Computed display: ${computedDisplay}
+Computed visibility: ${computedVisibility}
+Has 'admin-allowed' class: ${hasAdminAllowed ? '✅' : '❌'}
+Has 'admin-only' class: ${hasAdminOnly ? '✅' : '❌'}
+Button text: "${button.textContent.trim()}"`;
+
+            return createSection('Admin Panel Button Check', status, message, details);
+        }
+
+        function checkCSSRules() {
+            let details = '';
+
+            // Check CSS rules for admin panel button
+            const styleSheets = Array.from(document.styleSheets);
+            let rulesFound = [];
+
+            try {
+                styleSheets.forEach(sheet => {
+                    try {
+                        const rules = Array.from(sheet.cssRules || []);
+                        rules.forEach(rule => {
+                            if (rule.selectorText && rule.selectorText.includes('admin-panel')) {
+                                rulesFound.push(`${rule.selectorText}: ${rule.style.cssText}`);
+                            }
+                        });
+                    } catch (e) {
+                        // Cross-origin stylesheet access denied
+                    }
+                });
+            } catch (error) {
+                details += `Error reading CSS rules: ${error.message}\n`;
+            }
+
+            if (rulesFound.length > 0) {
+                details += `CSS Rules found:\n${rulesFound.join('\n')}`;
+            } else {
+                details += 'No specific admin-panel CSS rules found';
+            }
+
+            return createSection('CSS Rules Check', 'good', 'CSS check completed', details);
+        }
+
+        function createSection(title, status, message, details) {
+            return `
+                <div class="debug-section status-${status}">
+                    <h3>${title}</h3>
+                    <p class="${status === 'good' ? 'success' : status === 'error' ? 'error' : 'warning'}">${message}</p>
+                    ${details ? `<div class="debug-data">${details}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Manual test functions
+        function testUserRole() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const role = userData.role || userData.userRole || 'user';
+                alert(`Current user role: ${role}\nIs admin: ${role === 'admin' || role === 'administrator' || role === 'super_admin'}`);
+            } catch (error) {
+                alert(`Error reading user role: ${error.message}`);
+            }
+        }
+
+        function testSetAdminRole() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                userData.role = 'admin';
+                localStorage.setItem('userData', JSON.stringify(userData));
+
+                // Trigger header update if available
+                if (window.jamDashboardHeader && window.jamDashboardHeader.updateUserData) {
+                    window.jamDashboardHeader.updateUserData(userData);
+                    window.jamDashboardHeader.updateAdminAccess();
+                }
+
+                alert('✅ Admin role set! Check if the Admin Panel tab appears now.');
+                setTimeout(refreshDiagnostics, 500);
+            } catch (error) {
+                alert(`Error setting admin role: ${error.message}`);
+            }
+        }
+
+        function testUpdateHeader() {
+            try {
+                if (window.jamDashboardHeader) {
+                    if (window.jamDashboardHeader.refreshUserData) {
+                        window.jamDashboardHeader.refreshUserData();
+                    }
+                    if (window.jamDashboardHeader.updateAdminAccess) {
+                        window.jamDashboardHeader.updateAdminAccess();
+                    }
+                    alert('✅ Header update triggered!');
+                } else {
+                    alert('❌ Header module not available');
+                }
+                setTimeout(refreshDiagnostics, 500);
+            } catch (error) {
+                alert(`Error updating header: ${error.message}`);
+            }
+        }
+
+        function refreshDiagnostics() {
+            runDiagnostics();
+        }
+
+        // Run diagnostics when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(runDiagnostics, 500);
+        });
+
+        // Also run after a delay to catch any late-loading modules
+        setTimeout(runDiagnostics, 2000);
+    </script>
+</body>
+
+</html>
