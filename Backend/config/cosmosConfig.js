@@ -5,13 +5,27 @@ dotenv.config();
 
 export class CosmosDBConfig {
     constructor() {
-        this.endpoint = process.env.COSMOS_ENDPOINT;
-        this.key = process.env.COSMOS_KEY;
-        this.databaseId = process.env.COSMOS_DATABASE_NAME || 'jamdb';
-        this.containerId = process.env.COSMOS_CONTAINER_NAME || 'jamdbcontainer';
+        // Try to get connection string first, then fallback to individual endpoint/key
+        const connectionString = process.env.COSMOS_DB_CONNECTION_STRING;
+        
+        if (connectionString) {
+            // Parse connection string
+            const endpointMatch = connectionString.match(/AccountEndpoint=([^;]+)/);
+            const keyMatch = connectionString.match(/AccountKey=([^;]+)/);
+            
+            this.endpoint = endpointMatch ? endpointMatch[1] : null;
+            this.key = keyMatch ? keyMatch[1] : null;
+        } else {
+            // Fallback to individual environment variables
+            this.endpoint = process.env.COSMOS_ENDPOINT;
+            this.key = process.env.COSMOS_KEY;
+        }
+        
+        this.databaseId = process.env.COSMOS_DB_DATABASE_NAME || process.env.COSMOS_DATABASE_NAME || 'jamdb';
+        this.containerId = process.env.COSMOS_DB_CONTAINER_NAME || process.env.COSMOS_CONTAINER_NAME || 'jamdbcontainer';
         
         if (!this.endpoint || !this.key) {
-            throw new Error('CosmosDB endpoint and key must be provided in environment variables');
+            throw new Error('CosmosDB endpoint and key must be provided in environment variables (COSMOS_DB_CONNECTION_STRING or COSMOS_ENDPOINT/COSMOS_KEY)');
         }
 
         this.client = new CosmosClient({

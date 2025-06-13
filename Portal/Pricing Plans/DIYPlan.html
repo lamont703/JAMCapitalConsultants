@@ -3,12 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM Credit Solutions - DIY Plans</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -17,13 +38,13 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: #f8f9fa;
-            color: #343a40;
+            background: var(--gray-50);
+            color: var(--gray-700);
             line-height: 1.6;
             padding: 20px;
         }
 
-        /* DIY Container Styles */
+        /* DIY Container Styles - Enhanced */
         .diy-container {
             background: white;
             border-radius: 12px;
@@ -40,42 +61,48 @@
         .diy-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
 
         .diy-subtitle {
             font-size: 1.1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             max-width: 700px;
             margin: 0 auto;
+            line-height: 1.5;
         }
 
-        /* Plans Grid */
+        /* Plans Grid - Enhanced */
         .diy-plans-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
 
-        /* DIY Plan Card */
+        /* DIY Plan Card - Enhanced */
         .diy-plan-card {
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
             position: relative;
+            background: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
 
         .diy-plan-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-light);
         }
 
         .diy-plan-card.featured {
-            border-color: #09ccfc;
-            transform: scale(1.05);
+            border-color: var(--primary);
+            transform: scale(1.03);
+            box-shadow: 0 8px 30px rgba(9, 204, 252, 0.2);
         }
 
         .diy-plan-card.featured::before {
@@ -84,52 +111,58 @@
             top: -1px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             padding: 0.5rem 1.5rem;
-            border-radius: 0 0 10px 10px;
+            border-radius: 0 0 12px 12px;
             font-size: 0.8rem;
             font-weight: 600;
             z-index: 10;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
         }
 
         .diy-plan-header {
             padding: 1.5rem;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
             text-align: center;
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .diy-plan-card.featured .diy-plan-header {
-            background: #e6f9ff;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0f4ff 100%);
         }
 
         .diy-plan-name {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #343a40;
+            color: var(--gray-700);
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
 
         .diy-plan-card.featured .diy-plan-name {
-            color: #09ccfc;
+            color: var(--primary);
         }
 
         .diy-plan-price {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            color: #343a40;
+            color: var(--gray-800);
             margin-bottom: 0.5rem;
+            line-height: 1;
         }
 
         .diy-plan-price span {
             font-size: 1.2rem;
-            color: #6c757d;
+            color: var(--gray-500);
+            font-weight: 500;
         }
 
         .diy-plan-target {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             font-style: italic;
+            line-height: 1.4;
         }
 
         .diy-plan-body {
@@ -139,9 +172,10 @@
         .diy-plan-description {
             text-align: center;
             margin-bottom: 2rem;
-            color: #6c757d;
+            color: var(--gray-500);
             font-size: 1rem;
             min-height: 50px;
+            line-height: 1.5;
         }
 
         .diy-plan-features {
@@ -151,22 +185,35 @@
         }
 
         .diy-plan-feature {
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             display: flex;
-            align-items: center;
-            padding: 0.5rem 0;
+            align-items: flex-start;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .diy-plan-feature:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
         }
 
         .diy-plan-feature i {
-            color: #09ccfc;
-            margin-right: 1rem;
-            font-size: 1.2rem;
-            width: 20px;
+            color: var(--primary);
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 24px;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
         }
 
         .diy-plan-feature span {
-            font-size: 1rem;
-            color: #495057;
+            font-size: 0.95rem;
+            color: var(--gray-600);
+            line-height: 1.5;
         }
 
         .diy-plan-cta {
@@ -175,22 +222,30 @@
         }
 
         .diy-select-btn {
-            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             border-radius: 8px;
             padding: 1rem 2rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
             width: 100%;
+            min-height: 48px;
+            font-family: inherit;
         }
 
         .diy-select-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0596c7 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.4);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+        }
+
+        .diy-select-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
         }
 
         .diy-guarantee {
@@ -198,24 +253,29 @@
             align-items: center;
             justify-content: center;
             margin-top: 1.5rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .diy-guarantee i {
-            color: #28a745;
+            color: var(--success);
             font-size: 1.5rem;
             margin-right: 1rem;
+            flex-shrink: 0;
         }
 
         .diy-guarantee-text {
-            color: #495057;
-            font-size: 0.9rem;
+            color: var(--gray-600);
+            font-size: 0.95rem;
             text-align: center;
+            line-height: 1.5;
+            font-weight: 500;
         }
 
-        /* Modal Styles */
+        /* Modal Styles - Enhanced */
         .diy-modal {
             display: none;
             position: fixed;
@@ -223,21 +283,49 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            animation: fadeInModal 0.3s ease;
+        }
+
+        @keyframes fadeInModal {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .diy-modal-content {
-            background-color: white;
-            border-radius: 12px;
+            background: white;
+            border-radius: 16px;
             max-width: 600px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(1);
+            animation: slideInModal 0.3s ease;
+        }
+
+        @keyframes slideInModal {
+            from {
+                transform: scale(0.9) translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
         }
 
         .diy-modal-header {
@@ -245,32 +333,37 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem;
-            border-bottom: 1px solid #dee2e6;
-            background: #f8f9fa;
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
         }
 
         .diy-modal-header h3 {
-            color: #09ccfc;
+            color: var(--primary);
             font-size: 1.5rem;
             font-weight: 700;
+            line-height: 1.3;
         }
 
         .diy-modal-close {
-            background: none;
+            background: var(--gray-100);
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
-            color: #6c757d;
+            color: var(--gray-500);
             padding: 0;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
         }
 
         .diy-modal-close:hover {
-            color: #495057;
+            background: var(--gray-200);
+            color: var(--gray-700);
+            transform: scale(1.1);
         }
 
         .diy-modal-body {
@@ -279,29 +372,35 @@
 
         /* Plan summary styles */
         .plan-summary {
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .plan-summary h4 {
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
             font-size: 1.3rem;
+            line-height: 1.3;
+            font-weight: 700;
         }
 
         .price-display {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #28a745;
+            color: var(--success);
             margin-bottom: 1rem;
+            line-height: 1;
         }
 
         .price-display span {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
+            font-weight: 500;
         }
 
         .plan-features-summary {
@@ -314,11 +413,11 @@
 
         .plan-features-summary li {
             padding: 0.3rem 0;
-            color: #495057;
+            color: var(--gray-600);
         }
 
         .plan-features-summary i {
-            color: #28a745;
+            color: var(--success);
             margin-right: 0.5rem;
         }
 
@@ -328,12 +427,13 @@
         }
 
         .payment-security p {
-            color: #6c757d;
+            color: var(--gray-500);
             margin: 0.3rem 0;
+            line-height: 1.5;
         }
 
         .payment-security i {
-            color: #28a745;
+            color: var(--success);
             margin-right: 0.5rem;
         }
 
@@ -344,12 +444,13 @@
 
         .payment-note {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--gray-500);
             margin-top: 0.5rem;
+            line-height: 1.4;
         }
 
         .diy-submit-btn {
-            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -357,47 +458,60 @@
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            min-height: 48px;
+            font-family: inherit;
         }
 
         .diy-submit-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0596c7 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.4);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+        }
+
+        .diy-submit-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
         }
 
         .diy-submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.1);
         }
 
         .diy-cancel-btn {
-            background: #6c757d;
+            background: var(--gray-500);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             padding: 0.75rem 1.5rem;
             cursor: pointer;
             font-size: 1rem;
-            transition: background-color 0.3s ease;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            min-height: 44px;
         }
 
         .diy-cancel-btn:hover {
-            background: #5a6268;
+            background: var(--gray-600);
+            transform: translateY(-1px);
         }
 
         .diy-payment-footer {
             text-align: center;
             margin-top: 1.5rem;
             padding-top: 1rem;
-            border-top: 1px solid #dee2e6;
+            border-top: 1px solid var(--gray-200);
         }
 
         .guarantee-text {
-            color: #28a745;
+            color: var(--success);
             font-weight: 600;
             margin-bottom: 1rem;
+            line-height: 1.4;
         }
 
         .guarantee-text i {
@@ -444,48 +558,731 @@
 
         .diy-success-message p {
             margin-bottom: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
+            line-height: 1.5;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
+        /* ============================
+           MOBILE-FIRST RESPONSIVE DESIGN
+           ============================ */
+
+        /* Mobile Styles (default) */
+        @media (max-width: 575.98px) {
+            body {
+                padding: 0.5rem;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
             .diy-container {
                 padding: 1rem;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .diy-header {
+                margin-bottom: 1.5rem;
             }
 
             .diy-title {
                 font-size: 1.5rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.2;
             }
 
+            .diy-subtitle {
+                font-size: 0.95rem;
+                line-height: 1.4;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Enhanced mobile plan grid */
             .diy-plans-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .diy-plan-card {
+                border-radius: 8px;
+                padding: 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                transition: all 0.2s ease;
+            }
+
+            .diy-plan-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
             }
 
             .diy-plan-card.featured {
                 transform: scale(1);
+                box-shadow: 0 4px 16px rgba(9, 204, 252, 0.15);
+            }
+
+            .diy-plan-card.featured:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(9, 204, 252, 0.2);
+            }
+
+            .diy-plan-card.featured::before {
+                font-size: 0.75rem;
+                padding: 0.4rem 1rem;
+                border-radius: 0 0 8px 8px;
+            }
+
+            .diy-plan-header {
+                padding: 1rem;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .diy-plan-name {
+                font-size: 1.4rem;
+                margin-bottom: 0.4rem;
             }
 
             .diy-plan-price {
-                font-size: 2.5rem;
+                font-size: 2rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .diy-plan-price span {
+                font-size: 1rem;
+            }
+
+            .diy-plan-target {
+                font-size: 0.9rem;
+            }
+
+            .diy-plan-body {
+                padding: 1rem;
+            }
+
+            .diy-plan-description {
+                margin-bottom: 1.5rem;
+                font-size: 0.9rem;
+                min-height: auto;
+            }
+
+            .diy-plan-features {
+                margin-bottom: 1.5rem;
+                min-height: auto;
+            }
+
+            .diy-plan-feature {
+                margin-bottom: 0.5rem;
+                padding: 0.5rem;
+                border-radius: 6px;
+            }
+
+            .diy-plan-feature i {
+                font-size: 1rem;
+                width: 20px;
+                margin-right: 0.5rem;
+            }
+
+            .diy-plan-feature span {
+                font-size: 0.85rem;
+            }
+
+            .diy-plan-cta {
+                margin-top: 1.5rem;
+            }
+
+            .diy-select-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+                border-radius: 6px;
+                font-weight: 600;
+            }
+
+            .diy-guarantee {
+                margin-top: 1rem;
+                padding: 1rem;
+                border-radius: 8px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .diy-guarantee i {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+
+            .diy-guarantee-text {
+                font-size: 0.85rem;
+            }
+
+            /* Enhanced modals for mobile */
+            .diy-modal {
+                padding: 1rem;
+                backdrop-filter: blur(2px);
+                -webkit-backdrop-filter: blur(2px);
             }
 
             .diy-modal-content {
-                margin: 10px;
+                width: calc(100% - 2rem);
+                max-width: none;
+                border-radius: 12px;
                 max-height: 90vh;
                 overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
+            .diy-modal-header {
+                padding: 1rem;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .diy-modal-header h3 {
+                font-size: 1.25rem;
+                margin-bottom: 0;
+            }
+
+            .diy-modal-close {
+                width: 28px;
+                height: 28px;
+                font-size: 1.1rem;
+            }
+
+            .diy-modal-body {
+                padding: 1rem;
+            }
+
+            .plan-summary {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .plan-summary h4 {
+                font-size: 1.1rem;
+            }
+
+            .price-display {
+                font-size: 1.8rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .plan-features-summary {
+                font-size: 0.85rem;
+            }
+
+            .plan-features-summary li {
+                padding: 0.2rem 0;
+            }
+
+            .payment-security {
+                margin-bottom: 1rem;
+            }
+
+            .payment-security p {
+                font-size: 0.85rem;
+                margin: 0.2rem 0;
+            }
+
+            .payment-action-container {
+                margin: 1.5rem 0;
+            }
+
+            .diy-submit-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+            }
+
+            .payment-note {
+                font-size: 0.8rem;
+                margin-top: 0.4rem;
+            }
+
+            .diy-payment-footer {
+                margin-top: 1rem;
+                padding-top: 0.75rem;
+            }
+
+            .guarantee-text {
+                font-size: 0.85rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .diy-cancel-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                min-height: 40px;
+            }
+
+            /* Payment options styling */
             .payment-options,
             .status-options {
                 flex-direction: column;
                 align-items: center;
+                gap: 0.75rem;
             }
 
             .payment-options button,
             .status-options button {
                 width: 100%;
-                max-width: 250px;
+                max-width: 280px;
+                min-height: 44px;
+            }
+
+            .popup-blocked-message,
+            .payment-status-message {
+                padding: 1.5rem 1rem;
+            }
+
+            .popup-blocked-message h4,
+            .payment-status-message h4 {
+                font-size: 1.1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .popup-blocked-message p,
+            .payment-status-message p {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.4;
+            }
+
+            .popup-blocked-message ol {
+                font-size: 0.85rem;
+                margin: 0.75rem auto;
+                max-width: 280px;
+            }
+
+            .popup-blocked-message ol li {
+                margin-bottom: 0.5rem;
+                line-height: 1.4;
+            }
+
+            .diy-success-message {
+                padding: 1.5rem 1rem;
+            }
+
+            .diy-success-message h4 {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .diy-success-message p {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Touch enhancements */
+            .diy-select-btn,
+            .diy-submit-btn,
+            .diy-cancel-btn,
+            .diy-modal-close {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .diy-select-btn:active,
+            .diy-submit-btn:active {
+                transform: scale(0.98);
+            }
+
+            .diy-cancel-btn:active,
+            .diy-modal-close:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .diy-container {
+                padding: 1.5rem;
+                border-radius: 10px;
+            }
+
+            .diy-title {
+                font-size: 1.75rem;
+            }
+
+            .diy-subtitle {
+                font-size: 1rem;
+            }
+
+            .diy-plan-card {
+                border-radius: 10px;
+            }
+
+            .diy-plan-header {
+                padding: 1.25rem;
+            }
+
+            .diy-plan-name {
+                font-size: 1.6rem;
+            }
+
+            .diy-plan-price {
+                font-size: 2.2rem;
+            }
+
+            .diy-plan-body {
+                padding: 1.25rem;
+            }
+
+            .diy-modal-content {
+                width: 90%;
+                max-width: 500px;
+                padding: 1.5rem;
+            }
+
+            .diy-modal-header h3 {
+                font-size: 1.35rem;
+            }
+
+            .diy-select-btn,
+            .diy-submit-btn {
+                padding: 0.8rem 1.25rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            body {
+                padding: 1rem;
+            }
+
+            .diy-container {
+                padding: 1.75rem;
+            }
+
+            .diy-title {
+                font-size: 1.85rem;
+            }
+
+            .diy-subtitle {
+                font-size: 1.05rem;
+            }
+
+            .diy-plans-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .diy-plan-header {
+                padding: 1.5rem;
+            }
+
+            .diy-plan-body {
+                padding: 1.5rem;
+            }
+
+            .diy-modal-content {
+                width: 85%;
+                max-width: 520px;
+            }
+        }
+
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            .diy-container {
+                padding: 2rem;
+            }
+
+            .diy-plan-header {
+                padding: 1.5rem;
+            }
+
+            .diy-plan-body {
+                padding: 2rem;
+            }
+        }
+
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            body {
+                padding: 2rem;
+            }
+
+            .diy-container {
+                padding: 2.5rem;
+            }
+
+            .diy-plan-header {
+                padding: 2rem;
+            }
+
+            .diy-plan-body {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .diy-container {
+                padding: 0.75rem;
+            }
+
+            .diy-header {
+                margin-bottom: 1rem;
+            }
+
+            .diy-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .diy-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .diy-plans-grid {
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .diy-plan-card {
+                border-radius: 6px;
+            }
+
+            .diy-plan-header {
+                padding: 0.75rem;
+            }
+
+            .diy-plan-name {
+                font-size: 1.2rem;
+            }
+
+            .diy-plan-price {
+                font-size: 1.8rem;
+            }
+
+            .diy-plan-body {
+                padding: 0.75rem;
+            }
+
+            .diy-plan-description {
+                margin-bottom: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .diy-plan-features {
+                margin-bottom: 1rem;
+            }
+
+            .diy-plan-feature {
+                padding: 0.4rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .diy-plan-feature span {
+                font-size: 0.8rem;
+            }
+
+            .diy-guarantee {
+                padding: 0.75rem;
+                margin-top: 0.75rem;
+            }
+
+            .diy-guarantee-text {
+                font-size: 0.8rem;
+            }
+
+            .diy-modal-content {
+                max-height: 85vh;
+                padding: 1rem;
+            }
+
+            .diy-modal-header {
+                padding: 0.75rem;
+            }
+
+            .diy-modal-header h3 {
+                font-size: 1.1rem;
+            }
+
+            .diy-select-btn,
+            .diy-submit-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .diy-plan-card:hover {
+                transform: none;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            }
+
+            .diy-plan-card.featured:hover {
+                transform: scale(1.03);
+                box-shadow: 0 8px 30px rgba(9, 204, 252, 0.2);
+            }
+
+            .diy-plan-feature:hover {
+                background: var(--gray-50);
+                box-shadow: none;
+                transform: none;
+            }
+
+            .diy-select-btn:hover,
+            .diy-submit-btn:hover {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                transform: none;
+                box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            }
+
+            .diy-cancel-btn:hover {
+                background: var(--gray-500);
+                transform: none;
+            }
+
+            .diy-modal-close:hover {
+                background: var(--gray-100);
+                color: var(--gray-500);
+                transform: none;
+            }
+
+            /* Enhanced tap highlighting */
+            .diy-select-btn,
+            .diy-submit-btn,
+            .diy-cancel-btn,
+            .diy-modal-close {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+            }
+
+            /* Prevent text selection on interactive elements */
+            .diy-select-btn,
+            .diy-submit-btn,
+            .diy-cancel-btn,
+            .diy-modal-close {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .diy-container {
+                will-change: transform;
+            }
+
+            .diy-modal {
+                will-change: opacity;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .diy-modal-content {
+                min-height: -webkit-fill-available;
+            }
+
+            /* Safe area adjustments for iPhone X+ */
+            @media (max-width: 575.98px) {
+                body {
+                    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+                }
+
+                .diy-modal {
+                    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+                }
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+
+            .diy-plan-card,
+            .diy-plan-feature,
+            .diy-select-btn,
+            .diy-submit-btn,
+            .diy-cancel-btn,
+            .diy-modal-close {
+                transition: none;
+            }
+
+            .diy-plan-card:hover,
+            .diy-plan-card.featured:hover,
+            .diy-plan-feature:hover,
+            .diy-select-btn:hover,
+            .diy-submit-btn:hover,
+            .diy-cancel-btn:hover,
+            .diy-select-btn:active,
+            .diy-submit-btn:active,
+            .diy-cancel-btn:active,
+            .diy-modal-close:active {
+                transform: none;
+            }
+
+            .diy-modal {
+                animation: none;
+            }
+
+            .diy-modal-content {
+                animation: none;
+            }
+
+            @keyframes fadeInModal {
+
+                from,
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+
+            @keyframes slideInModal {
+
+                from,
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .diy-container {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .diy-plan-card {
+                box-shadow: none;
+                border: 1px solid #000;
+                margin-bottom: 1rem;
+                page-break-inside: avoid;
+            }
+
+            .diy-plan-card.featured::before {
+                background: #000;
+                color: white;
+            }
+
+            .diy-modal {
+                display: none;
+            }
+
+            .diy-guarantee {
+                box-shadow: none;
+                border: 1px solid #000;
             }
         }
     </style>
@@ -511,46 +1308,46 @@
                     name: 'DIY Starter',
                     price: '$29',
                     target: 'Perfect for beginners',
-                    description: 'Get started with essential credit repair tools and basic dispute capabilities.',
+                    description: 'Essential credit dispute tools with everything from Free plan plus 5 monthly dispute letter credits.',
                     features: [
-                        'Basic JAM Dispute Bot access',
-                        'Generate 5 dispute letters/month',
-                        'Basic progress tracking',
-                        'Email support',
-                        'Credit education resources'
+                        '✨ Everything in Free Plan included',
+                        '5 dispute letter credits per month',
+                        'JAM Engine Credit Management Platform',
+                        'Full JAM Dispute Bot access',
+                        'Unlimited credit analysis',
+                        'Dispute Library access',
+                        'Email support'
                     ]
                 },
                 professional: {
                     name: 'DIY Professional',
                     price: '$59',
                     target: 'Most popular choice',
-                    description: 'Comprehensive credit repair tools with advanced features for serious credit improvement.',
+                    description: 'Comprehensive credit dispute tools with everything from Free plan plus 15 monthly dispute letter credits.',
                     features: [
+                        '✨ Everything in Free Plan included',
+                        '15 dispute letter credits per month',
+                        'JAM Engine Credit Management Platform',
                         'Full JAM Dispute Bot access',
-                        'Unlimited custom dispute letters',
-                        'Advanced progress tracking',
-                        'Credit score monitoring & alerts',
-                        'Priority email support',
-                        'Professional dispute templates',
-                        'Automated follow-up reminders'
+                        'Unlimited credit analysis',
+                        'Dispute Library access',
+                        'Priority email support'
                     ],
                     featured: true
                 },
                 premium: {
                     name: 'DIY Premium',
                     price: '$99',
-                    target: 'For serious credit repair',
-                    description: 'Everything you need for comprehensive credit repair with premium support and advanced tools.',
+                    target: 'For serious credit disputes',
+                    description: 'Everything you need for comprehensive credit disputes with 50 monthly dispute letter credits and premium features.',
                     features: [
+                        '✨ Everything in Free Plan included',
+                        '50 dispute letter credits per month',
+                        'JAM Engine Credit Management Platform',
                         'Full JAM Dispute Bot access',
-                        'Unlimited dispute letters',
-                        'Real-time credit monitoring',
-                        'Advanced analytics & reporting',
-                        'Phone & email support',
-                        'Premium dispute templates',
-                        'Automated workflows',
-                        'Credit building strategies',
-                        'Debt validation letters'
+                        'Unlimited credit analysis',
+                        'Dispute Library access',
+                        'Phone & email support'
                     ]
                 }
             };
@@ -559,8 +1356,8 @@
             const diyPlanHTML = `
                 <div class="diy-container">
                     <div class="diy-header">
-                        <h2 class="diy-title">DIY Credit Repair Plans</h2>
-                        <p class="diy-subtitle">Take control of your credit repair journey with our powerful self-service tools and comprehensive resources. Choose the plan that fits your needs.</p>
+                        <h2 class="diy-title">DIY Credit Dispute Plans</h2>
+                        <p class="diy-subtitle">Take control of your credit dispute journey with our powerful self-service tools and comprehensive resources. Choose the plan that fits your needs.</p>
                     </div>
 
                     <div class="diy-plans-grid">
@@ -1004,6 +1801,16 @@
                 },
                 getPlans: function () {
                     return PLANS;
+                },
+                setUserData: function (userData) {
+                    console.log('🔄 Setting user data for DIY Plan:', userData.email);
+                    // Store for use in payment flow
+                    try {
+                        sessionStorage.setItem('jamDIYUserData', JSON.stringify(userData));
+                        console.log('✅ User data stored for DIY Plan');
+                    } catch (e) {
+                        console.warn('⚠️ Could not store DIY Plan user data:', e);
+                    }
                 }
             };
         })();
@@ -1030,6 +1837,31 @@
             if (container && window.jamDIYPlan) {
                 console.log('Found DIY plan container, initializing');
                 window.jamDIYPlan.init('diy-plan-container');
+            }
+
+            // Check for user data from pricing navigation
+            try {
+                const userData = sessionStorage.getItem('pricingUserData');
+                if (userData) {
+                    const parsedUserData = JSON.parse(userData);
+                    console.log('💾 Found user data from pricing navigation:', parsedUserData.email);
+
+                    // Add setUserData method to the module if it doesn't exist
+                    if (window.jamDIYPlan && !window.jamDIYPlan.setUserData) {
+                        window.jamDIYPlan.setUserData = function (data) {
+                            console.log('🔄 Setting user data for DIY Plan:', data.email);
+                            // Store for use in payment flow
+                            sessionStorage.setItem('jamDIYUserData', JSON.stringify(data));
+                        };
+                    }
+
+                    // Set the user data
+                    if (window.jamDIYPlan.setUserData) {
+                        window.jamDIYPlan.setUserData(parsedUserData);
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load user data:', e);
             }
         });
 

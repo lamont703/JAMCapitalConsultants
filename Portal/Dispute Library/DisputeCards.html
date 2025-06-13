@@ -3,243 +3,34 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispute Cards Data Module</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Modern, Clean Styling with enhanced mobile responsiveness */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: rgba(240, 242, 245, 0.85);
-            color: #2c3e50;
-            line-height: 1.6;
-        }
-
-        /* CSS for dispute cards with improved height handling */
-        .dispute-prompt-card {
-            perspective: 1000px;
-            margin: 15px;
-            width: 320px;
-            height: 450px;
-        }
-
-        .dispute-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: left;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        .dispute-card-front,
-        .dispute-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 10px;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .dispute-card-front {
-            background-color: #ffffff;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .dispute-card-header {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            min-height: 60px;
-        }
-
-        .dispute-ai-icon {
-            font-size: 24px;
-            margin-right: 10px;
-            color: #4a6cf7;
-            margin-top: 3px;
-        }
-
-        .dispute-card-front h3 {
-            margin: 0;
-            font-size: 18px;
-            color: #333;
-            flex: 1;
-            line-height: 1.4;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
-        .dispute-card-description {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #666;
-            max-height: 280px;
-            padding-right: 5px;
-            padding: 5px 5px 5px 0;
-        }
-
-        .dispute-card-description::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .dispute-card-description::-webkit-scrollbar-thumb {
-            background-color: #ddd;
-            border-radius: 4px;
-        }
-
-        .dispute-flip-btn {
-            align-self: flex-end;
-            background-color: transparent;
-            border: none;
-            color: #4a6cf7;
-            cursor: pointer;
-            font-weight: 600;
-            padding: 10px 0;
-            transition: color 0.3s;
-            margin-top: 10px;
-        }
-
-        .dispute-flip-btn:hover {
-            color: #3451b2;
-        }
-
-        .dispute-card-back {
-            background-color: #f8f9fa;
-            color: #333;
-            transform: rotateY(180deg);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .dispute-prompt-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .dispute-prompt-content h4 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .dispute-prompt-content pre {
-            flex: 1;
-            overflow-y: auto;
-            background-color: #f1f3f5;
-            padding: 12px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            margin: 0 0 15px 0;
-            white-space: pre-wrap;
-            max-height: 300px;
-            word-break: break-word;
-        }
-
-        .dispute-button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: auto;
-        }
-
-        .dispute-copy-btn {
-            background-color: #4a6cf7;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-
-        .dispute-copy-btn:hover {
-            background-color: #3451b2;
-        }
-
-        .dispute-copy-icon {
-            margin-right: 5px;
-        }
-
-        /* Flipped state */
-        .flipped .dispute-card-inner {
-            transform: rotateY(180deg);
-        }
-
-        /* Card grid layout improvements */
-        .dispute-card-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            padding: 25px;
-        }
-
-        /* Toast notification */
+        /* Minimal styling for toast notification only */
         .dispute-toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background-color: #002742;
+            background: linear-gradient(135deg, #002742 0%, #008080 100%);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
             z-index: 1000;
-            transition: transform 0.3s ease-out;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             border-left: 4px solid #09ccfc;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 500;
+            font-size: 0.9rem;
+            max-width: calc(100vw - 2rem);
+            text-align: center;
         }
 
         .dispute-toast.show {
             transform: translateX(-50%) translateY(0);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .dispute-prompt-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .dispute-section-header h2 {
-                font-size: 2.5rem;
-            }
-        }
-
-        /* Add ellipsis for very long titles */
-        .dispute-card-front h3.long-title {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -723,9 +514,6 @@
                 console.log('🎨 [DEBUG] Letter promptText exists:', !!letter.promptText);
                 console.log('🎨 [DEBUG] Letter promptText length:', letter.promptText ? letter.promptText.length : 'N/A');
 
-                // Check if title is long and needs special handling
-                const titleClass = letter.title.length > 40 ? 'long-title' : '';
-
                 // Get the prompt text for debugging
                 const promptText = letter.promptText || letter.content || 'No content available';
                 console.log('🎨 [DEBUG] Using prompt text:', promptText.substring(0, 100) + '...');
@@ -733,21 +521,23 @@
                 const cardHTML = `
                 <div class="dispute-prompt-card">
                     <div class="dispute-card-inner" data-id="${letter.id}">
+                        <!-- Front of card -->
                         <div class="dispute-card-front">
                             <div class="dispute-card-header">
-                                <i class="dispute-ai-icon fas ${letter.icon}"></i>
-                                <h3 class="${titleClass}">${letter.title}</h3>
+                                <span class="dispute-ai-icon">🤖</span>
+                                <h3>${letter.title}</h3>
                             </div>
                             <p class="dispute-card-description">${letter.description || 'No description available.'}</p>
-                            <button class="dispute-flip-btn">View Details →</button>
+                            <button class="dispute-flip-btn">View Prompt →</button>
                         </div>
+                        <!-- Back of card -->
                         <div class="dispute-card-back">
                             <div class="dispute-prompt-content">
-                                <h4>${letter.promptTitle || letter.title}</h4>
+                                <h4>${letter.title} Prompt</h4>
                                 <pre><code>${promptText}</code></pre>
                                 <div class="dispute-button-container">
-                                    <button class="dispute-copy-btn">
-                                        <span class="dispute-copy-icon">📋</span> Copy Text
+                                    <button class="dispute-copy-btn" data-prompt="${promptText.replace(/"/g, '&quot;')}">
+                                        <span class="dispute-copy-icon">📋</span> Copy Prompt
                                     </button>
                                     <button class="dispute-flip-btn">← Back</button>
                                 </div>

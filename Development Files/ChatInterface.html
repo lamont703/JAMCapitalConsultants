@@ -833,7 +833,7 @@
 
             try {
                 // Send the request and wait for the response
-                const response = await fetch('http://localhost:3000/api/chatGptService/analyzeReports', {
+                const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/chatGptService/analyzeReports', {
                     method: 'POST',
                     body: formData
                 });

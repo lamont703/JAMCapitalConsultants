@@ -193,6 +193,580 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* COMPREHENSIVE MOBILE RESPONSIVENESS */
+
+        /* Base mobile styles */
+        @media (max-width: 991.98px) {
+            .credit-report-container {
+                padding: 15px;
+            }
+
+            .smartcredit-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Extra Small Devices (phones, up to 575px) */
+        @media (max-width: 575.98px) {
+            .credit-report-container {
+                padding: 5px;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            /* Mobile Header - More Compact for Interface */
+            .credit-report-header {
+                margin-bottom: 15px;
+                text-align: center;
+                padding: 0 5px;
+            }
+
+            .credit-report-title {
+                font-size: 1.3rem;
+                margin-bottom: 6px;
+                line-height: 1.2;
+                color: var(--primary);
+                font-weight: 600;
+            }
+
+            .credit-report-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 12px;
+                line-height: 1.3;
+                padding: 0 8px;
+                color: var(--gray-600);
+            }
+
+            /* Mobile Service Sections - Optimized for Interface */
+            .smartcredit-section {
+                padding: 12px;
+                margin-bottom: 12px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                background: white;
+                border: 1px solid var(--gray-200);
+            }
+
+            .smartcredit-header {
+                flex-direction: column;
+                text-align: center;
+                margin-bottom: 15px;
+                align-items: center;
+            }
+
+            .smartcredit-logo {
+                max-width: 140px;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .smartcredit-title {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+                color: var(--primary);
+                font-weight: 600;
+                line-height: 1.2;
+            }
+
+            .smartcredit-description {
+                margin-bottom: 15px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+                color: var(--gray-600);
+                text-align: left;
+            }
+
+            /* Mobile Feature Grid - Enhanced */
+            .smartcredit-features {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .smartcredit-feature {
+                background: linear-gradient(135deg, #f8fdff 0%, #e6f9ff 100%);
+                padding: 15px;
+                border-radius: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                border: 1px solid var(--primary-light);
+                transition: all 0.2s ease;
+                min-height: 120px;
+                justify-content: center;
+            }
+
+            .smartcredit-feature:active {
+                transform: scale(0.98);
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            }
+
+            .smartcredit-feature i {
+                font-size: 2rem;
+                color: var(--primary);
+                margin-bottom: 10px;
+                background: white;
+                padding: 12px;
+                border-radius: 50%;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .smartcredit-feature h4 {
+                font-size: 1rem;
+                margin-bottom: 8px;
+                color: var(--primary-dark);
+                font-weight: 600;
+                line-height: 1.2;
+            }
+
+            .smartcredit-feature p {
+                color: var(--gray-700);
+                font-size: 0.8rem;
+                line-height: 1.3;
+                margin: 0;
+            }
+
+            /* Mobile CTA Section - Enhanced */
+            .smartcredit-cta {
+                text-align: center;
+                margin-top: 20px;
+                padding: 15px;
+                background: var(--gray-50);
+                border-radius: 12px;
+                border: 1px solid var(--gray-200);
+            }
+
+            .smartcredit-btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                border-radius: 12px;
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                touch-action: manipulation;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                border: none;
+                color: white;
+                box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
+                transition: all 0.2s ease;
+                text-decoration: none;
+                margin-bottom: 10px;
+            }
+
+            .smartcredit-btn:active {
+                transform: scale(0.96);
+                box-shadow: 0 2px 8px rgba(9, 204, 252, 0.4);
+            }
+
+            .smartcredit-btn:hover {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: white;
+                text-decoration: none;
+            }
+
+            .smartcredit-disclaimer {
+                font-size: 0.8rem;
+                color: var(--gray-600);
+                margin-top: 8px;
+                line-height: 1.3;
+                padding: 8px;
+                background: white;
+                border-radius: 8px;
+                border: 1px solid var(--gray-200);
+            }
+
+            /* Mobile FAQ Section - Enhanced */
+            .faq-section {
+                padding: 15px;
+                margin-top: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                background: white;
+                border: 1px solid var(--gray-200);
+            }
+
+            .faq-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+                text-align: center;
+                color: var(--primary);
+                font-weight: 600;
+            }
+
+            .faq-item {
+                border-bottom: 1px solid var(--gray-200);
+                margin-bottom: 10px;
+                border-radius: 8px;
+                overflow: hidden;
+                background: var(--gray-50);
+                transition: all 0.2s ease;
+            }
+
+            .faq-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+
+            .faq-item.faq-active {
+                background: white;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            }
+
+            .faq-question {
+                font-weight: 600;
+                padding: 12px 15px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+                line-height: 1.3;
+                color: var(--gray-800);
+                min-height: 44px;
+                touch-action: manipulation;
+                transition: all 0.2s ease;
+            }
+
+            .faq-question:active {
+                background: var(--primary-light);
+                transform: scale(0.98);
+            }
+
+            .faq-question i {
+                color: var(--primary);
+                transition: transform 0.3s ease;
+                font-size: 1rem;
+                margin-left: 10px;
+                flex-shrink: 0;
+            }
+
+            .faq-active .faq-question i {
+                transform: rotate(180deg);
+            }
+
+            .faq-answer {
+                display: none;
+                padding: 0 15px 15px 15px;
+                color: var(--gray-700);
+                line-height: 1.4;
+                font-size: 0.85rem;
+                background: white;
+            }
+
+            .faq-active .faq-answer {
+                display: block;
+                animation: fadeInAnswer 0.3s ease-out;
+            }
+
+            @keyframes fadeInAnswer {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Touch-friendly enhancements */
+            .smartcredit-btn,
+            .faq-question {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+                touch-action: manipulation;
+            }
+
+            /* Better text selection */
+            .smartcredit-feature,
+            .faq-question {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            .faq-answer {
+                -webkit-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+        }
+
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .credit-report-container {
+                padding: 10px;
+            }
+
+            .credit-report-title {
+                font-size: 1.5rem;
+            }
+
+            .credit-report-subtitle {
+                font-size: 1rem;
+            }
+
+            .smartcredit-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .smartcredit-logo {
+                max-width: 160px;
+            }
+
+            .smartcredit-title {
+                font-size: 1.3rem;
+            }
+
+            .smartcredit-features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .smartcredit-btn {
+                width: auto;
+                min-width: 200px;
+                margin: 0 auto;
+                display: inline-flex;
+            }
+
+            .faq-question {
+                font-size: 0.95rem;
+                padding: 15px;
+            }
+
+            .faq-answer {
+                padding: 0 15px 15px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .credit-report-container {
+                padding: 15px;
+            }
+
+            .credit-report-title {
+                font-size: 1.7rem;
+            }
+
+            .smartcredit-section {
+                padding: 25px;
+            }
+
+            .smartcredit-features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .smartcredit-logo {
+                max-width: 180px;
+            }
+
+            .faq-item {
+                margin-bottom: 12px;
+            }
+
+            .faq-question {
+                padding: 16px;
+                font-size: 1rem;
+            }
+
+            .faq-answer {
+                padding: 0 16px 16px 16px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .credit-report-container {
+                max-width: 1200px;
+                padding: 25px;
+            }
+
+            .smartcredit-section {
+                padding: 30px;
+            }
+
+            .smartcredit-features {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+            }
+        }
+
+        /* Landscape Orientation Adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .credit-report-header {
+                margin-bottom: 10px;
+            }
+
+            .credit-report-title {
+                font-size: 1.2rem;
+                margin-bottom: 4px;
+            }
+
+            .credit-report-subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 8px;
+            }
+
+            .smartcredit-section {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .smartcredit-features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .smartcredit-feature {
+                padding: 10px;
+                min-height: 100px;
+            }
+
+            .smartcredit-feature i {
+                font-size: 1.5rem;
+                margin-bottom: 6px;
+                padding: 8px;
+            }
+
+            .smartcredit-feature h4 {
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+            }
+
+            .smartcredit-feature p {
+                font-size: 0.75rem;
+            }
+
+            .faq-item {
+                margin-bottom: 6px;
+            }
+
+            .faq-question {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .faq-answer {
+                padding: 0 12px 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .smartcredit-btn:hover {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                transform: none;
+            }
+
+            .smartcredit-feature:hover {
+                background: linear-gradient(135deg, #f8fdff 0%, #e6f9ff 100%);
+                transform: none;
+            }
+
+            .faq-question:hover {
+                background: inherit;
+            }
+
+            /* Prevent text selection on interactive elements */
+            .smartcredit-btn,
+            .faq-question {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .smartcredit-feature i {
+                transform: translateZ(0);
+            }
+
+            .smartcredit-btn {
+                will-change: transform;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .credit-report-container {
+                min-height: -webkit-fill-available;
+            }
+
+            .faq-section {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            .smartcredit-feature,
+            .smartcredit-btn,
+            .faq-question,
+            .faq-answer {
+                transition: none;
+            }
+
+            .faq-active .faq-answer {
+                animation: none;
+            }
+
+            .smartcredit-feature:active,
+            .smartcredit-btn:active,
+            .faq-question:active {
+                transform: none;
+            }
+
+            .faq-question i {
+                transition: none;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .smartcredit-btn {
+                display: none;
+            }
+
+            .smartcredit-section {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .faq-item {
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .faq-answer {
+                display: block !important;
+            }
+
+            .credit-report-container {
+                max-width: none;
+                padding: 0;
+            }
+        }
     </style>
 </head>
 
@@ -224,7 +798,7 @@
                         
                         <div class="smartcredit-section">
                             <div class="smartcredit-header">
-                                <img src="../assets/images/smartcredit-logo.png" alt="SmartCredit Logo" class="smartcredit-logo">
+                                <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/684b930351bfbe2d182466a5.svg" alt="SmartCredit Logo" class="smartcredit-logo">
                                 <div>
                                     <h3 class="smartcredit-title">Our Recommended Credit Monitoring Service</h3>
                                 </div>
@@ -232,7 +806,7 @@
                             
                             <p class="smartcredit-description">
                                 SmartCredit provides comprehensive credit monitoring with powerful tools to help you understand, 
-                                manage and improve your credit. As part of your credit repair journey with JAM Credit Solutions, 
+                                manage and improve your credit. As part of your credit  dispute journey with JAM Capital Consultants, 
                                 we recommend SmartCredit for its exceptional features and user-friendly interface.
                             </p>
                             
@@ -263,7 +837,7 @@
                             </div>
                             
                             <div class="smartcredit-cta">
-                                <a href="https://smartcredit.com/partners/jamcredit" target="_blank" class="smartcredit-btn">
+                                <a href="https://www.smartcredit.com" target="_blank" class="smartcredit-btn">
                                     Sign Up for SmartCredit
                                 </a>
                                 <p class="smartcredit-disclaimer">
@@ -275,7 +849,7 @@
                         <!-- IdentityIQ Section -->
                         <div class="smartcredit-section">
                             <div class="smartcredit-header">
-                                <img src="../assets/images/identityiq-logo.png" alt="IdentityIQ Logo" class="smartcredit-logo">
+                                <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/684b930351bfbeae372466a6.svg" alt="IdentityIQ Logo" class="smartcredit-logo">
                                 <div>
                                     <h3 class="smartcredit-title">Advanced Identity & Credit Protection</h3>
                                 </div>
@@ -284,7 +858,7 @@
                             <p class="smartcredit-description">
                                 IdentityIQ SecureMax+ provides comprehensive identity protection and credit monitoring services. 
                                 With advanced dark web monitoring, enhanced identity theft protection, and detailed credit analysis tools, 
-                                IdentityIQ offers an additional layer of security for your financial identity during your credit repair journey.
+                                IdentityIQ offers an additional layer of security for your financial identity during your credit dispute journey.
                             </p>
                             
                             <div class="smartcredit-features">
@@ -338,7 +912,7 @@
                         <!-- MyScoreIQ Section -->
                         <div class="smartcredit-section">
                             <div class="smartcredit-header">
-                                <img src="../assets/images/myscoreiq-logo.png" alt="MyScoreIQ Logo" class="smartcredit-logo">
+                                <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/684b9303e3c4093d0cc74e75.svg" alt="MyScoreIQ Logo" class="smartcredit-logo">
                                 <div>
                                     <h3 class="smartcredit-title">Premium FICO® Score Monitoring & Identity Protection</h3>
                                 </div>
@@ -347,7 +921,7 @@
                             <p class="smartcredit-description">
                                 MyScoreIQ provides comprehensive FICO® score monitoring with advanced identity theft protection. 
                                 Get access to your FICO® scores from all three major credit bureaus, along with daily monitoring alerts, 
-                                dark web scanning, and $1 Million identity theft insurance to keep your credit and identity secure during your repair journey.
+                                dark web scanning, and $1 Million identity theft insurance to keep your credit and identity secure during your dispute journey.
                             </p>
                             
                             <div class="smartcredit-features">
@@ -403,11 +977,11 @@
                             
                             <div class="faq-item">
                                 <div class="faq-question" data-faq="1">
-                                    Why do I need credit monitoring during credit repair?
+                                    Why do I need credit monitoring during credit disputes?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
                                 <div class="faq-answer" id="faq-1">
-                                    Credit monitoring is essential during the repair process as it allows you to track changes to your credit report in real-time. 
+                                    Credit monitoring is essential during the dispute process as it allows you to track changes to your credit report in real-time. 
                                     You'll be able to see when negative items are removed, when your score changes, and verify that the dispute process is working. 
                                     It also helps you catch any new negative items quickly so they can be addressed.
                                 </div>
@@ -421,7 +995,7 @@
                                 <div class="faq-answer" id="faq-2">
                                     We've evaluated many credit monitoring services and found SmartCredit to offer the best combination of features, 
                                     usability, and value for our clients. Their 3-bureau monitoring, action tools, and user-friendly interface make 
-                                    it ideal for tracking your credit repair progress. Additionally, they offer special pricing for our clients.
+                                    it ideal for tracking your credit dispute progress. Additionally, they offer special pricing for our clients.
                                 </div>
                             </div>
                             
@@ -431,7 +1005,7 @@
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
                                 <div class="faq-answer" id="faq-3">
-                                    During active credit repair, we recommend checking your credit reports at least once a week. 
+                                    During active credit disputes, we recommend checking your credit reports at least once a week. 
                                     SmartCredit makes this easy with their dashboard and alert system. This frequent monitoring helps 
                                     you stay on top of changes and ensures you can quickly respond to any updates or issues.
                                 </div>
@@ -457,7 +1031,7 @@
                                 <div class="faq-answer" id="faq-5">
                                     IdentityIQ SecureMax+ goes beyond traditional credit monitoring by offering comprehensive identity protection 
                                     including dark web monitoring, criminal database monitoring, and ScoreCasterIQ analysis tools. Their focus 
-                                    on identity theft prevention makes them ideal for clients who want maximum protection during credit repair.
+                                    on identity theft prevention makes them ideal for clients who want maximum protection during credit disputes.
                                 </div>
                             </div>
                             
@@ -468,7 +1042,7 @@
                                 </div>
                                 <div class="faq-answer" id="faq-6">
                                     While both services offer credit monitoring, they have different strengths. SmartCredit excels in credit 
-                                    repair tools and user interface, while IdentityIQ provides superior identity theft protection and dark web 
+                                    dispute tools and user interface, while IdentityIQ provides superior identity theft protection and dark web 
                                     monitoring. Some clients choose one based on their priorities, while others use both for maximum protection.
                                 </div>
                             </div>
@@ -493,18 +1067,18 @@
                                 <div class="faq-answer" id="faq-8">
                                     MyScoreIQ focuses specifically on FICO® scores, which are the scores most lenders use for credit decisions. 
                                     They provide access to your FICO® scores from all three bureaus, along with a powerful score simulator tool 
-                                    that helps you understand how different actions could impact your score. This makes it ideal for active credit repair monitoring.
+                                    that helps you understand how different actions could impact your score. This makes it ideal for active credit dispute monitoring.
                                 </div>
                             </div>
                             
                             <div class="faq-item">
                                 <div class="faq-question" data-faq="9">
-                                    Why are FICO® scores important for credit repair?
+                                    Why are FICO® scores important for credit disputes?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
                                 <div class="faq-answer" id="faq-9">
                                     FICO® scores are used by 90% of top lenders when making credit decisions, making them the most important scores 
-                                    to monitor during credit repair. MyScoreIQ's focus on FICO® scores ensures you're tracking the scores that 
+                                    to monitor during credit disputes. MyScoreIQ's focus on FICO® scores ensures you're tracking the scores that 
                                     matter most for loan approvals, credit cards, and mortgage applications.
                                 </div>
                             </div>
@@ -515,9 +1089,9 @@
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
                                 <div class="faq-answer" id="faq-10">
-                                    The choice depends on your priorities: SmartCredit offers excellent credit repair tools and user interface; 
+                                    The choice depends on your priorities: SmartCredit offers excellent credit dispute tools and user interface; 
                                     IdentityIQ provides the most comprehensive identity theft protection; and MyScoreIQ specializes in FICO® score 
-                                    monitoring with powerful simulation tools. Many clients choose based on their main concern: credit repair tools, 
+                                    monitoring with powerful simulation tools. Many clients choose based on their main concern: credit dispute tools, 
                                     identity protection, or FICO® score tracking.
                                 </div>
                             </div>

@@ -3,12 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM Credit Solutions - Free Plan</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -17,13 +38,13 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: #f8f9fa;
-            color: #343a40;
+            background: var(--gray-50);
+            color: var(--gray-700);
             line-height: 1.6;
             padding: 20px;
         }
 
-        /* Free Plan Container Styles */
+        /* Free Plan Container Styles - Enhanced */
         .free-container {
             background: white;
             border-radius: 12px;
@@ -40,57 +61,37 @@
         .free-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
 
         .free-subtitle {
             font-size: 1.1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             max-width: 700px;
             margin: 0 auto;
+            line-height: 1.5;
         }
 
-        /* Current Plan Status */
-        .current-plan-status {
-            background: linear-gradient(135deg, #e6f9ff 0%, #f0f9ff 100%);
-            border: 2px solid #09ccfc;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            background: #09ccfc;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
 
-        .status-badge i {
-            margin-right: 0.5rem;
-        }
-
-        /* Free Plan Card Styles */
+        /* Free Plan Card Styles - Enhanced */
         .free-plan-card {
-            border: 2px solid #09ccfc;
-            border-radius: 10px;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
             max-width: 800px;
             margin: 0 auto;
             background: white;
+            box-shadow: 0 4px 16px rgba(9, 204, 252, 0.1);
         }
 
         .free-plan-header {
             padding: 1.5rem;
-            background: #e6f9ff;
-            border-bottom: 1px solid #dee2e6;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f9ff 100%);
+            border-bottom: 1px solid var(--gray-200);
             text-align: center;
         }
 
@@ -98,27 +99,30 @@
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: #09ccfc;
+            color: var(--primary);
+            line-height: 1.2;
         }
 
         .free-plan-price {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: #28a745;
+            color: var(--success);
+            line-height: 1;
         }
 
         .free-plan-price-period {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             font-weight: normal;
         }
 
         .free-plan-target {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             margin-top: 0.5rem;
             font-style: italic;
+            line-height: 1.4;
         }
 
         .free-plan-body {
@@ -128,48 +132,72 @@
         .free-plan-description {
             margin-bottom: 1.5rem;
             font-size: 1.1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             text-align: center;
+            line-height: 1.5;
         }
 
         .free-plan-features {
             list-style-type: none;
             margin-bottom: 2rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1rem;
         }
 
         .free-plan-feature {
             display: flex;
-            align-items: center;
-            padding: 0.5rem;
+            align-items: flex-start;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .free-plan-feature:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
         }
 
         .free-plan-feature i {
-            color: #28a745;
+            color: var(--success);
             margin-right: 0.75rem;
             font-size: 1.1rem;
-            min-width: 20px;
+            min-width: 24px;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
         }
 
         .free-plan-feature span {
-            color: #495057;
+            color: var(--gray-600);
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
 
-        /* Upgrade Section */
+        .free-plan-feature span strong {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
+
+        /* Upgrade Section - Enhanced */
         .upgrade-section {
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
             padding: 1.5rem;
             margin-top: 2rem;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .upgrade-title {
-            color: #495057;
+            color: var(--gray-600);
             margin-bottom: 1rem;
             font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.3;
         }
 
         .upgrade-options {
@@ -180,38 +208,50 @@
         }
 
         .upgrade-btn {
-            background: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            min-height: 48px;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+            font-family: inherit;
         }
 
         .upgrade-btn:hover {
-            background: #0bb3e6;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0596c7 100%);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+        }
+
+        .upgrade-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
         }
 
         .upgrade-btn i {
             margin-right: 0.5rem;
+            font-size: 1rem;
         }
 
         .upgrade-btn.secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, var(--gray-500) 0%, var(--gray-600) 100%);
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
         }
 
         .upgrade-btn.secondary:hover {
-            background: #5a6268;
+            background: linear-gradient(135deg, var(--gray-600) 0%, #495057 100%);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
         }
 
-        /* Usage Stats */
+        /* Usage Stats - Enhanced */
         .usage-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -220,43 +260,516 @@
         }
 
         .usage-stat {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1rem;
+            background: linear-gradient(135deg, white 0%, var(--gray-50) 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 1.25rem;
             text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .usage-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-light);
         }
 
         .usage-stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
+            line-height: 1;
         }
 
         .usage-stat-label {
-            color: #6c757d;
+            color: var(--gray-500);
             font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.4;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
+        /* ============================
+           MOBILE-FIRST RESPONSIVE DESIGN
+           ============================ */
+
+        /* Mobile Styles (default) */
+        @media (max-width: 575.98px) {
+            body {
+                padding: 0.5rem;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .free-container {
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .free-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .free-title {
+                font-size: 1.5rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.2;
+            }
+
+            .free-subtitle {
+                font-size: 0.95rem;
+                line-height: 1.4;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Enhanced mobile plan card */
             .free-plan-card {
                 max-width: 100%;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                box-shadow: 0 2px 12px rgba(9, 204, 252, 0.08);
+            }
+
+            .free-plan-header {
+                padding: 1rem;
+            }
+
+            .free-plan-name {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .free-plan-price {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .free-plan-price-period {
+                font-size: 0.9rem;
+            }
+
+            .free-plan-target {
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+
+            .free-plan-body {
+                padding: 1rem;
+            }
+
+            .free-plan-description {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Enhanced mobile features */
+            .free-plan-features {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .free-plan-feature {
+                padding: 0.75rem;
+                border-radius: 6px;
+            }
+
+            .free-plan-feature i {
+                font-size: 1rem;
+                min-width: 20px;
+                margin-right: 0.5rem;
+            }
+
+            .free-plan-feature span {
+                font-size: 0.9rem;
+            }
+
+            /* Enhanced mobile usage stats */
+            .usage-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                margin: 1.5rem 0;
+            }
+
+            .usage-stat {
+                padding: 0.75rem 0.5rem;
+                border-radius: 8px;
+            }
+
+            .usage-stat-number {
+                font-size: 1.5rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .usage-stat-label {
+                font-size: 0.75rem;
+                line-height: 1.2;
+            }
+
+            /* Enhanced mobile upgrade section */
+            .upgrade-section {
+                padding: 1rem;
+                margin-top: 1.5rem;
+                border-radius: 8px;
+            }
+
+            .upgrade-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.75rem;
             }
 
             .upgrade-options {
                 flex-direction: column;
                 align-items: center;
+                gap: 0.75rem;
             }
 
             .upgrade-btn {
                 width: 100%;
-                max-width: 250px;
+                max-width: none;
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+                border-radius: 6px;
+                touch-action: manipulation;
+            }
+
+            .upgrade-btn i {
+                margin-right: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            /* Touch enhancements */
+            .upgrade-btn:active {
+                transform: scale(0.98);
+            }
+
+            .free-plan-feature:active {
+                transform: scale(0.99);
+            }
+
+            .usage-stat:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .free-container {
+                padding: 1.5rem;
+                border-radius: 10px;
+            }
+
+            .free-title {
+                font-size: 1.75rem;
+            }
+
+            .free-subtitle {
+                font-size: 1rem;
+            }
+
+            .free-plan-card {
+                border-radius: 10px;
+            }
+
+            .free-plan-header {
+                padding: 1.25rem;
+            }
+
+            .free-plan-name {
+                font-size: 1.65rem;
+            }
+
+            .free-plan-price {
+                font-size: 2.25rem;
+            }
+
+            .free-plan-body {
+                padding: 1.5rem;
             }
 
             .free-plan-features {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .usage-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+
+            .upgrade-options {
+                flex-direction: row;
+                gap: 1rem;
+            }
+
+            .upgrade-btn {
+                flex: 1;
+                max-width: 250px;
+            }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            body {
+                padding: 1rem;
+            }
+
+            .free-container {
+                padding: 1.75rem;
+            }
+
+            .free-title {
+                font-size: 1.85rem;
+            }
+
+            .free-subtitle {
+                font-size: 1.05rem;
+            }
+
+            .free-plan-header {
+                padding: 1.5rem;
+            }
+
+            .free-plan-body {
+                padding: 1.75rem;
+            }
+
+            .free-plan-features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .usage-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .upgrade-options {
+                flex-direction: row;
+                gap: 1rem;
+            }
+
+            .upgrade-btn {
+                flex: 1;
+                max-width: 280px;
+            }
+        }
+
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            .free-container {
+                padding: 2rem;
+            }
+
+            .free-plan-features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .usage-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            body {
+                padding: 2rem;
+            }
+
+            .free-container {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .free-container {
+                padding: 0.75rem;
+            }
+
+            .free-header {
+                margin-bottom: 1rem;
+            }
+
+            .free-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .free-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .free-plan-header {
+                padding: 0.75rem;
+            }
+
+            .free-plan-name {
+                font-size: 1.25rem;
+            }
+
+            .free-plan-price {
+                font-size: 1.75rem;
+            }
+
+            .free-plan-body {
+                padding: 0.75rem;
+            }
+
+            .free-plan-features {
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .free-plan-feature {
+                padding: 0.5rem;
+            }
+
+            .usage-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                margin: 1rem 0;
+            }
+
+            .usage-stat {
+                padding: 0.5rem;
+            }
+
+            .usage-stat-number {
+                font-size: 1.25rem;
+            }
+
+            .usage-stat-label {
+                font-size: 0.7rem;
+            }
+
+            .upgrade-section {
+                padding: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .upgrade-title {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .upgrade-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+
+            .free-plan-feature:hover,
+            .usage-stat:hover {
+                transform: none;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            .upgrade-btn:hover {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                transform: none;
+                box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+            }
+
+            .upgrade-btn.secondary:hover {
+                background: linear-gradient(135deg, var(--gray-500) 0%, var(--gray-600) 100%);
+                box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+            }
+
+            /* Enhanced tap highlighting */
+            .upgrade-btn,
+            .free-plan-feature,
+            .usage-stat {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+            }
+
+            /* Prevent text selection on interactive elements */
+            .upgrade-btn {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .free-container {
+                will-change: transform;
+            }
+
+            .free-plan-card {
+                will-change: transform;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            /* Safe area adjustments for iPhone X+ */
+            @media (max-width: 575.98px) {
+                body {
+                    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+                }
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+
+            .free-plan-card,
+            .free-plan-feature,
+            .usage-stat,
+            .upgrade-btn {
+                transition: none;
+            }
+
+            .free-plan-feature:hover,
+            .usage-stat:hover,
+            .upgrade-btn:hover,
+            .upgrade-btn:active,
+            .free-plan-feature:active,
+            .usage-stat:active {
+                transform: none;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .free-container {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .free-plan-card {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .upgrade-section {
+                display: none;
             }
         }
     </style>
@@ -271,83 +784,74 @@
             const freePlanHTML = `
                 <div class="free-container">
                     <div class="free-header">
-                        <h2 class="free-title">Your Current Plan</h2>
-                        <p class="free-subtitle">You're currently on our Free Plan. Explore what's included and discover upgrade options to accelerate your credit repair journey.</p>
-                    </div>
-
-                    <div class="current-plan-status">
-                        <div class="status-badge">
-                            <i class="fas fa-check-circle"></i>
-                            Active Free Plan
-                        </div>
-                        <h3>Welcome to JAM Credit Solutions!</h3>
-                        <p>Your free account gives you access to essential credit monitoring and basic tools.</p>
+                        <h2 class="free-title">Free Plan</h2>
+                        <p class="free-subtitle">Start your credit dispute journey with our comprehensive free plan. Explore what's included and discover upgrade options to accelerate your progress.</p>
                     </div>
 
                     <div class="free-plan-card">
                         <div class="free-plan-header">
                             <h3 class="free-plan-name">Free Plan</h3>
                             <div class="free-plan-price">$0<span class="free-plan-price-period">/forever</span></div>
-                            <p class="free-plan-target">Perfect for getting started with credit monitoring</p>
+                            <p class="free-plan-target">Perfect for getting started with professional credit disputes</p>
                         </div>
 
                         <div class="free-plan-body">
                             <p class="free-plan-description">
-                                Your free plan includes essential credit monitoring tools to help you stay informed about your credit status.
+                                Get started with our comprehensive suite of credit dispute tools - completely free! Access professional-grade features to begin improving your credit score today.
                             </p>
 
                             <div class="usage-stats">
                                 <div class="usage-stat">
-                                    <div class="usage-stat-number">3</div>
-                                    <div class="usage-stat-label">Credit Reports</div>
+                                    <div class="usage-stat-number">2</div>
+                                    <div class="usage-stat-label">Free Dispute Letters</div>
                                 </div>
                                 <div class="usage-stat">
                                     <div class="usage-stat-number">∞</div>
-                                    <div class="usage-stat-label">Score Monitoring</div>
+                                    <div class="usage-stat-label">Credit Analysis</div>
                                 </div>
                                 <div class="usage-stat">
-                                    <div class="usage-stat-number">5</div>
-                                    <div class="usage-stat-label">Educational Resources</div>
+                                    <div class="usage-stat-number">∞</div>
+                                    <div class="usage-stat-label">Dispute Library Access</div>
                                 </div>
                             </div>
 
                             <ul class="free-plan-features">
                                 <li class="free-plan-feature">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Basic credit score monitoring</span>
+                                    <i class="fas fa-engine"></i>
+                                    <span><strong>JAM Engine Credit Management Platform</strong> - Full access to our comprehensive credit management tools</span>
                                 </li>
                                 <li class="free-plan-feature">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Monthly credit report access</span>
+                                    <i class="fas fa-book-open"></i>
+                                    <span><strong>Dispute Library</strong> - Professional prompts for various credit dispute reasons to use with your favorite AI tool</span>
                                 </li>
                                 <li class="free-plan-feature">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Credit education resources</span>
+                                    <i class="fas fa-envelope"></i>
+                                    <span><strong>2 Free Dispute Letter Credits</strong> - Generate professional dispute letters with our JAM Dispute Bot</span>
                                 </li>
                                 <li class="free-plan-feature">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Account alerts and notifications</span>
+                                    <i class="fas fa-chart-line"></i>
+                                    <span><strong>JAM Dispute Bot Credit Analysis</strong> - AI-powered analysis of your credit reports to identify dispute opportunities</span>
                                 </li>
                                 <li class="free-plan-feature">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Basic financial tips</span>
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span><strong>JAM Dispute Bot Credit Educator</strong> - Interactive credit education and strategic guidance</span>
                                 </li>
                                 <li class="free-plan-feature">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Community forum access</span>
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span><strong>Secure Document Storage</strong> - Safe storage for your credit reports and dispute documentation</span>
                                 </li>
                             </ul>
 
                             <div class="upgrade-section">
-                                <h4 class="upgrade-title">Ready to accelerate your credit repair?</h4>
+                                <h4 class="upgrade-title">Ready to accelerate your credit disputes?</h4>
                                 <div class="upgrade-options">
                                     <button class="upgrade-btn" id="upgrade-to-diy">
                                         <i class="fas fa-tools"></i>
-                                        Upgrade to DIY Plan - $79/mo
+                                        Upgrade to DIY Plan
                                     </button>
                                     <button class="upgrade-btn" id="upgrade-to-full">
                                         <i class="fas fa-user-tie"></i>
-                                        Upgrade to Full Service - $149/mo
+                                        Upgrade to Full Service
                                     </button>
                                 </div>
                             </div>

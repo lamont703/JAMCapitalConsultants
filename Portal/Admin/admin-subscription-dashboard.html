@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Dispute Bot - Subscription Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #09ccfc 0%, #0066cc 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-content {
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid #09ccfc;
+        }
+
+        .stat-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #09ccfc;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #09ccfc;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #0066cc;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .users-table th {
+            background: #09ccfc;
+            color: white;
+            font-weight: 600;
+        }
+
+        .users-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .tier-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tier-free {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tier-starter {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tier-professional {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .tier-premium {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tier-unknown {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px dashed #dee2e6;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🎯 JAM Dispute Bot</h1>
+            <p>Subscription Management Dashboard - Phase 1</p>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Statistics Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="stat-value" id="totalUsers">-</div>
+                    <div class="stat-label">Registered Users</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Subscriptions</h3>
+                    <div class="stat-value" id="activeSubscriptions">-</div>
+                    <div class="stat-label">Paying Customers</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Credits Used Today</h3>
+                    <div class="stat-value" id="creditsUsedToday">-</div>
+                    <div class="stat-label">Letter Generations</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Revenue (Est.)</h3>
+                    <div class="stat-value" id="estimatedRevenue">$-</div>
+                    <div class="stat-label">Monthly Recurring</div>
+                </div>
+            </div>
+
+            <!-- Manual User Management -->
+            <div class="section">
+                <h2>👤 Manual User Management</h2>
+                <div id="userManagementAlert"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h3>Update User Subscription</h3>
+                        <div class="form-group">
+                            <label for="userId">User ID:</label>
+                            <input type="text" id="userId" placeholder="Enter user ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="newTier">New Tier:</label>
+                            <select id="newTier">
+                                <option value="free">Free Trial</option>
+                                <option value="starter">DIY Starter ($29/month)</option>
+                                <option value="professional">DIY Professional ($59/month)</option>
+                                <option value="premium">DIY Premium ($99/month)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subscriptionStatus">Status:</label>
+                            <select id="subscriptionStatus">
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subscriptionDuration">Duration (for paid tiers):</label>
+                            <select id="subscriptionDuration">
+                                <option value="30">30 Days</option>
+                                <option value="60">60 Days</option>
+                                <option value="90">90 Days</option>
+                                <option value="180">6 Months</option>
+                                <option value="365">1 Year</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="updateUserTier()">Update Subscription</button>
+                    </div>
+
+                    <div>
+                        <h3>Add Credits to User</h3>
+                        <div class="form-group">
+                            <label for="creditUserId">User ID:</label>
+                            <input type="text" id="creditUserId" placeholder="Enter user ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="creditsToAdd">Credits to Add:</label>
+                            <input type="number" id="creditsToAdd" placeholder="Enter number of credits" min="1">
+                        </div>
+                        <button class="btn" onclick="addCreditsToUser()">Add Credits</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User List -->
+            <div class="section">
+                <h2>📋 User Subscriptions</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="loadUsers()">Refresh Users</button>
+                    <button class="btn btn-secondary" onclick="processExpiredSubscriptions()">Process Expired</button>
+                </div>
+
+                <div id="usersLoading" class="loading" style="display: none;">Loading users...</div>
+                <div id="usersContainer">
+                    <table class="users-table" id="usersTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Tier</th>
+                                <th>Credits</th>
+                                <th>Total Used</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div class="section">
+                <h2>📊 Analytics</h2>
+                <button class="btn" onclick="loadAnalytics()">Load Analytics</button>
+                <div id="analyticsContainer" style="margin-top: 20px;">
+                    <div id="analyticsLoading" class="loading" style="display: none;">Loading analytics...</div>
+                    <div id="analyticsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://jam-capital-backend.azurewebsites.net';
+
+        // Load dashboard data on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDashboardStats();
+            loadUsers();
+        });
+
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions/overview`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const data = result.data;
+                    document.getElementById('totalUsers').textContent = data.totalUsers || 0;
+
+                    // Calculate active subscriptions (non-free tiers)
+                    const activeSubscriptions = Object.entries(data.summary.tierBreakdown)
+                        .filter(([tier, count]) => tier !== 'free')
+                        .reduce((sum, [tier, count]) => sum + count, 0);
+                    document.getElementById('activeSubscriptions').textContent = activeSubscriptions;
+
+                    // Calculate today's credit usage
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayUsage = data.recentActivity
+                        .filter(activity => activity.timestamp.startsWith(today))
+                        .reduce((sum, activity) => sum + (activity.creditsUsed || 0), 0);
+                    document.getElementById('creditsUsedToday').textContent = todayUsage;
+
+                    // Estimate monthly revenue
+                    const tierPrices = { starter: 29, professional: 59, premium: 99 };
+                    const estimatedRevenue = Object.entries(data.summary.tierBreakdown)
+                        .reduce((sum, [tier, count]) => sum + (tierPrices[tier] || 0) * count, 0);
+                    document.getElementById('estimatedRevenue').textContent = estimatedRevenue;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        async function loadUsers() {
+            const loadingEl = document.getElementById('usersLoading');
+            const tableEl = document.getElementById('usersTable');
+            const bodyEl = document.getElementById('usersTableBody');
+
+            loadingEl.style.display = 'block';
+            tableEl.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions/users`);
+                const result = await response.json();
+
+                if (result.success) {
+                    bodyEl.innerHTML = '';
+
+                    result.data.users.forEach(user => {
+                        // Handle users without subscription data (legacy users)
+                        const subscription = user.subscription || {};
+                        const subscriptionInfo = user.subscriptionInfo || {
+                            tierName: 'Unknown',
+                            remainingCredits: 0,
+                            totalCreditsUsed: 0,
+                            status: 'unknown'
+                        };
+
+                        const tier = subscription.tier || 'unknown';
+                        const tierName = subscriptionInfo.tierName || 'Unknown';
+                        const remainingCredits = subscriptionInfo.remainingCredits || 0;
+                        const totalCreditsUsed = subscriptionInfo.totalCreditsUsed || 0;
+                        const status = subscriptionInfo.status || 'unknown';
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.id || 'N/A'}</td>
+                            <td>${user.email || 'N/A'}</td>
+                            <td>${user.name || 'N/A'}</td>
+                            <td><span class="tier-badge tier-${tier}">${tierName}</span></td>
+                            <td>${remainingCredits}</td>
+                            <td>${totalCreditsUsed}</td>
+                            <td>${status}</td>
+                            <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</td>
+                        `;
+                        bodyEl.appendChild(row);
+                    });
+
+                    tableEl.style.display = 'table';
+                } else {
+                    showAlert('userManagementAlert', 'error', result.message || 'Failed to load users');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showAlert('userManagementAlert', 'error', 'Error loading users: ' + error.message);
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        async function updateUserTier() {
+            const userId = document.getElementById('userId').value.trim();
+            const newTier = document.getElementById('newTier').value;
+            const status = document.getElementById('subscriptionStatus').value;
+            const duration = parseInt(document.getElementById('subscriptionDuration').value);
+
+            if (!userId) {
+                showAlert('userManagementAlert', 'error', 'Please enter a user ID');
+                return;
+            }
+
+            // Calculate subscription dates for paid tiers
+            let subscriptionStartDate = null;
+            let subscriptionEndDate = null;
+
+            if (newTier !== 'free' && status === 'active') {
+                subscriptionStartDate = new Date().toISOString();
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + duration);
+                subscriptionEndDate = endDate.toISOString();
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions/user/${userId}/tier`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tier: newTier,
+                        status: status,
+                        subscriptionStartDate: subscriptionStartDate,
+                        subscriptionEndDate: subscriptionEndDate,
+                        reason: 'admin_manual_update'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('userManagementAlert', 'success', result.message);
+                    document.getElementById('userId').value = '';
+                    loadUsers(); // Refresh user list
+                    loadDashboardStats(); // Refresh stats
+                } else {
+                    showAlert('userManagementAlert', 'error', result.message || 'Failed to update user tier');
+                }
+            } catch (error) {
+                console.error('Error updating user tier:', error);
+                showAlert('userManagementAlert', 'error', 'Error updating user tier: ' + error.message);
+            }
+        }
+
+        async function addCreditsToUser() {
+            const userId = document.getElementById('creditUserId').value.trim();
+            const creditsToAdd = parseInt(document.getElementById('creditsToAdd').value);
+
+            if (!userId) {
+                showAlert('userManagementAlert', 'error', 'Please enter a user ID');
+                return;
+            }
+
+            if (!creditsToAdd || creditsToAdd <= 0) {
+                showAlert('userManagementAlert', 'error', 'Please enter a valid number of credits');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions/user/${userId}/credits/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        creditsToAdd: creditsToAdd
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('userManagementAlert', 'success', result.message);
+                    document.getElementById('creditUserId').value = '';
+                    document.getElementById('creditsToAdd').value = '';
+                    loadUsers(); // Refresh user list
+                } else {
+                    showAlert('userManagementAlert', 'error', result.message || 'Failed to add credits');
+                }
+            } catch (error) {
+                console.error('Error adding credits:', error);
+                showAlert('userManagementAlert', 'error', 'Error adding credits: ' + error.message);
+            }
+        }
+
+        async function processExpiredSubscriptions() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions/process-expired`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('userManagementAlert', 'success', result.message);
+                    loadUsers(); // Refresh user list
+                    loadDashboardStats(); // Refresh stats
+                } else {
+                    showAlert('userManagementAlert', 'error', result.message || 'Failed to process expired subscriptions');
+                }
+            } catch (error) {
+                console.error('Error processing expired subscriptions:', error);
+                showAlert('userManagementAlert', 'error', 'Error processing expired subscriptions: ' + error.message);
+            }
+        }
+
+        async function loadAnalytics() {
+            const loadingEl = document.getElementById('analyticsLoading');
+            const contentEl = document.getElementById('analyticsContent');
+
+            loadingEl.style.display = 'block';
+            contentEl.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions/analytics`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const analytics = result.data;
+
+                    contentEl.innerHTML = `
+                        <h3>Subscription Analytics</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                            <div>
+                                <h4>Tier Breakdown</h4>
+                                <ul>
+                                    ${Object.entries(analytics.summary.tierBreakdown)
+                            .map(([tier, count]) => `<li>${tier}: ${count} users</li>`)
+                            .join('')}
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Usage Statistics</h4>
+                                <ul>
+                                    <li>Total Credits Used: ${analytics.summary.totalCreditsUsed}</li>
+                                    <li>Average per User: ${analytics.summary.avgCreditsPerUser.toFixed(2)}</li>
+                                    <li>Most Active Users: ${analytics.summary.mostActiveUsers.length}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <h4 style="margin-top: 20px;">Recent Credit Usage</h4>
+                        <div style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
+                            ${analytics.creditUsageLogs.slice(0, 10).map(log => `
+                                <div style="padding: 8px; border-bottom: 1px solid #eee;">
+                                    <strong>${log.userEmail}</strong> used ${log.creditsUsed} credits 
+                                    for ${log.operation} on ${new Date(log.timestamp).toLocaleString()}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    contentEl.innerHTML = `<div class="alert alert-error">${result.message || 'Failed to load analytics'}</div>`;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                contentEl.innerHTML = `<div class="alert alert-error">Error loading analytics: ${error.message}</div>`;
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        function showAlert(containerId, type, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

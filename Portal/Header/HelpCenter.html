@@ -399,6 +399,510 @@
             color: #09ccfc;
             font-weight: 500;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .help-container {
+                padding: 0 15px;
+            }
+
+            .help-title {
+                font-size: 20px;
+                text-align: center;
+            }
+
+            .help-subtitle {
+                font-size: 14px;
+                text-align: center;
+                margin-bottom: 25px;
+            }
+
+            .help-search-container {
+                margin-bottom: 25px;
+            }
+
+            .help-search-input {
+                font-size: 16px;
+                /* Prevents iOS zoom */
+                padding: 14px 45px 14px 15px;
+                border-radius: 8px;
+            }
+
+            .help-search-icon {
+                right: 12px;
+                font-size: 18px;
+            }
+
+            .help-categories {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .help-category {
+                padding: 18px;
+                border-radius: 10px;
+                transition: all 0.2s ease;
+            }
+
+            .help-category:hover {
+                transform: none;
+                /* Remove hover transform on mobile */
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+            }
+
+            .help-category:active {
+                transform: scale(0.98);
+                transition: transform 0.1s;
+            }
+
+            .help-category-icon {
+                font-size: 28px;
+                margin-bottom: 12px;
+            }
+
+            .help-category-title {
+                font-size: 17px;
+                margin-bottom: 8px;
+            }
+
+            .help-category-description {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .help-faq-section {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+            }
+
+            .help-faq-title {
+                font-size: 18px;
+                margin-bottom: 18px;
+                text-align: center;
+            }
+
+            .help-faq-item {
+                margin-bottom: 12px;
+                border-radius: 8px;
+            }
+
+            .help-faq-question {
+                padding: 16px 18px;
+                font-size: 15px;
+                line-height: 1.4;
+                border-radius: 8px 8px 0 0;
+                min-height: 44px;
+                /* Touch target */
+                display: flex;
+                align-items: center;
+            }
+
+            .help-faq-question span {
+                flex: 1;
+                margin-right: 10px;
+            }
+
+            .help-faq-question i {
+                font-size: 16px;
+                flex-shrink: 0;
+            }
+
+            .help-faq-answer {
+                padding: 0 18px;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .help-faq-answer.active {
+                padding: 16px 18px;
+            }
+
+            .help-contact-section {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+                text-align: center;
+            }
+
+            .help-contact-title {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+
+            .help-contact-description {
+                font-size: 14px;
+                margin-bottom: 18px;
+            }
+
+            .help-contact-button {
+                padding: 14px 24px;
+                font-size: 16px;
+                border-radius: 8px;
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .help-search-results,
+            .help-article-container {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+            }
+
+            .help-search-results-title,
+            .help-article-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+
+            .help-search-result {
+                padding: 16px 12px;
+                border-radius: 6px;
+                margin-bottom: 8px;
+            }
+
+            .help-search-result-title {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+
+            .help-search-result-preview {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+
+            .help-article-back {
+                margin-bottom: 15px;
+                font-size: 15px;
+                padding: 8px 0;
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .help-article-content {
+                font-size: 15px;
+                line-height: 1.7;
+            }
+
+            .help-article-content h3 {
+                font-size: 17px;
+                margin: 20px 0 12px;
+            }
+
+            .help-article-content p {
+                margin-bottom: 12px;
+            }
+
+            .help-article-content ul,
+            .help-article-content ol {
+                margin-bottom: 12px;
+                padding-left: 18px;
+            }
+
+            .help-article-helpful {
+                margin-top: 30px;
+                padding-top: 20px;
+            }
+
+            .help-article-helpful-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+
+            .help-article-helpful-buttons {
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
+            }
+
+            .help-article-helpful-button {
+                padding: 12px 20px;
+                min-height: 44px;
+                font-size: 15px;
+                width: 120px;
+                justify-content: center;
+                border-radius: 8px;
+            }
+
+            .help-no-results {
+                padding: 40px 20px;
+            }
+
+            .help-no-results i {
+                font-size: 40px;
+                margin-bottom: 12px;
+            }
+        }
+
+        /* Small Mobile Screens */
+        @media (max-width: 480px) {
+            .help-container {
+                padding: 0 10px;
+            }
+
+            .help-title {
+                font-size: 18px;
+            }
+
+            .help-subtitle {
+                font-size: 13px;
+            }
+
+            .help-search-input {
+                padding: 12px 40px 12px 12px;
+            }
+
+            .help-category {
+                padding: 15px;
+            }
+
+            .help-category-icon {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .help-category-title {
+                font-size: 16px;
+                margin-bottom: 6px;
+            }
+
+            .help-category-description {
+                font-size: 12px;
+            }
+
+            .help-faq-section {
+                padding: 15px 10px;
+            }
+
+            .help-faq-title {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            .help-faq-question {
+                padding: 14px 15px;
+                font-size: 14px;
+            }
+
+            .help-faq-answer {
+                padding: 0 15px;
+                font-size: 13px;
+            }
+
+            .help-faq-answer.active {
+                padding: 14px 15px;
+            }
+
+            .help-contact-section {
+                padding: 18px 12px;
+            }
+
+            .help-contact-title {
+                font-size: 16px;
+            }
+
+            .help-contact-button {
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+
+            .help-search-results,
+            .help-article-container {
+                padding: 15px 10px;
+            }
+
+            .help-search-results-title,
+            .help-article-title {
+                font-size: 16px;
+            }
+
+            .help-search-result {
+                padding: 14px 10px;
+            }
+
+            .help-search-result-title {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .help-search-result-preview {
+                font-size: 12px;
+            }
+
+            .help-article-content {
+                font-size: 14px;
+            }
+
+            .help-article-content h3 {
+                font-size: 16px;
+                margin: 18px 0 10px;
+            }
+
+            .help-article-helpful-button {
+                width: 100px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+
+        /* Touch Enhancements */
+        @media (hover: none) and (pointer: coarse) {
+
+            .help-category,
+            .help-faq-question,
+            .help-search-result,
+            .help-contact-button,
+            .help-article-helpful-button {
+                min-height: 44px;
+                /* Apple's recommended touch target */
+            }
+
+            .help-search-input {
+                min-height: 44px;
+                -webkit-appearance: none;
+                /* Remove iOS styling */
+            }
+
+            /* Improve touch feedback */
+            .help-category:active,
+            .help-faq-question:active,
+            .help-search-result:active,
+            .help-contact-button:active,
+            .help-article-helpful-button:active {
+                transform: scale(0.98);
+                transition: transform 0.1s;
+            }
+
+            /* Remove hover effects on touch devices */
+            .help-category:hover {
+                transform: none;
+            }
+
+            .help-faq-question:hover {
+                background: #fff;
+                border-color: #eee;
+            }
+
+            .help-search-result:hover {
+                background-color: transparent;
+            }
+        }
+
+        /* Landscape Mobile Optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .help-container {
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .help-categories {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .help-category {
+                padding: 12px;
+            }
+
+            .help-category-description {
+                display: none;
+                /* Hide descriptions in landscape to save space */
+            }
+
+            .help-faq-section {
+                padding: 15px;
+            }
+
+            .help-faq-question {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .help-faq-answer.active {
+                padding: 12px 15px;
+            }
+        }
+
+        /* Very Small Screens */
+        @media (max-width: 360px) {
+            .help-title {
+                font-size: 16px;
+            }
+
+            .help-subtitle {
+                font-size: 12px;
+            }
+
+            .help-category-title {
+                font-size: 15px;
+            }
+
+            .help-category-description {
+                font-size: 11px;
+            }
+
+            .help-faq-title {
+                font-size: 15px;
+            }
+
+            .help-contact-title {
+                font-size: 15px;
+            }
+        }
+
+        /* Dark Mode Support for Mobile 
+        @media (prefers-color-scheme: dark) and (max-width: 768px) {
+            .help-container {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+            }
+
+            .help-category,
+            .help-faq-section,
+            .help-search-results,
+            .help-article-container {
+                background-color: #2d2d2d;
+                color: #e0e0e0;
+            }
+
+            .help-faq-question {
+                background-color: #2d2d2d;
+                border-color: #404040;
+                color: #e0e0e0;
+            }
+
+            .help-faq-question:hover,
+            .help-faq-question.active {
+                background-color: #3a3a3a;
+                border-color: #09ccfc;
+            }
+
+            .help-faq-answer {
+                background-color: #3a3a3a;
+                color: #d0d0d0;
+            }
+
+            .help-search-input {
+                background-color: #2d2d2d;
+                border-color: #404040;
+                color: #e0e0e0;
+            }
+
+            .help-search-input:focus {
+                border-color: #09ccfc;
+            }
+
+            .help-search-result:hover {
+                background-color: #3a3a3a;
+            }
+
+            .help-contact-section {
+                background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+            }
+        }*/
     </style>
 </head>
 
@@ -419,7 +923,7 @@
                     category: 'Getting Started',
                     content: `
                         <h3>Welcome to JAM Engine</h3>
-                        <p>JAM Engine is your all-in-one platform for credit repair and financial management. This guide will help you get started with the basic features and navigation.</p>
+                        <p>JAM Engine is your all-in-one platform for credit disputes and financial management. This guide will help you get started with the basic features and navigation.</p>
                         
                         <h3>Setting Up Your Account</h3>
                         <p>When you first log in, you'll be prompted to complete your profile and provide some basic information about your credit situation. This helps us personalize your experience.</p>
@@ -435,7 +939,7 @@
                         </ul>
                         
                         <h3>Navigation</h3>
-                        <p>Use the sidebar menu to navigate between different sections of the platform. Each section is designed to help you with specific aspects of your credit repair journey.</p>
+                        <p>Use the sidebar menu to navigate between different sections of the platform. Each section is designed to help you with specific aspects of your credit dispute journey.</p>
                     `
                 },
                 {
@@ -528,7 +1032,7 @@
                     category: 'Support',
                     content: `
                         <h3>Messaging System</h3>
-                        <p>JAM Engine includes a built-in messaging system that allows you to communicate directly with your assigned credit repair specialist.</p>
+                        <p>JAM Engine includes a built-in messaging system that allows you to communicate directly with your assigned credit dispute specialist.</p>
                         
                         <h3>Sending Messages</h3>
                         <p>To send a message:</p>

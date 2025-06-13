@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispute Letter Library - JAM Credit Solutions</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -361,50 +361,920 @@
             }
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 1024px) {
-            .letter-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        /* Enhanced Mobile-First Responsive Design */
 
-        @media (max-width: 768px) {
-            .letter-grid {
-                grid-template-columns: 1fr;
+        /* Mobile Styles (default - ≤575px) */
+        @media (max-width: 575.98px) {
+            body {
+                font-size: 14px;
+                line-height: 1.5;
+                padding: 0.5rem;
+                background: linear-gradient(135deg, var(--gray-100) 0%, var(--primary-light) 100%);
             }
 
+            .dispute-library {
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* Enhanced Mobile Header */
+            .library-header {
+                text-align: center;
+                margin-bottom: 1.5rem;
+                padding: 1rem;
+                background: linear-gradient(135deg, white 0%, var(--primary-light) 100%);
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+
+            .library-title {
+                font-size: 1.5rem;
+                background: linear-gradient(135deg, var(--blue-accent) 0%, var(--primary) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 0.75rem;
+                font-weight: 700;
+            }
+
+            .library-description {
+                color: var(--gray-600);
+                font-size: 0.9rem;
+                line-height: 1.6;
+                margin: 0;
+            }
+
+            /* Touch-Optimized Search Container */
             .search-container {
                 flex-direction: column;
+                margin-bottom: 1.25rem;
+                max-width: 100%;
+                gap: 0.75rem;
             }
 
             .search-input {
-                border-radius: 4px;
-                margin-bottom: 0.5rem;
+                border-radius: 12px;
+                padding: 1rem;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                border: 2px solid var(--gray-300);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                transition: all 0.3s ease;
+                width: 100%;
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            .search-input:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+                outline: none;
             }
 
             .search-button {
-                border-radius: 4px;
+                border-radius: 12px;
                 width: 100%;
+                min-height: 44px;
+                padding: 1rem;
+                background: linear-gradient(135deg, var(--blue-dark) 0%, var(--primary) 100%);
+                color: white;
+                border: none;
+                font-weight: 600;
+                font-size: 0.95rem;
+                box-shadow: 0 4px 12px rgba(0, 39, 66, 0.2);
+                transition: all 0.3s ease;
+                touch-action: manipulation;
+            }
+
+            .search-button:active {
+                transform: translateY(1px);
+                box-shadow: 0 2px 8px rgba(0, 39, 66, 0.3);
+            }
+
+            /* Enhanced Filter Container */
+            .filter-container {
+                gap: 0.5rem;
+                margin-bottom: 1.5rem;
+                padding: 0 0.25rem;
+                justify-content: flex-start;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .filter-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .filter-button {
+                background: white;
+                border: 2px solid var(--gray-300);
+                padding: 0.75rem 1rem;
+                border-radius: 25px;
+                cursor: pointer;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 0.85rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                min-height: 44px;
+                white-space: nowrap;
+                flex-shrink: 0;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                touch-action: manipulation;
+            }
+
+            .filter-button:active {
+                transform: scale(0.98);
+            }
+
+            .filter-button.active {
+                background: linear-gradient(135deg, var(--blue-dark) 0%, var(--primary) 100%);
+                color: white;
+                border-color: var(--primary);
+                box-shadow: 0 4px 12px rgba(0, 128, 128, 0.2);
+            }
+
+            /* Mobile-Optimized Letter Grid */
+            .letter-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Enhanced Mobile Letter Cards */
+            .letter-card {
+                min-height: 320px;
+                margin-bottom: 0;
+                perspective: 1000px;
+                width: 100%;
+            }
+
+            .letter-card-inner {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+                border-radius: 16px;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            .letter-card-front,
+            .letter-card-back {
+                background: linear-gradient(135deg, var(--blue-dark) 0%, #001f36 100%);
+                border-radius: 16px;
+                padding: 1.25rem;
+                border-left: 6px solid var(--blue-accent);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .letter-card-front::before,
+            .letter-card-back::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 100px;
+                height: 100px;
+                background: radial-gradient(circle, rgba(9, 204, 252, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            }
+
+            .letter-card-header {
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 2px solid rgba(9, 204, 252, 0.3);
+            }
+
+            .letter-card-header h3 {
+                font-size: 1.1rem;
+                line-height: 1.4;
+                font-weight: 600;
+                margin: 0;
+                color: white;
+            }
+
+            .letter-icon {
+                font-size: 1.5rem;
+                margin-right: 0.75rem;
+                color: var(--blue-accent);
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .letter-description {
+                font-size: 0.9rem;
+                line-height: 1.6;
+                margin: 0.75rem 0 1rem;
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .letter-category {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
+                border-radius: 15px;
+                background: rgba(9, 204, 252, 0.2);
+                color: var(--blue-accent);
+                font-weight: 500;
+                border: 1px solid rgba(9, 204, 252, 0.3);
+            }
+
+            /* Touch-Optimized Buttons */
+            .letter-flip-btn,
+            .letter-action-btn,
+            .letter-back-btn {
+                min-height: 44px;
+                padding: 0.75rem 1.25rem;
+                border-radius: 25px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+                touch-action: manipulation;
+                border: none;
+                cursor: pointer;
+            }
+
+            .letter-flip-btn {
+                background: rgba(9, 204, 252, 0.2);
+                color: white;
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(9, 204, 252, 0.3);
+                width: 100%;
+                margin-top: auto;
+            }
+
+            .letter-flip-btn:active {
+                transform: scale(0.98);
+                background: rgba(9, 204, 252, 0.3);
+            }
+
+            .letter-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                margin-top: auto;
+            }
+
+            .letter-action-btn {
+                width: 100%;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .letter-action-btn.preview {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .letter-action-btn.preview:active {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0.98);
+            }
+
+            .letter-action-btn.download {
+                background: rgba(40, 167, 69, 0.2);
+                color: white;
+                border: 1px solid rgba(40, 167, 69, 0.3);
+            }
+
+            .letter-action-btn.download:active {
+                background: rgba(40, 167, 69, 0.3);
+                transform: scale(0.98);
+            }
+
+            .letter-back-btn {
+                background: transparent;
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .letter-back-btn:active {
+                background: rgba(255, 255, 255, 0.1);
+                transform: scale(0.98);
+            }
+
+            .letter-date {
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.7);
+                margin-top: 0.75rem;
+                text-align: center;
+            }
+
+            /* Enhanced Letter Content for Mobile */
+            .letter-content {
+                font-size: 0.85rem;
+                line-height: 1.6;
+                margin-bottom: 1rem;
+                max-height: 200px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .letter-content::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .letter-content::-webkit-scrollbar-thumb {
+                background: rgba(9, 204, 252, 0.3);
+                border-radius: 2px;
+            }
+
+            /* Enhanced Empty and Loading States */
+            .empty-state,
+            .loading-state {
+                padding: 2rem 1rem;
+                text-align: center;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                margin: 1rem 0;
+            }
+
+            .empty-state i,
+            .loading-state i {
+                font-size: 2.5rem;
+                color: var(--gray-600);
+                margin-bottom: 1rem;
+            }
+
+            .loading-spinner {
+                width: 32px;
+                height: 32px;
+                border: 3px solid rgba(0, 39, 66, 0.1);
+                border-top-color: var(--blue-dark);
+                margin: 0 auto 1rem;
+            }
+
+            /* Dispute Card Mobile Optimizations */
+            #letterGrid {
+                padding: 0;
+                gap: 1rem;
+            }
+
+            .dispute-prompt-card {
+                width: 100%;
+                height: auto;
+                min-height: 400px;
+                margin: 0 0 1rem 0;
+                perspective: 1000px;
+            }
+
+            .dispute-card-inner {
+                border-radius: 16px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+                transition: transform 0.6s ease;
+            }
+
+            .dispute-card-front,
+            .dispute-card-back {
+                border-radius: 16px;
+                padding: 1.25rem;
+                min-height: 380px;
+            }
+
+            .dispute-card-front {
+                background: linear-gradient(135deg, white 0%, var(--gray-100) 100%);
+                border-left: 6px solid var(--primary);
+            }
+
+            .dispute-card-back {
+                background: linear-gradient(135deg, var(--gray-100) 0%, white 100%);
+                border-left: 6px solid var(--blue-accent);
+            }
+
+            .dispute-card-header {
+                margin-bottom: 1rem;
+                min-height: auto;
+            }
+
+            .dispute-ai-icon {
+                font-size: 1.5rem;
+                color: var(--primary);
+                margin-right: 0.75rem;
+            }
+
+            .dispute-card-front h3 {
+                font-size: 1.1rem;
+                color: var(--gray-800);
+                line-height: 1.4;
+                font-weight: 600;
+            }
+
+            .dispute-card-description {
+                font-size: 0.9rem;
+                line-height: 1.6;
+                color: var(--gray-600);
+                margin-bottom: 1rem;
+                max-height: 180px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .dispute-flip-btn,
+            .dispute-copy-btn {
+                min-height: 44px;
+                padding: 0.75rem 1.25rem;
+                border-radius: 25px;
+                font-weight: 600;
+                touch-action: manipulation;
+                transition: all 0.3s ease;
+            }
+
+            .dispute-flip-btn {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: white;
+                border: none;
+                width: 100%;
+                margin-top: auto;
+            }
+
+            .dispute-flip-btn:active {
+                transform: scale(0.98);
+            }
+
+            .dispute-copy-btn {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: white;
+                border: none;
+                width: 100%;
+            }
+
+            .dispute-copy-btn:active {
+                transform: scale(0.98);
+            }
+
+            .dispute-prompt-content pre {
+                font-size: 0.8rem;
+                line-height: 1.5;
+                max-height: 160px;
+                padding: 0.75rem;
+                border-radius: 12px;
+                background: rgba(0, 0, 0, 0.05);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .dispute-button-container {
+                margin-top: 1rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            /* Mobile button visibility fixes */
+            .dispute-card-back .dispute-copy-btn,
+            .dispute-card-back .letter-action-btn.preview {
+                background: linear-gradient(135deg, #4a6cf7 0%, #3451b2 100%) !important;
+                color: white !important;
+                border: 2px solid #4a6cf7 !important;
+                font-weight: 600 !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+                box-shadow: 0 2px 8px rgba(74, 108, 247, 0.3) !important;
+                min-height: 44px !important;
+                font-size: 0.9rem !important;
+                border-radius: 8px !important;
+            }
+
+            .dispute-card-back .letter-back-btn,
+            .dispute-card-back .dispute-back-btn {
+                background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+                color: white !important;
+                border: 2px solid #6c757d !important;
+                font-weight: 600 !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+                box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3) !important;
+                min-height: 44px !important;
+                font-size: 0.9rem !important;
+                border-radius: 8px !important;
+            }
+
+            .dispute-card-back .dispute-copy-btn:active,
+            .dispute-card-back .letter-action-btn.preview:active {
+                transform: scale(0.98) !important;
+                box-shadow: 0 1px 4px rgba(74, 108, 247, 0.4) !important;
+            }
+
+            .dispute-card-back .letter-back-btn:active,
+            .dispute-card-back .dispute-back-btn:active {
+                transform: scale(0.98) !important;
+                box-shadow: 0 1px 4px rgba(108, 117, 125, 0.4) !important;
+            }
+
+            /* Enhanced Mobile Card Flipping */
+            .dispute-prompt-card {
+                perspective: 1200px;
+                -webkit-perspective: 1200px;
+            }
+
+            .dispute-card-inner {
+                transform-style: preserve-3d;
+                -webkit-transform-style: preserve-3d;
+                transition: transform 0.6s ease;
+                -webkit-transition: -webkit-transform 0.6s ease;
+                will-change: transform;
+            }
+
+            .dispute-card-front,
+            .dispute-card-back {
+                backface-visibility: hidden;
+                -webkit-backface-visibility: hidden;
+                transform-origin: center center;
+                -webkit-transform-origin: center center;
+            }
+
+            .dispute-card-back {
+                transform: rotateY(180deg);
+                -webkit-transform: rotateY(180deg);
+            }
+
+            /* Mobile Flipped State */
+            .dispute-card-inner.flipped,
+            .dispute-card-inner[style*="rotateY(180deg)"] {
+                transform: rotateY(180deg) !important;
+                -webkit-transform: rotateY(180deg) !important;
             }
         }
 
-        /* Dispute Card Styles */
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            body {
+                padding: 0.75rem;
+                font-size: 15px;
+            }
+
+            .dispute-library {
+                padding: 0.5rem;
+            }
+
+            .library-title {
+                font-size: 1.75rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 0.75rem;
+            }
+
+            .search-input {
+                flex: 1;
+                border-radius: 8px;
+            }
+
+            .search-button {
+                width: auto;
+                border-radius: 8px;
+                padding: 1rem 1.5rem;
+            }
+
+            .filter-container {
+                justify-content: center;
+                overflow-x: visible;
+            }
+
+            .letter-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+
+            .dispute-prompt-card {
+                width: calc(50% - 0.625rem);
+                margin: 0 0 1.25rem 0;
+            }
+
+            #letterGrid {
+                gap: 1.25rem;
+                padding: 0.5rem;
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            body {
+                padding: 1rem;
+            }
+
+            .dispute-library {
+                padding: 1rem;
+            }
+
+            .library-title {
+                font-size: 2rem;
+            }
+
+            .letter-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .letter-card {
+                min-height: 300px;
+            }
+
+            .dispute-prompt-card {
+                width: calc(50% - 0.75rem);
+                height: 420px;
+            }
+
+            #letterGrid {
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .letter-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+
+            .dispute-prompt-card {
+                width: 320px;
+                height: 450px;
+                margin: 15px;
+            }
+
+            #letterGrid {
+                gap: 25px;
+                padding: 25px;
+            }
+        }
+
+        /* Landscape Orientation Adjustments for Mobile */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            body {
+                padding: 0.25rem 0.5rem;
+            }
+
+            .library-header {
+                margin-bottom: 1rem;
+                padding: 0.75rem;
+            }
+
+            .library-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .library-description {
+                font-size: 0.85rem;
+            }
+
+            .search-container {
+                margin-bottom: 1rem;
+                gap: 0.5rem;
+            }
+
+            .search-input,
+            .search-button {
+                padding: 0.75rem;
+                min-height: 40px;
+            }
+
+            .filter-container {
+                margin-bottom: 1rem;
+            }
+
+            .filter-button {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+                min-height: 40px;
+            }
+
+            .letter-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .letter-card {
+                min-height: 280px;
+            }
+
+            .letter-card-front,
+            .letter-card-back {
+                padding: 1rem;
+            }
+
+            .dispute-prompt-card {
+                min-height: 300px;
+            }
+
+            .dispute-card-front,
+            .dispute-card-back {
+                padding: 1rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+
+            .filter-button:hover,
+            .letter-flip-btn:hover,
+            .letter-action-btn:hover,
+            .search-button:hover {
+                background-color: initial;
+                transform: none;
+            }
+
+            .letter-card-inner:hover {
+                transform: none;
+            }
+
+            /* Enhanced tap targets for touch */
+            .letter-flip-btn,
+            .letter-action-btn,
+            .letter-back-btn,
+            .dispute-flip-btn,
+            .dispute-copy-btn {
+                -webkit-tap-highlight-color: rgba(0, 128, 128, 0.2);
+            }
+
+            /* Prevent text selection on interactive elements */
+            .filter-button,
+            .letter-flip-btn,
+            .letter-action-btn,
+            .letter-back-btn,
+            .search-button,
+            .dispute-flip-btn,
+            .dispute-copy-btn {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .letter-card-inner,
+            .dispute-card-inner {
+                will-change: transform;
+            }
+
+            .letter-icon,
+            .dispute-ai-icon {
+                text-rendering: optimizeLegibility;
+            }
+        }
+
+        /* iOS Safari Specific Adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .search-input {
+                font-size: 16px;
+                /* Prevent zoom on focus */
+            }
+
+            .letter-grid,
+            .filter-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Safe area adjustments for iPhone X+ */
+            @media (max-width: 575.98px) {
+                body {
+                    padding-left: max(0.5rem, env(safe-area-inset-left));
+                    padding-right: max(0.5rem, env(safe-area-inset-right));
+                }
+            }
+        }
+
+        /* Reduced Motion Preferences */
+        @media (prefers-reduced-motion: reduce) {
+
+            .letter-card-inner,
+            .dispute-card-inner {
+                transition: none;
+            }
+
+            .letter-flip-btn,
+            .letter-action-btn,
+            .filter-button,
+            .search-button,
+            .dispute-flip-btn,
+            .dispute-copy-btn {
+                transition: none;
+            }
+
+            .loading-spinner {
+                animation: none;
+                border: 3px solid var(--gray-300);
+                border-top: 3px solid var(--blue-dark);
+            }
+        }
+
+        /* Dark Mode Support 
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gray-100: #2d2d2d;
+                --gray-200: #3a3a3a;
+                --gray-300: #4a4a4a;
+                --gray-600: #cccccc;
+                --gray-800: #ffffff;
+                --primary-light: rgba(0, 128, 128, 0.2);
+            }
+
+            body {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                color: #ffffff;
+            }
+
+            .library-header {
+                background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+            }
+
+            .search-input {
+                background: #3a3a3a;
+                border-color: #4a4a4a;
+                color: #ffffff;
+            }
+
+            .filter-button {
+                background: #3a3a3a;
+                border-color: #4a4a4a;
+                color: #ffffff;
+            }
+
+            .empty-state,
+            .loading-state {
+                background: #2d2d2d;
+            }
+
+            .dispute-card-front {
+                background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+            }
+
+            .dispute-card-back {
+                background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
+            }
+        }*/
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+            }
+
+            .search-container,
+            .filter-container {
+                display: none;
+            }
+
+            .letter-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .letter-card-inner {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+
+            .letter-card-back {
+                display: none;
+            }
+
+            .letter-flip-btn,
+            .letter-action-btn {
+                display: none;
+            }
+        }
+
+        /* Dispute Card Styles - Mobile First Approach - Optimized Larger Size */
         .dispute-prompt-card {
-            perspective: 1000px;
+            perspective: 1200px;
+            -webkit-perspective: 1200px;
             margin: 15px;
-            width: 320px;
-            height: 450px;
+            width: 100%;
+            height: auto;
+            min-height: 420px;
+            /* Increased from 320px */
         }
 
         .dispute-card-inner {
             position: relative;
             width: 100%;
             height: 100%;
+            min-height: 380px;
+            /* Increased from 280px */
             text-align: left;
-            transition: transform 0.6s;
+            transition: transform 0.5s ease;
+            -webkit-transition: -webkit-transform 0.5s ease;
             transform-style: preserve-3d;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            -webkit-transform-style: preserve-3d;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+            border-radius: 12px;
         }
 
         .dispute-card-front,
@@ -412,14 +1282,36 @@
             position: absolute;
             width: 100%;
             height: 100%;
+            min-height: 380px;
+            /* Increased from 280px */
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 24px;
+            /* Increased from 20px */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: visible;
+        }
+
+        /* Desktop and larger screens */
+        @media (min-width: 576px) {
+            .dispute-prompt-card {
+                width: 320px;
+                height: 450px;
+                min-height: 450px;
+            }
+
+            .dispute-card-inner {
+                min-height: 450px;
+            }
+
+            .dispute-card-front,
+            .dispute-card-back {
+                min-height: 450px;
+                overflow: hidden;
+            }
         }
 
         .dispute-card-front {
@@ -464,12 +1356,22 @@
         .dispute-card-description {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 15px;
-            font-size: 14px;
-            line-height: 1.6;
+            margin-bottom: 18px;
+            font-size: 15px;
+            /* Increased from 14px */
+            line-height: 1.7;
+            /* Increased from 1.6 */
             color: #666;
-            max-height: 280px;
-            padding: 5px 5px 5px 0;
+            padding: 8px 8px 8px 0;
+            /* Increased padding */
+        }
+
+        /* Desktop and larger screens - add max-height for description */
+        @media (min-width: 576px) {
+            .dispute-card-description {
+                max-height: 360px;
+                /* Increased from 280px */
+            }
         }
 
         .dispute-card-description::-webkit-scrollbar {
@@ -501,8 +1403,66 @@
             background-color: #f8f9fa;
             color: #333;
             transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
             display: flex;
             flex-direction: column;
+        }
+
+        /* Ensure buttons on card back are visible */
+        .dispute-card-back .dispute-copy-btn,
+        .dispute-card-back .letter-action-btn,
+        .dispute-card-back .letter-back-btn,
+        .dispute-card-back .dispute-back-btn {
+            background-color: #4a6cf7 !important;
+            color: white !important;
+            border: 2px solid #4a6cf7 !important;
+            font-weight: 600 !important;
+            opacity: 1 !important;
+        }
+
+        .dispute-card-back .letter-back-btn,
+        .dispute-card-back .dispute-back-btn {
+            background-color: #6c757d !important;
+            color: white !important;
+            border: 2px solid #6c757d !important;
+        }
+
+        .dispute-card-back .dispute-copy-btn:hover,
+        .dispute-card-back .letter-action-btn:hover {
+            background-color: #3451b2 !important;
+            border-color: #3451b2 !important;
+        }
+
+        .dispute-card-back .letter-back-btn:hover,
+        .dispute-card-back .dispute-back-btn:hover {
+            background-color: #5a6268 !important;
+            border-color: #5a6268 !important;
+        }
+
+        /* Immediate content hiding during flip animation */
+        .dispute-card-inner.flipping .dispute-card-front .letter-flip-btn,
+        .dispute-card-inner.flipping .dispute-card-front .dispute-flip-btn {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: none !important;
+        }
+
+        .dispute-card-inner.flipping .dispute-card-back .letter-back-btn,
+        .dispute-card-inner.flipping .dispute-card-back .dispute-back-btn,
+        .dispute-card-inner.flipping .dispute-card-back .dispute-copy-btn {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: none !important;
+        }
+
+        /* Show content after flip animation completes */
+        .dispute-card-inner:not(.flipping) .dispute-card-front .letter-flip-btn,
+        .dispute-card-inner:not(.flipping) .dispute-card-front .dispute-flip-btn,
+        .dispute-card-inner:not(.flipping) .dispute-card-back .letter-back-btn,
+        .dispute-card-inner:not(.flipping) .dispute-card-back .dispute-back-btn,
+        .dispute-card-inner:not(.flipping) .dispute-card-back .dispute-copy-btn {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         .dispute-prompt-content {
@@ -521,15 +1481,83 @@
             flex: 1;
             overflow-y: auto;
             background-color: #f1f3f5;
-            padding: 12px;
-            border-radius: 5px;
+            padding: 16px;
+            /* Increased from 12px */
+            border-radius: 8px;
+            /* Increased from 5px */
             font-family: monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            margin: 0 0 15px 0;
+            font-size: 14px;
+            /* Increased from 13px */
+            line-height: 1.6;
+            /* Increased from 1.5 */
+            margin: 0 0 18px 0;
+            /* Increased margin */
             white-space: pre-wrap;
-            max-height: 300px;
             word-break: break-word;
+        }
+
+        /* Desktop and larger screens - add max-height for prompt content */
+        @media (min-width: 576px) {
+            .dispute-prompt-content pre {
+                max-height: 380px;
+                /* Increased from 300px */
+            }
+        }
+
+        /* Tablet Screens - Enhanced Size */
+        @media (min-width: 768px) {
+            .dispute-prompt-card {
+                min-height: 460px;
+            }
+
+            .dispute-card-inner,
+            .dispute-card-front,
+            .dispute-card-back {
+                min-height: 420px;
+                padding: 28px;
+            }
+
+            .dispute-card-description {
+                font-size: 16px;
+                line-height: 1.8;
+                margin-bottom: 20px;
+                max-height: 400px;
+            }
+
+            .dispute-prompt-content pre {
+                font-size: 15px;
+                line-height: 1.7;
+                padding: 20px;
+                max-height: 420px;
+            }
+        }
+
+        /* Desktop Screens - Maximum Size */
+        @media (min-width: 992px) {
+            .dispute-prompt-card {
+                min-height: 500px;
+            }
+
+            .dispute-card-inner,
+            .dispute-card-front,
+            .dispute-card-back {
+                min-height: 460px;
+                padding: 32px;
+            }
+
+            .dispute-card-description {
+                font-size: 17px;
+                line-height: 1.8;
+                margin-bottom: 22px;
+                max-height: 440px;
+            }
+
+            .dispute-prompt-content pre {
+                font-size: 16px;
+                line-height: 1.8;
+                padding: 24px;
+                max-height: 460px;
+            }
         }
 
         .dispute-button-container {
@@ -672,7 +1700,7 @@
                             <div class="dispute-library">
                                 <div class="library-header">
                                     <h1 class="library-title">Dispute Letter Library</h1>
-                                    <p class="library-description">Browse our collection of professionally crafted dispute letters for various credit reporting issues.</p>
+                                    <p class="library-description">Browse our collection of professionally crafted dispute letter prompts for various credit reporting issues.</p>
                                 </div>
                                 
                                 <div class="search-container">
@@ -1396,35 +2424,32 @@
                     return;
                 }
 
-                // Render the letters
-                debugLog(`Rendering ${filteredLetters.length} letters`);
+                // Render the letters using dispute card format for better mobile experience
+                debugLog(`Rendering ${filteredLetters.length} letters as dispute cards`);
                 letterGrid.innerHTML = filteredLetters.map(letter => `
-                    <div class="letter-card" data-id="${letter.id}">
-                        <div class="letter-card-inner">
-                            <div class="letter-card-front">
-                                <div class="letter-card-header">
-                                    <i class="fas ${letter.icon} letter-icon"></i>
+                    <div class="dispute-prompt-card">
+                        <div class="dispute-card-inner" data-id="${letter.id}">
+                            <div class="dispute-card-front">
+                                <div class="dispute-card-header">
+                                    <span class="dispute-ai-icon">🤖</span>
                                     <h3>${letter.title}</h3>
                                 </div>
-                                <span class="letter-category">${letter.category}</span>
-                                <p class="letter-description">${letter.description}</p>
-                                <button class="letter-flip-btn">View Prompt →</button>
-                                <div class="letter-date">Added: ${letter.date}</div>
+                                <span class="letter-category" style="background: rgba(9, 204, 252, 0.2); color: #09ccfc; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; margin-bottom: 0.8rem; display: inline-block;">${letter.category}</span>
+                                <p class="dispute-card-description">${letter.description}</p>
+                                <button class="dispute-flip-btn letter-flip-btn">View Prompt →</button>
+                                <div class="letter-date" style="font-size: 0.8rem; color: rgba(102, 102, 102, 0.7); margin-top: 1rem;">Added: ${letter.date}</div>
                             </div>
-                            <div class="letter-card-back">
-                                <h3>${letter.title}</h3>
-                                <div class="letter-content">
-                                    <p><strong>AI Prompt:</strong></p>
-                                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0; max-height: 200px; overflow-y: auto; font-size: 0.85rem; line-height: 1.4;">
-                                        ${(letter.promptText || 'No prompt available').substring(0, 300)}${(letter.promptText && letter.promptText.length > 300) ? '...' : ''}
-                                    </div>
-                                </div>
-                                <div class="letter-actions">
-                                    <button class="letter-action-btn preview" data-letter-id="${letter.id}">
-                                        <i class="fas fa-copy"></i> Copy Full Prompt
+                            <div class="dispute-card-back">
+                                <div class="dispute-prompt-content">
+                                    <h4>${letter.title} Prompt</h4>
+                                    <pre><code>${(letter.promptText || letter.content || 'No content available')}</code></pre>
+                                    <div class="dispute-button-container">
+                                        <button class="dispute-copy-btn letter-action-btn preview" data-letter-id="${letter.id}">
+                                            <span class="dispute-copy-icon">📋</span> Copy Prompt
                                     </button>
+                                        <button class="letter-back-btn dispute-back-btn">← Back</button>
                                 </div>
-                                <button class="letter-back-btn">← Back</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1438,58 +2463,136 @@
             function setupCardEventListeners() {
                 debugLog('Setting up card flip listeners');
 
-                const flipButtons = document.querySelectorAll('.letter-card .letter-flip-btn');
-                const backButtons = document.querySelectorAll('.letter-card .letter-back-btn');
-                const previewButtons = document.querySelectorAll('.letter-action-btn.preview');
+                // Handle both letter cards and dispute cards - separate flip and back buttons
+                const flipButtons = document.querySelectorAll('.letter-flip-btn:not(.letter-back-btn), .dispute-flip-btn:not(.dispute-back-btn)');
+                const backButtons = document.querySelectorAll('.letter-back-btn, .dispute-back-btn');
+                const previewButtons = document.querySelectorAll('.letter-action-btn.preview, .dispute-copy-btn');
                 const downloadButtons = document.querySelectorAll('.letter-action-btn.download');
 
                 debugLog(`Found ${flipButtons.length} flip buttons, ${backButtons.length} back buttons`);
                 debugLog(`Found ${previewButtons.length} preview buttons, ${downloadButtons.length} download buttons`);
 
+                // Handle front-to-back flip buttons
                 flipButtons.forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const cardId = this.closest('.letter-card').getAttribute('data-id');
-                        debugLog(`Flip button clicked for card ${cardId}`);
-                        flipCard(parseInt(cardId));
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Find the card ID from either dispute card or letter card structure
+                        const disputeCard = this.closest('.dispute-prompt-card');
+                        const letterCard = this.closest('.letter-card');
+
+                        let cardId;
+                        if (disputeCard) {
+                            const cardInner = disputeCard.querySelector('.dispute-card-inner');
+                            cardId = cardInner ? cardInner.getAttribute('data-id') : null;
+                        } else if (letterCard) {
+                            cardId = letterCard.getAttribute('data-id');
+                        }
+
+                        if (cardId) {
+                            debugLog(`Front flip button clicked for card ${cardId}`);
+                            flipCardToBack(parseInt(cardId));
+                        } else {
+                            errorLog('Could not find card ID for flip button');
+                        }
                     });
                 });
 
+                // Handle back-to-front flip buttons  
                 backButtons.forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const cardId = this.closest('.letter-card').getAttribute('data-id');
-                        debugLog(`Back button clicked for card ${cardId}`);
-                        flipCard(parseInt(cardId));
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Find the card ID from either dispute card or letter card structure
+                        const disputeCard = this.closest('.dispute-prompt-card');
+                        const letterCard = this.closest('.letter-card');
+
+                        let cardId;
+                        if (disputeCard) {
+                            const cardInner = disputeCard.querySelector('.dispute-card-inner');
+                            cardId = cardInner ? cardInner.getAttribute('data-id') : null;
+                        } else if (letterCard) {
+                            cardId = letterCard.getAttribute('data-id');
+                        }
+
+                        if (cardId) {
+                            debugLog(`Back button clicked for card ${cardId}`);
+                            flipCardToFront(parseInt(cardId));
+                        } else {
+                            errorLog('Could not find card ID for back button');
+                        }
                     });
                 });
 
                 previewButtons.forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const cardId = this.closest('.letter-card').getAttribute('data-id');
-                        debugLog(`Preview button clicked for card ${cardId}`);
-                        previewLetter(parseInt(cardId));
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const cardId = this.getAttribute('data-letter-id') || this.getAttribute('data-card-id');
+
+                        if (cardId) {
+                            debugLog(`Preview/Copy button clicked for card ${cardId}`);
+                            previewLetter(parseInt(cardId));
+                        } else {
+                            errorLog('Could not find card ID for preview button');
+                        }
                     });
                 });
 
                 downloadButtons.forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const cardId = this.closest('.letter-card').getAttribute('data-id');
-                        debugLog(`Download button clicked for card ${cardId}`);
-                        downloadLetter(parseInt(cardId));
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const cardId = this.getAttribute('data-letter-id') || this.getAttribute('data-card-id');
+
+                        if (cardId) {
+                            debugLog(`Download button clicked for card ${cardId}`);
+                            downloadLetter(parseInt(cardId));
+                        } else {
+                            errorLog('Could not find card ID for download button');
+                        }
                     });
                 });
             }
 
             function flipCard(id) {
                 debugLog(`flipCard called for id: ${id}`);
-                const card = document.querySelector(`.letter-card[data-id="${id}"] .letter-card-inner`);
+
+                // Try to find both letter cards and dispute cards
+                let card = document.querySelector(`.letter-card[data-id="${id}"] .letter-card-inner`);
+                let isDisputeCard = false;
+
+                if (!card) {
+                    // Try dispute card selector
+                    card = document.querySelector(`.dispute-card-inner[data-id="${id}"]`);
+                    isDisputeCard = true;
+                }
+
                 if (card) {
-                    debugLog('Card found, flipping');
+                    debugLog(`${isDisputeCard ? 'Dispute card' : 'Letter card'} found, flipping`);
+
                     // Add flipping class to hide buttons during animation
                     card.classList.add('flipping');
 
-                    // Toggle the transform
-                    card.style.transform = card.style.transform === 'rotateY(180deg)' ? '' : 'rotateY(180deg)';
-                    debugLog(`Card transform set to: ${card.style.transform}`);
+                    // For mobile devices, use both webkit and standard transform
+                    const currentTransform = card.style.transform || card.style.webkitTransform || '';
+                    const isFlipped = currentTransform.includes('rotateY(180deg)');
+
+                    if (isFlipped) {
+                        card.style.transform = 'rotateY(0deg)';
+                        card.style.webkitTransform = 'rotateY(0deg)';
+                        card.classList.remove('flipped');
+                        debugLog('Card flipped to front');
+                    } else {
+                        card.style.transform = 'rotateY(180deg)';
+                        card.style.webkitTransform = 'rotateY(180deg)';
+                        card.classList.add('flipped');
+                        debugLog('Card flipped to back');
+                    }
 
                     // Remove the flipping class after animation completes
                     setTimeout(() => {
@@ -1497,7 +2600,77 @@
                         debugLog('Flipping animation complete');
                     }, 500); // Match the transition duration
                 } else {
-                    errorLog(`Card with id ${id} not found`);
+                    errorLog(`Card with id ${id} not found in either letter or dispute card collections`);
+                }
+            }
+
+            function flipCardToBack(id) {
+                debugLog(`flipCardToBack called for id: ${id}`);
+
+                // Try to find both letter cards and dispute cards
+                let card = document.querySelector(`.letter-card[data-id="${id}"] .letter-card-inner`);
+                let isDisputeCard = false;
+
+                if (!card) {
+                    // Try dispute card selector
+                    card = document.querySelector(`.dispute-card-inner[data-id="${id}"]`);
+                    isDisputeCard = true;
+                }
+
+                if (card) {
+                    debugLog(`${isDisputeCard ? 'Dispute card' : 'Letter card'} found, flipping to back`);
+
+                    // Add flipping class to hide buttons during animation
+                    card.classList.add('flipping');
+
+                    // Always flip to back (180deg)
+                    card.style.transform = 'rotateY(180deg)';
+                    card.style.webkitTransform = 'rotateY(180deg)';
+                    card.classList.add('flipped');
+                    debugLog('Card flipped to back');
+
+                    // Remove the flipping class after animation completes
+                    setTimeout(() => {
+                        card.classList.remove('flipping');
+                        debugLog('Flip to back animation complete');
+                    }, 500); // Match the transition duration
+                } else {
+                    errorLog(`Card with id ${id} not found in either letter or dispute card collections`);
+                }
+            }
+
+            function flipCardToFront(id) {
+                debugLog(`flipCardToFront called for id: ${id}`);
+
+                // Try to find both letter cards and dispute cards
+                let card = document.querySelector(`.letter-card[data-id="${id}"] .letter-card-inner`);
+                let isDisputeCard = false;
+
+                if (!card) {
+                    // Try dispute card selector
+                    card = document.querySelector(`.dispute-card-inner[data-id="${id}"]`);
+                    isDisputeCard = true;
+                }
+
+                if (card) {
+                    debugLog(`${isDisputeCard ? 'Dispute card' : 'Letter card'} found, flipping to front`);
+
+                    // Add flipping class to hide buttons during animation
+                    card.classList.add('flipping');
+
+                    // Always flip to front (0deg)
+                    card.style.transform = 'rotateY(0deg)';
+                    card.style.webkitTransform = 'rotateY(0deg)';
+                    card.classList.remove('flipped');
+                    debugLog('Card flipped to front');
+
+                    // Remove the flipping class after animation completes
+                    setTimeout(() => {
+                        card.classList.remove('flipping');
+                        debugLog('Flip to front animation complete');
+                    }, 500); // Match the transition duration
+                } else {
+                    errorLog(`Card with id ${id} not found in either letter or dispute card collections`);
                 }
             }
 

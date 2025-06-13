@@ -6,37 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM Credit Report Uploader Module</title>
     <style>
-        /* Upload Container Styles */
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
+        /* Upload Container Styles - Enhanced */
         .Bot-upload-container {
-            padding: 20px;
-            max-width: 800px;
+            padding: 1.5rem;
+            max-width: 1000px;
             margin: 0 auto;
+            background: var(--gray-50);
+            min-height: 100%;
         }
 
         .Bot-upload-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
         }
 
         .Bot-upload-title {
             font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #343a40;
+            margin-bottom: 0.75rem;
+            color: var(--gray-800);
+            font-weight: 700;
+            line-height: 1.2;
         }
 
         .Bot-upload-subtitle {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-600);
+            line-height: 1.4;
         }
 
-        /* Upload Message Styles */
+        /* Upload Message Styles - Enhanced */
         .Bot-upload-message {
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
         }
 
         .Bot-message {
             display: flex;
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
         }
 
         .Bot-bot-message {
@@ -44,73 +75,126 @@
         }
 
         .Bot-message-avatar {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: #e6f9ff;
-            color: #09ccfc;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(9, 204, 252, 0.2) 100%);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 1rem;
             flex-shrink: 0;
+            border: 2px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+            font-size: 1.25rem;
         }
 
         .Bot-message-content {
-            background: #f8f9fa;
-            padding: 15px;
+            background: white;
+            padding: 1.25rem;
             border-radius: 12px;
-            max-width: 80%;
+            max-width: 85%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+            line-height: 1.5;
         }
 
         .Bot-bot-message .Bot-message-content {
-            background: #e6f9ff;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(9, 204, 252, 0.1) 100%);
+            border: 1px solid var(--primary);
         }
 
-        /* Upload Area Styles */
+        /* Upload Area Styles - Enhanced */
         .Bot-upload-area {
-            border: 2px dashed #b3eafc;
-            border-radius: 8px;
-            padding: 30px;
+            border: 3px dashed var(--primary);
+            border-radius: 12px;
+            padding: 2rem;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
             transition: all 0.3s ease;
             cursor: pointer;
+            background: white;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .Bot-upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(9, 204, 252, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
         .Bot-upload-area:hover {
-            background-color: #e6f9ff;
-            border-color: #09ccfc;
+            background: white;
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(9, 204, 252, 0.2);
+        }
+
+        .Bot-upload-area:hover::before {
+            opacity: 1;
+        }
+
+        .Bot-upload-area.dragover {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+            transform: scale(1.02);
         }
 
         .Bot-upload-icon {
-            font-size: 40px;
-            color: #6c757d;
-            margin-bottom: 15px;
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .Bot-upload-area-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #343a40;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--gray-800);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            line-height: 1.3;
         }
 
         .Bot-upload-area-subtitle {
             font-size: 1rem;
-            color: #6c757d;
-            margin-bottom: 5px;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.4;
         }
 
         .Bot-upload-area-formats {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-bottom: 20px;
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.4;
         }
 
         .Bot-btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
@@ -118,23 +202,38 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.95rem;
+            min-height: 44px;
+            touch-action: manipulation;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .Bot-btn i {
-            margin-right: 8px;
+            margin-right: 0.5rem;
+            font-size: 1rem;
         }
 
         .Bot-btn-primary {
-            background: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            border: 2px solid var(--primary);
         }
 
         .Bot-btn-primary:hover {
-            background: #07a3ca;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #056080 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
+        }
+
+        .Bot-btn-primary:active {
+            transform: scale(0.98);
         }
 
         .Bot-upload-btn {
-            margin-top: 10px;
+            margin-top: 0.75rem;
         }
 
         /* Uploaded Files List */
@@ -242,117 +341,184 @@
             text-decoration: underline;
         }
 
-        /* Continue Section Styles */
+        /* Continue Section Styles - Enhanced */
         .Bot-continue-section {
             text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            background: #f0f9ff;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(9, 204, 252, 0.1) 100%);
             border-radius: 12px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.2);
         }
 
         .Bot-continue-btn {
-            padding: 12px 24px;
+            padding: 0.875rem 2rem;
             font-size: 1.1rem;
+            font-weight: 700;
+            min-height: 50px;
         }
 
         .Bot-continue-hint {
-            margin-top: 10px;
-            color: #6c757d;
+            margin-top: 0.75rem;
+            color: var(--gray-600);
             font-size: 0.9rem;
+            line-height: 1.4;
         }
 
-        /* Document Section Styles */
+        /* Document Section Styles - Enhanced */
         .Bot-document-section {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-bottom: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-200);
         }
 
         .Bot-document-section-title {
-            color: #09ccfc;
+            color: var(--primary);
             font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e6f9ff;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary-light);
+            font-weight: 700;
+            line-height: 1.2;
+            position: relative;
+        }
+
+        .Bot-document-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
         }
 
         .Bot-document-section-description {
-            margin-bottom: 25px;
+            margin-bottom: 1.75rem;
             line-height: 1.6;
-            color: #6c757d;
+            color: var(--gray-600);
+            font-size: 1rem;
         }
 
-        /* Bureau Selection Styles */
+        /* Bureau Selection Styles - Enhanced */
         .Bot-bureau-selection {
-            margin-bottom: 25px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
         }
 
         .Bot-bureau-selection-label {
             display: block;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: #343a40;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+            font-size: 1.1rem;
+            line-height: 1.3;
         }
 
         .Bot-bureau-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .Bot-bureau-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            background-color: white;
+            padding: 1.25rem 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 12px;
+            background: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
-            color: #495057;
+            font-weight: 600;
+            color: var(--gray-600);
+            min-height: 100px;
+            touch-action: manipulation;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .Bot-bureau-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(9, 204, 252, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
         .Bot-bureau-btn:hover {
-            border-color: #09ccfc;
-            background-color: #e6f9ff;
-            color: #09ccfc;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.2);
+        }
+
+        .Bot-bureau-btn:hover::before {
+            opacity: 1;
         }
 
         .Bot-bureau-btn.selected {
-            border-color: #09ccfc;
-            background-color: #09ccfc;
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
+        }
+
+        .Bot-bureau-btn.selected::before {
+            opacity: 0;
         }
 
         .Bot-bureau-btn.occupied {
-            border-color: #28a745;
-            background-color: #e8f5e8;
-            color: #28a745;
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+            color: var(--success);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
         }
 
         .Bot-bureau-btn i {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .Bot-bureau-btn span {
+            position: relative;
+            z-index: 1;
+            font-size: 0.9rem;
+            line-height: 1.3;
         }
 
         .Bot-bureau-hint {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--gray-500);
             margin: 0;
+            text-align: center;
+            line-height: 1.4;
         }
 
         .occupied-indicator {
             font-size: 0.8rem;
-            margin-left: 8px;
+            margin-left: 0.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         /* Document List Styles */
@@ -416,13 +582,404 @@
         /* Update existing upload area styles */
         .Bot-upload-text {
             font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: #343a40;
+            margin-bottom: 0.75rem;
+            color: var(--gray-800);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            line-height: 1.3;
         }
 
         .Bot-upload-subtext {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--gray-600);
+            position: relative;
+            z-index: 1;
+            line-height: 1.4;
+        }
+
+        /* ============================
+           MOBILE-FIRST RESPONSIVE DESIGN
+           ============================ */
+
+        /* Mobile Styles (default) */
+        @media (max-width: 575.98px) {
+            .Bot-upload-container {
+                padding: 1rem;
+            }
+
+            .Bot-upload-header {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .Bot-upload-title {
+                font-size: 1.25rem;
+            }
+
+            .Bot-upload-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .Bot-message-avatar {
+                width: 40px;
+                height: 40px;
+                margin-right: 0.75rem;
+                font-size: 1rem;
+            }
+
+            .Bot-message-content {
+                padding: 1rem;
+                max-width: 90%;
+                font-size: 0.9rem;
+            }
+
+            .Bot-upload-area {
+                padding: 1.5rem 1rem;
+                min-height: 160px;
+            }
+
+            .Bot-upload-icon {
+                font-size: 2.5rem;
+            }
+
+            .Bot-upload-area-title {
+                font-size: 1.1rem;
+            }
+
+            .Bot-upload-area-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .Bot-upload-area-formats {
+                font-size: 0.8rem;
+            }
+
+            .Bot-document-section {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .Bot-document-section-title {
+                font-size: 1.25rem;
+            }
+
+            .Bot-document-section-description {
+                font-size: 0.9rem;
+            }
+
+            .Bot-bureau-selection {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .Bot-bureau-options {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .Bot-bureau-btn {
+                padding: 1rem;
+                min-height: 80px;
+            }
+
+            .Bot-bureau-btn i {
+                font-size: 1.5rem;
+            }
+
+            .Bot-bureau-selection-label {
+                font-size: 1rem;
+            }
+
+            .Bot-bureau-hint {
+                font-size: 0.85rem;
+            }
+
+            .Bot-continue-section {
+                padding: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .Bot-continue-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+                min-height: 44px;
+                width: 100%;
+            }
+
+            .Bot-btn {
+                padding: 0.625rem 1.25rem;
+                min-height: 44px;
+                font-size: 0.9rem;
+            }
+
+            .Bot-upload-files .Bot-upload-file {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+
+            .Bot-upload-file-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-upload-file-actions {
+                justify-content: center;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .Bot-upload-container {
+                padding: 1.25rem;
+            }
+
+            .Bot-bureau-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .Bot-upload-area {
+                padding: 1.75rem 1.25rem;
+                min-height: 180px;
+            }
+
+            .Bot-upload-files .Bot-upload-file {
+                flex-direction: row;
+                text-align: left;
+            }
+
+            .Bot-upload-file-icon {
+                margin-right: 1rem;
+                margin-bottom: 0;
+            }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .Bot-upload-container {
+                padding: 1.75rem;
+                max-width: 900px;
+            }
+
+            .Bot-bureau-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .Bot-upload-area {
+                padding: 2.25rem 1.5rem;
+                min-height: 220px;
+            }
+
+            .Bot-document-section {
+                padding: 1.75rem;
+            }
+
+            .Bot-bureau-selection {
+                padding: 1.5rem;
+            }
+
+            .Bot-continue-section {
+                padding: 1.5rem;
+            }
+
+            .Bot-continue-btn {
+                width: auto;
+                min-width: 200px;
+            }
+        }
+
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .Bot-upload-container {
+                padding: 2rem;
+                max-width: 1000px;
+            }
+
+            .Bot-upload-area {
+                padding: 2.5rem 2rem;
+            }
+
+            .Bot-document-section {
+                padding: 2.25rem;
+            }
+
+            .Bot-bureau-selection {
+                padding: 1.75rem;
+            }
+
+            .Bot-continue-section {
+                padding: 1.75rem;
+            }
+        }
+
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .Bot-upload-container {
+                max-width: 1200px;
+                padding: 2.5rem;
+            }
+
+            .Bot-upload-area {
+                padding: 3rem 2.5rem;
+            }
+
+            .Bot-document-section {
+                padding: 2.5rem;
+            }
+
+            .Bot-bureau-selection {
+                padding: 2rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .Bot-upload-area {
+                min-height: 140px;
+                padding: 1.25rem 1rem;
+            }
+
+            .Bot-upload-icon {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-upload-area-title {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-upload-area-subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .Bot-upload-area-formats {
+                font-size: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .Bot-bureau-btn {
+                min-height: 70px;
+                padding: 0.75rem;
+            }
+
+            .Bot-bureau-btn i {
+                font-size: 1.25rem;
+                margin-bottom: 0.25rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .Bot-upload-area:hover {
+                transform: none;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .Bot-bureau-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .Bot-btn:hover {
+                transform: none;
+            }
+
+            .Bot-upload-area:active {
+                transform: scale(0.98);
+            }
+
+            .Bot-bureau-btn:active {
+                transform: scale(0.98);
+            }
+
+            .Bot-btn:active {
+                transform: scale(0.98);
+            }
+
+            /* Enhanced tap highlighting */
+            .Bot-upload-area,
+            .Bot-bureau-btn,
+            .Bot-btn {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .Bot-btn {
+                -webkit-appearance: none;
+            }
+
+            .Bot-upload-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Safe area adjustments for iPhone X+ */
+            @media (max-width: 575.98px) {
+                .Bot-upload-container {
+                    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+                }
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .Bot-upload-area,
+            .Bot-bureau-btn,
+            .Bot-btn {
+                border-width: 1px;
+            }
+
+            .Bot-document-section {
+                border-width: 1px;
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .Bot-upload-area:hover,
+            .Bot-bureau-btn:hover,
+            .Bot-btn:hover {
+                transform: none;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+
+            .Bot-upload-header,
+            .Bot-document-section {
+                background: white !important;
+                color: black !important;
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+            }
+
+            .Bot-upload-area,
+            .Bot-bureau-btn,
+            .Bot-btn {
+                border: 1px solid #000 !important;
+                box-shadow: none !important;
+                background: white !important;
+                color: black !important;
+            }
+
+            .Bot-continue-section {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -1494,7 +2051,7 @@
                         return;
                     }
 
-                    const response = await fetch(`http://localhost:3000/api/admin/get-user-documents?userId=${userId}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/get-user-documents?userId=${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
@@ -1791,7 +2348,7 @@
                     formData.append('bureau', bureau);
 
                     // Upload to backend
-                    const response = await fetch('http://localhost:3000/api/admin/upload-document', {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/admin/upload-document', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${authToken}`
@@ -1841,7 +2398,7 @@
                     }
 
                     // Use the working endpoint directly
-                    const response = await fetch(`http://localhost:3000/api/admin/delete-document`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/delete-document`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,

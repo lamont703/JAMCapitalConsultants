@@ -27,11 +27,13 @@ export class GHLOAuthExchange {
             response_type: 'code',
             redirect_uri: this.redirectUri,
             client_id: this.clientId,
-            scope: 'contacts.write contacts.read locations.read locations.write users.read users.write opportunities.read opportunities.write calendars.read calendars.write'
+            scope: 'contacts.write contacts.read locations.read locations.write users.read users.write opportunities.read opportunities.write calendars.read calendars.write payments.read payments.write subscriptions.read subscriptions.write'
         });
         
         const fullUrl = `${baseUrl}?${params.toString()}`;
-        console.log('Authorization URL:', fullUrl);
+        console.log('📋 Authorization URL for GoHighLevel:');
+        console.log(fullUrl);
+        console.log('\n📝 This URL includes payment and subscription scopes needed for cancellation features.');
         return fullUrl;
     }
 
@@ -73,11 +75,19 @@ export class GHLOAuthExchange {
         try {
             console.log('🔄 Attempting to refresh GHL access token...');
             
+            // Load saved tokens to get refresh token
+            const savedTokens = await this.loadSavedTokens();
+            if (!savedTokens?.refresh_token) {
+                throw new Error('No refresh token found. Please re-authenticate.');
+            }
+            
+            console.log('🔍 Using refresh token from saved tokens...');
+            
             const response = await axios.post(this.tokenEndpoint, {
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
                 grant_type: 'refresh_token',
-                refresh_token: this.refreshToken
+                refresh_token: savedTokens.refresh_token
             }, {
                 headers: {
                     'Accept': 'application/json',
@@ -85,9 +95,31 @@ export class GHLOAuthExchange {
                 }
             });
             
+            // Update saved tokens with new access token
+            const updatedTokens = {
+                ...savedTokens,
+                access_token: response.data.access_token,
+                expires_in: response.data.expires_in,
+                expires_at: new Date(Date.now() + (response.data.expires_in * 1000)).toISOString(),
+                // Keep the same refresh token unless a new one is provided
+                refresh_token: response.data.refresh_token || savedTokens.refresh_token
+            };
+            
+            await this.saveTokens(updatedTokens);
+            await this.updateEnvFile(updatedTokens.access_token);
+            
+            console.log('✅ Tokens refreshed and saved successfully');
+            
             return response.data;
             
         } catch (error) {
+            console.error('❌ Token refresh error details:', {
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                message: error.message
+            });
+            
             // Clean, specific error handling
             if (error.response?.status === 400) {
                 const errorData = error.response.data;
@@ -98,6 +130,8 @@ export class GHLOAuthExchange {
                 }
             } else if (error.response?.status === 401) {
                 throw new Error('OAuth credentials invalid');
+            } else if (error.response?.status === 422) {
+                throw new Error(`Validation error: ${error.response?.data?.message || 'Invalid request format'}`);
             } else {
                 throw new Error(`Network error during token refresh: ${error.message}`);
             }
@@ -132,7 +166,7 @@ export class GHLOAuthExchange {
     }
 
     async updateEnvFile(accessToken) {
-        const envPath = path.join(__dirname, '../../.env');
+        const envPath = path.join(__dirname, '../.env');
         let envContent = fs.readFileSync(envPath, 'utf8');
         
         if (envContent.includes('GHL_ACCESS_TOKEN=')) {
@@ -146,7 +180,10 @@ export class GHLOAuthExchange {
 }
 
 // CLI interface - only run if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+const isMainModule = import.meta.url === `file://${process.argv[1]}` || 
+                    process.argv[1]?.endsWith('ghlOAuthExchange.js');
+
+if (isMainModule) {
     const args = process.argv.slice(2);
     const command = args[0];
 

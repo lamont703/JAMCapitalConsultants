@@ -3,12 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM Credit Solutions - Full Service Plan</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -17,13 +38,13 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: #f8f9fa;
-            color: #343a40;
+            background: var(--gray-50);
+            color: var(--gray-700);
             line-height: 1.6;
             padding: 20px;
         }
 
-        /* Full Service Container Styles */
+        /* Full Service Container Styles - Enhanced */
         .full-container {
             background: white;
             border-radius: 12px;
@@ -40,130 +61,221 @@
         .full-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
 
         .full-subtitle {
             font-size: 1.1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             max-width: 700px;
             margin: 0 auto;
+            line-height: 1.5;
         }
 
-        /* Full Service Plan Card */
+        /* Plans Grid - Enhanced */
+        .full-plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Full Service Plan Card - Enhanced */
         .full-plan-card {
-            border: 2px solid #09ccfc;
-            border-radius: 10px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
-            max-width: 800px;
-            margin: 0 auto;
+            position: relative;
+            background: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
 
         .full-plan-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-light);
+        }
+
+        .full-plan-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.03);
+            box-shadow: 0 8px 30px rgba(9, 204, 252, 0.2);
+        }
+
+        .full-plan-card.featured::before {
+            content: "Most Popular";
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0 0 12px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
         }
 
         .full-plan-header {
             padding: 1.5rem;
-            background: #e6f9ff;
-            border-bottom: 1px solid #dee2e6;
-            position: relative;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
         }
 
-        .full-plan-premium-tag {
-            background: #09ccfc;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.3rem 1rem;
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            border-radius: 20px;
+        .full-plan-card.featured .full-plan-header {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0f4ff 100%);
         }
 
         .full-plan-name {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            color: var(--gray-700);
             margin-bottom: 0.5rem;
-            color: #09ccfc;
+            line-height: 1.2;
+        }
+
+        .full-plan-card.featured .full-plan-name {
+            color: var(--primary);
         }
 
         .full-plan-price {
             font-size: 2.2rem;
             font-weight: 700;
+            color: var(--gray-800);
             margin-bottom: 0.5rem;
+            line-height: 1;
         }
 
-        .full-plan-price-period {
+        .full-plan-price span {
             font-size: 1rem;
-            color: #6c757d;
-            font-weight: normal;
+            color: var(--gray-500);
+            font-weight: 500;
         }
 
         .full-plan-target {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             margin-top: 0.5rem;
             font-style: italic;
+            line-height: 1.4;
         }
 
         .full-plan-body {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
+            padding: 2rem;
         }
 
         .full-plan-description {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--gray-500);
+            font-size: 1rem;
+            min-height: 50px;
+            line-height: 1.5;
+        }
+
+        .full-payment-structure {
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 1.25rem;
             margin-bottom: 1.5rem;
-            font-size: 1.1rem;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .full-payment-structure-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
+        .full-payment-structure-text {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         .full-plan-features {
-            list-style-type: none;
-            margin-bottom: 1.5rem;
+            list-style: none;
+            margin-bottom: 2rem;
+            min-height: 200px;
         }
 
         .full-plan-feature {
+            margin-bottom: 0.75rem;
             display: flex;
-            margin-bottom: 1rem;
-            font-size: 1.05rem;
+            align-items: flex-start;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .full-plan-feature:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
         }
 
         .full-plan-feature i {
-            color: #28a745;
-            margin-right: 0.8rem;
-            margin-top: 0.3rem;
+            color: var(--primary);
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 24px;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
+        }
+
+        .full-plan-feature span {
+            font-size: 0.95rem;
+            color: var(--gray-600);
+            line-height: 1.5;
         }
 
         .full-plan-cta {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 2rem;
         }
 
         .full-select-btn {
             display: inline-block;
-            background-color: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 1rem 2rem;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
             width: 100%;
-            max-width: 300px;
+            min-height: 48px;
+            font-family: inherit;
         }
 
         .full-select-btn:hover {
-            background-color: #08b5e0;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0596c7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
         }
 
-        /* Modal Styles */
+        .full-select-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
+        }
+
+        /* Modal Styles - Enhanced */
         .full-modal {
             display: none;
             position: fixed;
@@ -171,39 +283,82 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            animation: fadeInModal 0.3s ease;
+        }
+
+        @keyframes fadeInModal {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .full-modal-content {
-            background-color: white;
-            border-radius: 10px;
+            background: white;
+            border-radius: 16px;
             max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             position: relative;
             padding: 2rem;
+            transform: scale(1);
+            animation: slideInModal 0.3s ease;
+        }
+
+        @keyframes slideInModal {
+            from {
+                transform: scale(0.9) translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
         }
 
         .full-modal-close {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
-            color: #6c757d;
+            color: var(--gray-500);
+            background: var(--gray-100);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .full-modal-close:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            transform: scale(1.1);
         }
 
         .full-modal-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 1.5rem;
             text-align: center;
+            line-height: 1.3;
         }
 
         /* Payment Form Styles */
@@ -230,26 +385,36 @@
         }
 
         .full-form-input:focus {
-            border-color: #09ccfc;
+            border-color: var(--primary);
             outline: none;
             box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.25);
         }
 
         .full-submit-btn {
-            background-color: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            min-height: 48px;
+            font-family: inherit;
         }
 
         .full-submit-btn:hover {
-            background-color: #08b5e0;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0596c7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+        }
+
+        .full-submit-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
         }
 
         /* Success Message */
@@ -260,14 +425,15 @@
 
         .full-success-message i {
             font-size: 3rem;
-            color: #28a745;
+            color: var(--success);
             margin-bottom: 1rem;
         }
 
         .full-success-message h4 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: #28a745;
+            color: var(--success);
+            line-height: 1.3;
         }
 
         .full-success-message p {
@@ -275,39 +441,35 @@
         }
 
         /* Responsive Styles */
-        @media (max-width: 768px) {
-            .full-plan-header {
-                padding: 1rem;
-            }
-
-            .full-plan-premium-tag {
-                top: 0.5rem;
-                right: 0.5rem;
-                font-size: 0.7rem;
-                padding: 0.2rem 0.7rem;
-            }
-
-            .full-plan-name {
-                font-size: 1.5rem;
-            }
-
-            .full-plan-price {
-                font-size: 1.8rem;
-            }
-
-            .full-plan-body {
-                padding: 1rem;
-            }
-
-            .full-plan-feature {
-                font-size: 0.95rem;
-            }
-
-            .full-select-btn {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-            }
+        /* Guarantee section styling - Enhanced */
+        .diy-guarantee {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
+
+        .diy-guarantee i {
+            color: var(--success);
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .diy-guarantee-text {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            text-align: center;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+
 
         /* Payment iframe styles */
         .full-payment-info {
@@ -333,29 +495,33 @@
         }
 
         .full-payment-footer p {
-            color: #6c757d;
+            color: var(--gray-500);
             font-size: 0.9rem;
             margin-bottom: 1rem;
+            line-height: 1.5;
         }
 
         .full-payment-footer i {
-            color: #28a745;
+            color: var(--success);
             margin-right: 0.5rem;
         }
 
         .full-cancel-btn {
-            background: #6c757d;
+            background: var(--gray-500);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background-color 0.3s ease;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            min-height: 44px;
         }
 
         .full-cancel-btn:hover {
-            background: #5a6268;
+            background: var(--gray-600);
+            transform: translateY(-1px);
         }
 
         /* Success message styles */
@@ -365,54 +531,51 @@
         }
 
         .full-success-message h4 {
-            color: #28a745;
+            color: var(--success);
             margin-bottom: 1rem;
             font-size: 1.5rem;
+            line-height: 1.3;
         }
 
         .full-success-message p {
             margin-bottom: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
+            line-height: 1.5;
         }
 
-        /* Modal responsiveness for iframe */
-        @media (max-width: 768px) {
-            .full-payment-iframe-container iframe {
-                height: 500px;
-            }
 
-            .full-modal-content {
-                margin: 10px;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-        }
 
         /* Enhanced modal styles */
         .plan-summary {
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .plan-summary h4 {
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
             font-size: 1.3rem;
+            line-height: 1.3;
+            font-weight: 700;
         }
 
         .price-display {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #28a745;
+            color: var(--success);
             margin-bottom: 1rem;
+            line-height: 1;
         }
 
         .price-display span {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--gray-500);
+            font-weight: 500;
         }
 
         .plan-features-summary {
@@ -425,11 +588,11 @@
 
         .plan-features-summary li {
             padding: 0.3rem 0;
-            color: #495057;
+            color: var(--gray-600);
         }
 
         .plan-features-summary i {
-            color: #28a745;
+            color: var(--success);
             margin-right: 0.5rem;
         }
 
@@ -439,12 +602,13 @@
         }
 
         .payment-security p {
-            color: #6c757d;
+            color: var(--gray-500);
             margin: 0.3rem 0;
+            line-height: 1.5;
         }
 
         .payment-security i {
-            color: #28a745;
+            color: var(--success);
             margin-right: 0.5rem;
         }
 
@@ -455,14 +619,16 @@
 
         .payment-note {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--gray-500);
             margin-top: 0.5rem;
+            line-height: 1.4;
         }
 
         .guarantee-text {
-            color: #28a745;
+            color: var(--success);
             font-weight: 600;
             margin-bottom: 1rem;
+            line-height: 1.4;
         }
 
         .guarantee-text i {
@@ -494,19 +660,743 @@
             text-decoration: none;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
 
+
+        /* ============================
+           MOBILE-FIRST RESPONSIVE DESIGN
+           ============================ */
+
+        /* Mobile Styles (default) */
+        @media (max-width: 575.98px) {
+            body {
+                padding: 0.5rem;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .full-container {
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .full-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .full-title {
+                font-size: 1.5rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.2;
+            }
+
+            .full-subtitle {
+                font-size: 0.95rem;
+                line-height: 1.4;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Enhanced mobile plan grid */
+            .full-plans-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .full-plan-card {
+                border-radius: 8px;
+                padding: 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                transition: all 0.2s ease;
+            }
+
+            .full-plan-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            }
+
+            .full-plan-card.featured {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(9, 204, 252, 0.15);
+            }
+
+            .full-plan-card.featured:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(9, 204, 252, 0.2);
+            }
+
+            .full-plan-card.featured::before {
+                font-size: 0.75rem;
+                padding: 0.4rem 1rem;
+                border-radius: 0 0 8px 8px;
+            }
+
+            .full-plan-header {
+                padding: 1rem;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .full-plan-name {
+                font-size: 1.2rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .full-plan-price {
+                font-size: 1.8rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .full-plan-price span {
+                font-size: 0.9rem;
+            }
+
+            .full-plan-target {
+                font-size: 0.9rem;
+            }
+
+            .full-plan-body {
+                padding: 1rem;
+            }
+
+            .full-plan-description {
+                margin-bottom: 1.5rem;
+                font-size: 0.9rem;
+                min-height: auto;
+            }
+
+            .full-payment-structure {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .full-payment-structure-title {
+                font-size: 0.85rem;
+            }
+
+            .full-payment-structure-text {
+                font-size: 0.8rem;
+            }
+
+            .full-plan-features {
+                margin-bottom: 1.5rem;
+                min-height: auto;
+            }
+
+            .full-plan-feature {
+                margin-bottom: 0.5rem;
+                padding: 0.5rem;
+                border-radius: 6px;
+            }
+
+            .full-plan-feature i {
+                font-size: 1rem;
+                width: 20px;
+                margin-right: 0.5rem;
+            }
+
+            .full-plan-feature span {
+                font-size: 0.85rem;
+            }
+
+            .full-plan-cta {
+                margin-top: 1.5rem;
+            }
+
+            .full-select-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+                border-radius: 6px;
+                font-weight: 600;
+            }
+
+            .diy-guarantee {
+                margin-top: 1rem;
+                padding: 1rem;
+                border-radius: 8px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .diy-guarantee i {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+
+            .diy-guarantee-text {
+                font-size: 0.85rem;
+            }
+
+            /* Enhanced modals for mobile */
+            .full-modal {
+                padding: 1rem;
+                backdrop-filter: blur(2px);
+                -webkit-backdrop-filter: blur(2px);
+            }
+
+            .full-modal-content {
+                width: calc(100% - 2rem);
+                max-width: none;
+                border-radius: 12px;
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 1rem;
+            }
+
+            .full-modal-close {
+                top: 0.75rem;
+                right: 0.75rem;
+                width: 28px;
+                height: 28px;
+                font-size: 1.1rem;
+            }
+
+            .full-modal-title {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .plan-summary {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .plan-summary h4 {
+                font-size: 1.1rem;
+            }
+
+            .price-display {
+                font-size: 1.8rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .full-payment-structure {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .plan-features-summary {
+                font-size: 0.85rem;
+            }
+
+            .plan-features-summary li {
+                padding: 0.2rem 0;
+            }
+
+            .payment-security {
+                margin-bottom: 1rem;
+            }
+
+            .payment-security p {
+                font-size: 0.85rem;
+                margin: 0.2rem 0;
+            }
+
+            .payment-action-container {
+                margin: 1.5rem 0;
+            }
+
+            .full-submit-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+            }
+
+            .payment-note {
+                font-size: 0.8rem;
+                margin-top: 0.4rem;
+            }
+
+            .full-payment-footer {
+                margin-top: 1rem;
+                padding-top: 0.75rem;
+            }
+
+            .guarantee-text {
+                font-size: 0.85rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .full-cancel-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                min-height: 40px;
+            }
+
+            /* Payment options styling */
             .payment-options,
             .status-options {
                 flex-direction: column;
                 align-items: center;
+                gap: 0.75rem;
             }
 
             .payment-options button,
             .status-options button {
                 width: 100%;
-                max-width: 250px;
+                max-width: 280px;
+                min-height: 44px;
+            }
+
+            .popup-blocked-message,
+            .payment-status-message {
+                padding: 1.5rem 1rem;
+            }
+
+            .popup-blocked-message h4,
+            .payment-status-message h4 {
+                font-size: 1.1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .popup-blocked-message p,
+            .payment-status-message p {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.4;
+            }
+
+            .popup-blocked-message ol {
+                font-size: 0.85rem;
+                margin: 0.75rem auto;
+                max-width: 280px;
+            }
+
+            .popup-blocked-message ol li {
+                margin-bottom: 0.5rem;
+                line-height: 1.4;
+            }
+
+            .full-success-message {
+                padding: 1.5rem 1rem;
+            }
+
+            .full-success-message h4 {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .full-success-message p {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Touch enhancements */
+            .full-select-btn,
+            .full-submit-btn,
+            .full-cancel-btn,
+            .full-modal-close {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .full-select-btn:active,
+            .full-submit-btn:active {
+                transform: scale(0.98);
+            }
+
+            .full-cancel-btn:active,
+            .full-modal-close:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .full-container {
+                padding: 1.5rem;
+                border-radius: 10px;
+            }
+
+            .full-title {
+                font-size: 1.75rem;
+            }
+
+            .full-subtitle {
+                font-size: 1rem;
+            }
+
+            .full-plan-card {
+                border-radius: 10px;
+            }
+
+            .full-plan-header {
+                padding: 1.25rem;
+            }
+
+            .full-plan-name {
+                font-size: 1.4rem;
+            }
+
+            .full-plan-price {
+                font-size: 2rem;
+            }
+
+            .full-plan-body {
+                padding: 1.25rem;
+            }
+
+            .full-modal-content {
+                width: 90%;
+                max-width: 500px;
+                padding: 1.5rem;
+            }
+
+            .full-modal-title {
+                font-size: 1.35rem;
+            }
+
+            .full-select-btn,
+            .full-submit-btn {
+                padding: 0.8rem 1.25rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            body {
+                padding: 1rem;
+            }
+
+            .full-container {
+                padding: 1.75rem;
+            }
+
+            .full-title {
+                font-size: 1.85rem;
+            }
+
+            .full-subtitle {
+                font-size: 1.05rem;
+            }
+
+            .full-plans-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .full-plan-header {
+                padding: 1.5rem;
+            }
+
+            .full-plan-body {
+                padding: 1.5rem;
+            }
+
+            .full-modal-content {
+                width: 85%;
+                max-width: 520px;
+            }
+        }
+
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            .full-container {
+                padding: 2rem;
+            }
+
+            .full-plan-header {
+                padding: 1.5rem;
+            }
+
+            .full-plan-body {
+                padding: 2rem;
+            }
+        }
+
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            body {
+                padding: 2rem;
+            }
+
+            .full-container {
+                padding: 2.5rem;
+            }
+
+            .full-plan-header {
+                padding: 2rem;
+            }
+
+            .full-plan-body {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .full-container {
+                padding: 0.75rem;
+            }
+
+            .full-header {
+                margin-bottom: 1rem;
+            }
+
+            .full-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .full-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .full-plans-grid {
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .full-plan-card {
+                border-radius: 6px;
+            }
+
+            .full-plan-header {
+                padding: 0.75rem;
+            }
+
+            .full-plan-name {
+                font-size: 1.1rem;
+            }
+
+            .full-plan-price {
+                font-size: 1.6rem;
+            }
+
+            .full-plan-body {
+                padding: 0.75rem;
+            }
+
+            .full-plan-description {
+                margin-bottom: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .full-payment-structure {
+                padding: 0.6rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .full-plan-features {
+                margin-bottom: 1rem;
+            }
+
+            .full-plan-feature {
+                padding: 0.4rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .full-plan-feature span {
+                font-size: 0.8rem;
+            }
+
+            .diy-guarantee {
+                padding: 0.75rem;
+                margin-top: 0.75rem;
+            }
+
+            .diy-guarantee-text {
+                font-size: 0.8rem;
+            }
+
+            .full-modal-content {
+                max-height: 85vh;
+                padding: 1rem;
+            }
+
+            .full-modal-title {
+                font-size: 1.1rem;
+            }
+
+            .full-select-btn,
+            .full-submit-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .full-plan-card:hover {
+                transform: none;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            }
+
+            .full-plan-card.featured:hover {
+                transform: scale(1.03);
+                box-shadow: 0 8px 30px rgba(9, 204, 252, 0.2);
+            }
+
+            .full-plan-feature:hover {
+                background: var(--gray-50);
+                box-shadow: none;
+                transform: none;
+            }
+
+            .full-select-btn:hover,
+            .full-submit-btn:hover {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                transform: none;
+                box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            }
+
+            .full-cancel-btn:hover {
+                background: var(--gray-500);
+                transform: none;
+            }
+
+            .full-modal-close:hover {
+                background: var(--gray-100);
+                color: var(--gray-500);
+                transform: none;
+            }
+
+            /* Enhanced tap highlighting */
+            .full-select-btn,
+            .full-submit-btn,
+            .full-cancel-btn,
+            .full-modal-close {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+            }
+
+            /* Prevent text selection on interactive elements */
+            .full-select-btn,
+            .full-submit-btn,
+            .full-cancel-btn,
+            .full-modal-close {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .full-container {
+                will-change: transform;
+            }
+
+            .full-modal {
+                will-change: opacity;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .full-modal-content {
+                min-height: -webkit-fill-available;
+            }
+
+            /* Safe area adjustments for iPhone X+ */
+            @media (max-width: 575.98px) {
+                body {
+                    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+                }
+
+                .full-modal {
+                    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+                }
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+
+            .full-plan-card,
+            .full-plan-feature,
+            .full-select-btn,
+            .full-submit-btn,
+            .full-cancel-btn,
+            .full-modal-close {
+                transition: none;
+            }
+
+            .full-plan-card:hover,
+            .full-plan-card.featured:hover,
+            .full-plan-feature:hover,
+            .full-select-btn:hover,
+            .full-submit-btn:hover,
+            .full-cancel-btn:hover,
+            .full-select-btn:active,
+            .full-submit-btn:active,
+            .full-cancel-btn:active,
+            .full-modal-close:active {
+                transform: none;
+            }
+
+            .full-modal {
+                animation: none;
+            }
+
+            .full-modal-content {
+                animation: none;
+            }
+
+            @keyframes fadeInModal {
+
+                from,
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+
+            @keyframes slideInModal {
+
+                from,
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .full-container {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .full-plan-card {
+                box-shadow: none;
+                border: 1px solid #000;
+                margin-bottom: 1rem;
+                page-break-inside: avoid;
+            }
+
+            .full-plan-card.featured::before {
+                background: #000;
+                color: white;
+            }
+
+            .full-modal {
+                display: none;
+            }
+
+            .diy-guarantee {
+                box-shadow: none;
+                border: 1px solid #000;
             }
         }
     </style>
@@ -518,6 +1408,90 @@
         const FullServicePlanModule = (function () {
             let isInitialized = false;
             let isModalOpen = false;
+            let selectedPlan = null;
+
+            // Payment links for each plan
+            const PAYMENT_LINKS = {
+                elite: 'https://link.fastpaydirect.com/payment-link/6820e345082a6fd7e3ee6652', // Elite JumpStart
+                momentum: 'https://link.fastpaydirect.com/payment-link/68464415edf79f5d1dafec66', // Momentum Builder
+                strategic: 'https://link.fastpaydirect.com/payment-link/68464507edf79f5bb4afec6e', // Strategic Start Package
+                platinum: 'https://link.fastpaydirect.com/payment-link/684652510a574128ec525b8c' // Platinum Commitment
+            };
+
+            // Plan configurations
+            const PLANS = {
+                elite: {
+                    name: 'Done For You Elite JumpStart',
+                    price: '$399',
+                    priceSubtext: 'setup + $197/month',
+                    target: 'Quick start with affordable setup',
+                    description: 'Get started immediately with a low setup fee, then enjoy our full-service credit disputes with monthly payments.',
+                    paymentStructure: '$399 setup fee + $197/month starting 30 days later',
+                    features: [
+                        'Dedicated credit dispute specialist',
+                        'Unlimited custom dispute letters',
+                        'Priority processing of all disputes',
+                        'Monthly credit score updates',
+                        'Direct creditor negotiations',
+                        'Weekly progress updates',
+                        'Personalized credit building strategy'
+                    ]
+                },
+                momentum: {
+                    name: 'Done For You Momentum Builder',
+                    price: '2 x $250',
+                    priceSubtext: 'weekly + $197/month',
+                    target: 'Spread your startup cost',
+                    description: 'Break up your initial investment with 2 weekly payments, then transition to monthly service payments.',
+                    paymentStructure: '2 weekly payments of $250 each + $197/month starting 30 days later',
+                    features: [
+                        'Dedicated credit dispute specialist',
+                        'Unlimited custom dispute letters',
+                        'Priority processing of all disputes',
+                        'Monthly credit score updates',
+                        'Direct creditor negotiations',
+                        'Weekly progress updates',
+                        'Personalized credit building strategy'
+                    ],
+                    featured: true
+                },
+                strategic: {
+                    name: 'Done For You Strategic Start',
+                    price: '4 x $150',
+                    priceSubtext: 'weekly + $197/month',
+                    target: 'Most budget-friendly start',
+                    description: 'The most affordable way to begin with 4 small weekly payments, perfect for tight budgets.',
+                    paymentStructure: '4 weekly payments of $150 each + $197/month starting 30 days later',
+                    features: [
+                        'Dedicated credit dispute specialist',
+                        'Unlimited custom dispute letters',
+                        'Priority processing of all disputes',
+                        'Monthly credit score updates',
+                        'Direct creditor negotiations',
+                        'Weekly progress updates',
+                        'Personalized credit building strategy'
+                    ]
+                },
+                platinum: {
+                    name: 'Done For You Platinum Commitment',
+                    price: '$1,499',
+                    priceSubtext: 'one-time payment',
+                    target: 'Best value - 6 months included',
+                    description: 'Pay once and get 6 full months of premium credit dispute service. The best value for serious credit improvement.',
+                    paymentStructure: 'One-time payment of $1,499 (includes 6 months of service)',
+                    features: [
+                        'Dedicated credit dispute specialist',
+                        'Unlimited custom dispute letters',
+                        'Priority processing of all disputes',
+                        'Monthly credit score updates',
+                        'Direct creditor negotiations',
+                        'Weekly progress updates',
+                        'Personalized credit building strategy',
+                        '6 months of service included',
+                        'No monthly payments for 6 months'
+                    ]
+                }
+            };
 
             // Try to restore state immediately when module is defined
             try {
@@ -531,6 +1505,9 @@
                     }
                     if (parsedState.isModalOpen) {
                         isModalOpen = parsedState.isModalOpen;
+                    }
+                    if (parsedState.selectedPlan) {
+                        selectedPlan = parsedState.selectedPlan;
                     }
                 }
             } catch (e) {
@@ -546,102 +1523,67 @@
 
                 console.log('Initializing Full Service Plan Module, isInitialized:', isInitialized);
 
-                // Insert the widget HTML
-                container.innerHTML = `
+                // HTML template for the Full Service plans
+                const fullServicePlanHTML = `
                     <div class="full-container">
-                        <div class="full-plan-card">
-                            <div class="full-plan-header">
-                                <div class="full-plan-premium-tag">PREMIUM</div>
-                                <h3 class="full-plan-name">Full-Service Plan</h3>
-                                <div class="full-plan-price">$199<span class="full-plan-price-period">/month</span></div>
-                                <div class="full-plan-target">For those who want experts to handle everything</div>
-                            </div>
-                            <div class="full-plan-body">
-                                <div class="full-plan-description">
-                                    Our premium white-glove service where our experts handle every aspect of your credit repair journey.
+                        <div class="full-header">
+                            <h2 class="full-title">Full-Service Credit Dispute Plans</h2>
+                            <p class="full-subtitle">Let our experts handle everything while you relax. Choose the payment option that works best for your budget - all plans include the same premium white-glove service.</p>
+                        </div>
+
+                        <div class="full-plans-grid">
+                            ${Object.entries(PLANS).map(([key, plan]) => `
+                                <div class="full-plan-card ${plan.featured ? 'featured' : ''}" data-plan="${key}">
+                                    <div class="full-plan-header">
+                                        <h3 class="full-plan-name">${plan.name}</h3>
+                                        <div class="full-plan-price">${plan.price}<span> ${plan.priceSubtext}</span></div>
+                                        <p class="full-plan-target">${plan.target}</p>
+                                    </div>
+
+                                    <div class="full-plan-body">
+                                        <p class="full-plan-description">${plan.description}</p>
+
+                                        <div class="full-payment-structure">
+                                            <div class="full-payment-structure-title">Payment Structure:</div>
+                                            <div class="full-payment-structure-text">${plan.paymentStructure}</div>
+                                        </div>
+
+                                        <ul class="full-plan-features">
+                                            ${plan.features.map(feature => `
+                                                <li class="full-plan-feature">
+                                                    <i class="fas fa-check"></i>
+                                                    <span>${feature}</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+
+                                        <div class="full-plan-cta">
+                                            <button class="full-select-btn" data-plan="${key}">Get Started Now</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <ul class="full-plan-features">
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Dedicated credit repair specialist assigned to your case</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Unlimited custom dispute letters to creditors & bureaus</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Priority processing of all disputes</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Monthly credit score updates & detailed analysis</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Direct creditor negotiations on your behalf</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Identity theft protection & insurance</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Weekly progress updates via phone or email</span>
-                                    </li>
-                                    <li class="full-plan-feature">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Personalized credit building strategy</span>
-                                    </li>
-                                </ul>
-                                <div class="full-plan-cta">
-                                    <button class="full-select-btn" id="full-select-btn">Get Started Now</button>
-                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="diy-guarantee">
+                            <i class="fas fa-medal"></i>
+                            <div class="diy-guarantee-text">
+                                <strong>30-Day Money-Back Guarantee</strong><br>
+                                If you're not satisfied with our service within the first 30 days, we'll refund your payment in full.
                             </div>
                         </div>
 
-                        <!-- Hidden payment form container -->
-                        <div id="full-payment-form-container" class="full-payment-form-container">
-                            <form id="full-payment-form">
-                                <div class="full-form-group">
-                                    <label for="full-name" class="full-form-label">Full Name</label>
-                                    <input type="text" id="full-name" class="full-form-input" required>
-                                </div>
-                                <div class="full-form-group">
-                                    <label for="full-email" class="full-form-label">Email Address</label>
-                                    <input type="email" id="full-email" class="full-form-input" required>
-                                </div>
-                                <div class="full-form-group">
-                                    <label for="full-phone" class="full-form-label">Phone Number</label>
-                                    <input type="tel" id="full-phone" class="full-form-input" required>
-                                </div>
-                                <div class="full-form-group">
-                                    <label for="full-card-number" class="full-form-label">Credit Card Number</label>
-                                    <input type="text" id="full-card-number" class="full-form-input" required>
-                                </div>
-                                <div class="full-form-group">
-                                    <label for="full-card-expiry" class="full-form-label">Expiration Date</label>
-                                    <input type="text" id="full-card-expiry" class="full-form-input" placeholder="MM/YY" required>
-                                </div>
-                                <div class="full-form-group">
-                                    <label for="full-card-cvv" class="full-form-label">CVV</label>
-                                    <input type="text" id="full-card-cvv" class="full-form-input" required>
-                                </div>
-                                <button type="submit" class="full-submit-btn">Complete Purchase</button>
-                            </form>
-                        </div>
-
-                        <div class="full-modal" id="full-modal">
+                        <!-- Modal -->
+                        <div id="full-modal" class="full-modal">
                             <div class="full-modal-content">
-                                <span class="full-modal-close" id="full-modal-close">&times;</span>
-                                <h3 class="full-modal-title">Complete Your Full-Service Plan Purchase</h3>
-                                <div id="full-modal-content">
-                                    <!-- Content will be dynamically inserted here -->
-                                </div>
+                                <!-- Modal content will be dynamically inserted here -->
                             </div>
                         </div>
                     </div>
                 `;
+
+                // Insert the HTML
+                container.innerHTML = fullServicePlanHTML;
 
                 // Set up event listeners
                 setupEventListeners(container);
@@ -657,21 +1599,23 @@
 
             // Set up event listeners for the module
             function setupEventListeners(container) {
-                // Select button
-                const selectBtn = container.querySelector('#full-select-btn');
-                if (selectBtn) {
-                    selectBtn.addEventListener('click', openModal);
-                }
-
-                // Modal close button
-                const modalCloseBtn = container.querySelector('#full-modal-close');
-                if (modalCloseBtn) {
-                    modalCloseBtn.addEventListener('click', function () {
-                        closeModal();
+                // Select buttons
+                const selectBtns = container.querySelectorAll('.full-select-btn');
+                selectBtns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const planKey = this.getAttribute('data-plan');
+                        openModal(planKey);
                     });
-                }
+                });
 
-                // Close modal when clicking outside
+                // Close button (will be added dynamically)
+                container.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('full-modal-close')) {
+                        closeModal();
+                    }
+                });
+
+                // Close when clicking outside the modal content
                 const modal = container.querySelector('#full-modal');
                 if (modal) {
                     modal.addEventListener('click', function (e) {
@@ -680,20 +1624,19 @@
                         }
                     });
                 }
-
-                // Payment form submission
-                const paymentForm = container.querySelector('#full-payment-form');
-                if (paymentForm) {
-                    paymentForm.addEventListener('submit', function (e) {
-                        e.preventDefault();
-                        processPayment(container);
-                    });
-                }
             }
 
-            // Show the modal with payment options - New Window approach
-            function openModal() {
+            // Show the modal with payment options
+            function openModal(planKey) {
+                if (!PLANS[planKey]) {
+                    console.error('Invalid plan key:', planKey);
+                    return;
+                }
+
+                selectedPlan = planKey;
+                const plan = PLANS[planKey];
                 const modal = document.getElementById('full-modal');
+
                 if (modal) {
                     modal.style.display = 'flex';
                     isModalOpen = true;
@@ -702,19 +1645,23 @@
                     if (modalContent) {
                         modalContent.innerHTML = `
                             <div class="full-modal-header">
-                                <h3>Complete Your Full-Service Plan Purchase</h3>
-                                <span class="full-modal-close" id="full-modal-close">&times;</span>
+                                <h3>Complete Your ${plan.name} Purchase</h3>
+                                <span class="full-modal-close">&times;</span>
                             </div>
                             <div class="full-modal-body">
                                 <div class="full-payment-info">
                                     <div class="plan-summary">
-                                        <h4>Full-Service Credit Repair Plan</h4>
-                                        <div class="price-display">$149<span>/month</span></div>
+                                        <h4>${plan.name}</h4>
+                                        <div class="price-display">${plan.price}<span> ${plan.priceSubtext}</span></div>
+                                        <div class="full-payment-structure">
+                                            <div class="full-payment-structure-title">Payment Structure:</div>
+                                            <div class="full-payment-structure-text">${plan.paymentStructure}</div>
+                                        </div>
                                         <ul class="plan-features-summary">
-                                            <li><i class="fas fa-check"></i> Personal Credit Advisor</li>
-                                            <li><i class="fas fa-check"></i> Unlimited Disputes</li>
-                                            <li><i class="fas fa-check"></i> Credit Monitoring</li>
-                                            <li><i class="fas fa-check"></i> 24/7 Support</li>
+                                            ${plan.features.slice(0, 6).map(feature => `
+                                                <li><i class="fas fa-check"></i> ${feature}</li>
+                                            `).join('')}
+                                            ${plan.features.length > 6 ? '<li><i class="fas fa-plus"></i> And more...</li>' : ''}
                                         </ul>
                                     </div>
                                     
@@ -767,13 +1714,19 @@
                 const proceedBtn = document.getElementById('proceed-to-payment');
                 if (proceedBtn) {
                     proceedBtn.addEventListener('click', function () {
+                        if (!selectedPlan || !PAYMENT_LINKS[selectedPlan]) {
+                            console.error('No payment link found for selected plan');
+                            alert('Payment link not available. Please contact support.');
+                            return;
+                        }
+
                         // Show loading state
                         proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening secure payment...';
                         proceedBtn.disabled = true;
 
                         // Open payment in new window
                         const paymentWindow = window.open(
-                            'https://link.fastpaydirect.com/payment-link/6820e345082a6fd7e3ee6652',
+                            PAYMENT_LINKS[selectedPlan],
                             'payment',
                             'width=800,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
                         );
@@ -822,7 +1775,7 @@
                                     </ol>
                                     
                                     <div class="payment-options">
-                                        <a href="https://link.fastpaydirect.com/payment-link/6820e345082a6fd7e3ee6652" 
+                                        <a href="${PAYMENT_LINKS[selectedPlan]}" 
                                            target="_blank" 
                                            class="full-submit-btn">
                                             <i class="fas fa-external-link-alt"></i>
@@ -964,7 +1917,7 @@
                             <i class="fas fa-check-circle"></i>
                             <h4>Payment Successful!</h4>
                             <p>Thank you for purchasing our Full-Service Plan. We've sent a confirmation email to ${email}.</p>
-                            <p>A credit advisor will contact you within 24 hours to get started on your credit repair journey.</p>
+                            <p>A credit advisor will contact you within 24 hours to get started on your credit dispute journey.</p>
                             <button class="full-submit-btn" id="full-close-success-btn">Close</button>
                         </div>
                     `;
@@ -994,8 +1947,8 @@
                                 <div class="full-success-message">
                                     <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 1rem;"></i>
                                     <h4>Thank you for your purchase!</h4>
-                                    <p>Your Full-Service Credit Repair Plan is now active.</p>
-                                    <p>A credit advisor will contact you within 24 hours to get started on your credit repair journey.</p>
+                                    <p>Your Full-Service Credit Dispute Plan is now active.</p>
+                                    <p>A credit advisor will contact you within 24 hours to get started on your credit dispute journey.</p>
                                     <p>You should receive a confirmation email shortly.</p>
                                     <button class="full-submit-btn" id="full-close-success-btn">Continue to Dashboard</button>
                                 </div>
@@ -1026,7 +1979,8 @@
                 try {
                     const state = {
                         isInitialized: isInitialized,
-                        isModalOpen: isModalOpen
+                        isModalOpen: isModalOpen,
+                        selectedPlan: selectedPlan
                     };
                     sessionStorage.setItem('jamFullServicePlanState', JSON.stringify(state));
                     console.log('Saved Full Service Plan state to session storage', state);
@@ -1039,6 +1993,7 @@
             function reset() {
                 isInitialized = false;
                 isModalOpen = false;
+                selectedPlan = null;
                 try {
                     sessionStorage.removeItem('jamFullServicePlanState');
                 } catch (e) {
@@ -1051,9 +2006,9 @@
             return {
                 init: init,
                 reset: reset,
-                openModal: function () {
-                    if (isInitialized) {
-                        openModal();
+                openModal: function (planKey) {
+                    if (isInitialized && PLANS[planKey]) {
+                        openModal(planKey);
                         return true;
                     }
                     return false;
@@ -1067,6 +2022,26 @@
                 },
                 isModalOpen: function () {
                     return isModalOpen;
+                },
+                getPlans: function () {
+                    return PLANS;
+                },
+                setPaymentLink: function (planKey, link) {
+                    if (PAYMENT_LINKS.hasOwnProperty(planKey)) {
+                        PAYMENT_LINKS[planKey] = link;
+                        return true;
+                    }
+                    return false;
+                },
+                setUserData: function (userData) {
+                    console.log('🔄 Setting user data for Full Service Plan:', userData.email);
+                    // Store for use in payment flow
+                    try {
+                        sessionStorage.setItem('jamFullServiceUserData', JSON.stringify(userData));
+                        console.log('✅ User data stored for Full Service Plan');
+                    } catch (e) {
+                        console.warn('⚠️ Could not store Full Service Plan user data:', e);
+                    }
                 }
             };
         })();
@@ -1093,6 +2068,31 @@
             if (container && window.jamFullServicePlan) {
                 console.log('Found Full Service plan container, initializing');
                 window.jamFullServicePlan.init('fullservice-plan-container');
+            }
+
+            // Check for user data from pricing navigation
+            try {
+                const userData = sessionStorage.getItem('pricingUserData');
+                if (userData) {
+                    const parsedUserData = JSON.parse(userData);
+                    console.log('💾 Found user data from pricing navigation:', parsedUserData.email);
+
+                    // Add setUserData method to the module if it doesn't exist
+                    if (window.jamFullServicePlan && !window.jamFullServicePlan.setUserData) {
+                        window.jamFullServicePlan.setUserData = function (data) {
+                            console.log('🔄 Setting user data for Full Service Plan:', data.email);
+                            // Store for use in payment flow
+                            sessionStorage.setItem('jamFullServiceUserData', JSON.stringify(data));
+                        };
+                    }
+
+                    // Set the user data
+                    if (window.jamFullServicePlan.setUserData) {
+                        window.jamFullServicePlan.setUserData(parsedUserData);
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load user data:', e);
             }
         });
 

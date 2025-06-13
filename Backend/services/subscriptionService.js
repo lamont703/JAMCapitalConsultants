@@ -1013,4 +1013,77 @@ export class SubscriptionService {
             throw error;
         }
     }
+
+    /**
+     * Downgrade user subscription to a lower tier (typically used for cancellations)
+     * @param {string} userId - User ID
+     * @param {string} newTier - New subscription tier (typically 'free')
+     * @param {Object} options - Downgrade options
+     * @returns {Object} Updated subscription info
+     */
+    async downgradeTo(userId, newTier, options = {}) {
+        try {
+            await this.initialize();
+            
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            const oldTier = user.subscription?.tier || user.subscriptionTier || 'free';
+            
+            console.log(`⬇️ Downgrading user ${userId} from ${oldTier} to ${newTier}`, {
+                reason: options.reason || 'unspecified',
+                originalTier: options.originalTier || oldTier
+            });
+
+            // Create User instance to access methods
+            const userInstance = new User(user);
+            
+            // Update subscription tier with downgrade options
+            await userInstance.updateSubscriptionTier(newTier, {
+                reason: options.reason || 'downgrade',
+                resetCredits: options.resetCredits !== false, // Default to true for downgrades
+                preserveHistory: true,
+                ...options
+            });
+            
+            // If downgrading to free, update the status appropriately
+            if (newTier === 'free') {
+                userInstance.subscription.status = 'cancelled';
+                userInstance.subscription.cancelledAt = new Date().toISOString();
+                userInstance.subscription.cancellationData = options.cancellationData || {};
+            }
+
+            // Save the updated user
+            await userInstance.save();
+            
+            // Log the downgrade event
+            if (options.cancellationData) {
+                await this.logPaymentEvent(userId, {
+                    type: 'subscription_cancelled',
+                    oldTier: oldTier,
+                    newTier: newTier,
+                    reason: options.reason || 'user_cancellation',
+                    cancellationData: options.cancellationData,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                await this.logPaymentEvent(userId, {
+                    type: 'subscription_downgrade',
+                    oldTier: oldTier,
+                    newTier: newTier,
+                    reason: options.reason || 'downgrade',
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            console.log(`✅ Successfully downgraded user ${userId} from ${oldTier} to ${newTier}`);
+            
+            return userInstance.getSubscriptionInfo();
+        } catch (error) {
+            console.error('Error downgrading subscription:', error);
+            throw error;
+        }
+    }
 } 

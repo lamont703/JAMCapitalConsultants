@@ -352,12 +352,8 @@
 
                     this.showLoading();
 
-                    // Load subscription dashboard data
-                    const response = await fetch('http://localhost:3000/api/subscriptions/dashboard', {
-                        headers: {
-                            'Authorization': `Bearer ${this.getAuthToken()}`
-                        }
-                    });
+                    // Load subscription dashboard data using auth manager
+                    const response = await window.authManager.authenticatedFetch('/api/subscriptions/dashboard');
 
                     if (!response.ok) {
                         throw new Error('Failed to load subscription data');
@@ -391,8 +387,8 @@
             }
 
             getAuthToken() {
-                // This should be replaced with your actual auth token retrieval
-                return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                // Use centralized auth manager
+                return window.authManager ? window.authManager.getAuthToken() : null;
             }
 
             getCachedData() {
@@ -678,6 +674,9 @@
             }
         });
     </script>
+
+    <!-- Auth Utility -->
+    <script src="../js/auth.js"></script>
 </body>
 
 </html>

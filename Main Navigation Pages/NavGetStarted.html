@@ -1,43 +1,157 @@
-<!-- Add viewport meta tag -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script>
+    (function () {
+        'use strict';
 
-<!-- Styles -->
-<style>
-    /* Quiz Button Styles */
-    .nav-quiz-button-container {
-        margin: 1rem auto;
-        text-align: center;
-        width: 100%;
-        max-width: 400px;
-        padding: 0 1rem;
-        box-sizing: border-box;
-    }
+        // Add AuthManager for JAMGetStartedModule
+        class AuthManager {
+            constructor() {
+                this.TOKEN_KEY = 'authToken';
+                this.USER_DATA_KEY = 'userData';
+                this.API_BASE_URL = 'https://jam-capital-backend.azurewebsites.net/api';
+                this.listeners = [];
+                this._initialized = false;
+            }
 
-    .nav-credit-quiz-btn {
-        background-color: #09ccfc;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 5px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-align: center;
-        display: inline-block;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+            getAuthToken() {
+                return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
+            }
 
-    .nav-credit-quiz-btn:hover {
-        background-color: #08b6e2;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
+            setAuthToken(token) {
+                if (!token) {
+                    console.error('❌ Cannot store empty token');
+                    return;
+                }
+                localStorage.setItem(this.TOKEN_KEY, token);
+                console.log('✅ Auth token stored successfully');
+                this.notifyListeners('tokenUpdated', token);
+            }
 
-    .nav-credit-quiz-btn .nav-subtext {
-        display: none;
-    }
+            getUserData() {
+                try {
+                    const userData = localStorage.getItem(this.USER_DATA_KEY) ||
+                        sessionStorage.getItem(this.USER_DATA_KEY);
 
+                    if (!userData) {
+                        console.warn('⚠️ No user data found');
+                        return null;
+                    }
+                    return JSON.parse(userData);
+                } catch (error) {
+                    console.error('❌ Error parsing user data:', error);
+                    this.clearAuth();
+                    return null;
+                }
+            }
+
+            setUserData(userData) {
+                if (!userData) {
+                    console.error('❌ Cannot store empty user data');
+                    return;
+                }
+                localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userData));
+                console.log('✅ User data stored successfully');
+                this.notifyListeners('userDataUpdated', userData);
+            }
+
+            getUserId() {
+                const userData = this.getUserData();
+                return userData?.id || userData?.userId || userData?._id || userData?.user_id || null;
+            }
+
+            isAuthenticated() {
+                const token = this.getAuthToken();
+                const userData = this.getUserData();
+
+                // Check for various possible user ID fields
+                const userId = userData?.id || userData?.userId || userData?._id || userData?.user_id;
+
+                const isAuth = !!(token && userId);
+                console.log('🔍 Authentication check:', isAuth ? 'AUTHENTICATED' : 'NOT AUTHENTICATED');
+                console.log('🔍 Token present:', !!token);
+                console.log('🔍 User ID found:', userId);
+                console.log('🔍 User data structure:', userData);
+
+                return isAuth;
+            }
+
+            clearAuth() {
+                localStorage.removeItem(this.TOKEN_KEY);
+                localStorage.removeItem(this.USER_DATA_KEY);
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem(this.TOKEN_KEY);
+                sessionStorage.removeItem(this.USER_DATA_KEY);
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('user');
+
+                console.log('🧹 Authentication data cleared');
+                this.notifyListeners('authCleared');
+            }
+
+            handleLoginSuccess(data) {
+                if (data.token && data.user) {
+                    this.setAuthToken(data.token);
+                    this.setUserData(data.user);
+                    console.log('✅ Login success handled');
+                    this.notifyListeners('loginSuccess', data);
+                } else {
+                    console.error('❌ Invalid login response data');
+                    throw new Error('Invalid login response');
+                }
+            }
+
+            addListener(callback) {
+                this.listeners.push(callback);
+            }
+
+            removeListener(callback) {
+                const index = this.listeners.indexOf(callback);
+                if (index > -1) {
+                    this.listeners.splice(index, 1);
+                }
+            }
+
+            notifyListeners(event, data) {
+                this.listeners.forEach(callback => {
+                    try {
+                        callback(event, data);
+                    } catch (error) {
+                        console.error('❌ Error in auth listener:', error);
+                    }
+                });
+            }
+
+            init() {
+                console.log('🚀 AuthManager initialized for JAMGetStartedModule');
+
+                if (this.isAuthenticated()) {
+                    console.log('✅ User is authenticated');
+                } else {
+                    console.log('ℹ️ User is not authenticated');
+                }
+
+                this._initialized = true;
+            }
+        }
+
+        // Create global instance immediately 
+        window.authManager = new AuthManager();
+
+        // Initialize immediately
+        window.authManager.init();
+
+        console.log('🔧 JAM Capital Auth Manager embedded for JAMGetStartedModule');
+
+        // Create the module
+        const JAMGetStartedModule = (function () {
+            let isInitialized = false;
+            let currentContainer = null;
+            let currentStep = 1;
+            const totalSteps = 7;
+            let quizData = {};
+
+            // CSS Styles as a string
+            const moduleStyles = `
     .nav-quiz-modal {
         display: none;
         position: fixed;
@@ -45,7 +159,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+background-color: transparent;
         z-index: 1000;
         -webkit-overflow-scrolling: touch;
         box-sizing: border-box;
@@ -68,6 +182,8 @@
         height: 92vh;
         border-radius: 8px;
         margin: auto;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+border: 1px solid #e0e0e0;
     }
 
     .nav-close-button {
@@ -86,68 +202,53 @@
         color: #000;
     }
 
-    @media (max-width: 639px) {
+/* Mobile Responsive Styles */
+@media (max-width: 575.98px) {
         .nav-quiz-button-container {
             margin: 0.5rem auto;
-            padding: 0 0.75rem;
+padding: 0 0.5rem;
+max-width: 100%;
         }
 
         .nav-credit-quiz-btn {
-            padding: 0.875rem 1rem;
-            border-radius: 10px;
-        }
+padding: 1rem;
+font-size: 0.9rem;
+border-radius: 8px;
+min-height: 44px;
+touch-action: manipulation;
+width: 100%;
+}
 
-        .nav-credit-quiz-btn .nav-subtext {
-            font-size: 0.813rem;
+.nav-credit-quiz-btn:active {
+transform: scale(0.98);
         }
 
         .nav-modal-content {
-            padding: 1rem;
-            margin: 0;
             width: 100%;
-            height: 100%;
+height: 100vh;
+max-height: 100vh;
             border-radius: 0;
-        }
-
-        .nav-quiz-container {
-            padding: 0;
-        }
-
-        .nav-options-grid {
-            padding: 0;
-        }
-
-        .nav-question-title {
-            padding: 0;
-        }
-
-        .nav-quiz-navigation {
-            position: sticky;
-            bottom: 0;
-            background: #fff;
             padding: 1rem;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            margin: 0 -1rem;
-        }
+margin: 0;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+border: 1px solid #e0e0e0;
+}
 
-        .nav-nav-btn {
-            min-height: 44px;
-            flex: 1;
-            font-size: 0.938rem;
-        }
-    }
+.nav-close-button {
+top: 0.5rem;
+right: 0.5rem;
+width: 36px;
+height: 36px;
+font-size: 1.3rem;
+background-color: rgba(255, 255, 255, 0.9);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+}
 
-    @supports (-webkit-touch-callout: none) {
-        .nav-modal-content {
-            height: -webkit-fill-available;
-        }
-
-        .nav-quiz-navigation {
-            padding-bottom: max(env(safe-area-inset-bottom), 1rem);
-        }
-    }
-
-    /* Add quiz-specific styles */
+/* Quiz Container Styles */
     .nav-quiz-container {
         max-width: 800px;
         margin: 0 auto;
@@ -304,6 +405,7 @@
         border-radius: 8px;
         font-size: 1rem;
         transition: border-color 0.3s ease;
+box-sizing: border-box;
     }
 
     .nav-form-input:focus {
@@ -311,92 +413,6 @@
         border-color: #008080;
     }
 
-    /* Success Message */
-    .nav-success-message {
-        text-align: center;
-        padding: 2rem;
-    }
-
-    .nav-success-message h2 {
-        color: #008080;
-        margin-bottom: 1rem;
-    }
-
-    /* Responsive Breakpoints */
-    @media (min-width: 640px) {
-        .nav-options-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .nav-question-title {
-            font-size: 1.75rem;
-        }
-    }
-
-    @media (max-width: 639px) {
-        .nav-modal-content {
-            margin: 0;
-            width: 100%;
-            height: 100vh;
-            border-radius: 0;
-            padding: 1rem;
-        }
-
-        .nav-question-title {
-            font-size: 1.25rem;
-        }
-
-        .nav-option-btn {
-            padding: 0.875rem;
-        }
-
-        .nav-nav-btn {
-            padding: 0.75rem 1rem;
-        }
-    }
-
-    .nav-get-started-btn {
-        background-color: #09ccfc;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        width: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .nav-get-started-btn .nav-subtext {
-        font-size: 0.875rem;
-        font-weight: 400;
-        opacity: 0.9;
-    }
-
-    .nav-get-started-btn:hover {
-        background-color: #08b6e2;
-        /* Slightly darker shade for hover */
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(9, 204, 252, 0.2);
-    }
-
-    .nav-get-started-btn:active {
-        background-color: #079fcb;
-        /* Even darker for click state */
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(9, 204, 252, 0.1);
-    }
-
-    .nav-get-started-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.3);
-    }
-
-    /* Registration form styles */
     .nav-registration-form {
         max-width: 500px;
         margin: 0 auto;
@@ -409,10 +425,6 @@
         margin-bottom: 1.5rem;
     }
 
-    .nav-form-group {
-        margin-bottom: 1.25rem;
-    }
-
     .nav-form-group label {
         display: block;
         margin-bottom: 0.5rem;
@@ -420,22 +432,8 @@
         color: #333;
     }
 
-    .nav-form-input {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 1rem;
-        transition: border-color 0.3s;
-    }
-
-    .nav-form-input:focus {
-        border-color: #008080;
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2);
-    }
-
-    .nav-password-hint {
+.nav-password-hint,
+.nav-security-hint {
         display: block;
         font-size: 0.8rem;
         color: #666;
@@ -465,37 +463,130 @@
         text-decoration: underline;
     }
 
-    /* Update button styles for registration */
-    #nav-nextBtn:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
+/* Alert Styles */
+.nav-alert {
+            padding: 1rem;
+            border-radius: 8px;
+margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+gap: 0.5rem;
+font-size: 0.9rem;
+}
+
+.nav-alert-error {
+background-color: #fee;
+color: #c53030;
+border: 1px solid #feb2b2;
+}
+
+.nav-alert-success {
+background-color: #f0fff4;
+color: #38a169;
+border: 1px solid #9ae6b4;
+}
+
+.nav-alert i {
+font-size: 1rem;
+}
+
+/* Additional Mobile Optimizations */
+@media (max-width: 575.98px) {
+        .nav-quiz-navigation {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 1rem 0.5rem;
+            margin: 0 -1rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-nav-btn {
+            flex: 1;
+            min-height: 44px;
+            font-size: 0.9rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            touch-action: manipulation;
+        }
+
+        .nav-nav-btn:active {
+            transform: scale(0.98);
+        }
+
+        .nav-options-grid {
+display: flex;
+flex-direction: column;
+gap: 0.75rem;
+}
+
+.nav-option-btn {
+            padding: 1rem;
+font-size: 0.9rem;
+min-height: 44px;
+touch-action: manipulation;
+        }
+
+        .nav-question-title {
+font-size: 1.2rem;
+margin-bottom: 1.5rem;
+line-height: 1.3;
+}
+
+.nav-alert {
+            padding: 0.75rem;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+border-radius: 6px;
+}
+
+.nav-form-input {
+padding: 0.875rem;
+font-size: 16px; /* Prevents zoom on iOS */
+border-radius: 6px;
+}
+
+.nav-password-hint,
+.nav-security-hint {
+            font-size: 0.75rem;
+margin-top: 0.25rem;
+        }
     }
 
-    #nav-nextBtn[disabled]:hover {
-        background-color: #cccccc;
-    }
-</style>
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .nav-credit-quiz-btn:hover {
+            background-color: #09ccfc;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-<!-- HTML Content -->
-<div class="nav-quiz-button-container">
-    <button class="nav-credit-quiz-btn">
-        Get Started
-    </button>
-</div>
+.nav-option-btn:hover {
+            background-color: #ffffff;
+border-color: #e0e0e0;
+        }
 
-<!-- Modal with Quiz Content -->
+        .nav-credit-quiz-btn,
+.nav-option-btn,
+.nav-nav-btn {
+            -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+        }
+}
+`;
+
+            // HTML Template
+            const moduleHTML = `
 <div id="nav-quizModal" class="nav-quiz-modal">
     <div class="nav-modal-content">
         <span class="nav-close-button">&times;</span>
-        <!-- Quiz Content Structure -->
         <div id="navQuizContent" class="nav-quiz-container">
-            <!-- Progress Bar -->
             <div class="nav-progress-container">
                 <div class="nav-progress-bar" id="nav-quizProgress"></div>
                 <span class="nav-progress-text">Progress: <span id="nav-progressPercentage">0%</span></span>
             </div>
 
-            <!-- Quiz Steps Container -->
             <div class="nav-quiz-steps" id="nav-quizSteps">
                 <!-- Step 1 -->
                 <div class="nav-quiz-step" data-step="1">
@@ -672,24 +763,32 @@
                             <label for="nav-password">Create Password</label>
                             <input type="password" id="nav-password" class="nav-form-input"
                                 placeholder="Create a secure password" required>
-                            <small class="nav-password-hint">Must be at least 8 characters with a number and special
-                                character</small>
+                            <small class="nav-password-hint">Must be at least 6 characters long</small>
                         </div>
                         <div class="nav-form-group">
-                            <label for="nav-confirm-password">Confirm Password</label>
-                            <input type="password" id="nav-confirm-password" class="nav-form-input"
-                                placeholder="Confirm your password" required>
+                            <label for="nav-security-question">Security Question</label>
+                            <select id="nav-security-question" class="nav-form-input" required>
+                                <option value="">Select a Security Question</option>
+                                <option value="mother_maiden_name">What is your mother's maiden name?</option>
+                                <option value="first_pet_name">What was the name of your first pet?</option>
+                                <option value="childhood_street">What street did you grow up on?</option>
+                                <option value="first_school">What was the name of your elementary school?</option>
+                                <option value="favorite_teacher">What was your favorite teacher's last name?</option>
+                                <option value="first_car">What was the make of your first car?</option>
+                                <option value="birth_city">In what city were you born?</option>
+                                <option value="childhood_friend">What was your childhood best friend's name?</option>
+                            </select>
                         </div>
-                        <div class="nav-form-group nav-checkbox-group">
-                            <input type="checkbox" id="nav-terms" required>
-                            <label for="nav-terms">I agree to the <a href="/terms" target="_blank">Terms of Service</a>
-                                and <a href="/privacy" target="_blank">Privacy Policy</a></label>
+                        <div class="nav-form-group">
+                            <label for="nav-security-answer">Security Answer</label>
+                            <input type="text" id="nav-security-answer" class="nav-form-input"
+                                placeholder="Enter your security answer" required>
+                            <small class="nav-security-hint">This will help verify your identity if you forget your password</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Navigation Buttons -->
             <div class="nav-quiz-navigation">
                 <button id="nav-prevBtn" class="nav-nav-btn" style="display: none;">Previous</button>
                 <button id="nav-nextBtn" class="nav-nav-btn">Next</button>
@@ -697,330 +796,513 @@
         </div>
     </div>
 </div>
+`;
 
-<!-- Scripts -->
-<script src="https://link.msgsndr.com/js/form_embed.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Global variables
-        let currentStep = 1;
-        const totalSteps = 7;
-        window.quizData = {};
+            // Initialize the module
+            function init(containerIdOrElement, options = {}) {
+                console.log('🚀 Initializing JAM Get Started Module...');
 
-        // Get DOM elements
-        const quizButton = document.querySelector('.nav-credit-quiz-btn');
-        const quizModal = document.getElementById('nav-quizModal');
-        const closeButton = document.querySelector('.nav-close-button');
+                let container;
+                if (typeof containerIdOrElement === 'string') {
+                    container = document.getElementById(containerIdOrElement);
+                } else if (containerIdOrElement && containerIdOrElement.nodeType === 1) {
+                    container = containerIdOrElement;
+                } else {
+                    console.error('❌ Invalid container parameter');
+                    return false;
+                }
 
-        // Fix: Correct ID references for quiz elements
-        const quizSteps = document.getElementById('nav-quizSteps');
-        const nextBtn = document.getElementById('nav-nextBtn');
-        const prevBtn = document.getElementById('nav-prevBtn');
+                if (!container) {
+                    console.error('❌ Container not found');
+                    return false;
+                }
 
-        // Initialize progress bar
-        updateProgress(1, totalSteps);
+                currentContainer = container;
 
-        // Show first step
-        showStep(1);
+                // Inject styles
+                injectStyles();
 
-        // Open modal when quiz button is clicked
-        window.openQuizModal = function () {
-            if (quizModal) {
-                quizModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                // Reset to first step when opening modal
-                currentStep = 1;
+                // Insert HTML
+                container.innerHTML = moduleHTML;
+
+                // Initialize functionality
+                setupEventListeners();
+                updateProgress(1, totalSteps);
                 showStep(1);
-            } else {
-                console.error("Quiz modal element not found!");
+
+                isInitialized = true;
+                console.log('✅ JAM Get Started Module initialized successfully');
+                return true;
             }
-        };
 
-        // Close modal function
-        window.closeQuizModal = function () {
-            if (quizModal) {
-                quizModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        };
-
-        // Add event listeners
-        if (quizButton) {
-            quizButton.addEventListener('click', window.openQuizModal);
-        } else {
-            console.error("Quiz button not found!");
-        }
-
-        if (closeButton) {
-            closeButton.addEventListener('click', window.closeQuizModal);
-        } else {
-            console.error("Close button not found!");
-        }
-
-        // Fix: Add direct event listeners to option buttons
-        document.querySelectorAll('.nav-option-btn').forEach(button => {
-            button.addEventListener('click', function (e) {
-                handleOptionSelect(e);
-            });
-        });
-
-        // Next button functionality
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                if (currentStep < totalSteps) {
-                    currentStep++;
-                    showStep(currentStep);
-                } else {
-                    submitRegistration();
+            // Inject CSS styles
+            function injectStyles() {
+                const styleId = 'jam-get-started-styles';
+                if (!document.getElementById(styleId)) {
+                    const style = document.createElement('style');
+                    style.id = styleId;
+                    style.textContent = moduleStyles;
+                    document.head.appendChild(style);
                 }
-            });
-        } else {
-            console.error("Next button not found!");
-        }
-
-        // Previous button functionality
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (currentStep > 1) {
-                    currentStep--;
-                    showStep(currentStep);
-                }
-            });
-        } else {
-            console.error("Previous button not found!");
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function (event) {
-            if (event.target === quizModal) {
-                window.closeQuizModal();
             }
-        });
 
-        // Function to show a specific step
-        function showStep(step) {
-            console.log(`Showing step ${step} of ${totalSteps}`);
+            // Setup event listeners
+            function setupEventListeners() {
+                const quizButton = currentContainer.querySelector('.nav-credit-quiz-btn');
+                const quizModal = currentContainer.querySelector('#nav-quizModal');
+                const closeButton = currentContainer.querySelector('.nav-close-button');
+                const nextBtn = currentContainer.querySelector('#nav-nextBtn');
+                const prevBtn = currentContainer.querySelector('#nav-prevBtn');
 
-            // Hide all steps
-            const steps = document.querySelectorAll('.nav-quiz-step');
-            steps.forEach(s => s.style.display = 'none');
+                // Open modal
+                if (quizButton) {
+                    quizButton.addEventListener('click', openQuizModal);
+                }
 
-            // Show current step
-            const currentStepEl = document.querySelector(`.nav-quiz-step[data-step="${step}"]`);
-            if (currentStepEl) {
-                currentStepEl.style.display = 'block';
+                // Close modal
+                if (closeButton) {
+                    closeButton.addEventListener('click', closeQuizModal);
+                }
 
-                // Special handling for the final step (registration form)
-                if (step === 7) {
-                    // For the registration form step, we don't need to check for previous selections
-                    console.log("Showing registration form step");
-                } else {
-                    // Highlight previously selected option if exists
-                    const questionId = currentStepEl.getAttribute('data-question') || `question_${step}`;
-                    const selectedValue = window.quizData[questionId];
+                // Navigation buttons
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        if (currentStep < totalSteps) { currentStep++; showStep(currentStep); } else { submitRegistration(); }
+                    });
+                } if
+                    (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        if (currentStep > 1) {
+                            currentStep--;
+                            showStep(currentStep);
+                        }
+                    });
+                }
 
-                    if (selectedValue) {
-                        // Clear any existing selections first
-                        currentStepEl.querySelectorAll('.nav-option-btn').forEach(btn => {
-                            btn.classList.remove('nav-active');
-                            btn.classList.remove('selected');
-                        });
+                // Option buttons
+                currentContainer.querySelectorAll('.nav-option-btn').forEach(button => {
+                    button.addEventListener('click', handleOptionSelect);
+                });
 
-                        // Find and highlight the previously selected option
-                        const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${selectedValue}"]`);
-                        if (selectedOption) {
-                            selectedOption.classList.add('nav-active');
-                            selectedOption.classList.add('selected');
+                // Form validation
+                currentContainer.addEventListener('input', function (e) {
+                    if (currentStep === 7) {
+                        validateRegistrationForm();
+                    }
+                });
+
+                // Close modal when clicking outside
+                if (quizModal) {
+                    quizModal.addEventListener('click', function (event) {
+                        if (event.target === quizModal) {
+                            closeQuizModal();
+                        }
+                    });
+                }
+            }
+
+            // Open quiz modal
+            function openQuizModal() {
+                const quizModal = currentContainer.querySelector('#nav-quizModal');
+                if (quizModal) {
+                    quizModal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    currentStep = 1;
+                    showStep(1);
+                }
+            }
+
+            // Close quiz modal
+            function closeQuizModal() {
+                const quizModal = currentContainer.querySelector('#nav-quizModal');
+                if (quizModal) {
+                    quizModal.style.display = 'none';
+                    quizModal.style.background = 'transparent';
+                    document.body.style.overflow = 'auto';
+
+                    // Reset any potential overlay styles
+                    document.body.style.backgroundColor = '';
+                    document.body.style.position = '';
+
+                    // Ensure no other elements have overlay styles
+                    const overlays = document.querySelectorAll('.nav-quiz-modal');
+                    overlays.forEach(overlay => {
+                        overlay.style.display = 'none';
+                        overlay.style.background = 'transparent';
+                    });
+                }
+            }
+
+            // Show specific step
+            function showStep(step) {
+                const steps = currentContainer.querySelectorAll('.nav-quiz-step');
+                steps.forEach(s => s.style.display = 'none');
+
+                const currentStepEl = currentContainer.querySelector(`.nav-quiz-step[data-step="${step}"]`);
+                if (currentStepEl) {
+                    currentStepEl.style.display = 'block';
+
+                    if (step !== 7) {
+                        const questionId = `question_${step}`;
+                        const selectedValue = quizData[questionId];
+
+                        if (selectedValue) {
+                            currentStepEl.querySelectorAll('.nav-option-btn').forEach(btn => {
+                                btn.classList.remove('nav-active', 'selected');
+                            });
+
+                            const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${selectedValue}"]`);
+                            if (selectedOption) {
+                                selectedOption.classList.add('nav-active', 'selected');
+                            }
                         }
                     }
                 }
-            } else {
-                console.error(`Step ${step} not found!`);
+
+                updateProgress(step, totalSteps);
+                updateNavButtons(step, totalSteps);
             }
 
-            // Update progress
-            updateProgress(step, totalSteps);
+            // Update progress bar
+            function updateProgress(current, total) {
+                const progressBar = currentContainer.querySelector('.nav-progress-bar');
+                const progressText = currentContainer.querySelector('.nav-progress-text');
+
+                if (progressBar) {
+                    const percentage = (current / total) * 100;
+                    progressBar.style.setProperty('--progress-width', `${percentage}%`);
+                    progressBar.style.background = `linear-gradient(to right, #008080 ${percentage}%, #f0f0f0 ${percentage}%)`;
+                }
+
+                if (progressText) {
+                    progressText.textContent = `Step ${current} of ${total}`;
+                }
+            }
 
             // Update navigation buttons
-            updateNavButtons(step, totalSteps);
-        }
+            function updateNavButtons(current, total) {
+                const prevBtn = currentContainer.querySelector('#nav-prevBtn');
+                const nextBtn = currentContainer.querySelector('#nav-nextBtn');
 
-        // Function to update progress bar
-        function updateProgress(current, total) {
-            const progressBar = document.querySelector('.nav-progress-bar');
-            const progressText = document.querySelector('.nav-progress-text');
-
-            if (progressBar) {
-                const percentage = (current / total) * 100;
-                progressBar.style.width = `${percentage}%`;
-            }
-
-            if (progressText) {
-                progressText.textContent = `Step ${current} of ${total}`;
-            }
-        }
-
-        // Function to update navigation buttons
-        function updateNavButtons(current, total) {
-            if (prevBtn) {
-                prevBtn.style.display = current === 1 ? 'none' : 'block';
-            }
-
-            if (nextBtn) {
-                nextBtn.textContent = current === total ? 'Create Account' : 'Next';
-
-                // Check if there's a selection for the current step
-                if (current === 7) {
-                    // For the registration form step, check if required fields are filled
-                    validateRegistrationForm();
-                } else {
-                    // For other steps, check if an option is selected
-                    const currentStepEl = document.querySelector(`.nav-quiz-step[data-step="${current}"]`);
-                    const questionId = currentStepEl.getAttribute('data-question') || `question_${current}`;
-                    const hasSelection = window.quizData[questionId] !== undefined;
-
-                    // Enable/disable next button based on selection
-                    nextBtn.disabled = !hasSelection;
+                if (prevBtn) {
+                    prevBtn.style.display = current === 1 ? 'none' : 'block';
                 }
-            }
-        }
 
-        // Function to handle option selection
-        function handleOptionSelect(e) {
-            e.preventDefault();
-            const button = e.target.closest('.nav-option-btn');
-            if (!button) return;
+                if (nextBtn) {
+                    nextBtn.textContent = current === total ? 'Create Account' : 'Next';
 
-            // Get all options in the current step
-            const currentStepEl = document.querySelector(`.nav-quiz-step[data-step="${currentStep}"]`);
-            const options = currentStepEl.querySelectorAll('.nav-option-btn');
-
-            // Remove active class from all options
-            options.forEach(opt => {
-                opt.classList.remove('nav-active');
-                opt.classList.remove('selected');
-            });
-
-            // Add active class to selected option
-            button.classList.add('nav-active');
-            button.classList.add('selected');
-
-            // Store the selected value
-            const value = button.getAttribute('data-value');
-            const questionId = currentStepEl.getAttribute('data-question') || `question_${currentStep}`;
-
-            // Save to quiz data
-            window.quizData[questionId] = value;
-
-            // Enable next button
-            if (nextBtn) {
-                nextBtn.disabled = false;
-            }
-        }
-
-        // Add form input validation for registration form
-        document.addEventListener('input', function (e) {
-            if (currentStep === 7) {
-                validateRegistrationForm();
-            }
-        });
-
-        // Function to validate registration form
-        function validateRegistrationForm() {
-            const fullname = document.getElementById('nav-fullname');
-            const email = document.getElementById('nav-email');
-            const phone = document.getElementById('nav-phone');
-            const password = document.getElementById('nav-password');
-            const confirmPassword = document.getElementById('nav-confirm-password');
-            const terms = document.getElementById('nav-terms');
-
-            if (!fullname || !email || !phone || !password || !confirmPassword || !terms) {
-                console.error("One or more registration form fields not found");
-                return;
-            }
-
-            // Check if all required fields are filled
-            const isFullnameFilled = fullname.value.trim() !== '';
-            const isEmailFilled = email.value.trim() !== '';
-            const isPhoneFilled = phone.value.trim() !== '';
-            const isPasswordFilled = password.value !== '';
-            const isConfirmPasswordFilled = confirmPassword.value !== '';
-            const isTermsChecked = terms.checked;
-
-            // Check if passwords match
-            const doPasswordsMatch = password.value === confirmPassword.value;
-
-            // Check password strength (at least 8 chars with a number and special char)
-            const isPasswordStrong = /^(?=.*[0-9])(?=.*[!@#$%^&*])(.{8,})$/.test(password.value);
-
-            // Show password mismatch error if needed
-            const passwordHint = document.querySelector('.nav-password-hint');
-            if (passwordHint) {
-                if (isPasswordFilled && isConfirmPasswordFilled && !doPasswordsMatch) {
-                    passwordHint.textContent = "Passwords do not match";
-                    passwordHint.style.color = "red";
-                } else if (isPasswordFilled && !isPasswordStrong) {
-                    passwordHint.textContent = "Password must be at least 8 characters with a number and special character";
-                    passwordHint.style.color = "red";
-                } else {
-                    passwordHint.textContent = "Must be at least 8 characters with a number and special character";
-                    passwordHint.style.color = "";
+                    if (current === 7) {
+                        validateRegistrationForm();
+                    } else {
+                        const questionId = `question_${current}`;
+                        const hasSelection = quizData[questionId] !== undefined;
+                        nextBtn.disabled = !hasSelection;
+                    }
                 }
             }
 
-            // Enable/disable submit button based on validation
-            if (nextBtn) {
-                nextBtn.disabled = !(
-                    isFullnameFilled &&
-                    isEmailFilled &&
-                    isPhoneFilled &&
-                    isPasswordFilled &&
-                    isConfirmPasswordFilled &&
-                    doPasswordsMatch &&
-                    isPasswordStrong &&
-                    isTermsChecked
-                );
-            }
-        }
+            // Handle option selection
+            function handleOptionSelect(e) {
+                e.preventDefault();
+                const button = e.target.closest('.nav-option-btn');
+                if (!button) return;
 
-        // Function to submit registration
-        function submitRegistration() {
-            // Get form data
-            const fullname = document.getElementById('nav-fullname').value.trim();
-            const email = document.getElementById('nav-email').value.trim();
-            const phone = document.getElementById('nav-phone').value.trim();
-            const password = document.getElementById('nav-password').value;
+                const currentStepEl = currentContainer.querySelector(`.nav-quiz-step[data-step="${currentStep}"]`);
+                const options = currentStepEl.querySelectorAll('.nav-option-btn');
 
-            // Combine with quiz data
-            const registrationData = {
-                ...window.quizData,
-                fullname: fullname,
-                email: email,
-                phone: phone,
-                // Don't include password in analytics data for security
-            };
-
-            console.log("Registration submitted with data:", registrationData);
-
-            // Track submission if analytics is available
-            if (typeof analytics !== 'undefined') {
-                analytics.track('AccountRegistration', {
-                    quizData: registrationData,
-                    timestamp: new Date().toISOString()
+                options.forEach(opt => {
+                    opt.classList.remove('nav-active', 'selected');
                 });
+
+                button.classList.add('nav-active', 'selected');
+
+                const value = button.getAttribute('data-value');
+                const questionId = `question_${currentStep}`;
+                quizData[questionId] = value;
+
+                const nextBtn = currentContainer.querySelector('#nav-nextBtn');
+                if (nextBtn) {
+                    nextBtn.disabled = false;
+                }
             }
 
-            // Redirect to dashboard
-            window.location.href = "https://jamcapitalconsultants.com/dashboard";
-        }
+            // Validate registration form
+            function validateRegistrationForm() {
+                const fullname = currentContainer.querySelector('#nav-fullname');
+                const email = currentContainer.querySelector('#nav-email');
+                const phone = currentContainer.querySelector('#nav-phone');
+                const password = currentContainer.querySelector('#nav-password');
+                const securityQuestion = currentContainer.querySelector('#nav-security-question');
+                const securityAnswer = currentContainer.querySelector('#nav-security-answer');
+                const nextBtn = currentContainer.querySelector('#nav-nextBtn');
 
-        // Find and update the button text if it exists
+                if (!fullname || !email || !phone || !password || !securityQuestion || !securityAnswer) {
+                    return;
+                }
+
+                const isFullnameFilled = fullname.value.trim() !== '';
+                const isEmailFilled = email.value.trim() !== '';
+                const isPhoneFilled = phone.value.trim() !== '';
+                const isPasswordFilled = password.value !== '';
+                const isSecurityQuestionFilled = securityQuestion.value !== '';
+                const isSecurityAnswerFilled = securityAnswer.value.trim() !== '';
+                const isPasswordStrong = password.value.length >= 6;
+
+                const passwordHint = currentContainer.querySelector('.nav-password-hint');
+                if (passwordHint) {
+                    if (isPasswordFilled && !isPasswordStrong) {
+                        passwordHint.textContent = "Password must be at least 6 characters long";
+                        passwordHint.style.color = "red";
+                    } else {
+                        passwordHint.textContent = "Must be at least 6 characters long";
+                        passwordHint.style.color = "";
+                    }
+                }
+
+                if (nextBtn) {
+                    nextBtn.disabled = !(
+                        isFullnameFilled &&
+                        isEmailFilled &&
+                        isPhoneFilled &&
+                        isPasswordFilled &&
+                        isSecurityQuestionFilled &&
+                        isSecurityAnswerFilled &&
+                        isPasswordStrong
+                    );
+                }
+            }
+
+            // Submit registration
+            async function submitRegistration() {
+                const fullname = currentContainer.querySelector('#nav-fullname').value.trim();
+                const email = currentContainer.querySelector('#nav-email').value.trim();
+                const phone = currentContainer.querySelector('#nav-phone').value.trim();
+                const password = currentContainer.querySelector('#nav-password').value;
+                const securityQuestion = currentContainer.querySelector('#nav-security-question').value;
+                const securityAnswer = currentContainer.querySelector('#nav-security-answer').value.trim();
+                const nextBtn = currentContainer.querySelector('#nav-nextBtn');
+
+                // Basic validation
+                if (!fullname || !email || !phone || !password || !securityQuestion || !securityAnswer) {
+                    showError('Please fill in all fields');
+                    return;
+                }
+
+                // Password validation
+                if (password.length < 6) {
+                    showError('Password must be at least 6 characters long');
+                    return;
+                }
+
+                // Security answer validation
+                if (securityAnswer.length < 2) {
+                    showError('Security answer must be at least 2 characters long');
+                    return;
+                }
+
+                // Show loading state
+                if (nextBtn) {
+                    nextBtn.innerHTML = 'Creating Account...';
+                    nextBtn.disabled = true;
+                }
+
+                try {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: fullname,
+                            email: email,
+                            phone: phone,
+                            password: password,
+                            securityQuestion: securityQuestion,
+                            securityAnswer: securityAnswer.toLowerCase() // Normalize for consistency
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        console.log('🎉 Registration successful! Response data:', data);
+
+                        // Set registration flags for dashboard authentication check
+                        sessionStorage.setItem('comingFromRegistration', 'true');
+                        sessionStorage.setItem('registrationTimestamp', Date.now().toString());
+
+                        // Check if authManager exists
+                        if (window.authManager) {
+                            console.log('✅ AuthManager found, calling handleLoginSuccess');
+                            try {
+                                window.authManager.handleLoginSuccess(data);
+                                console.log('✅ handleLoginSuccess completed successfully');
+
+                                // Verify authentication was set
+                                const isAuth = window.authManager.isAuthenticated();
+                                const token = window.authManager.getAuthToken();
+                                const userData = window.authManager.getUserData();
+
+                                console.log('🔍 Post-registration auth check:');
+                                console.log('  - Is authenticated:', isAuth);
+                                console.log('  - Token present:', !!token);
+                                console.log('  - User data:', userData);
+
+                            } catch (error) {
+                                console.error('❌ Error in handleLoginSuccess:', error);
+                                showError('Authentication setup failed: ' + error.message);
+                                resetButton();
+                                return;
+                            }
+                        } else {
+                            console.error('❌ AuthManager not found!');
+                            showError('Authentication system not available');
+                            resetButton();
+                            return;
+                        }
+
+                        // Track successful registration
+                        if (typeof analytics !== 'undefined') {
+                            analytics.track('RegistrationSuccess', {
+                                email: email,
+                                source: 'JAMGetStartedModule',
+                                quizData: quizData,
+                                timestamp: new Date().toISOString()
+                            });
+                        }
+
+                        // Show success message
+                        showSuccess('Account created successfully! Redirecting to dashboard...');
+
+                        // Ensure authentication data is properly stored before redirect
+                        setTimeout(() => {
+                            console.log('🔄 About to redirect to dashboard...');
+                            console.log('🔍 Final auth check before redirect:');
+                            console.log('  - Is authenticated:', window.authManager.isAuthenticated());
+                            console.log('  - Token:', window.authManager.getAuthToken() ? 'Present' : 'Missing');
+                            console.log('  - User data:', window.authManager.getUserData());
+
+                            // Double-check authentication before redirect
+                            if (window.authManager.isAuthenticated()) {
+                                console.log('✅ Authentication confirmed, redirecting to dashboard');
+                                window.location.href = '/dashboard';
+                            } else {
+                                console.error('❌ Authentication failed after registration');
+                                showError('Authentication failed. Please try logging in manually.');
+
+                                // Fallback: redirect to login page
+                                setTimeout(() => {
+                                    window.location.href = '/login';
+                                }, 2000);
+                            }
+                        }, 2000); // Increased delay to ensure data is stored
+
+                    } else {
+                        showError(data.message || 'Registration failed. Please try again.');
+                        resetButton();
+                    }
+
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    showError('Network error. Please check your connection and try again.');
+                    resetButton();
+                }
+
+                function resetButton() {
+                    if (nextBtn) {
+                        nextBtn.innerHTML = 'Create Account';
+                        nextBtn.disabled = false;
+                    }
+                }
+
+                function showError(message) {
+                    // Remove existing alerts
+                    const existingAlert = currentContainer.querySelector('.nav-alert');
+                    if (existingAlert) {
+                        existingAlert.remove();
+                    }
+
+                    // Create error alert
+                    const alert = document.createElement('div');
+                    alert.className = 'nav-alert nav-alert-error';
+                    alert.innerHTML = `
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>${message}</span>
+                    `;
+
+                    // Insert at top of quiz container
+                    const quizContainer = currentContainer.querySelector('.nav-quiz-container');
+                    if (quizContainer) {
+                        quizContainer.insertBefore(alert, quizContainer.firstChild);
+                    }
+
+                    // Auto remove after 5 seconds
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 5000);
+                }
+
+                function showSuccess(message) {
+                    // Remove existing alerts
+                    const existingAlert = currentContainer.querySelector('.nav-alert');
+                    if (existingAlert) {
+                        existingAlert.remove();
+                    }
+
+                    // Create success alert
+                    const alert = document.createElement('div');
+                    alert.className = 'nav-alert nav-alert-success';
+                    alert.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <span>${message}</span>
+                    `;
+
+                    // Insert at top of quiz container
+                    const quizContainer = currentContainer.querySelector('.nav-quiz-container');
+                    if (quizContainer) {
+                        quizContainer.insertBefore(alert, quizContainer.firstChild);
+                    }
+                }
+            }
+
+            // Reset module
+            function reset() {
+                currentStep = 1;
+                quizData = {};
+                isInitialized = false;
+                currentContainer = null;
+            }
+
+            // Public API
+            return {
+                init: init,
+                reset: reset,
+                openQuiz: openQuizModal,
+                closeQuiz: closeQuizModal,
+                isInitialized: function () { return isInitialized; },
+                getQuizData: function () { return { ...quizData }; }
+            };
+        })();
+
+        // Expose globally
+        window.JAMGetStartedModule = JAMGetStartedModule;
+
+        // Auto-initialize if container exists
         document.addEventListener('DOMContentLoaded', function () {
-            const quizButton = document.querySelector('.nav-credit-quiz-btn');
-            if (quizButton) {
-                // Clear any existing content and set to just "Get Started"
-                quizButton.innerHTML = 'Get Started';
+            const autoContainer = document.getElementById('jam-get-started-container');
+            if (autoContainer) {
+                JAMGetStartedModule.init('jam-get-started-container');
             }
         });
-    });
+
+        // Signal module is loaded
+        if (window.dispatchEvent) {
+            window.dispatchEvent(new CustomEvent('jamGetStartedModuleLoaded'));
+            console.log('JAM Get Started Module loaded and available globally');
+        }
+
+    })();
+
 </script>

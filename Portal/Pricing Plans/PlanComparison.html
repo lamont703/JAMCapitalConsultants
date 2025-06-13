@@ -3,12 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM Credit Solutions - Plan Comparison</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -17,13 +38,13 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: #f8f9fa;
-            color: #343a40;
+            background: var(--gray-50);
+            color: var(--gray-700);
             line-height: 1.6;
             padding: 20px;
         }
 
-        /* Comparison Container Styles */
+        /* Comparison Container Styles - Enhanced */
         .comparison-container {
             background: white;
             border-radius: 12px;
@@ -42,21 +63,26 @@
         .comparison-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
 
         .comparison-subtitle {
             font-size: 1.1rem;
-            color: #6c757d;
+            color: var(--gray-500);
             max-width: 700px;
             margin: 0 auto;
+            line-height: 1.5;
         }
 
-        /* Comparison Table Styles */
+        /* Comparison Table Styles - Enhanced */
         .comparison-table-container {
             overflow-x: auto;
             margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-200);
         }
 
         .comparison-table {
@@ -64,106 +90,312 @@
             border-collapse: collapse;
             border-spacing: 0;
             font-size: 0.95rem;
+            background: white;
         }
 
         .comparison-table th,
         .comparison-table td {
             padding: 1rem;
             text-align: center;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
         }
 
         .comparison-table th {
-            background-color: #e6f9ff;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0f4ff 100%);
             font-weight: 600;
-            color: #343a40;
+            color: var(--gray-700);
             position: sticky;
             top: 0;
+            z-index: 10;
+            border-bottom: 2px solid var(--primary);
         }
 
         .comparison-table th:first-child {
             text-align: left;
             width: 25%;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border-right: 2px solid var(--primary);
         }
 
         .comparison-table td:first-child {
             text-align: left;
             font-weight: 500;
+            color: var(--gray-700);
+            background: var(--gray-50);
+            border-right: 1px solid var(--gray-200);
         }
 
         .comparison-table tr:hover {
-            background-color: #f8f9fa;
+            background-color: var(--gray-50);
+        }
+
+        .comparison-table tr:hover td:first-child {
+            background-color: #e8f4f8;
         }
 
         .comparison-check {
-            color: #09ccfc;
+            color: var(--success);
             font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .comparison-times {
-            color: #dc3545;
+            color: var(--danger);
             font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .comparison-highlight {
-            background-color: rgba(9, 204, 252, 0.1);
+            background: linear-gradient(135deg, rgba(9, 204, 252, 0.08) 0%, rgba(9, 204, 252, 0.15) 100%);
+            border-left: 3px solid var(--primary);
+        }
+
+        .comparison-highlight.comparison-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-bottom: 2px solid var(--primary-dark);
         }
 
         .comparison-plan-name {
             font-size: 1.2rem;
             font-weight: 700;
-            color: #09ccfc;
+            color: var(--primary);
             margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .comparison-highlight .comparison-plan-name {
+            color: white;
         }
 
         .comparison-plan-price {
             font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
+            color: var(--gray-800);
+            line-height: 1;
+        }
+
+        .comparison-highlight .comparison-plan-price {
+            color: white;
         }
 
         .comparison-plan-period {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .comparison-highlight .comparison-plan-period {
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .comparison-cta {
             margin-top: 2rem;
             text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
         }
 
         .comparison-cta-text {
             font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: #343a40;
+            margin-bottom: 1.5rem;
+            color: var(--gray-700);
+            font-weight: 600;
+            line-height: 1.4;
         }
 
         .comparison-select-btn {
-            background-color: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 0.5rem 1rem 0.5rem;
+            transition: all 0.2s ease;
+            margin: 0.5rem;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            min-height: 48px;
+            font-family: inherit;
         }
 
         .comparison-select-btn:hover {
-            background-color: #08b7e4;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0596c7 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(9, 204, 252, 0.3);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
         }
 
-        /* Responsive styles */
-        @media (max-width: 768px) {
+        .comparison-select-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.3);
+        }
+
+        /* ============================
+           MOBILE-FIRST RESPONSIVE DESIGN
+           ============================ */
+
+        /* Mobile Styles (default) */
+        @media (max-width: 575.98px) {
+            body {
+                padding: 0.5rem;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .comparison-container {
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .comparison-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .comparison-title {
+                font-size: 1.5rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.2;
+            }
+
+            .comparison-subtitle {
+                font-size: 0.95rem;
+                line-height: 1.4;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Enhanced mobile table */
+            .comparison-table-container {
+                margin-bottom: 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .comparison-table {
+                font-size: 0.8rem;
+                min-width: 600px;
+                /* Ensure table doesn't get too cramped */
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.6rem 0.4rem;
+                font-size: 0.75rem;
+                line-height: 1.3;
+            }
+
+            .comparison-table th:first-child {
+                min-width: 120px;
+                font-size: 0.8rem;
+                padding: 0.6rem 0.5rem;
+            }
+
+            .comparison-table td:first-child {
+                font-size: 0.8rem;
+                padding: 0.6rem 0.5rem;
+                font-weight: 600;
+            }
+
+            .comparison-plan-name {
+                font-size: 0.9rem;
+                margin-bottom: 0.3rem;
+                line-height: 1.1;
+            }
+
+            .comparison-plan-price {
+                font-size: 1rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .comparison-plan-period {
+                font-size: 0.7rem;
+            }
+
+            .comparison-check,
+            .comparison-times {
+                font-size: 1rem;
+            }
+
+            /* Enhanced mobile CTA */
+            .comparison-cta {
+                margin-top: 1.5rem;
+                padding: 1rem;
+                border-radius: 8px;
+            }
+
+            .comparison-cta-text {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+                line-height: 1.3;
+            }
+
+            .comparison-select-btn {
+                display: block;
+                width: 100%;
+                margin: 0.5rem 0;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+                border-radius: 6px;
+                font-weight: 600;
+                touch-action: manipulation;
+            }
+
+            /* Touch enhancements */
+            .comparison-select-btn {
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .comparison-select-btn:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .comparison-container {
+                padding: 1.5rem;
+                border-radius: 10px;
+            }
+
+            .comparison-title {
+                font-size: 1.75rem;
+            }
+
+            .comparison-subtitle {
+                font-size: 1rem;
+            }
+
+            .comparison-table-container {
+                border-radius: 10px;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
 
             .comparison-table th,
             .comparison-table td {
                 padding: 0.75rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .comparison-table th:first-child,
+            .comparison-table td:first-child {
                 font-size: 0.85rem;
+                padding: 0.75rem 0.6rem;
             }
 
             .comparison-plan-name {
@@ -172,6 +404,288 @@
 
             .comparison-plan-price {
                 font-size: 1.2rem;
+            }
+
+            .comparison-plan-period {
+                font-size: 0.8rem;
+            }
+
+            .comparison-cta {
+                padding: 1.25rem;
+            }
+
+            .comparison-cta-text {
+                font-size: 1.1rem;
+            }
+
+            .comparison-select-btn {
+                display: inline-block;
+                width: auto;
+                margin: 0.4rem;
+                padding: 0.8rem 1.25rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            body {
+                padding: 1rem;
+            }
+
+            .comparison-container {
+                padding: 1.75rem;
+            }
+
+            .comparison-title {
+                font-size: 1.85rem;
+            }
+
+            .comparison-subtitle {
+                font-size: 1.05rem;
+            }
+
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.8rem 0.6rem;
+            }
+
+            .comparison-plan-name {
+                font-size: 1.1rem;
+            }
+
+            .comparison-plan-price {
+                font-size: 1.3rem;
+            }
+
+            .comparison-select-btn {
+                margin: 0.4rem;
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            .comparison-container {
+                padding: 2rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 1rem;
+            }
+        }
+
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            body {
+                padding: 2rem;
+            }
+
+            .comparison-container {
+                padding: 2.5rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 1.2rem;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .comparison-container {
+                padding: 0.75rem;
+            }
+
+            .comparison-header {
+                margin-bottom: 1rem;
+            }
+
+            .comparison-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .comparison-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .comparison-table-container {
+                margin-bottom: 1rem;
+                border-radius: 6px;
+            }
+
+            .comparison-table {
+                font-size: 0.7rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.5rem 0.3rem;
+                font-size: 0.7rem;
+            }
+
+            .comparison-table th:first-child,
+            .comparison-table td:first-child {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.4rem;
+            }
+
+            .comparison-plan-name {
+                font-size: 0.8rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .comparison-plan-price {
+                font-size: 0.9rem;
+                margin-bottom: 0.1rem;
+            }
+
+            .comparison-plan-period {
+                font-size: 0.65rem;
+            }
+
+            .comparison-check,
+            .comparison-times {
+                font-size: 0.9rem;
+            }
+
+            .comparison-cta {
+                margin-top: 1rem;
+                padding: 0.75rem;
+            }
+
+            .comparison-cta-text {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .comparison-select-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+                margin: 0.3rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .comparison-table tr:hover {
+                background-color: transparent;
+            }
+
+            .comparison-table tr:hover td:first-child {
+                background-color: var(--gray-50);
+            }
+
+            .comparison-select-btn:hover {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                transform: none;
+                box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            }
+
+            /* Enhanced tap highlighting */
+            .comparison-select-btn {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+            }
+
+            /* Prevent text selection on interactive elements */
+            .comparison-select-btn {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .comparison-container {
+                will-change: transform;
+            }
+
+            .comparison-table-container {
+                will-change: transform;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .comparison-table-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Safe area adjustments for iPhone X+ */
+            @media (max-width: 575.98px) {
+                body {
+                    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+                }
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .comparison-select-btn {
+                transition: none;
+            }
+
+            .comparison-select-btn:hover,
+            .comparison-select-btn:active {
+                transform: none;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .comparison-container {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .comparison-table-container {
+                box-shadow: none;
+                border: 1px solid #000;
+                overflow: visible;
+            }
+
+            .comparison-table th {
+                background: #f0f0f0 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .comparison-highlight {
+                background: #f0f0f0 !important;
+                border-left: 3px solid #000;
+            }
+
+            .comparison-cta {
+                display: none;
+            }
+
+            .comparison-check {
+                color: #000;
+            }
+
+            .comparison-times {
+                color: #000;
             }
         }
     </style>
@@ -212,7 +726,7 @@
                     <div class="comparison-container">
                         <div class="comparison-header">
                             <h2 class="comparison-title">Plan Comparison</h2>
-                            <p class="comparison-subtitle">Compare our plans to find the best fit for your credit repair needs.</p>
+                            <p class="comparison-subtitle">Compare our plans to find the best fit for your credit dispute needs.</p>
                         </div>
                         
                         <div class="comparison-table-container">
@@ -225,54 +739,66 @@
                                             <div class="comparison-plan-price">$0<span class="comparison-plan-period">/forever</span></div>
                                         </th>
                                         <th>
-                                            <div class="comparison-plan-name">DIY Plan</div>
-                                            <div class="comparison-plan-price">$49-$79<span class="comparison-plan-period">/month</span></div>
+                                            <div class="comparison-plan-name">DIY Plans</div>
+                                            <div class="comparison-plan-price">$29-$99<span class="comparison-plan-period">/month</span></div>
                                         </th>
                                         <th class="comparison-highlight">
-                                            <div class="comparison-plan-name">Full-Service Plan</div>
-                                            <div class="comparison-plan-price">$99<span class="comparison-plan-period">/month</span></div>
+                                            <div class="comparison-plan-name">Done For You Plans</div>
+                                            <div class="comparison-plan-price">Starting $197<span class="comparison-plan-period">/month</span></div>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Dispute Letter Library</td>
+                                        <td>JAM Engine Credit Management Platform</td>
                                         <td><i class="fas fa-check comparison-check"></i></td>
                                         <td><i class="fas fa-check comparison-check"></i></td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
                                     </tr>
                                     <tr>
-                                        <td>Credit Repair eBook</td>
+                                        <td>Dispute Library (AI Prompts)</td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>JAM Dispute Bot Credit Analysis</td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>JAM Dispute Bot Credit Educator</td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dispute Letter Credits per Month</td>
+                                        <td>2 lifetime</td>
+                                        <td>5-50/month</td>
+                                        <td class="comparison-highlight">Unlimited</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Secure Document Storage</td>
                                         <td><i class="fas fa-check comparison-check"></i></td>
                                         <td><i class="fas fa-check comparison-check"></i></td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
                                     </tr>
                                     <tr>
                                         <td>Email Support</td>
-                                        <td><i class="fas fa-check comparison-check"></i></td>
-                                        <td><i class="fas fa-check comparison-check"></i></td>
-                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>JAM Dispute Bot Access</td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td><i class="fas fa-check comparison-check"></i></td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
                                     </tr>
                                     <tr>
-                                        <td>Custom Dispute Letters</td>
+                                        <td>Phone Support</td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
-                                        <td><i class="fas fa-check comparison-check"></i></td>
+                                        <td>Premium plan only</td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
                                     </tr>
                                     <tr>
-                                        <td>Credit Score Monitoring</td>
-                                        <td><i class="fas fa-times comparison-times"></i></td>
-                                        <td><i class="fas fa-check comparison-check"></i></td>
-                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Personal Credit Advisor</td>
+                                        <td>Dedicated Credit Dispute Specialist</td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
@@ -284,13 +810,25 @@
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
                                     </tr>
                                     <tr>
-                                        <td>Credit Building Strategies</td>
+                                        <td>Direct Creditor Negotiations</td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
                                     </tr>
                                     <tr>
-                                        <td>Monthly Progress Reports</td>
+                                        <td>Monthly Credit Score Updates</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Weekly Progress Updates</td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td><i class="fas fa-times comparison-times"></i></td>
+                                        <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Personalized Credit Building Strategy</td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td><i class="fas fa-times comparison-times"></i></td>
                                         <td class="comparison-highlight"><i class="fas fa-check comparison-check"></i></td>
@@ -302,8 +840,8 @@
                         <div class="comparison-cta">
                             <p class="comparison-cta-text">Ready to start improving your credit?</p>
                             <button class="comparison-select-btn" id="comparison-free-btn">Choose Free Plan</button>
-                            <button class="comparison-select-btn" id="comparison-diy-btn">Choose DIY Plan</button>
-                            <button class="comparison-select-btn" id="comparison-full-btn">Choose Full-Service Plan</button>
+                            <button class="comparison-select-btn" id="comparison-diy-btn">Choose DIY Plans</button>
+                            <button class="comparison-select-btn" id="comparison-full-btn">Choose Done For You Plans</button>
                         </div>
                     </div>
                 `;

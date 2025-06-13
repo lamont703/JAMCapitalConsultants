@@ -11,6 +11,11 @@ export class User {
         this.company = userData.company ? userData.company.trim() : '';
         this.ghlContactId = userData.ghlContactId || null;
         this.ghlSyncStatus = userData.ghlSyncStatus || 'pending';
+        this.role = userData.role || 'user'; // Add role field with default value
+        this.isActive = userData.isActive !== undefined ? userData.isActive : true;
+        this.securityQuestion = userData.securityQuestion || '';
+        this.securityAnswerHash = userData.securityAnswerHash || '';
+        this.securitySalt = userData.securitySalt || '';
         this.createdAt = userData.createdAt || new Date().toISOString();
         this.updatedAt = userData.updatedAt || new Date().toISOString();
         
@@ -106,6 +111,11 @@ export class User {
                 company: this.company.trim(),
                 ghlContactId: this.ghlContactId,
                 ghlSyncStatus: this.ghlSyncStatus,
+                role: this.role,
+                isActive: this.isActive,
+                securityQuestion: this.securityQuestion,
+                securityAnswerHash: this.securityAnswerHash,
+                securitySalt: this.securitySalt,
                 createdAt: this.createdAt,
                 updatedAt: this.updatedAt,
                 subscription: this.subscription
@@ -135,6 +145,11 @@ export class User {
             company: this.company,
             ghlContactId: this.ghlContactId,
             ghlSyncStatus: this.ghlSyncStatus,
+            role: this.role,
+            isActive: this.isActive,
+            securityQuestion: this.securityQuestion,
+            securityAnswerHash: this.securityAnswerHash,
+            securitySalt: this.securitySalt,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             subscription: this.subscription

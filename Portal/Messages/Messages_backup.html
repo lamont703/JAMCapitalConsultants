@@ -757,7 +757,7 @@
 
                     console.log('🔍 Making API request for user:', userId);
 
-                    const response = await fetch(`http://localhost:3000/api/admin/get-user-notifications/${userId}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/get-user-notifications/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1344,7 +1344,7 @@
                         return false;
                     }
 
-                    const response = await fetch(`http://localhost:3000/api/admin/delete-notification`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/delete-notification`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1700,7 +1700,7 @@
                         return false;
                     }
 
-                    const response = await fetch(`http://localhost:3000/api/admin/bulk-delete-notifications`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/bulk-delete-notifications`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1815,7 +1815,7 @@
             // Load notifications separately
             async function loadNotifications(token) {
                 try {
-                    const response = await fetch('http://localhost:3000/api/user/notifications', {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/user/notifications', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -2338,7 +2338,7 @@
                         return [];
                     }
 
-                    const response = await fetch(`http://localhost:3000/api/user/dispute-reports/${userId}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/user/dispute-reports/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,

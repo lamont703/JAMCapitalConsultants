@@ -8,31 +8,73 @@
     <!-- Add jsPDF library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* Chat Container Styles */
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
+        /* Chat Container Styles - Enhanced */
         .Bot-chat-container {
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 20px;
+            padding: 1.5rem;
+            position: relative;
+            background: var(--gray-50);
+            min-height: 500px;
+            overflow: hidden;
         }
 
         .Bot-chat-messages {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #f8f9fa;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: white;
             border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
         }
 
         /* Removed chat input interface CSS - no longer needed for button-only interface */
 
-        /* Message Styles */
+        /* Message Styles - Enhanced */
         .Bot-message {
-            margin-bottom: 15px;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 0.75rem;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .Bot-message.user {
@@ -40,91 +82,121 @@
         }
 
         .Bot-message-content {
-            max-width: 70%;
-            padding: 12px 16px;
+            max-width: 85%;
+            padding: 1rem 1.25rem;
             border-radius: 18px;
             word-wrap: break-word;
-            line-height: 1.4;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
         }
 
         .Bot-message.bot .Bot-message-content {
-            background: white;
-            color: #333;
-            border: 1px solid #e9ecef;
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+            border-bottom-left-radius: 6px;
         }
 
         .Bot-message.user .Bot-message-content {
-            background: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
         }
 
         .Bot-message-avatar {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 1.125rem;
             flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid white;
         }
 
         .Bot-message.bot .Bot-message-avatar {
-            background: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
         }
 
         .Bot-message.user .Bot-message-avatar {
-            background: #6c757d;
+            background: linear-gradient(135deg, var(--gray-600) 0%, var(--gray-700) 100%);
             color: white;
         }
 
-        /* Button Styles */
+        /* Button Styles - Enhanced */
         .Bot-message-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
 
         .Bot-chat-button {
-            background: #007bff;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 0.75rem 1.25rem;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
             transition: all 0.2s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+            border: 2px solid var(--primary);
+            line-height: 1.3;
         }
 
         .Bot-chat-button:hover {
-            background: #0056b3;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #056080 100%);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
         }
 
-        /* Typing Indicator */
+        .Bot-chat-button:active {
+            transform: scale(0.98);
+        }
+
+        .Bot-chat-button i {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Typing Indicator - Enhanced */
         .Bot-typing-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: white;
-            border: 1px solid #e9ecef;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border: 1px solid var(--gray-200);
             border-radius: 18px;
-            max-width: 70%;
+            border-bottom-left-radius: 6px;
+            max-width: 80%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.3s ease-out;
         }
 
         .Bot-typing-dots {
             display: flex;
-            gap: 4px;
+            gap: 0.25rem;
         }
 
         .Bot-typing-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #09ccfc;
+            background: var(--primary);
             animation: typing 1.4s infinite ease-in-out;
         }
 
@@ -180,6 +252,570 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Payment Modal Styles - Enhanced */
+        .Bot-payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .Bot-payment-modal-content {
+            background: linear-gradient(135deg, white 0%, var(--gray-50) 100%);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--gray-200);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .Bot-payment-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+        }
+
+        .Bot-payment-modal-header h3 {
+            color: #09ccfc;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .Bot-payment-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .Bot-payment-modal-close:hover {
+            color: #495057;
+        }
+
+        .Bot-payment-modal-body {
+            padding: 2rem;
+        }
+
+        .Bot-plan-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .Bot-plan-summary h4 {
+            color: #09ccfc;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .Bot-price-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .Bot-price-display span {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .Bot-plan-features-summary {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .Bot-plan-features-summary li {
+            padding: 0.3rem 0;
+            color: #495057;
+        }
+
+        .Bot-plan-features-summary i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .Bot-payment-security {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .Bot-payment-security p {
+            color: #6c757d;
+            margin: 0.3rem 0;
+        }
+
+        .Bot-payment-security i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .Bot-payment-action-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .Bot-payment-note {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .Bot-proceed-payment-btn {
+            background: linear-gradient(135deg, #09ccfc 0%, #08b5e0 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        .Bot-proceed-payment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.4);
+        }
+
+        .Bot-proceed-payment-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .Bot-cancel-payment-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .Bot-cancel-payment-btn:hover {
+            background: #5a6268;
+        }
+
+        .Bot-payment-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .Bot-guarantee-text {
+            color: #28a745;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .Bot-guarantee-text i {
+            margin-right: 0.5rem;
+        }
+
+        /* Popup blocked and status message styles */
+        .Bot-popup-blocked-message,
+        .Bot-payment-status-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .Bot-popup-blocked-message ol {
+            text-align: left;
+            max-width: 400px;
+            margin: 1rem auto;
+        }
+
+        .Bot-payment-options,
+        .Bot-status-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .Bot-payment-options a {
+            text-decoration: none;
+        }
+
+        /* Success message styles */
+        .Bot-success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .Bot-success-message h4 {
+            color: #28a745;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .Bot-success-message p {
+            margin-bottom: 1rem;
+            color: #6c757d;
+        }
+
+        /* Mobile-First Responsive Design */
+
+        /* Base Mobile Styles (≤575px) */
+        @media (max-width: 575.98px) {
+            .Bot-chat-container {
+                padding: 1rem;
+                min-height: 400px;
+            }
+
+            .Bot-chat-messages {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .Bot-message {
+                margin-bottom: 1rem;
+                gap: 0.5rem;
+            }
+
+            .Bot-message-content {
+                max-width: 90%;
+                padding: 0.875rem 1rem;
+                border-radius: 16px;
+                font-size: 0.9rem;
+            }
+
+            .Bot-message-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .Bot-message-buttons {
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+            }
+
+            .Bot-chat-button {
+                padding: 0.75rem 1rem;
+                font-size: 0.85rem;
+                min-height: 48px;
+                text-align: center;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .Bot-typing-indicator {
+                max-width: 85%;
+                padding: 0.875rem 1rem;
+            }
+
+            .Bot-payment-modal {
+                padding: 1rem;
+                align-items: flex-start;
+                overflow-y: auto;
+            }
+
+            .Bot-payment-modal-content {
+                max-height: 95vh;
+                border-radius: 12px;
+                margin-top: 1rem;
+            }
+
+            .Bot-payment-modal-header,
+            .Bot-payment-modal-body {
+                padding: 1.25rem;
+            }
+
+            .Bot-plan-summary {
+                padding: 1.25rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .Bot-price-display {
+                font-size: 2rem;
+            }
+
+            .Bot-proceed-payment-btn {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                width: 100%;
+            }
+
+            .Bot-payment-options {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .Bot-payment-options .Bot-chat-button,
+            .Bot-status-options .Bot-chat-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Small Devices (576px - 767px) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .Bot-chat-container {
+                padding: 1.25rem;
+            }
+
+            .Bot-message-content {
+                max-width: 88%;
+            }
+
+            .Bot-message-buttons {
+                gap: 0.625rem;
+            }
+
+            .Bot-chat-button {
+                min-width: 140px;
+            }
+
+            .Bot-payment-modal-content {
+                border-radius: 14px;
+            }
+        }
+
+        /* Tablets (768px - 991px) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .Bot-chat-container {
+                padding: 1.5rem;
+            }
+
+            .Bot-message-content {
+                max-width: 85%;
+            }
+
+            .Bot-chat-button {
+                min-width: 160px;
+            }
+
+            .Bot-payment-modal {
+                padding: 2rem;
+            }
+        }
+
+        /* Desktop (≥992px) */
+        @media (min-width: 992px) {
+            .Bot-chat-container {
+                padding: 2rem;
+            }
+
+            .Bot-chat-messages {
+                padding: 1.5rem;
+            }
+
+            .Bot-message {
+                margin-bottom: 1.5rem;
+            }
+
+            .Bot-message-content {
+                max-width: 80%;
+                padding: 1.125rem 1.375rem;
+            }
+
+            .Bot-message-avatar {
+                width: 44px;
+                height: 44px;
+            }
+
+            .Bot-chat-button {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.95rem;
+                min-width: 180px;
+            }
+
+            .Bot-payment-modal {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Extra Large Screens (≥1200px) */
+        @media (min-width: 1200px) {
+            .Bot-chat-container {
+                padding: 2.5rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .Bot-chat-messages {
+                padding: 2rem;
+            }
+
+            .Bot-message-content {
+                max-width: 75%;
+                font-size: 1rem;
+            }
+
+            .Bot-chat-button {
+                font-size: 1rem;
+                min-width: 200px;
+            }
+        }
+
+        /* Touch and Mobile Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .Bot-chat-button:hover {
+                transform: none;
+                box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+            }
+
+            .Bot-chat-button:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+        }
+
+        /* Landscape Mobile Adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .Bot-chat-container {
+                padding: 0.75rem;
+                min-height: 300px;
+            }
+
+            .Bot-chat-messages {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .Bot-message {
+                margin-bottom: 0.75rem;
+            }
+
+            .Bot-payment-modal {
+                padding: 0.75rem;
+            }
+
+            .Bot-payment-modal-content {
+                max-height: 98vh;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .Bot-message-avatar,
+            .Bot-chat-button {
+                backface-visibility: hidden;
+                -webkit-font-smoothing: antialiased;
+            }
+        }
+
+        /* Reduced Motion Preference */
+        @media (prefers-reduced-motion: reduce) {
+
+            .Bot-message,
+            .Bot-typing-indicator,
+            .Bot-payment-modal-content {
+                animation: none;
+            }
+
+            .Bot-chat-button,
+            .Bot-proceed-payment-btn {
+                transition: none;
+            }
+
+            .Bot-typing-dot {
+                animation: none;
+            }
+        }
+
+        /* Dark Mode Support 
+        @media (prefers-color-scheme: dark) {
+            .Bot-chat-container {
+                background: #1a1a1a;
+            }
+
+            .Bot-chat-messages {
+                background: #2d2d2d;
+                border-color: #404040;
+            }
+
+            .Bot-message.bot .Bot-message-content {
+                background: linear-gradient(135deg, #404040 0%, #2d2d2d 100%);
+                color: #e9ecef;
+                border-color: #555;
+            }
+
+            .Bot-typing-indicator {
+                background: linear-gradient(135deg, #404040 0%, #2d2d2d 100%);
+                border-color: #555;
+            }
+
+            .Bot-payment-modal-content {
+                background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+                border-color: #404040;
+            }
+        }*/
+
+        /* Print Styles */
+        @media print {
+            .Bot-chat-container {
+                background: white;
+                box-shadow: none;
+                padding: 1rem;
+            }
+
+            .Bot-chat-messages {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .Bot-message-buttons,
+            .Bot-payment-modal {
+                display: none;
+            }
+
+            .Bot-message-content {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
     </style>
 </head>
 
@@ -195,6 +831,8 @@
             let parentModule = null;
             let typingIndicator = null;
             let isInitialized = false;
+            let paymentModal = null;
+            let selectedPlanType = null;
 
             // NEW: Conversation state management
             let conversationState = {
@@ -207,6 +845,61 @@
                 userChoices: {},
                 groupedItems: null,
                 categoryOrder: ['high_impact', 'medium_impact', 'low_impact']
+            };
+
+            // Payment configuration
+            const PAYMENT_LINKS = {
+                starter: 'https://link.fastpaydirect.com/payment-link/6843a3290a574190c5525591',
+                professional: 'https://link.fastpaydirect.com/payment-link/6843a3570a5741e44652559b',
+                premium: 'https://link.fastpaydirect.com/payment-link/6843a3850263ae38e2780bda'
+            };
+
+            const PLAN_DETAILS = {
+                starter: {
+                    name: 'DIY Starter',
+                    price: '$29',
+                    target: 'Perfect for beginners',
+                    description: 'Get started with essential credit repair tools and basic dispute capabilities.',
+                    features: [
+                        'Basic JAM Dispute Bot access',
+                        'Generate 5 dispute letters/month',
+                        'Basic progress tracking',
+                        'Email support',
+                        'Credit education resources'
+                    ]
+                },
+                professional: {
+                    name: 'DIY Professional',
+                    price: '$59',
+                    target: 'Most popular choice',
+                    description: 'Comprehensive credit repair tools with advanced features for serious credit improvement.',
+                    features: [
+                        'Full JAM Dispute Bot access',
+                        'Unlimited custom dispute letters',
+                        'Advanced progress tracking',
+                        'Credit score monitoring & alerts',
+                        'Priority email support',
+                        'Professional dispute templates',
+                        'Automated follow-up reminders'
+                    ]
+                },
+                premium: {
+                    name: 'DIY Premium',
+                    price: '$99',
+                    target: 'For serious credit repair',
+                    description: 'Everything you need for comprehensive credit repair with premium support and advanced tools.',
+                    features: [
+                        'Full JAM Dispute Bot access',
+                        'Unlimited dispute letters',
+                        'Real-time credit monitoring',
+                        'Advanced analytics & reporting',
+                        'Phone & email support',
+                        'Premium dispute templates',
+                        'Automated workflows',
+                        'Credit building strategies',
+                        'Debt validation letters'
+                    ]
+                }
             };
 
             // Private helper functions
@@ -266,8 +959,10 @@
                             tier: status.tier,
                             isActive: status.isActive,
                             remainingCredits: status.remainingCredits,
-                            tierName: status.tierName
+                            tierName: status.tierName,
+                            disputeLetterUsage: status.disputeLetterUsage
                         });
+                        console.log('📊 ChatModule received disputeLetterUsage:', status.disputeLetterUsage);
                         return status;
                     } else {
                         console.warn('⚠️ Global subscription manager not available');
@@ -282,25 +977,51 @@
             // NEW: Show subscription-aware welcome message
             function showSubscriptionAwareWelcome(subscriptionStatus, container) {
                 const isFreeTier = subscriptionStatus.tier === 'free';
-                const remainingCredits = subscriptionStatus.remainingCredits;
                 const tierName = subscriptionStatus.tierName;
+                const disputeLetterUsage = subscriptionStatus.disputeLetterUsage || {};
 
-                // Calculate dispute letter usage for free tier
-                let actualRemaining = remainingCredits;
-                if (isFreeTier && subscriptionStatus.disputeLetterUsage) {
-                    const totalGenerated = subscriptionStatus.disputeLetterUsage.totalLettersGenerated || 0;
+                // Calculate actual remaining credits using SAME logic as ManageSubscriptionModule
+                let actualRemaining = 0;
+                let displayText = '';
+
+                if (isFreeTier) {
+                    // Free tier: 2 lifetime credits total
+                    const totalGenerated = disputeLetterUsage.totalLettersGenerated || 0;
                     const freeTrialLimit = 2;
                     actualRemaining = Math.max(0, freeTrialLimit - totalGenerated);
+                    displayText = `📝 **Dispute Letters:** ${actualRemaining} remaining (lifetime)`;
+
+                    console.log('🆓 ChatModule Free tier calculation:', {
+                        lifetimeLimit: freeTrialLimit,
+                        totalGenerated: totalGenerated,
+                        remaining: actualRemaining
+                    });
+                } else {
+                    // Paid tier: Use same calculation as ManageSubscriptionModule
+                    const monthlyLimit = disputeLetterUsage.monthlyLimit || 0;
+                    const monthlyUsed = disputeLetterUsage.monthlyLettersUsed || 0;
+                    const backendRemaining = disputeLetterUsage.monthlyRemaining;
+
+                    // Primary calculation: trust backend if available, otherwise calculate
+                    const calculatedRemaining = Math.max(0, monthlyLimit - monthlyUsed);
+                    actualRemaining = Math.max(0, backendRemaining !== undefined ? backendRemaining : calculatedRemaining);
+
+                    displayText = `📝 **Dispute Letters:** ${actualRemaining} remaining this month`;
+
+                    console.log('💳 ChatModule Paid tier calculation:', {
+                        tier: subscriptionStatus.tier,
+                        monthlyLimit: monthlyLimit,
+                        monthlyUsed: monthlyUsed,
+                        backendRemaining: backendRemaining,
+                        calculatedRemaining: calculatedRemaining,
+                        finalRemaining: actualRemaining,
+                        legacyRemainingCredits: subscriptionStatus.remainingCredits
+                    });
                 }
 
                 let welcomeMessage = `👋 **Welcome to JAM Dispute Bot!**\n\n`;
                 welcomeMessage += `💳 **Your Plan:** ${tierName}\n`;
-
-                if (isFreeTier) {
-                    welcomeMessage += `📝 **Dispute Letters:** ${actualRemaining} remaining (lifetime)\n\n`;
-                } else {
-                    welcomeMessage += `📝 **Dispute Letters:** ${remainingCredits} remaining this month\n\n`;
-                }
+                welcomeMessage += `${displayText}\n\n`;
 
                 // Create appropriate conversation flow based on subscription
                 if (actualRemaining === 0) {
@@ -365,20 +1086,32 @@
 
                     if (subscriptionStatus) {
                         const isFreeTier = subscriptionStatus.tier === 'free';
-                        let actualRemaining = subscriptionStatus.remainingCredits;
+                        const disputeLetterUsage = subscriptionStatus.disputeLetterUsage || {};
+                        let actualRemaining = 0;
 
-                        // For free tier, calculate actual remaining based on usage
-                        if (isFreeTier && subscriptionStatus.disputeLetterUsage) {
-                            const totalGenerated = subscriptionStatus.disputeLetterUsage.totalLettersGenerated || 0;
+                        // Use SAME calculation logic as welcome message
+                        if (isFreeTier) {
+                            // Free tier: 2 lifetime credits total
+                            const totalGenerated = disputeLetterUsage.totalLettersGenerated || 0;
                             const freeTrialLimit = 2;
                             actualRemaining = Math.max(0, freeTrialLimit - totalGenerated);
+                        } else {
+                            // Paid tier: Use same calculation as ManageSubscriptionModule
+                            const monthlyLimit = disputeLetterUsage.monthlyLimit || 0;
+                            const monthlyUsed = disputeLetterUsage.monthlyLettersUsed || 0;
+                            const backendRemaining = disputeLetterUsage.monthlyRemaining;
+
+                            // Primary calculation: trust backend if available, otherwise calculate
+                            const calculatedRemaining = Math.max(0, monthlyLimit - monthlyUsed);
+                            actualRemaining = Math.max(0, backendRemaining !== undefined ? backendRemaining : calculatedRemaining);
                         }
 
                         console.log('📊 Report checking flow - subscription check:', {
                             tier: subscriptionStatus.tier,
                             isFreeTier: isFreeTier,
-                            remainingCredits: subscriptionStatus.remainingCredits,
-                            actualRemaining: actualRemaining
+                            disputeLetterUsage: disputeLetterUsage,
+                            actualRemaining: actualRemaining,
+                            legacyRemainingCredits: subscriptionStatus.remainingCredits
                         });
 
                         // Check if user has enough credits before proceeding
@@ -483,6 +1216,315 @@
                     { text: "💬 Ask Specific Questions", value: "general_chat_mode" },
                     { text: "📤 Upload Reports First", value: "no_reports_uploaded" },
                     { text: "🔄 Back to Start", value: "restart_conversation" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Show credit repair questions with buttons
+            function showCreditRepairQuestions(container) {
+                addBotMessageWithButtons(
+                    "Perfect! I'm here to help with any credit repair questions. What would you like to know about?",
+                    [
+                        { text: "📊 How Credit Scores Work", value: "explain_credit_scores" },
+                        { text: "⚠️ What Hurts Credit Most", value: "explain_credit_damage" },
+                        { text: "🛠️ Credit Repair Strategies", value: "explain_repair_strategies" },
+                        { text: "📄 Understanding Credit Reports", value: "explain_credit_reports" },
+                        { text: "✉️ Dispute Letter Basics", value: "explain_dispute_letters" },
+                        { text: "⏰ Timeline for Improvement", value: "explain_timeline" },
+                        { text: "📈 Score Improvement Tips", value: "explain_score_tips" },
+                        { text: "🔄 Back to Main Menu", value: "restart_conversation" }
+                    ]
+                );
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain credit scores
+            function explainCreditScores(container) {
+                let message = `📊 **How Credit Scores Work**\n\n`;
+                message += `**🎯 FICO Score Breakdown:**\n`;
+                message += `• **Payment History (35%)** - Most important factor\n`;
+                message += `• **Credit Utilization (30%)** - How much credit you use\n`;
+                message += `• **Length of History (15%)** - Age of accounts\n`;
+                message += `• **Credit Mix (10%)** - Types of credit\n`;
+                message += `• **New Credit (10%)** - Recent inquiries\n\n`;
+
+                message += `**📈 Score Ranges:**\n`;
+                message += `• 800-850: Excellent\n`;
+                message += `• 740-799: Very Good\n`;
+                message += `• 670-739: Good\n`;
+                message += `• 580-669: Fair\n`;
+                message += `• 300-579: Poor\n\n`;
+
+                message += `💡 **Key Insight:** Even small improvements can move you to the next score tier!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "⚠️ What Damages Credit", value: "explain_credit_damage" },
+                    { text: "🛠️ How to Improve", value: "explain_score_tips" },
+                    { text: "📄 About Credit Reports", value: "explain_credit_reports" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "📊 Analyze My Reports", value: "check_for_reports" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain what damages credit
+            function explainCreditDamage(container) {
+                let message = `⚠️ **What Hurts Your Credit Score Most**\n\n`;
+                message += `**🔥 High Impact Damage:**\n`;
+                message += `• Late payments (30+ days): -60 to -110 points\n`;
+                message += `• Collections: -50 to -100 points\n`;
+                message += `• Charge-offs: -50 to -100 points\n`;
+                message += `• Bankruptcies: -130 to -200 points\n`;
+                message += `• Foreclosures: -85 to -160 points\n\n`;
+
+                message += `**📉 Medium Impact Damage:**\n`;
+                message += `• High credit utilization (over 30%): -10 to -45 points\n`;
+                message += `• Multiple hard inquiries: -5 to -10 points each\n`;
+                message += `• Closing old accounts: -5 to -15 points\n\n`;
+
+                message += `**🎯 Good News:** Many of these can be disputed if inaccurate!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "✉️ How to Dispute These", value: "explain_dispute_letters" },
+                    { text: "⏰ How Long to Fix", value: "explain_timeline" },
+                    { text: "🛠️ Repair Strategies", value: "explain_repair_strategies" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "📊 Analyze My Reports", value: "check_for_reports" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain repair strategies
+            function explainRepairStrategies(container) {
+                let message = `🛠️ **Credit Repair Strategies**\n\n`;
+                message += `**🎯 The Strategic Approach:**\n`;
+                message += `1. **Get all 3 credit reports** (Experian, Equifax, TransUnion)\n`;
+                message += `2. **Identify inaccuracies** (wrong dates, amounts, accounts)\n`;
+                message += `3. **Prioritize high-impact items** (collections, charge-offs)\n`;
+                message += `4. **Dispute systematically** (one round at a time)\n`;
+                message += `5. **Monitor and follow up** (30-day cycles)\n\n`;
+
+                message += `**⚖️ Legal Rights:**\n`;
+                message += `• Fair Credit Reporting Act (FCRA) protects you\n`;
+                message += `• Bureaus must investigate within 30 days\n`;
+                message += `• Items must be removed if unverifiable\n`;
+                message += `• You can dispute the same item multiple times\n\n`;
+
+                message += `💡 **Pro Tip:** Focus on accuracy, not just negative items!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "✉️ Dispute Letter Process", value: "explain_dispute_letters" },
+                    { text: "📄 Understanding Reports", value: "explain_credit_reports" },
+                    { text: "⏰ Expected Timeline", value: "explain_timeline" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "📊 Let's Analyze My Reports", value: "check_for_reports" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain credit reports
+            function explainCreditReports(container) {
+                let message = `📄 **Understanding Your Credit Report**\n\n`;
+                message += `**📋 Main Sections:**\n`;
+                message += `• **Personal Information** - Name, address, SSN\n`;
+                message += `• **Account History** - All credit accounts\n`;
+                message += `• **Payment History** - On-time vs late payments\n`;
+                message += `• **Public Records** - Bankruptcies, liens, judgments\n`;
+                message += `• **Credit Inquiries** - Who checked your credit\n\n`;
+
+                message += `**🔍 What to Look For:**\n`;
+                message += `• Accounts that aren't yours\n`;
+                message += `• Wrong payment dates or amounts\n`;
+                message += `• Incorrect balances or limits\n`;
+                message += `• Duplicate accounts\n`;
+                message += `• Outdated information (7+ years old)\n\n`;
+
+                message += `**🎯 Remember:** Each bureau may have different information!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "🔍 Common Report Errors", value: "explain_common_errors" },
+                    { text: "✉️ How to Dispute Errors", value: "explain_dispute_letters" },
+                    { text: "📊 Analyze My Reports Now", value: "check_for_reports" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "📤 Upload My Reports", value: "no_reports_uploaded" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain dispute letters
+            function explainDisputeLetters(container) {
+                let message = `✉️ **Dispute Letter Basics**\n\n`;
+                message += `**📝 What Makes a Good Dispute Letter:**\n`;
+                message += `• Specific item identification\n`;
+                message += `• Clear reason for dispute\n`;
+                message += `• Professional language\n`;
+                message += `• Supporting documentation (when available)\n`;
+                message += `• Certified mail delivery\n\n`;
+
+                message += `**🎯 Common Dispute Reasons:**\n`;
+                message += `• "This account is not mine"\n`;
+                message += `• "Payment dates are incorrect"\n`;
+                message += `• "Balance amount is wrong"\n`;
+                message += `• "Account was paid on time"\n`;
+                message += `• "This is a duplicate account"\n\n`;
+
+                message += `**⏰ Process:** Mail → 30-day investigation → Result`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "📊 Generate My Letters", value: "check_for_reports" },
+                    { text: "⏰ How Long Does It Take", value: "explain_timeline" },
+                    { text: "🔍 Common Errors to Dispute", value: "explain_common_errors" },
+                    { text: "📈 Success Rate Tips", value: "explain_success_tips" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain timeline
+            function explainTimeline(container) {
+                let message = `⏰ **Credit Repair Timeline**\n\n`;
+                message += `**📅 Realistic Expectations:**\n`;
+                message += `• **Month 1:** Gather reports, identify errors\n`;
+                message += `• **Month 2:** Send first round of disputes\n`;
+                message += `• **Month 3:** Review results, send follow-ups\n`;
+                message += `• **Months 4-6:** Continue dispute cycles\n`;
+                message += `• **Months 6-12:** Focus on credit building\n\n`;
+
+                message += `**🎯 Quick Wins (30-60 days):**\n`;
+                message += `• Personal information errors\n`;
+                message += `• Duplicate accounts\n`;
+                message += `• Unauthorized inquiries\n\n`;
+
+                message += `**📈 Moderate Wins (3-6 months):**\n`;
+                message += `• Collections removal\n`;
+                message += `• Charge-off disputes\n`;
+                message += `• Payment history corrections\n\n`;
+
+                message += `💡 **Remember:** Every situation is unique, but persistence pays off!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "🚀 Start My Disputes Now", value: "check_for_reports" },
+                    { text: "📈 Score Improvement Tips", value: "explain_score_tips" },
+                    { text: "🎯 Success Rate Tips", value: "explain_success_tips" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "🔄 Back to Main Menu", value: "restart_conversation" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain score improvement tips
+            function explainScoreTips(container) {
+                let message = `📈 **Score Improvement Tips**\n\n`;
+                message += `**🚀 Quick Boost Strategies:**\n`;
+                message += `• Pay down credit card balances (target under 10%)\n`;
+                message += `• Don't close old credit accounts\n`;
+                message += `• Pay all bills on time (even non-credit bills)\n`;
+                message += `• Dispute inaccurate negative items\n`;
+                message += `• Become an authorized user on family accounts\n\n`;
+
+                message += `**📊 Credit Utilization Tips:**\n`;
+                message += `• Keep total utilization under 30%\n`;
+                message += `• Individual cards under 30% too\n`;
+                message += `• Pay before statement closes\n`;
+                message += `• Request credit limit increases\n\n`;
+
+                message += `**⚡ Pro Tip:** Small changes can boost your score 20-50 points quickly!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "⚠️ What Damages Credit", value: "explain_credit_damage" },
+                    { text: "📊 How Scores Work", value: "explain_credit_scores" },
+                    { text: "🛠️ Repair Strategies", value: "explain_repair_strategies" },
+                    { text: "📊 Analyze My Reports", value: "check_for_reports" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain common errors
+            function explainCommonErrors(container) {
+                let message = `🔍 **Common Credit Report Errors**\n\n`;
+                message += `**👤 Personal Information Errors:**\n`;
+                message += `• Wrong name spellings or variations\n`;
+                message += `• Incorrect addresses or phone numbers\n`;
+                message += `• Mixed files (someone else's info)\n`;
+                message += `• Wrong social security number\n\n`;
+
+                message += `**💳 Account Information Errors:**\n`;
+                message += `• Accounts that aren't yours\n`;
+                message += `• Duplicate accounts from same debt\n`;
+                message += `• Wrong balance amounts\n`;
+                message += `• Incorrect payment history\n`;
+                message += `• Wrong account status or dates\n\n`;
+
+                message += `**📊 Status and Date Errors:**\n`;
+                message += `• Accounts showing open when closed\n`;
+                message += `• Wrong date of first delinquency\n`;
+                message += `• Incorrect charge-off dates\n`;
+                message += `• Old debts re-aged to look recent\n\n`;
+
+                message += `**🎯 Success Rate:** Personal info errors have 90%+ dispute success rate!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "✉️ How to Dispute These", value: "explain_dispute_letters" },
+                    { text: "📊 Analyze My Reports", value: "check_for_reports" },
+                    { text: "📈 Success Rate Tips", value: "explain_success_tips" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "🔄 Back to Main Menu", value: "restart_conversation" }
+                ]);
+
+                updateMessagesDisplay(container);
+                saveState();
+            }
+
+            // NEW: Explain success tips
+            function explainSuccessTips(container) {
+                let message = `📈 **Dispute Success Rate Tips**\n\n`;
+                message += `**🎯 High Success Rate Strategies:**\n`;
+                message += `• Be specific about the error\n`;
+                message += `• Include supporting documentation\n`;
+                message += `• Send via certified mail\n`;
+                message += `• Keep detailed records\n`;
+                message += `• Follow up consistently\n\n`;
+
+                message += `**📝 Letter Writing Tips:**\n`;
+                message += `• Use professional language\n`;
+                message += `• Cite the Fair Credit Reporting Act\n`;
+                message += `• Request method of verification\n`;
+                message += `• Don't admit the debt is yours\n`;
+                message += `• Focus on accuracy, not fairness\n\n`;
+
+                message += `**⏰ Timing Tips:**\n`;
+                message += `• Wait for 30-day response period\n`;
+                message += `• Send follow-ups if no response\n`;
+                message += `• Dispute same item multiple times if needed\n`;
+                message += `• Stagger disputes across different months\n\n`;
+
+                message += `**🎖️ Pro Tip:** Success rates are highest for factual errors, not "please remove" requests!`;
+
+                addBotMessageWithButtons(message, [
+                    { text: "✉️ Generate My Letters", value: "check_for_reports" },
+                    { text: "🔍 Common Errors List", value: "explain_common_errors" },
+                    { text: "⏰ Timeline Expectations", value: "explain_timeline" },
+                    { text: "💬 Ask Another Question", value: "general_chat_mode" },
+                    { text: "🔄 Back to Main Menu", value: "restart_conversation" }
                 ]);
 
                 updateMessagesDisplay(container);
@@ -1301,7 +2343,7 @@
                     console.log('🌐 Checking backend for reports with user ID:', userId);
 
                     // Make backend request to get user documents
-                    const response = await fetch(`http://localhost:3000/api/admin/get-user-documents?userId=${userId}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/get-user-documents?userId=${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
@@ -1675,7 +2717,7 @@
                     const waitingMessageId = await startContinuousWaiting(container, progressMessageId);
 
                     // Now make the actual API call
-                    const response = await fetch(`http://localhost:3000/api/chat/analyze?userEmail=${encodeURIComponent(userEmail)}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/chat/analyze?userEmail=${encodeURIComponent(userEmail)}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1856,9 +2898,7 @@
 
                 } else if (value === 'general_chat_mode') {
                     addUserMessage("💬 I want to ask questions first");
-                    addBotMessage("Perfect! I'm here to help with any credit repair questions. Ask me about:\n\n• How credit scores work\n• What items hurt your score most\n• Credit repair strategies\n• Understanding your credit report\n• Dispute letter basics\n• Timeline for credit improvement\n\nWhat would you like to know?");
-                    updateMessagesDisplay(container);
-                    saveState();
+                    showCreditRepairQuestions(container);
 
                 } else if (value === 'learn_credit_repair') {
                     addUserMessage("📚 Teach me about credit repair");
@@ -2103,15 +3143,15 @@
                     // NEW: Subscription plan selection handlers
                 } else if (value === 'select_starter_plan') {
                     addUserMessage("💼 I want the DIY Starter plan");
-                    navigateToDIYPlanModule('starter', container);
+                    showPaymentModal('starter', container);
 
                 } else if (value === 'select_professional_plan') {
                     addUserMessage("🚀 I want the DIY Professional plan");
-                    navigateToDIYPlanModule('professional', container);
+                    showPaymentModal('professional', container);
 
                 } else if (value === 'select_premium_plan') {
                     addUserMessage("⭐ I want the DIY Premium plan");
-                    navigateToDIYPlanModule('premium', container);
+                    showPaymentModal('premium', container);
 
                 } else if (value === 'keep_free_plan') {
                     addUserMessage("🆓 I'll stay on the free plan");
@@ -2125,6 +3165,43 @@
                     updateMessagesDisplay(container);
                     saveState();
 
+                    // NEW: Question-specific handlers
+                } else if (value === 'explain_credit_scores') {
+                    addUserMessage("📊 How do credit scores work?");
+                    explainCreditScores(container);
+
+                } else if (value === 'explain_credit_damage') {
+                    addUserMessage("⚠️ What hurts my credit score the most?");
+                    explainCreditDamage(container);
+
+                } else if (value === 'explain_repair_strategies') {
+                    addUserMessage("🛠️ What are the best credit repair strategies?");
+                    explainRepairStrategies(container);
+
+                } else if (value === 'explain_credit_reports') {
+                    addUserMessage("📄 Help me understand credit reports");
+                    explainCreditReports(container);
+
+                } else if (value === 'explain_dispute_letters') {
+                    addUserMessage("✉️ Tell me about dispute letters");
+                    explainDisputeLetters(container);
+
+                } else if (value === 'explain_timeline') {
+                    addUserMessage("⏰ How long does credit repair take?");
+                    explainTimeline(container);
+
+                } else if (value === 'explain_score_tips') {
+                    addUserMessage("📈 How can I improve my credit score?");
+                    explainScoreTips(container);
+
+                } else if (value === 'explain_common_errors') {
+                    addUserMessage("🔍 What are common credit report errors?");
+                    explainCommonErrors(container);
+
+                } else if (value === 'explain_success_tips') {
+                    addUserMessage("📈 How can I increase my success rate?");
+                    explainSuccessTips(container);
+
                 } else {
                     // Fallback for unhandled button clicks
                     console.log('Unhandled button click:', value);
@@ -2134,6 +3211,270 @@
                 }
 
                 debugLog('handleButtonClick', 'COMPLETED', { value: value });
+            }
+
+            // NEW: Payment modal functions
+            function showPaymentModal(planType, container) {
+                console.log(`💳 Opening payment modal for plan: ${planType}`);
+
+                const plan = PLAN_DETAILS[planType];
+                if (!plan) {
+                    console.error('Invalid plan type:', planType);
+                    return;
+                }
+
+                selectedPlanType = planType;
+
+                // Show confirmation in chat
+                addBotMessage(`Perfect! Let me set up your ${plan.name} payment. Opening secure payment modal...`);
+                updateMessagesDisplay(container);
+
+                // Create and show modal
+                setTimeout(() => {
+                    createPaymentModal(planType, container);
+                }, 500);
+            }
+
+            function createPaymentModal(planType, container) {
+                const plan = PLAN_DETAILS[planType];
+
+                // Remove existing modal if present
+                const existingModal = document.getElementById('Bot-payment-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Create modal element
+                paymentModal = document.createElement('div');
+                paymentModal.id = 'Bot-payment-modal';
+                paymentModal.className = 'Bot-payment-modal';
+                paymentModal.innerHTML = `
+                    <div class="Bot-payment-modal-content">
+                        <div class="Bot-payment-modal-header">
+                            <h3>Complete Your ${plan.name} Purchase</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-plan-summary">
+                                <h4>${plan.name}</h4>
+                                <div class="Bot-price-display">${plan.price}<span>/month</span></div>
+                                <ul class="Bot-plan-features-summary">
+                                    ${plan.features.slice(0, 5).map(feature => `
+                                        <li><i class="fas fa-check"></i> ${feature}</li>
+                                    `).join('')}
+                                    ${plan.features.length > 5 ? '<li><i class="fas fa-plus"></i> And more...</li>' : ''}
+                                </ul>
+                            </div>
+                            
+                            <div class="Bot-payment-security">
+                                <p><i class="fas fa-shield-alt"></i> Secure payment processing</p>
+                                <p><i class="fas fa-lock"></i> 256-bit SSL encryption</p>
+                            </div>
+                            
+                            <div class="Bot-payment-action-container">
+                                <button class="Bot-proceed-payment-btn" onclick="ChatModule.proceedToPayment('${planType}')">
+                                    <i class="fas fa-credit-card"></i>
+                                    Proceed to Secure Payment
+                                </button>
+                                <p class="Bot-payment-note">You'll be redirected to our secure payment processor</p>
+                            </div>
+                            
+                            <div class="Bot-payment-footer">
+                                <p class="Bot-guarantee-text">
+                                    <i class="fas fa-medal"></i> 
+                                    30-day money-back guarantee
+                                </p>
+                                <button class="Bot-cancel-payment-btn" onclick="ChatModule.closePaymentModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Add to document body (not container to ensure it's on top)
+                document.body.appendChild(paymentModal);
+
+                // Show modal with animation
+                setTimeout(() => {
+                    paymentModal.style.display = 'flex';
+                }, 100);
+
+                // Setup modal event listeners
+                setupPaymentModalEventListeners();
+            }
+
+            function setupPaymentModalEventListeners() {
+                // Close when clicking outside the modal content
+                if (paymentModal) {
+                    paymentModal.addEventListener('click', function (e) {
+                        if (e.target === paymentModal) {
+                            closePaymentModal();
+                        }
+                    });
+
+                    // Close on Escape key
+                    document.addEventListener('keydown', function handleEscape(e) {
+                        if (e.key === 'Escape') {
+                            closePaymentModal();
+                            document.removeEventListener('keydown', handleEscape);
+                        }
+                    });
+                }
+            }
+
+            function proceedToPayment(planType) {
+                if (!PAYMENT_LINKS[planType]) {
+                    console.error('No payment link found for plan:', planType);
+                    return;
+                }
+
+                const plan = PLAN_DETAILS[planType];
+                const proceedBtn = document.querySelector('.Bot-proceed-payment-btn');
+
+                if (proceedBtn) {
+                    // Show loading state
+                    proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening secure payment...';
+                    proceedBtn.disabled = true;
+                }
+
+                // Open payment in new window
+                const paymentWindow = window.open(
+                    PAYMENT_LINKS[planType],
+                    'payment',
+                    'width=800,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
+                );
+
+                // Check if popup was blocked
+                if (!paymentWindow || paymentWindow.closed || typeof paymentWindow.closed == 'undefined') {
+                    // Popup blocked, show alternative
+                    showPopupBlockedInModal(planType);
+                } else {
+                    // Monitor the payment window
+                    monitorPaymentWindow(paymentWindow, planType);
+                }
+            }
+
+            function showPopupBlockedInModal(planType) {
+                if (!paymentModal || !PAYMENT_LINKS[planType]) return;
+
+                const modalContent = paymentModal.querySelector('.Bot-payment-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="Bot-payment-modal-header">
+                            <h3>Complete Your Payment</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-popup-blocked-message">
+                                <i class="fas fa-exclamation-triangle" style="color: #ffc107; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h4>Popup Blocked</h4>
+                                <p>Your browser blocked the payment window. Please:</p>
+                                <ol>
+                                    <li>Allow popups for this site, or</li>
+                                    <li>Click the button below to open payment in a new tab</li>
+                                </ol>
+                                
+                                <div class="Bot-payment-options">
+                                    <a href="${PAYMENT_LINKS[planType]}" target="_blank" class="Bot-proceed-payment-btn">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Open Payment in New Tab
+                                    </a>
+                                    <button class="Bot-cancel-payment-btn" onclick="ChatModule.retryPayment('${planType}')">Try Again</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            function monitorPaymentWindow(paymentWindow, planType) {
+                const checkClosed = setInterval(function () {
+                    if (paymentWindow.closed) {
+                        clearInterval(checkClosed);
+                        // Show completion message in modal
+                        showPaymentCompletionInModal(planType);
+                    }
+                }, 1000);
+            }
+
+            function showPaymentCompletionInModal(planType) {
+                if (!paymentModal) return;
+
+                const modalContent = paymentModal.querySelector('.Bot-payment-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="Bot-payment-modal-header">
+                            <h3>Payment Status</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-payment-status-message">
+                                <i class="fas fa-info-circle" style="color: #09ccfc; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h4>Payment Window Closed</h4>
+                                <p>If you completed your payment, you should receive a confirmation email shortly.</p>
+                                <p>If you didn't complete the payment, you can try again anytime.</p>
+                                
+                                <div class="Bot-status-options">
+                                    <button class="Bot-proceed-payment-btn" onclick="ChatModule.paymentCompleted('${planType}')">
+                                        <i class="fas fa-check"></i>
+                                        I Completed Payment
+                                    </button>
+                                    <button class="Bot-cancel-payment-btn" onclick="ChatModule.retryPayment('${planType}')">
+                                        Try Payment Again
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            function paymentCompleted(planType) {
+                const plan = PLAN_DETAILS[planType];
+
+                if (!paymentModal) return;
+
+                const modalContent = paymentModal.querySelector('.Bot-payment-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="Bot-payment-modal-header">
+                            <h3>Payment Successful!</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-success-message">
+                                <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h4>Thank you for your purchase!</h4>
+                                <p>Your ${plan.name} is now active.</p>
+                                <p>You now have access to all the tools and features included in your plan.</p>
+                                <p>You should receive a confirmation email with login instructions shortly.</p>
+                                <button class="Bot-proceed-payment-btn" onclick="ChatModule.closePaymentModal()">Continue to Dashboard</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Add success message to chat
+                setTimeout(() => {
+                    addBotMessage(`🎉 **Congratulations!** Your ${plan.name} subscription is now active! You can now access all premium features and start improving your credit score with professional dispute letters.`);
+                    updateMessagesDisplay(document.querySelector('.Bot-chat-container'));
+                }, 1500);
+            }
+
+            function retryPayment(planType) {
+                createPaymentModal(planType, document.querySelector('.Bot-chat-container'));
+            }
+
+            function closePaymentModal() {
+                if (paymentModal) {
+                    paymentModal.style.display = 'none';
+                    paymentModal.remove();
+                    paymentModal = null;
+                    selectedPlanType = null;
+
+                    // Add message to chat
+                    addBotMessage("No problem! I'm here whenever you're ready to upgrade your subscription. Feel free to ask me anything about credit repair!");
+                    updateMessagesDisplay(document.querySelector('.Bot-chat-container'));
+                }
             }
 
             // NEW: Additional conversation flow helper functions
@@ -2760,7 +4101,7 @@
                     };
 
                     // Send request to backend for ChatGPT letter generation
-                    const response = await fetch('http://localhost:3000/api/chat/generate-letters', {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/chat/generate-letters', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
@@ -2890,7 +4231,7 @@
                     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
                     const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
 
-                    const response = await fetch('http://localhost:3000/api/chat/download-letters', {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/chat/download-letters', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
@@ -3037,7 +4378,7 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
 
                     const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
 
-                    const response = await fetch('http://localhost:3000/api/chat/email-letters', {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/chat/email-letters', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
@@ -3312,180 +4653,275 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                 }
             }
 
-            // NEW: Navigate to DIY Plan Module for plan selection and purchase
-            function navigateToDIYPlanModule(planType, container) {
-                console.log(`🚀 Navigating user to DIY Plan Module for plan: ${planType}`);
+            // NEW: Show payment modal directly in chat
+            function showPaymentModal(planType, container) {
+                console.log(`💳 Opening payment modal for plan: ${planType}`);
 
-                // Show confirmation message in chat
-                const planNames = {
-                    'starter': 'DIY Starter ($29/month)',
-                    'professional': 'DIY Professional ($59/month)',
-                    'premium': 'DIY Premium ($99/month)'
-                };
+                const plan = PLAN_DETAILS[planType];
+                if (!plan) {
+                    console.error('Invalid plan type:', planType);
+                    return;
+                }
 
-                addBotMessage(`Excellent choice! I'm taking you to complete your ${planNames[planType]} purchase. You'll be redirected to our secure payment page.`);
+                selectedPlanType = planType;
+
+                // Show confirmation in chat
+                addBotMessage(`Perfect! Let me set up your ${plan.name} payment. Opening secure payment modal...`);
                 updateMessagesDisplay(container);
-                saveState();
 
-                // PRIORITY METHOD: Navigate via parent interface first (most reliable)
-                console.log('🔍 Checking navigation options...', {
-                    hasParent: window.parent && window.parent !== window,
-                    hasTop: window.top && window.top !== window,
-                    parentType: typeof window.parent,
-                    topType: typeof window.top
-                });
-
-                // Try multiple approaches to navigate to pricing tab
-                let navigationAttempted = false;
-
-                // Method 1: Direct parent navigation
-                if (window.parent && window.parent !== window) {
-                    console.log('🔄 Method 1: Navigating via parent interface to pricing tab');
-
-                    // Send message to parent to switch to pricing tab
-                    window.parent.postMessage({
-                        type: 'loadTab',
-                        tabId: 'interface-pricing',
-                        selectedPlan: planType
-                    }, '*');
-
-                    // Also try clicking the pricing nav link directly if available
-                    try {
-                        const pricingNavLink = window.parent.document.querySelector('.interface-sidebar-nav-link[data-tab="interface-pricing"]');
-                        if (pricingNavLink) {
-                            console.log('🖱️ Found pricing nav link in parent, clicking it');
-                            pricingNavLink.click();
-                        }
-                    } catch (e) {
-                        console.log('⚠️ Could not access parent document directly:', e.message);
-                    }
-
-                    // Give the pricing module time to load, then select the specific plan
-                    setTimeout(() => {
-                        console.log(`🎯 Sending selectPlan message for: ${planType}`);
-                        window.parent.postMessage({
-                            type: 'selectPlan',
-                            planType: planType
-                        }, '*');
-                    }, 2000);
-
-                    navigationAttempted = true;
-                }
-
-                // Method 2: Try top-level window navigation
-                if (!navigationAttempted && window.top && window.top !== window) {
-                    console.log('🔄 Method 2: Navigating via top-level window');
-
-                    window.top.postMessage({
-                        type: 'loadTab',
-                        tabId: 'interface-pricing',
-                        selectedPlan: planType
-                    }, '*');
-
-                    setTimeout(() => {
-                        window.top.postMessage({
-                            type: 'selectPlan',
-                            planType: planType
-                        }, '*');
-                    }, 2000);
-
-                    navigationAttempted = true;
-                }
-
-                // Method 3: Try global function calls
-                if (!navigationAttempted) {
-                    console.log('🔄 Method 3: Trying global function calls');
-
-                    // Try to call global navigation functions
-                    try {
-                        if (typeof switchToTab === 'function') {
-                            console.log('📞 Calling global switchToTab function');
-                            switchToTab('interface-pricing');
-                            navigationAttempted = true;
-                        } else if (window.parent && typeof window.parent.switchToTab === 'function') {
-                            console.log('📞 Calling parent switchToTab function');
-                            window.parent.switchToTab('interface-pricing');
-                            navigationAttempted = true;
-                        }
-                    } catch (e) {
-                        console.log('⚠️ Global function call failed:', e.message);
-                    }
-                }
-
-                if (navigationAttempted) {
-                    console.log('✅ Navigation attempted via parent/top interface');
-                    return;
-                }
-
-                // FALLBACK METHOD: Try direct DIY Plan Module access
-                console.log('🔄 Method 4: Fallback - Direct DIY Plan Module access');
-
-                if (window.jamDIYPlan) {
-                    console.log('✅ Found DIY Plan Module globally - trying direct access');
-
-                    // Check if the module is initialized first
-                    const diyContainer = document.getElementById('diy-plan-container');
-                    if (!diyContainer) {
-                        console.log('📦 DIY container not found, trying to initialize');
-                        // Try to initialize it in the interface
-                        if (window.jamPricingTiers && typeof window.jamPricingTiers.init === 'function') {
-                            window.jamPricingTiers.init('interface-pricing-widget');
-                        }
-                    }
-
-                    // Try to open the modal
-                    if (typeof window.jamDIYPlan.openModal === 'function') {
-                        setTimeout(() => {
-                            console.log(`🔓 Attempting to open modal for plan: ${planType}`);
-                            const success = window.jamDIYPlan.openModal(planType);
-
-                            if (success) {
-                                console.log('✅ Modal opened successfully');
-                                // Add additional message to chat about modal opening
-                                setTimeout(() => {
-                                    addBotMessage(`🎉 Great! I've opened the payment page for your ${planNames[planType]} plan. If you don't see the payment window, please check for pop-up blockers or navigate to the **Pricing Plans** tab.`);
-                                    updateMessagesDisplay(container);
-                                }, 500);
-                            } else {
-                                console.log('❌ Failed to open modal directly');
-                                showManualNavigationInstructions(planNames[planType], container);
-                            }
-                        }, 1000);
-                        return;
-                    }
-
-                    console.log('⚠️ DIY Plan Module found but no openModal method available');
-                } else {
-                    console.log('❌ DIY Plan Module not found globally');
-                }
-
-                // THIRD OPTION: Try via top-level interface navigation
-                if (window.top && window.top.jamPricingTiers) {
-                    console.log('🔄 Using top-level interface navigation');
-                    setTimeout(() => {
-                        if (typeof window.top.jamPricingTiers.selectPlan === 'function') {
-                            window.top.jamPricingTiers.selectPlan(planType);
-                        }
-                    }, 1000);
-                    return;
-                }
-
-                // FINAL FALLBACK: Show manual instructions
-                console.log('⚠️ Could not automatically navigate - showing manual instructions');
-                showManualNavigationInstructions(planNames[planType], container);
+                // Create and show modal
+                createPaymentModal(planType, container);
             }
 
-            // Helper function for manual navigation instructions
-            function showManualNavigationInstructions(planName, container) {
+            // NEW: Create payment modal
+            function createPaymentModal(planType, container) {
+                const plan = PLAN_DETAILS[planType];
+
+                // Remove existing modal if present
+                const existingModal = document.getElementById('Bot-payment-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Create modal element
+                paymentModal = document.createElement('div');
+                paymentModal.id = 'Bot-payment-modal';
+                paymentModal.className = 'Bot-payment-modal';
+                paymentModal.innerHTML = `
+                    <div class="Bot-payment-modal-content">
+                        <div class="Bot-payment-modal-header">
+                            <h3>Complete Your ${plan.name} Purchase</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-plan-summary">
+                                <h4>${plan.name}</h4>
+                                <div class="Bot-price-display">${plan.price}<span>/month</span></div>
+                                <ul class="Bot-plan-features-summary">
+                                    ${plan.features.slice(0, 5).map(feature => `
+                                        <li><i class="fas fa-check"></i> ${feature}</li>
+                                    `).join('')}
+                                    ${plan.features.length > 5 ? '<li><i class="fas fa-plus"></i> And more...</li>' : ''}
+                                </ul>
+                            </div>
+                            
+                            <div class="Bot-payment-security">
+                                <p><i class="fas fa-shield-alt"></i> Secure payment processing</p>
+                                <p><i class="fas fa-lock"></i> 256-bit SSL encryption</p>
+                            </div>
+                            
+                            <div class="Bot-payment-action-container">
+                                <button class="Bot-proceed-payment-btn" onclick="ChatModule.proceedToPayment('${planType}')">
+                                    <i class="fas fa-credit-card"></i>
+                                    Proceed to Secure Payment
+                                </button>
+                                <p class="Bot-payment-note">You'll be redirected to our secure payment processor</p>
+                            </div>
+                            
+                            <div class="Bot-payment-footer">
+                                <p class="Bot-guarantee-text">
+                                    <i class="fas fa-medal"></i> 
+                                    30-day money-back guarantee
+                                </p>
+                                <button class="Bot-cancel-payment-btn" onclick="ChatModule.closePaymentModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Add to container
+                container.appendChild(paymentModal);
+
+                // Show modal with animation
                 setTimeout(() => {
-                    addBotMessage(`🧭 **Manual Navigation Required**\n\n` +
-                        `Please follow these steps to complete your ${planName} purchase:\n\n` +
-                        `1️⃣ Click the **"Pricing Plans"** tab in the sidebar\n` +
-                        `2️⃣ Look for the **${planName}** option\n` +
-                        `3️⃣ Click **"Get Started Now"** to begin payment\n\n` +
-                        `💡 **Tip:** I've pre-configured everything for you - just navigate to the pricing page!`);
-                    updateMessagesDisplay(container);
+                    paymentModal.style.display = 'flex';
+                }, 100);
+
+                // Setup modal event listeners
+                setupPaymentModalEventListeners();
+            }
+
+            // NEW: Setup payment modal event listeners
+            function setupPaymentModalEventListeners() {
+                // Close when clicking outside the modal content
+                if (paymentModal) {
+                    paymentModal.addEventListener('click', function (e) {
+                        if (e.target === paymentModal) {
+                            closePaymentModal();
+                        }
+                    });
+
+                    // Close on Escape key
+                    document.addEventListener('keydown', function handleEscape(e) {
+                        if (e.key === 'Escape') {
+                            closePaymentModal();
+                            document.removeEventListener('keydown', handleEscape);
+                        }
+                    });
+                }
+            }
+
+            // NEW: Proceed to payment
+            function proceedToPayment(planType) {
+                if (!PAYMENT_LINKS[planType]) {
+                    console.error('No payment link found for plan:', planType);
+                    return;
+                }
+
+                const plan = PLAN_DETAILS[planType];
+                const proceedBtn = document.querySelector('.Bot-proceed-payment-btn');
+
+                if (proceedBtn) {
+                    // Show loading state
+                    proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening secure payment...';
+                    proceedBtn.disabled = true;
+                }
+
+                // Open payment in new window
+                const paymentWindow = window.open(
+                    PAYMENT_LINKS[planType],
+                    'payment',
+                    'width=800,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
+                );
+
+                // Check if popup was blocked
+                if (!paymentWindow || paymentWindow.closed || typeof paymentWindow.closed == 'undefined') {
+                    // Popup blocked, show alternative
+                    showPopupBlockedInModal(planType);
+                } else {
+                    // Monitor the payment window
+                    monitorPaymentWindow(paymentWindow, planType);
+                }
+            }
+
+            // NEW: Handle popup blocked scenario in modal
+            function showPopupBlockedInModal(planType) {
+                if (!paymentModal || !PAYMENT_LINKS[planType]) return;
+
+                const modalContent = paymentModal.querySelector('.Bot-payment-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="Bot-payment-modal-header">
+                            <h3>Complete Your Payment</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-popup-blocked-message">
+                                <i class="fas fa-exclamation-triangle" style="color: #ffc107; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h4>Popup Blocked</h4>
+                                <p>Your browser blocked the payment window. Please:</p>
+                                <ol>
+                                    <li>Allow popups for this site, or</li>
+                                    <li>Click the button below to open payment in a new tab</li>
+                                </ol>
+                                
+                                <div class="Bot-payment-options">
+                                    <a href="${PAYMENT_LINKS[planType]}" target="_blank" class="Bot-proceed-payment-btn">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Open Payment in New Tab
+                                    </a>
+                                    <button class="Bot-cancel-payment-btn" onclick="ChatModule.retryPayment('${planType}')">Try Again</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // NEW: Monitor payment window for completion
+            function monitorPaymentWindow(paymentWindow, planType) {
+                const checkClosed = setInterval(function () {
+                    if (paymentWindow.closed) {
+                        clearInterval(checkClosed);
+                        // Show completion message in modal
+                        showPaymentCompletionInModal(planType);
+                    }
                 }, 1000);
+            }
+
+            // NEW: Show payment completion message in modal
+            function showPaymentCompletionInModal(planType) {
+                if (!paymentModal) return;
+
+                const modalContent = paymentModal.querySelector('.Bot-payment-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="Bot-payment-modal-header">
+                            <h3>Payment Status</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-payment-status-message">
+                                <i class="fas fa-info-circle" style="color: #09ccfc; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h4>Payment Window Closed</h4>
+                                <p>If you completed your payment, you should receive a confirmation email shortly.</p>
+                                <p>If you didn't complete the payment, you can try again anytime.</p>
+                                
+                                <div class="Bot-status-options">
+                                    <button class="Bot-proceed-payment-btn" onclick="ChatModule.paymentCompleted('${planType}')">
+                                        <i class="fas fa-check"></i>
+                                        I Completed Payment
+                                    </button>
+                                    <button class="Bot-cancel-payment-btn" onclick="ChatModule.retryPayment('${planType}')">
+                                        Try Payment Again
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // NEW: Handle payment completed
+            function paymentCompleted(planType) {
+                const plan = PLAN_DETAILS[planType];
+
+                if (!paymentModal) return;
+
+                const modalContent = paymentModal.querySelector('.Bot-payment-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="Bot-payment-modal-header">
+                            <h3>Payment Successful!</h3>
+                            <span class="Bot-payment-modal-close" onclick="ChatModule.closePaymentModal()">&times;</span>
+                        </div>
+                        <div class="Bot-payment-modal-body">
+                            <div class="Bot-success-message">
+                                <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h4>Thank you for your purchase!</h4>
+                                <p>Your ${plan.name} is now active.</p>
+                                <p>You now have access to all the tools and features included in your plan.</p>
+                                <p>You should receive a confirmation email with login instructions shortly.</p>
+                                <button class="Bot-proceed-payment-btn" onclick="ChatModule.closePaymentModal()">Continue to Dashboard</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Add success message to chat
+                setTimeout(() => {
+                    addBotMessage(`🎉 **Congratulations!** Your ${plan.name} subscription is now active! You can now access all premium features and start improving your credit score with professional dispute letters.`);
+                    updateMessagesDisplay(document.querySelector('.Bot-chat-container'));
+                }, 1500);
+            }
+
+            // NEW: Retry payment
+            function retryPayment(planType) {
+                createPaymentModal(planType, document.querySelector('.Bot-chat-container'));
+            }
+
+            // NEW: Close payment modal
+            function closePaymentModal() {
+                if (paymentModal) {
+                    paymentModal.style.display = 'none';
+                    paymentModal.remove();
+                    paymentModal = null;
+                    selectedPlanType = null;
+
+                    // Add message to chat
+                    addBotMessage("No problem! I'm here whenever you're ready to upgrade your subscription. Feel free to ask me anything about credit repair!");
+                    updateMessagesDisplay(document.querySelector('.Bot-chat-container'));
+                }
             }
 
             // Subscription-related functions
@@ -3653,36 +5089,8 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
                 restartConversation: function (container) {
                     this.clearChatHistory();
                     if (container) {
-                        addBotMessageWithButtons(
-                            "👋 **Welcome to JAM Dispute Bot!**\n\nDid you upload your credit reports? Would you like me to check for your credit reports?",
-                            [
-                                { text: "Yes, check for my reports", value: "check_for_reports" },
-                                { text: "No, I haven't uploaded them yet", value: "no_reports_uploaded" }
-                            ]
-                        );
-                        updateMessagesDisplay(container);
-
-                        // Check for uploaded reports
-                        checkForUploadedReports().then(hasReports => {
-                            console.log('🔄 Restart conversation - upload check:', hasReports);
-
-                            if (hasReports.hasReports && hasReports.count > 0) {
-                                console.log(`✅ Found ${hasReports.count} reports in restart - showing analysis prompt`);
-
-                                addBotMessageWithButtons(
-                                    `I see you've uploaded ${hasReports.count} credit report${hasReports.count > 1 ? 's' : ''}. Would you like me to analyze them for potential items to dispute?`,
-                                    [
-                                        { text: "Yes, analyze my reports", value: "analyze_reports" },
-                                        { text: "No, I'll ask something else", value: "skip_analysis" }
-                                    ]
-                                );
-                                updateMessagesDisplay(container);
-                            } else {
-                                console.log(`❌ No reports found in restart (source: ${hasReports.source})`);
-                            }
-                        }).catch(error => {
-                            console.error('❌ Error checking for reports in restart:', error);
-                        });
+                        // Use subscription-aware conversation start instead of hardcoded message
+                        startSubscriptionAwareConversation(container);
                     }
                 },
 
@@ -3699,6 +5107,13 @@ ${result.letters.map(l => `• ${l.filename} (${l.bureau.charAt(0).toUpperCase()
 
                 // NEW: Expose handleUserInfoSubmit for user info collection
                 handleUserInfoSubmit: handleUserInfoSubmit,
+
+                // NEW: Expose payment modal functions
+                showPaymentModal: showPaymentModal,
+                closePaymentModal: closePaymentModal,
+                proceedToPayment: proceedToPayment,
+                paymentCompleted: paymentCompleted,
+                retryPayment: retryPayment,
 
                 // Utility methods for debugging
                 debugLocalStorage: function () {

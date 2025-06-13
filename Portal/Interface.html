@@ -670,7 +670,7 @@
                 overflow-x: hidden;
             }
 
-            /* Close button for mobile sidebar */
+            /* Close button for mobile sidebar 
             .interface-sidebar::before {
                 content: '×';
                 position: absolute;
@@ -694,304 +694,304 @@
                 background: var(--gray-200);
                 color: var(--gray-800);
             }
-        }
+        }*/
 
-        /* Small Devices (landscape phones, 576px and up) */
-        @media (min-width: 576px) and (max-width: 767.98px) {
-            .mobile-menu-toggle {
-                display: block;
-                top: 18px;
-                left: 18px;
+            /* Small Devices (landscape phones, 576px and up) */
+            @media (min-width: 576px) and (max-width: 767.98px) {
+                .mobile-menu-toggle {
+                    display: block;
+                    top: 18px;
+                    left: 18px;
+                }
+
+                .interface-sidebar {
+                    width: 320px;
+                    max-width: 320px;
+                    left: -320px;
+                }
+
+                .interface-sidebar.mobile-open {
+                    left: 0;
+                }
+
+                .interface-main {
+                    padding: 0.75rem;
+                }
+
+                .interface-widget {
+                    margin-bottom: 1.25rem;
+                }
+
+                .interface-widget-header {
+                    padding: 1.25rem;
+                }
+
+                .interface-widget-body {
+                    padding: 1.25rem;
+                }
+
+                .interface-widget-footer {
+                    padding: 1.25rem;
+                }
+
+                .card-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.25rem;
+                }
+
+                table {
+                    font-size: 0.9rem;
+                }
             }
 
-            .interface-sidebar {
-                width: 320px;
-                max-width: 320px;
-                left: -320px;
+            /* Medium Devices (tablets, 768px and up) */
+            @media (min-width: 768px) and (max-width: 991.98px) {
+                .mobile-menu-toggle {
+                    display: none;
+                }
+
+                .interface-content {
+                    flex-direction: row;
+                }
+
+                .interface-sidebar {
+                    position: sticky;
+                    top: 70px;
+                    width: 220px;
+                    height: calc(100vh - 70px);
+                    left: 0;
+                    padding: 1.5rem 0;
+                    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+                    transition: none;
+                }
+
+                .interface-main {
+                    flex: 1;
+                    padding: 1.5rem;
+                }
+
+                .interface-widget {
+                    margin-bottom: 1.5rem;
+                }
+
+                .card-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.5rem;
+                }
             }
 
-            .interface-sidebar.mobile-open {
-                left: 0;
+            /* Large Devices (desktops, 992px and up) */
+            @media (min-width: 992px) {
+                .mobile-menu-toggle {
+                    display: none;
+                }
+
+                .interface-sidebar {
+                    width: 250px;
+                    position: sticky;
+                    top: 70px;
+                    height: calc(100vh - 70px);
+                }
+
+                .interface-main {
+                    flex: 1;
+                    padding: 2rem;
+                }
+
+                .card-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 2rem;
+                }
             }
 
-            .interface-main {
-                padding: 0.75rem;
+            /* Extra Large Devices (large desktops, 1200px and up) */
+            @media (min-width: 1200px) {
+                .interface-main {
+                    padding: 2.5rem;
+                }
+
+                .card-grid {
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 2rem;
+                }
             }
 
-            .interface-widget {
-                margin-bottom: 1.25rem;
+            /* Landscape Orientation Adjustments */
+            @media (max-width: 767.98px) and (orientation: landscape) {
+                .interface-sidebar {
+                    width: 70vw;
+                    max-width: 280px;
+                    left: -70vw;
+                }
+
+                .interface-main {
+                    padding: 0.25rem 0.5rem;
+                    padding-bottom: 70px;
+                    /* Smaller bottom padding for landscape */
+                }
+
+                /* Compress widgets more in landscape */
+                .interface-widget {
+                    margin-bottom: 0.5rem;
+                }
+
+                .interface-widget-header {
+                    padding: 0.5rem 0.75rem;
+                }
+
+                .interface-widget-body {
+                    padding: 0.5rem 0.75rem;
+                }
+
+                .interface-widget-footer {
+                    padding: 0.5rem 0.75rem;
+                }
+
+                /* Make better use of horizontal space */
+                .card-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 0.5rem;
+                }
+
+                /* Adjust bottom nav for landscape */
+                .bottom-nav-items {
+                    padding: 0.25rem 0;
+                }
+
+                .bottom-nav-item {
+                    padding: 0.25rem;
+                    font-size: 0.65rem;
+                }
+
+                .bottom-nav-item i {
+                    font-size: 1.1rem;
+                    margin-bottom: 0.125rem;
+                }
+
+                .interface-widget {
+                    margin-bottom: 0.75rem;
+                }
+
+                .interface-widget-header {
+                    padding: 0.75rem;
+                }
+
+                .interface-widget-body {
+                    padding: 0.75rem;
+                }
+
+                .interface-widget-footer {
+                    padding: 0.75rem;
+                }
+
+                .interface-widget-title {
+                    font-size: 0.95rem;
+                }
+
+                .card-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 0.75rem;
+                }
             }
 
-            .interface-widget-header {
-                padding: 1.25rem;
+            /* Touch Device Optimizations */
+            @media (hover: none) and (pointer: coarse) {
+                .interface-sidebar-nav-link:hover {
+                    background-color: transparent;
+                }
+
+                .interface-sidebar-nav-link:active {
+                    background-color: var(--primary-light);
+                }
+
+                .mobile-menu-toggle:hover {
+                    background: var(--primary);
+                    transform: none;
+                }
+
+                .interface-widget {
+                    transition: none;
+                }
+
+                /* Prevent text selection on interactive elements */
+                .interface-sidebar-nav-link,
+                .mobile-menu-toggle,
+                button {
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                }
+
+                /* Enhanced tap highlight */
+                .interface-sidebar-nav-link,
+                button,
+                .btn {
+                    -webkit-tap-highlight-color: rgba(0, 128, 128, 0.2);
+                }
             }
 
-            .interface-widget-body {
-                padding: 1.25rem;
+            /* High DPI Displays */
+            @media (-webkit-min-device-pixel-ratio: 2),
+            (min-resolution: 192dpi) {
+                .interface-widget {
+                    will-change: transform;
+                }
+
+                .interface-sidebar {
+                    will-change: transform;
+                }
             }
 
-            .interface-widget-footer {
-                padding: 1.25rem;
+            /* iOS Safari specific adjustments */
+            @supports (-webkit-touch-callout: none) {
+                .interface-main {
+                    min-height: -webkit-fill-available;
+                }
+
+                .interface-sidebar {
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                /* Safe area adjustments for iPhone X+ */
+                .mobile-menu-toggle {
+                    top: max(15px, env(safe-area-inset-top));
+                    left: max(15px, env(safe-area-inset-left));
+                }
+
+                .interface-sidebar {
+                    padding-bottom: max(20px, env(safe-area-inset-bottom));
+                }
             }
 
-            .card-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.25rem;
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+                .interface-sidebar {
+                    transition: none;
+                }
+
+                .mobile-overlay {
+                    transition: none;
+                }
+
+                .interface-sidebar-nav-link,
+                .mobile-menu-toggle {
+                    transition: none;
+                }
+
+                .interface-sidebar-nav-link:active,
+                .mobile-menu-toggle:active {
+                    transform: none;
+                }
+
+                .interface-loading-spinner {
+                    animation: none;
+                    border: 3px solid var(--gray-300);
+                    border-top: 3px solid var(--primary);
+                }
             }
 
-            table {
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Medium Devices (tablets, 768px and up) */
-        @media (min-width: 768px) and (max-width: 991.98px) {
-            .mobile-menu-toggle {
-                display: none;
-            }
-
-            .interface-content {
-                flex-direction: row;
-            }
-
-            .interface-sidebar {
-                position: sticky;
-                top: 70px;
-                width: 220px;
-                height: calc(100vh - 70px);
-                left: 0;
-                padding: 1.5rem 0;
-                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-                transition: none;
-            }
-
-            .interface-main {
-                flex: 1;
-                padding: 1.5rem;
-            }
-
-            .interface-widget {
-                margin-bottom: 1.5rem;
-            }
-
-            .card-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
-        }
-
-        /* Large Devices (desktops, 992px and up) */
-        @media (min-width: 992px) {
-            .mobile-menu-toggle {
-                display: none;
-            }
-
-            .interface-sidebar {
-                width: 250px;
-                position: sticky;
-                top: 70px;
-                height: calc(100vh - 70px);
-            }
-
-            .interface-main {
-                flex: 1;
-                padding: 2rem;
-            }
-
-            .card-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 2rem;
-            }
-        }
-
-        /* Extra Large Devices (large desktops, 1200px and up) */
-        @media (min-width: 1200px) {
-            .interface-main {
-                padding: 2.5rem;
-            }
-
-            .card-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 2rem;
-            }
-        }
-
-        /* Landscape Orientation Adjustments */
-        @media (max-width: 767.98px) and (orientation: landscape) {
-            .interface-sidebar {
-                width: 70vw;
-                max-width: 280px;
-                left: -70vw;
-            }
-
-            .interface-main {
-                padding: 0.25rem 0.5rem;
-                padding-bottom: 70px;
-                /* Smaller bottom padding for landscape */
-            }
-
-            /* Compress widgets more in landscape */
-            .interface-widget {
-                margin-bottom: 0.5rem;
-            }
-
-            .interface-widget-header {
-                padding: 0.5rem 0.75rem;
-            }
-
-            .interface-widget-body {
-                padding: 0.5rem 0.75rem;
-            }
-
-            .interface-widget-footer {
-                padding: 0.5rem 0.75rem;
-            }
-
-            /* Make better use of horizontal space */
-            .card-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
-            }
-
-            /* Adjust bottom nav for landscape */
-            .bottom-nav-items {
-                padding: 0.25rem 0;
-            }
-
-            .bottom-nav-item {
-                padding: 0.25rem;
-                font-size: 0.65rem;
-            }
-
-            .bottom-nav-item i {
-                font-size: 1.1rem;
-                margin-bottom: 0.125rem;
-            }
-
-            .interface-widget {
-                margin-bottom: 0.75rem;
-            }
-
-            .interface-widget-header {
-                padding: 0.75rem;
-            }
-
-            .interface-widget-body {
-                padding: 0.75rem;
-            }
-
-            .interface-widget-footer {
-                padding: 0.75rem;
-            }
-
-            .interface-widget-title {
-                font-size: 0.95rem;
-            }
-
-            .card-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-        }
-
-        /* Touch Device Optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            .interface-sidebar-nav-link:hover {
-                background-color: transparent;
-            }
-
-            .interface-sidebar-nav-link:active {
-                background-color: var(--primary-light);
-            }
-
-            .mobile-menu-toggle:hover {
-                background: var(--primary);
-                transform: none;
-            }
-
-            .interface-widget {
-                transition: none;
-            }
-
-            /* Prevent text selection on interactive elements */
-            .interface-sidebar-nav-link,
-            .mobile-menu-toggle,
-            button {
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-            }
-
-            /* Enhanced tap highlight */
-            .interface-sidebar-nav-link,
-            button,
-            .btn {
-                -webkit-tap-highlight-color: rgba(0, 128, 128, 0.2);
-            }
-        }
-
-        /* High DPI Displays */
-        @media (-webkit-min-device-pixel-ratio: 2),
-        (min-resolution: 192dpi) {
-            .interface-widget {
-                will-change: transform;
-            }
-
-            .interface-sidebar {
-                will-change: transform;
-            }
-        }
-
-        /* iOS Safari specific adjustments */
-        @supports (-webkit-touch-callout: none) {
-            .interface-main {
-                min-height: -webkit-fill-available;
-            }
-
-            .interface-sidebar {
-                -webkit-overflow-scrolling: touch;
-            }
-
-            /* Safe area adjustments for iPhone X+ */
-            .mobile-menu-toggle {
-                top: max(15px, env(safe-area-inset-top));
-                left: max(15px, env(safe-area-inset-left));
-            }
-
-            .interface-sidebar {
-                padding-bottom: max(20px, env(safe-area-inset-bottom));
-            }
-        }
-
-        /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            .interface-sidebar {
-                transition: none;
-            }
-
-            .mobile-overlay {
-                transition: none;
-            }
-
-            .interface-sidebar-nav-link,
-            .mobile-menu-toggle {
-                transition: none;
-            }
-
-            .interface-sidebar-nav-link:active,
-            .mobile-menu-toggle:active {
-                transform: none;
-            }
-
-            .interface-loading-spinner {
-                animation: none;
-                border: 3px solid var(--gray-300);
-                border-top: 3px solid var(--primary);
-            }
-        }
-
-        /* Dark Mode Support 
+            /* Dark Mode Support 
         @media (prefers-color-scheme: dark) {
             :root {
                 --gray-100: #2d2d2d;
@@ -1048,396 +1048,396 @@
             }
         }*/
 
-        /* Bottom Navigation Bar for Mobile */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid var(--gray-300);
-            display: none;
-            z-index: 999;
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .bottom-nav-items {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0.5rem 0;
-            max-width: 100%;
-        }
-
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0.5rem;
-            text-decoration: none;
-            color: var(--gray-600);
-            font-size: 0.7rem;
-            min-width: 0;
-            flex: 1;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .bottom-nav-item:active {
-            transform: scale(0.95);
-            color: var(--primary);
-        }
-
-        .bottom-nav-item.active {
-            color: var(--primary);
-        }
-
-        .bottom-nav-item i {
-            font-size: 1.25rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .bottom-nav-badge {
-            position: absolute;
-            top: 0.25rem;
-            right: 0.5rem;
-            background: var(--danger);
-            color: white;
-            font-size: 0.6rem;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        /* Show bottom nav on small screens */
-        @media (max-width: 575.98px) {
+            /* Bottom Navigation Bar for Mobile */
             .bottom-nav {
-                display: block;
-            }
-
-            .interface-main {
-                padding-bottom: 80px;
-                /* Account for bottom nav height */
-            }
-
-            /* Mobile Widget Optimizations */
-            .interface-widget {
-                margin-bottom: 0.75rem;
-                border-radius: 8px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-                overflow: hidden;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 background: white;
+                border-top: 1px solid var(--gray-300);
+                display: none;
+                z-index: 999;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
             }
 
-            .interface-widget-header {
-                padding: 0.75rem;
-                border-bottom: 1px solid var(--gray-200);
-                background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-            }
-
-            .interface-widget-title {
-                font-size: 1rem;
-                font-weight: 600;
-                color: var(--gray-800);
-                margin: 0;
-                line-height: 1.3;
-            }
-
-            .interface-widget-actions {
+            .bottom-nav-items {
                 display: flex;
-                gap: 0.5rem;
-                margin-top: 0.5rem;
-                flex-wrap: wrap;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0.5rem 0;
+                max-width: 100%;
             }
 
-            .interface-widget-actions button {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-                border-radius: 6px;
-                min-height: 36px;
-                touch-action: manipulation;
+            .bottom-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 0.5rem;
+                text-decoration: none;
+                color: var(--gray-600);
+                font-size: 0.7rem;
+                min-width: 0;
+                flex: 1;
+                position: relative;
+                transition: all 0.2s ease;
             }
 
-            .interface-widget-body {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-                line-height: 1.5;
+            .bottom-nav-item:active {
+                transform: scale(0.95);
+                color: var(--primary);
             }
 
-            .interface-widget-footer {
-                padding: 0.75rem;
-                border-top: 1px solid var(--gray-200);
-                background: var(--gray-50);
-                font-size: 0.85rem;
+            .bottom-nav-item.active {
+                color: var(--primary);
             }
 
-            .interface-widget-loading {
-                padding: 1.5rem 0.75rem;
-                text-align: center;
-            }
-
-            .interface-loading-spinner {
-                width: 24px;
-                height: 24px;
-                margin-bottom: 0.75rem;
-            }
-
-            .interface-error-message {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-                border-radius: 8px;
-                margin: 0.75rem 0;
-            }
-
-            /* Enhanced touch targets */
-            button,
-            .btn,
-            .interface-sidebar-nav-link,
-            input,
-            select,
-            textarea {
-                min-height: 44px;
-                touch-action: manipulation;
-            }
-
-            /* Improved form elements */
-            input,
-            select,
-            textarea {
-                padding: 12px;
-                border-radius: 8px;
-                font-size: 16px;
-                /* Prevents zoom on iOS */
-                border: 2px solid var(--gray-300);
-                transition: border-color 0.2s ease;
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            input:focus,
-            select:focus,
-            textarea:focus {
-                border-color: var(--primary);
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
-            }
-
-            /* Responsive tables */
-            .table-responsive {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin: 0 -0.5rem;
-                padding: 0 0.5rem;
-            }
-
-            table {
-                min-width: 600px;
-                font-size: 0.85rem;
-            }
-
-            th,
-            td {
-                padding: 8px 12px;
-                white-space: nowrap;
-            }
-
-            /* Card grids - Full width on mobile */
-            .card-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-                margin: 0;
-            }
-
-            /* Status indicators */
-            .status-indicator {
-                padding: 4px 8px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            /* Full-width buttons on mobile */
-            .btn-primary,
-            .btn-secondary,
-            .btn {
-                width: 100%;
-                margin-bottom: 0.5rem;
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-                border-radius: 8px;
-            }
-
-            /* Optimize content spacing */
-            h1,
-            h2,
-            h3,
-            h4,
-            h5,
-            h6 {
-                margin-top: 0;
-                margin-bottom: 0.75rem;
-                line-height: 1.3;
-            }
-
-            p {
-                margin-bottom: 0.75rem;
-                line-height: 1.5;
-            }
-
-            /* Lists optimization */
-            ul,
-            ol {
-                margin-bottom: 0.75rem;
-                padding-left: 1.25rem;
-            }
-
-            li {
+            .bottom-nav-item i {
+                font-size: 1.25rem;
                 margin-bottom: 0.25rem;
             }
 
-            /* Make iframes and embedded content responsive */
-            iframe {
-                max-width: 100%;
-                width: 100%;
-            }
-
-            /* Responsive images */
-            img {
-                max-width: 100%;
-                height: auto;
-            }
-
-            /* Tab-specific optimizations */
-            .interface-tab {
-                width: 100%;
-                max-width: 100%;
-                box-sizing: border-box;
-            }
-
-            /* Dashboard tab optimizations */
-            #interface-dashboard .interface-widget {
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            /* Credit report tab optimizations */
-            #interface-credit-report .interface-widget,
-            #interface-credit-report-full-widget {
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            /* Documents tab optimizations */
-            #interface-documents .interface-widget,
-            #interface-documents-document-upload-widget {
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            /* Messages tab optimizations */
-            #interface-messages .interface-widget,
-            #interface-messages-content {
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            /* Remove any potential horizontal margins on containers */
-            .interface-widget-container {
-                margin-left: 0;
-                margin-right: 0;
-                width: 100%;
-            }
-
-            /* Ensure full-width usage for specific content types */
-            .content-grid,
-            .dashboard-grid,
-            .report-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-                margin: 0;
-                width: 100%;
-            }
-
-            /* Optimize progress bars and charts for mobile */
-            .progress-bar,
-            .chart-container,
-            .graph-container {
-                width: 100%;
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            /* Forms optimization */
-            .form-group {
-                margin-bottom: 1rem;
-                width: 100%;
-            }
-
-            .form-row {
+            .bottom-nav-badge {
+                position: absolute;
+                top: 0.25rem;
+                right: 0.5rem;
+                background: var(--danger);
+                color: white;
+                font-size: 0.6rem;
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
                 display: flex;
-                flex-direction: column;
-                gap: 0.75rem;
-                width: 100%;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
             }
 
-            .form-row .form-group {
-                flex: 1;
-                margin-bottom: 0;
+            /* Show bottom nav on small screens */
+            @media (max-width: 575.98px) {
+                .bottom-nav {
+                    display: block;
+                }
+
+                .interface-main {
+                    padding-bottom: 80px;
+                    /* Account for bottom nav height */
+                }
+
+                /* Mobile Widget Optimizations */
+                .interface-widget {
+                    margin-bottom: 0.75rem;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    background: white;
+                }
+
+                .interface-widget-header {
+                    padding: 0.75rem;
+                    border-bottom: 1px solid var(--gray-200);
+                    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+                }
+
+                .interface-widget-title {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: var(--gray-800);
+                    margin: 0;
+                    line-height: 1.3;
+                }
+
+                .interface-widget-actions {
+                    display: flex;
+                    gap: 0.5rem;
+                    margin-top: 0.5rem;
+                    flex-wrap: wrap;
+                }
+
+                .interface-widget-actions button {
+                    padding: 8px 12px;
+                    font-size: 0.85rem;
+                    border-radius: 6px;
+                    min-height: 36px;
+                    touch-action: manipulation;
+                }
+
+                .interface-widget-body {
+                    padding: 0.75rem;
+                    font-size: 0.9rem;
+                    line-height: 1.5;
+                }
+
+                .interface-widget-footer {
+                    padding: 0.75rem;
+                    border-top: 1px solid var(--gray-200);
+                    background: var(--gray-50);
+                    font-size: 0.85rem;
+                }
+
+                .interface-widget-loading {
+                    padding: 1.5rem 0.75rem;
+                    text-align: center;
+                }
+
+                .interface-loading-spinner {
+                    width: 24px;
+                    height: 24px;
+                    margin-bottom: 0.75rem;
+                }
+
+                .interface-error-message {
+                    padding: 0.75rem;
+                    font-size: 0.9rem;
+                    border-radius: 8px;
+                    margin: 0.75rem 0;
+                }
+
+                /* Enhanced touch targets */
+                button,
+                .btn,
+                .interface-sidebar-nav-link,
+                input,
+                select,
+                textarea {
+                    min-height: 44px;
+                    touch-action: manipulation;
+                }
+
+                /* Improved form elements */
+                input,
+                select,
+                textarea {
+                    padding: 12px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    /* Prevents zoom on iOS */
+                    border: 2px solid var(--gray-300);
+                    transition: border-color 0.2s ease;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                input:focus,
+                select:focus,
+                textarea:focus {
+                    border-color: var(--primary);
+                    outline: none;
+                    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+                }
+
+                /* Responsive tables */
+                .table-responsive {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                    margin: 0 -0.5rem;
+                    padding: 0 0.5rem;
+                }
+
+                table {
+                    min-width: 600px;
+                    font-size: 0.85rem;
+                }
+
+                th,
+                td {
+                    padding: 8px 12px;
+                    white-space: nowrap;
+                }
+
+                /* Card grids - Full width on mobile */
+                .card-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 0.75rem;
+                    margin: 0;
+                }
+
+                /* Status indicators */
+                .status-indicator {
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                /* Full-width buttons on mobile */
+                .btn-primary,
+                .btn-secondary,
+                .btn {
+                    width: 100%;
+                    margin-bottom: 0.5rem;
+                    padding: 0.75rem 1rem;
+                    font-size: 0.9rem;
+                    border-radius: 8px;
+                }
+
+                /* Optimize content spacing */
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6 {
+                    margin-top: 0;
+                    margin-bottom: 0.75rem;
+                    line-height: 1.3;
+                }
+
+                p {
+                    margin-bottom: 0.75rem;
+                    line-height: 1.5;
+                }
+
+                /* Lists optimization */
+                ul,
+                ol {
+                    margin-bottom: 0.75rem;
+                    padding-left: 1.25rem;
+                }
+
+                li {
+                    margin-bottom: 0.25rem;
+                }
+
+                /* Make iframes and embedded content responsive */
+                iframe {
+                    max-width: 100%;
+                    width: 100%;
+                }
+
+                /* Responsive images */
+                img {
+                    max-width: 100%;
+                    height: auto;
+                }
+
+                /* Tab-specific optimizations */
+                .interface-tab {
+                    width: 100%;
+                    max-width: 100%;
+                    box-sizing: border-box;
+                }
+
+                /* Dashboard tab optimizations */
+                #interface-dashboard .interface-widget {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                /* Credit report tab optimizations */
+                #interface-credit-report .interface-widget,
+                #interface-credit-report-full-widget {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                /* Documents tab optimizations */
+                #interface-documents .interface-widget,
+                #interface-documents-document-upload-widget {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                /* Messages tab optimizations */
+                #interface-messages .interface-widget,
+                #interface-messages-content {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                /* Remove any potential horizontal margins on containers */
+                .interface-widget-container {
+                    margin-left: 0;
+                    margin-right: 0;
+                    width: 100%;
+                }
+
+                /* Ensure full-width usage for specific content types */
+                .content-grid,
+                .dashboard-grid,
+                .report-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 0.75rem;
+                    margin: 0;
+                    width: 100%;
+                }
+
+                /* Optimize progress bars and charts for mobile */
+                .progress-bar,
+                .chart-container,
+                .graph-container {
+                    width: 100%;
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+
+                /* Forms optimization */
+                .form-group {
+                    margin-bottom: 1rem;
+                    width: 100%;
+                }
+
+                .form-row {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.75rem;
+                    width: 100%;
+                }
+
+                .form-row .form-group {
+                    flex: 1;
+                    margin-bottom: 0;
+                }
+
+                /* Modal and popup optimizations */
+                .modal-content,
+                .popup-content {
+                    margin: 0.5rem;
+                    max-width: calc(100vw - 1rem);
+                    width: calc(100vw - 1rem);
+                }
             }
 
-            /* Modal and popup optimizations */
-            .modal-content,
-            .popup-content {
-                margin: 0.5rem;
-                max-width: calc(100vw - 1rem);
-                width: calc(100vw - 1rem);
-            }
-        }
+            /* Print Styles */
+            @media print {
 
-        /* Print Styles */
-        @media print {
+                .mobile-menu-toggle,
+                .mobile-overlay,
+                .interface-sidebar,
+                .bottom-nav {
+                    display: none;
+                }
 
-            .mobile-menu-toggle,
-            .mobile-overlay,
-            .interface-sidebar,
-            .bottom-nav {
-                display: none;
-            }
+                .interface-main {
+                    width: 100%;
+                    padding: 0;
+                }
 
-            .interface-main {
-                width: 100%;
-                padding: 0;
-            }
+                .interface-widget {
+                    box-shadow: none;
+                    border: 1px solid #000;
+                    margin-bottom: 1rem;
+                    page-break-inside: avoid;
+                }
 
-            .interface-widget {
-                box-shadow: none;
-                border: 1px solid #000;
-                margin-bottom: 1rem;
-                page-break-inside: avoid;
-            }
+                .interface-widget-header {
+                    background: white;
+                    border-bottom: 1px solid #000;
+                }
 
-            .interface-widget-header {
-                background: white;
-                border-bottom: 1px solid #000;
-            }
+                .interface-widget-footer {
+                    background: white;
+                    border-top: 1px solid #000;
+                }
 
-            .interface-widget-footer {
-                background: white;
-                border-top: 1px solid #000;
+                .interface-content {
+                    flex-direction: column;
+                }
             }
-
-            .interface-content {
-                flex-direction: column;
-            }
-        }
     </style>
 </head>
 
@@ -1458,7 +1458,7 @@
         <div class="interface-content">
             <!-- Sidebar navigation -->
             <div class="interface-sidebar">
-                <!-- Mobile Header Actions (visible only on mobile) -->
+                <!-- Mobile Header Actions (visible only on mobile) 
                 <div class="mobile-header-actions">
                     <div class="mobile-user-info">
                         <div class="mobile-user-avatar" id="mobile-user-avatar">U</div>
@@ -1488,7 +1488,7 @@
                             <span>Logout</span>
                         </a>
                     </div>
-                </div>
+                </div>-->
 
                 <ul class="interface-sidebar-nav">
                     <li class="interface-sidebar-nav-item">
@@ -1545,7 +1545,7 @@
                 <!-- Dashboard Tab -->
                 <div id="interface-dashboard" class="interface-tab active">
                     <h1>Welcome to Your JAM Engine Dashboard</h1>
-                    <p>Track your credit repair progress and next steps.</p>
+                    <p>Track your credit dispute progress and next steps.</p>
 
                     <!-- Next Steps Widget -->
                     <div id="interface-next-steps-widget" class="interface-widget">
@@ -1699,6 +1699,30 @@
         // Authentication check - redirect to login if not authenticated
         function checkAuthentication() {
             console.log('🔍 Checking authentication status...');
+            console.log('🔍 AuthManager available:', typeof window.authManager !== 'undefined');
+            console.log('🔍 AuthManager instance:', window.authManager);
+
+            // Check if user is coming from registration
+            const comingFromRegistration = sessionStorage.getItem('comingFromRegistration');
+            const registrationTimestamp = sessionStorage.getItem('registrationTimestamp');
+
+            if (comingFromRegistration && registrationTimestamp) {
+                const timeSinceRegistration = Date.now() - parseInt(registrationTimestamp);
+                console.log('🔍 User coming from registration, time since:', timeSinceRegistration + 'ms');
+
+                // If registration was very recent (within 10 seconds), wait a bit longer
+                if (timeSinceRegistration < 10000) {
+                    console.log('⏳ Registration very recent, waiting for auth data...');
+                    setTimeout(() => {
+                        checkAuthentication();
+                    }, 1000);
+                    return true; // Don't redirect yet
+                }
+
+                // Clear registration flags
+                sessionStorage.removeItem('comingFromRegistration');
+                sessionStorage.removeItem('registrationTimestamp');
+            }
 
             // Auth manager should be available now (with fallback)
             if (typeof window.authManager === 'undefined') {
@@ -1708,9 +1732,12 @@
             }
 
             const isAuth = window.authManager.isAuthenticated();
+            console.log('🔍 Initial authentication check result:', isAuth);
 
             if (!isAuth) {
                 console.log('❌ User not authenticated, redirecting to login');
+                console.log('🔍 Token check:', window.authManager.getAuthToken() ? 'Present' : 'Missing');
+                console.log('🔍 User data check:', window.authManager.getUserData());
                 alert('Please log in to access the dashboard');
                 window.location.href = '/login';
                 return false;
@@ -3507,7 +3534,5 @@
         });
     </script>
 </body>
-
-</html>
 
 </html>

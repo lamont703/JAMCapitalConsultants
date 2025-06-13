@@ -249,6 +249,334 @@
             display: none;
         }
     }
+
+    /* ENHANCED MOBILE RESPONSIVENESS */
+
+    /* Extra Small Devices (phones, up to 575px) */
+    @media (max-width: 575.98px) {
+        .who-ideal-client-section {
+            padding: 1.5rem 0;
+        }
+
+        .who-container {
+            padding: 0 0.75rem;
+        }
+
+        .who-section-title {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+            padding: 0 0.5rem;
+        }
+
+        .who-client-grid {
+            gap: 1.5rem;
+        }
+
+        .who-client-cards-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0;
+        }
+
+        .who-client-card {
+            padding: 1rem;
+            margin: 0;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            flex-direction: row;
+            align-items: flex-start;
+            min-height: 60px;
+            touch-action: manipulation;
+        }
+
+        .who-client-card:active {
+            transform: scale(0.98);
+            background: #f8fcff;
+        }
+
+        .who-check-icon {
+            font-size: 1.2rem;
+            min-width: 22px;
+            margin-right: 0.75rem;
+            margin-top: 2px;
+        }
+
+        .who-client-card p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+            flex: 1;
+        }
+
+        .who-not-for-you {
+            padding: 1.25rem;
+            margin: 0;
+            border-radius: 12px;
+            background: #fafafa;
+        }
+
+        .who-not-for-you h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .who-not-for-you-items {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .who-not-for-you-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex-direction: row;
+            align-items: flex-start;
+        }
+
+        .who-x-icon {
+            font-size: 1.1rem;
+            min-width: 20px;
+            margin-right: 0.75rem;
+            margin-top: 2px;
+        }
+
+        .who-not-for-you-item p {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 0;
+            flex: 1;
+        }
+    }
+
+    /* Small Devices (landscape phones, 576px and up) */
+    @media (min-width: 576px) and (max-width: 767.98px) {
+        .who-ideal-client-section {
+            padding: 2rem 0;
+        }
+
+        .who-container {
+            padding: 0 1rem;
+        }
+
+        .who-section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .who-client-cards-container {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        .who-client-card {
+            padding: 1.25rem;
+            border-radius: 10px;
+        }
+
+        .who-not-for-you {
+            padding: 1.5rem;
+        }
+
+        .who-not-for-you-items {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+
+    /* Medium Devices (tablets, 768px and up) */
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .who-ideal-client-section {
+            padding: 3rem 0;
+        }
+
+        .who-section-title {
+            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .who-client-cards-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .who-not-for-you-items {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+    }
+
+    /* Large Devices (desktops, 992px and up) */
+    @media (min-width: 992px) {
+        .who-ideal-client-section {
+            padding: 4rem 0;
+        }
+
+        .who-client-cards-container {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .who-not-for-you-items {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+    }
+
+    /* Landscape Orientation Adjustments */
+    @media (max-width: 767.98px) and (orientation: landscape) {
+        .who-ideal-client-section {
+            padding: 1rem 0;
+        }
+
+        .who-section-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .who-client-grid {
+            gap: 1rem;
+        }
+
+        .who-client-card {
+            padding: 0.75rem;
+            min-height: 50px;
+        }
+
+        .who-not-for-you {
+            padding: 1rem;
+        }
+
+        .who-not-for-you h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .who-not-for-you-item {
+            padding: 0.5rem;
+        }
+    }
+
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .who-client-card:hover {
+            transform: none;
+        }
+
+        .who-client-card,
+        .who-not-for-you-item {
+            -webkit-tap-highlight-color: rgba(9, 204, 252, 0.1);
+        }
+
+        /* Prevent text selection on touch devices */
+        .who-check-icon,
+        .who-x-icon {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    }
+
+    /* High DPI Displays */
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+
+        .who-check-icon,
+        .who-x-icon {
+            transform: translateZ(0);
+        }
+    }
+
+    /* iOS Safari specific adjustments */
+    @supports (-webkit-touch-callout: none) {
+        .who-container {
+            min-height: -webkit-fill-available;
+        }
+
+        .who-client-grid {
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+        .who-client-card {
+            transition: none;
+        }
+
+        .who-client-card:hover,
+        .who-client-card:active {
+            transform: none;
+        }
+
+        .animated-pointer {
+            animation: none;
+        }
+    }
+
+    /* Dark Mode Support 
+    @media (prefers-color-scheme: dark) {
+        .who-ideal-client-section {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .who-section-title {
+            color: #ffffff;
+        }
+
+        .who-client-card {
+            background: #2d2d2d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .who-client-card:active {
+            background: #3a3a3a;
+        }
+
+        .who-not-for-you {
+            background: #2d2d2d;
+        }
+
+        .who-not-for-you h3 {
+            color: #ffffff;
+        }
+
+        .who-not-for-you-item {
+            background: #3a3a3a;
+        }
+
+        .who-not-for-you-item p {
+            color: #cccccc;
+        }
+    }*/
+
+    /* Print Styles */
+    @media print {
+        .who-ideal-client-section {
+            padding: 1rem 0;
+            background: white;
+        }
+
+        .who-client-card {
+            box-shadow: none;
+            border: 1px solid #000;
+            page-break-inside: avoid;
+        }
+
+        .who-not-for-you {
+            border: 1px solid #000;
+            background: #f5f5f5;
+        }
+
+        .animated-pointer {
+            display: none;
+        }
+    }
 </style>
 
 <section class="who-ideal-client-section">

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .debug-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .debug-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .debug-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .debug-content {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .test-button:hover {
+            background: #0056b3;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Authentication Debug Test</h1>
+
+    <div class="debug-container">
+        <h2>Test Authentication Flow</h2>
+        <p>This page helps debug the authentication issue between JAMGetStartedModule and the dashboard.</p>
+
+        <div class="debug-section">
+            <div class="debug-title">1. Check AuthManager Availability</div>
+            <button class="test-button" onclick="checkAuthManager()">Check AuthManager</button>
+            <div id="authManagerStatus" class="status"></div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">2. Simulate Registration Response</div>
+            <button class="test-button" onclick="simulateRegistration()">Simulate Registration</button>
+            <div id="registrationStatus" class="status"></div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">3. Check Authentication Status</div>
+            <button class="test-button" onclick="checkAuthStatus()">Check Auth Status</button>
+            <div id="authStatus" class="status"></div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">4. Test Dashboard Redirect</div>
+            <button class="test-button" onclick="testDashboardRedirect()">Test Dashboard Redirect</button>
+            <div id="redirectStatus" class="status"></div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">5. Current Authentication Data</div>
+            <div id="currentAuthData" class="debug-content">Click "Check Auth Status" to see current data</div>
+        </div>
+    </div>
+
+    <script>
+        // Load AuthManager from Interface.html
+        function loadAuthManager() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = '/Portal/Interface.html';
+                script.onload = () => {
+                    // Wait for AuthManager to be available
+                    let attempts = 0;
+                    const checkAuthManager = () => {
+                        if (window.authManager) {
+                            resolve(window.authManager);
+                        } else if (attempts < 10) {
+                            attempts++;
+                            setTimeout(checkAuthManager, 500);
+                        } else {
+                            reject(new Error('AuthManager not found after 5 seconds'));
+                        }
+                    };
+                    checkAuthManager();
+                };
+                script.onerror = () => reject(new Error('Failed to load Interface.html'));
+                document.head.appendChild(script);
+            });
+        }
+
+        function checkAuthManager() {
+            const statusDiv = document.getElementById('authManagerStatus');
+
+            if (window.authManager) {
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = `
+                    ✅ AuthManager is available<br>
+                    Methods: ${Object.getOwnPropertyNames(Object.getPrototypeOf(window.authManager)).join(', ')}
+                `;
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ AuthManager is not available';
+            }
+        }
+
+        function simulateRegistration() {
+            const statusDiv = document.getElementById('registrationStatus');
+
+            if (!window.authManager) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ AuthManager not available. Please check step 1 first.';
+                return;
+            }
+
+            // Simulate the registration response from backend
+            const mockRegistrationData = {
+                success: true,
+                token: 'mock-jwt-token-' + Date.now(),
+                user: {
+                    id: 'user-' + Date.now(),
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    phone: '555-1234',
+                    isAdmin: false,
+                    createdAt: new Date().toISOString()
+                },
+                message: 'Registration successful'
+            };
+
+            try {
+                console.log('🎉 Simulating registration with data:', mockRegistrationData);
+                window.authManager.handleLoginSuccess(mockRegistrationData);
+
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = `
+                    ✅ Registration simulation successful<br>
+                    Token: ${mockRegistrationData.token.substring(0, 20)}...<br>
+                    User ID: ${mockRegistrationData.user.id}
+                `;
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ Registration simulation failed: ${error.message}`;
+            }
+        }
+
+        function checkAuthStatus() {
+            const statusDiv = document.getElementById('authStatus');
+            const dataDiv = document.getElementById('currentAuthData');
+
+            if (!window.authManager) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ AuthManager not available';
+                return;
+            }
+
+            const isAuth = window.authManager.isAuthenticated();
+            const token = window.authManager.getAuthToken();
+            const userData = window.authManager.getUserData();
+            const userId = window.authManager.getUserId();
+
+            if (isAuth) {
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = `
+                    ✅ User is authenticated<br>
+                    User ID: ${userId}<br>
+                    Token: ${token ? 'Present' : 'Missing'}
+                `;
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `
+                    ❌ User is not authenticated<br>
+                    Token: ${token ? 'Present' : 'Missing'}<br>
+                    User Data: ${userData ? 'Present' : 'Missing'}
+                `;
+            }
+
+            // Update data display
+            dataDiv.textContent = JSON.stringify({
+                isAuthenticated: isAuth,
+                token: token ? token.substring(0, 50) + '...' : null,
+                userData: userData,
+                userId: userId
+            }, null, 2);
+        }
+
+        function testDashboardRedirect() {
+            const statusDiv = document.getElementById('redirectStatus');
+
+            if (!window.authManager) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ AuthManager not available';
+                return;
+            }
+
+            const isAuth = window.authManager.isAuthenticated();
+
+            if (isAuth) {
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Authentication passed - would redirect to dashboard';
+
+                // Simulate the redirect (but don't actually redirect)
+                setTimeout(() => {
+                    statusDiv.innerHTML += '<br>🔄 Simulated redirect to /dashboard';
+                }, 1000);
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Authentication failed - would redirect to login';
+            }
+        }
+
+        // Auto-check on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkAuthManager, 1000);
+        });
+    </script>
+</body>
+
+</html>

@@ -6,48 +6,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAM Letters Module</title>
     <style>
-        /* Letters Container Styles */
+        /* CSS Variables for Design System Consistency */
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #07a3ca;
+            --primary-light: #e3f2fd;
+            --secondary: #008080;
+            --gray-50: #f8f9fa;
+            --gray-100: #e9ecef;
+            --gray-200: #dee2e6;
+            --gray-300: #ced4da;
+            --gray-400: #adb5bd;
+            --gray-500: #6c757d;
+            --gray-600: #495057;
+            --gray-700: #343a40;
+            --gray-800: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --blue-accent: #09ccfc;
+        }
+
+        /* Letters Container Styles - Enhanced */
         .Bot-letters-container {
-            padding: 20px;
-            max-width: 800px;
+            padding: 1.5rem;
+            max-width: 1000px;
             margin: 0 auto;
+            background: var(--gray-50);
+            min-height: 500px;
         }
 
         .Bot-letters-title {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #343a40;
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--gray-800);
             text-align: center;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .Bot-letters-description {
             font-size: 1rem;
-            color: #6c757d;
-            margin-bottom: 30px;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
             text-align: center;
+            line-height: 1.5;
         }
 
-        /* Letters List Styles */
+        /* Letters List Styles - Enhanced */
         .Bot-letters-list {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
         }
 
-        /* Loading State Styles */
+        /* Loading State Styles - Enhanced */
         .Bot-loading-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 3rem 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
         }
 
         .Bot-loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #09ccfc;
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
         }
 
         @keyframes spin {
@@ -61,193 +97,856 @@
         }
 
         .Bot-loading-text {
-            color: #6c757d;
+            color: var(--gray-600);
             font-size: 1rem;
+            font-weight: 500;
         }
 
-        /* Error State Styles */
+        /* Error State Styles - Enhanced */
         .Bot-error-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 3rem 1.5rem;
+            background: linear-gradient(135deg, #fdf2f2 0%, white 100%);
+            border-radius: 16px;
+            border: 1px solid #fecaca;
         }
 
         .Bot-error-icon {
-            font-size: 3rem;
-            color: #dc3545;
-            margin-bottom: 20px;
+            font-size: 3.5rem;
+            color: var(--danger);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
         }
 
         .Bot-error-title {
-            font-size: 1.25rem;
-            color: #dc3545;
-            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: var(--danger);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
         }
 
         .Bot-error-text {
-            color: #6c757d;
-            margin-bottom: 20px;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
 
-        /* Empty State Styles */
+        /* Empty State Styles - Enhanced */
         .Bot-empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 3rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-light) 0%, white 100%);
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
         }
 
         .Bot-empty-icon {
-            font-size: 3rem;
-            color: #dee2e6;
-            margin-bottom: 20px;
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
         }
 
         .Bot-empty-title {
-            font-size: 1.25rem;
-            color: #343a40;
-            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: var(--gray-800);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
         }
 
         .Bot-empty-text {
-            color: #6c757d;
-            margin-bottom: 20px;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
 
-        /* Letter Item Styles */
+        /* Letter Item Styles - Enhanced */
         .Bot-letter-item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border-radius: 8px;
-            background: white;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
+            padding: 1.25rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, white 0%, var(--gray-50) 100%);
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .Bot-letter-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .Bot-letter-item:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .Bot-letter-item:hover::before {
+            opacity: 1;
         }
 
         .Bot-letter-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #e6f9ff;
-            color: #09ccfc;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e6f9ff 100%);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 1rem;
             flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+            border: 2px solid white;
+            font-size: 1.25rem;
         }
 
         .Bot-letter-info {
             flex: 1;
+            min-width: 0;
         }
 
         .Bot-letter-name {
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+            font-size: 1.1rem;
+            line-height: 1.3;
         }
 
         .Bot-letter-details {
             font-size: 0.875rem;
-            color: #6c757d;
-            margin-bottom: 2px;
+            color: var(--gray-600);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .Bot-letter-details i {
+            color: var(--primary);
+            font-size: 0.75rem;
         }
 
         .Bot-letter-date {
-            font-size: 0.875rem;
-            color: #6c757d;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            font-weight: 500;
         }
 
         .Bot-letter-actions {
             display: flex;
-            gap: 10px;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .Bot-letter-action {
-            background: none;
-            border: none;
-            color: #6c757d;
+            background: var(--gray-100);
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
             cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            font-size: 1rem;
+            touch-action: manipulation;
         }
 
         .Bot-letter-action:hover {
-            background: #f1f3f5;
-            color: #343a40;
+            background: white;
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.2);
+        }
+
+        .Bot-letter-action:active {
+            transform: scale(0.95);
         }
 
         .Bot-letter-action.download {
-            color: #09ccfc;
+            color: var(--primary);
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .Bot-letter-action.download:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
         }
 
         .Bot-letter-action.delete {
-            color: #dc3545;
+            color: var(--danger);
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .Bot-letter-action.delete:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
         }
 
         .Bot-letter-action:disabled {
-            color: #adb5bd;
+            color: var(--gray-400);
+            background: var(--gray-100);
+            border-color: var(--gray-200);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* Button Styles */
+        .Bot-letter-action:disabled:hover {
+            color: var(--gray-400);
+            background: var(--gray-100);
+            border-color: var(--gray-200);
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Button Styles - Enhanced */
         .Bot-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 20px;
-            background: #f1f3f5;
-            color: #495057;
-            border: none;
-            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            font-size: 0.9rem;
+            min-height: 44px;
+            touch-action: manipulation;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .Bot-btn:hover {
-            background: #e9ecef;
+            background: linear-gradient(135deg, white 0%, var(--gray-100) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .Bot-btn:active {
+            transform: scale(0.98);
         }
 
         .Bot-btn-primary {
-            background: #09ccfc;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
         }
 
         .Bot-btn-primary:hover {
-            background: #07a3ca;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #056080 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(9, 204, 252, 0.3);
+            border-color: var(--primary-dark);
+            color: white;
         }
 
         .Bot-btn:disabled {
-            background: #e9ecef;
-            color: #adb5bd;
+            background: var(--gray-200);
+            color: var(--gray-400);
+            border-color: var(--gray-300);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        /* Success/Info Messages */
+        .Bot-btn:disabled:hover {
+            background: var(--gray-200);
+            color: var(--gray-400);
+            border-color: var(--gray-300);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .Bot-btn i {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Success/Info Messages - Enhanced */
         .Bot-success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #c3e6cb;
+            background: linear-gradient(135deg, #d4edda 0%, #e8f5e8 100%);
+            color: var(--success);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 2px solid #c3e6cb;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .Bot-success-message::before {
+            content: '✅';
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
         .Bot-error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #f5c6cb;
+            background: linear-gradient(135deg, #f8d7da 0%, #fae8ea 100%);
+            color: var(--danger);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 2px solid #f5c6cb;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .Bot-error-message::before {
+            content: '❌';
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* Mobile-First Responsive Design */
+
+        /* Base Mobile Styles (≤575px) */
+        @media (max-width: 575.98px) {
+            .Bot-letters-container {
+                padding: 1rem;
+                min-height: 400px;
+            }
+
+            .Bot-letters-title {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-letters-description {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .Bot-letters-list {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+
+            .Bot-letter-item {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .Bot-letter-item::before {
+                width: 100%;
+                height: 4px;
+                top: 0;
+                left: 0;
+            }
+
+            .Bot-letter-icon {
+                width: 48px;
+                height: 48px;
+                margin-right: 0;
+                margin-bottom: 0;
+                align-self: flex-start;
+            }
+
+            .Bot-letter-info {
+                width: 100%;
+                order: 2;
+            }
+
+            .Bot-letter-name {
+                font-size: 1rem;
+                margin-bottom: 0.375rem;
+            }
+
+            .Bot-letter-details {
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+
+            .Bot-letter-date {
+                font-size: 0.75rem;
+            }
+
+            .Bot-letter-actions {
+                width: 100%;
+                justify-content: space-between;
+                order: 3;
+                gap: 0.75rem;
+            }
+
+            .Bot-letter-action {
+                flex: 1;
+                min-width: 44px;
+                height: 48px;
+                justify-content: center;
+                font-size: 1.125rem;
+            }
+
+            /* State containers mobile optimization */
+            .Bot-loading-state,
+            .Bot-error-state,
+            .Bot-empty-state {
+                padding: 2rem 1rem;
+                border-radius: 12px;
+            }
+
+            .Bot-loading-spinner {
+                width: 40px;
+                height: 40px;
+            }
+
+            .Bot-error-icon,
+            .Bot-empty-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .Bot-error-title,
+            .Bot-empty-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-loading-text,
+            .Bot-error-text,
+            .Bot-empty-text {
+                font-size: 0.9rem;
+                margin-bottom: 1rem;
+            }
+
+            .Bot-btn {
+                padding: 0.875rem 1.25rem;
+                font-size: 0.9rem;
+                width: 100%;
+                justify-content: center;
+                min-height: 48px;
+            }
+
+            .Bot-btn-primary {
+                font-size: 1rem;
+                padding: 1rem 1.5rem;
+                min-height: 52px;
+            }
+
+            /* Message styles for mobile */
+            .Bot-success-message,
+            .Bot-error-message {
+                padding: 0.875rem 1rem;
+                border-radius: 10px;
+                font-size: 0.875rem;
+                margin-bottom: 0.875rem;
+            }
+
+            .Bot-success-message::before,
+            .Bot-error-message::before {
+                font-size: 1.125rem;
+            }
+        }
+
+        /* Small Devices (576px - 767px) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .Bot-letters-container {
+                padding: 1.25rem;
+            }
+
+            .Bot-letters-title {
+                font-size: 1.625rem;
+            }
+
+            .Bot-letters-list {
+                padding: 1.25rem;
+            }
+
+            .Bot-letter-item {
+                flex-direction: row;
+                align-items: center;
+                padding: 1.125rem;
+            }
+
+            .Bot-letter-item::before {
+                width: 4px;
+                height: 100%;
+                top: 0;
+                left: 0;
+            }
+
+            .Bot-letter-icon {
+                margin-right: 0.875rem;
+                margin-bottom: 0;
+            }
+
+            .Bot-letter-info {
+                order: initial;
+            }
+
+            .Bot-letter-actions {
+                width: auto;
+                order: initial;
+                justify-content: flex-end;
+                flex-shrink: 0;
+            }
+
+            .Bot-letter-action {
+                flex: none;
+                width: 44px;
+            }
+
+            .Bot-btn {
+                width: auto;
+                min-width: 120px;
+            }
+        }
+
+        /* Tablets (768px - 991px) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .Bot-letters-container {
+                padding: 1.75rem;
+            }
+
+            .Bot-letters-title {
+                font-size: 1.75rem;
+            }
+
+            .Bot-letters-list {
+                padding: 1.5rem;
+            }
+
+            .Bot-letter-item {
+                padding: 1.375rem;
+            }
+
+            .Bot-letter-icon {
+                width: 56px;
+                height: 56px;
+                margin-right: 1.125rem;
+            }
+
+            .Bot-loading-state,
+            .Bot-error-state,
+            .Bot-empty-state {
+                padding: 3.5rem 2rem;
+            }
+        }
+
+        /* Desktop (≥992px) */
+        @media (min-width: 992px) {
+            .Bot-letters-container {
+                padding: 2rem;
+                max-width: 1200px;
+            }
+
+            .Bot-letters-title {
+                font-size: 2rem;
+            }
+
+            .Bot-letters-list {
+                padding: 2rem;
+            }
+
+            .Bot-letter-item {
+                padding: 1.5rem;
+            }
+
+            .Bot-letter-icon {
+                width: 60px;
+                height: 60px;
+                margin-right: 1.25rem;
+                font-size: 1.375rem;
+            }
+
+            .Bot-letter-name {
+                font-size: 1.2rem;
+            }
+
+            .Bot-letter-details {
+                font-size: 0.925rem;
+            }
+
+            .Bot-letter-actions {
+                gap: 0.75rem;
+            }
+
+            .Bot-letter-action {
+                width: 48px;
+                height: 48px;
+            }
+        }
+
+        /* Extra Large Screens (≥1200px) */
+        @media (min-width: 1200px) {
+            .Bot-letters-container {
+                padding: 2.5rem;
+                max-width: 1400px;
+            }
+
+            .Bot-letters-title {
+                font-size: 2.25rem;
+            }
+
+            .Bot-letters-description {
+                font-size: 1.125rem;
+            }
+
+            .Bot-letters-list {
+                padding: 2.5rem;
+            }
+
+            .Bot-letter-item {
+                padding: 1.75rem;
+            }
+        }
+
+        /* Touch and Mobile Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .Bot-letter-item:hover {
+                transform: none;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                border-color: var(--gray-200);
+            }
+
+            .Bot-letter-item:hover::before {
+                opacity: 0;
+            }
+
+            .Bot-letter-action:hover {
+                transform: none;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .Bot-letter-action:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+
+            .Bot-btn:hover {
+                transform: none;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .Bot-btn:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+        }
+
+        /* Landscape Mobile Adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .Bot-letters-container {
+                padding: 0.75rem;
+                min-height: 300px;
+            }
+
+            .Bot-letters-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-letters-description {
+                font-size: 0.85rem;
+                margin-bottom: 1rem;
+            }
+
+            .Bot-letters-list {
+                padding: 0.75rem;
+            }
+
+            .Bot-letter-item {
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .Bot-letter-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .Bot-loading-state,
+            .Bot-error-state,
+            .Bot-empty-state {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .Bot-letter-item,
+            .Bot-letter-action,
+            .Bot-btn {
+                backface-visibility: hidden;
+                -webkit-font-smoothing: antialiased;
+            }
+        }
+
+        /* Reduced Motion Preference */
+        @media (prefers-reduced-motion: reduce) {
+
+            .Bot-letter-item,
+            .Bot-letter-action,
+            .Bot-btn,
+            .Bot-loading-spinner {
+                transition: none;
+                animation: none;
+            }
+
+            .Bot-letter-item:hover,
+            .Bot-letter-action:hover,
+            .Bot-letter-action:active,
+            .Bot-btn:hover,
+            .Bot-btn:active {
+                transform: none;
+            }
+        }
+
+        /* Dark Mode Support 
+        @media (prefers-color-scheme: dark) {
+            .Bot-letters-container {
+                background: #1a1a1a;
+            }
+
+            .Bot-letters-list {
+                background: #2d2d2d;
+                border-color: #404040;
+            }
+
+            .Bot-letter-item {
+                background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+                border-color: #404040;
+            }
+
+            .Bot-letter-item:hover {
+                border-color: var(--primary);
+            }
+
+            .Bot-letter-name {
+                color: #ffffff;
+            }
+
+            .Bot-letter-details {
+                color: #cccccc;
+            }
+
+            .Bot-letter-date {
+                color: #999999;
+            }
+
+            .Bot-letter-action {
+                background: #404040;
+                border-color: #555555;
+                color: #cccccc;
+            }
+
+            .Bot-loading-state,
+            .Bot-error-state,
+            .Bot-empty-state {
+                background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+                border-color: #404040;
+            }
+
+            .Bot-loading-text,
+            .Bot-error-text,
+            .Bot-empty-text {
+                color: #cccccc;
+            }
+
+            .Bot-error-title,
+            .Bot-empty-title {
+                color: #ffffff;
+            }
+
+            .Bot-btn {
+                background: linear-gradient(135deg, #404040 0%, #2d2d2d 100%);
+                border-color: #555555;
+                color: #cccccc;
+            }
+
+            .Bot-btn:hover {
+                background: linear-gradient(135deg, #555555 0%, #404040 100%);
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+        }*/
+
+        /* Print Styles */
+        @media print {
+            .Bot-letters-container {
+                background: white;
+                box-shadow: none;
+                padding: 1rem;
+            }
+
+            .Bot-letters-list {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .Bot-letter-item {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                background: white;
+                page-break-inside: avoid;
+            }
+
+            .Bot-letter-item:hover {
+                transform: none;
+                box-shadow: none;
+                border-color: #ccc;
+            }
+
+            .Bot-letter-item::before {
+                display: none;
+            }
+
+            .Bot-letter-actions {
+                display: none;
+            }
+
+            .Bot-loading-state,
+            .Bot-error-state,
+            .Bot-empty-state {
+                background: white;
+                border: 1px solid #ccc;
+            }
+
+            .Bot-btn {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -361,7 +1060,7 @@
                     if (currentUser.id) queryParams.append('userId', currentUser.id);
                     if (currentUser.email) queryParams.append('userEmail', currentUser.email);
 
-                    const response = await fetch(`http://localhost:3000/api/chat/user-letters?${queryParams.toString()}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/chat/user-letters?${queryParams.toString()}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
@@ -655,7 +1354,7 @@
                         }
 
                         // Create download URL pointing to our backend proxy
-                        const downloadUrl = `http://localhost:3000/api/chat/download-letter/${letter.id}`;
+                        const downloadUrl = `https://jam-capital-backend.azurewebsites.net/api/chat/download-letter/${letter.id}`;
 
                         // Use fetch with proper authentication
                         const response = await fetch(downloadUrl, {

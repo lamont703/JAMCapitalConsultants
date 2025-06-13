@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Subscription Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 20px 0;
+        }
+
+        .test-btn {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .test-btn:hover {
+            background: #08b5e0;
+        }
+
+        #subscription-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>Enhanced Subscription Manager Test</h1>
+        <p>This page tests the new upgrade and cancellation functionality.</p>
+
+        <div class="test-buttons">
+            <button class="test-btn" onclick="loadSubscriptionManager()">Load Subscription Manager</button>
+            <button class="test-btn" onclick="simulateFreeTier()">Simulate Free Tier User</button>
+            <button class="test-btn" onclick="simulatePaidTier()">Simulate Paid Tier User</button>
+            <button class="test-btn" onclick="testUpgradeFlow()">Test Upgrade Flow</button>
+            <button class="test-btn" onclick="testCancelFlow()">Test Cancel Flow</button>
+            <button class="test-btn" onclick="showDiagnostics()">Show Diagnostics</button>
+        </div>
+
+        <div id="subscription-container">
+            <!-- Subscription Manager will load here -->
+        </div>
+
+        <div id="test-output"
+            style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none;">
+            <h3>Test Output:</h3>
+            <pre id="output-content"></pre>
+        </div>
+    </div>
+
+    <!-- Load the subscription manager -->
+    <script src="Portal/Header/SubscriptionManager.html"></script>
+
+    <script>
+        // Test functions
+        function loadSubscriptionManager() {
+            console.log('Loading subscription manager...');
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.init('subscription-container');
+                showOutput('Subscription manager loaded successfully');
+            } else {
+                showOutput('Error: jamSubscriptionManager not found');
+            }
+        }
+
+        function simulateFreeTier() {
+            // Simulate a free tier user
+            localStorage.setItem('userData', JSON.stringify({
+                email: 'test@example.com',
+                name: 'Test User',
+                id: 'test123'
+            }));
+            localStorage.setItem('authToken', 'test_token_123');
+
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.forceCreateFreeTier();
+                showOutput('Free tier user simulated');
+            } else {
+                showOutput('Error: jamSubscriptionManager not found');
+            }
+        }
+
+        function simulatePaidTier() {
+            // Simulate a paid tier user with mock data
+            localStorage.setItem('userData', JSON.stringify({
+                email: 'premium@example.com',
+                name: 'Premium User',
+                id: 'premium123'
+            }));
+            localStorage.setItem('authToken', 'premium_token_123');
+
+            // Create mock subscription data
+            const mockSubscription = {
+                tier: 'professional',
+                isActive: true,
+                tierConfig: {
+                    name: 'Professional Plan',
+                    price: 49,
+                    monthlyCredits: 15,
+                    features: [
+                        'Professional Credit Analysis',
+                        '15 Monthly Dispute Letters',
+                        'Priority Email Support',
+                        'Advanced Strategies'
+                    ]
+                },
+                remainingCredits: 12,
+                subscriptionEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                daysUntilExpiration: 30
+            };
+
+            sessionStorage.setItem('fallbackSubscription', JSON.stringify(mockSubscription));
+            showOutput('Paid tier user simulated');
+
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.refresh();
+            }
+        }
+
+        function testUpgradeFlow() {
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.upgradeSubscription();
+                showOutput('Upgrade flow triggered');
+            } else {
+                showOutput('Error: jamSubscriptionManager not found');
+            }
+        }
+
+        function testCancelFlow() {
+            if (window.jamSubscriptionManager) {
+                window.jamSubscriptionManager.cancelSubscription();
+                showOutput('Cancel flow triggered');
+            } else {
+                showOutput('Error: jamSubscriptionManager not found');
+            }
+        }
+
+        function showDiagnostics() {
+            if (window.jamSubscriptionManager && window.jamSubscriptionManager.diagnoseSubscription) {
+                window.jamSubscriptionManager.diagnoseSubscription().then(diagnosis => {
+                    showOutput(JSON.stringify(diagnosis, null, 2));
+                });
+            } else {
+                showOutput('Error: Diagnostics not available');
+            }
+        }
+
+        function showOutput(content) {
+            document.getElementById('test-output').style.display = 'block';
+            document.getElementById('output-content').textContent = content;
+        }
+
+        // Auto-load when page loads
+        window.addEventListener('load', function () {
+            setTimeout(() => {
+                loadSubscriptionManager();
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

@@ -14,33 +14,32 @@ export class GHLTokenService {
 
     async getValidAccessToken() {
         try {
-            // Check if current token is still valid
-            if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
-                return this.accessToken;
+            // First, try to load saved tokens
+            const savedTokens = await this.oauth.loadSavedTokens();
+            
+            // Check if saved tokens exist and are still valid
+            if (savedTokens && !this.oauth.isTokenExpired(savedTokens)) {
+                console.log('✅ Using valid saved GHL access token');
+                return savedTokens.access_token;
             }
 
-            // Try to refresh the token
-            console.log('🔄 Refreshing GHL access token...');
-            const tokenData = await this.oauth.refreshAccessToken();
-            
-            this.accessToken = tokenData.access_token;
-            this.tokenExpiry = Date.now() + (tokenData.expires_in * 1000);
-            
-            console.log('✅ GHL access token refreshed successfully');
-            return this.accessToken;
+            // Only refresh if tokens are expired or don't exist
+            if (savedTokens && savedTokens.refresh_token) {
+                console.log('🔄 Refreshing expired GHL access token...');
+                const tokenData = await this.oauth.refreshAccessToken();
+                console.log('✅ GHL access token refreshed successfully');
+                return tokenData.access_token;
+            } else {
+                throw new Error('No valid tokens found - authentication required');
+            }
             
         } catch (error) {
             // Handle token refresh errors gracefully
             if (error.response?.status === 400 && error.response?.data?.error === 'invalid_grant') {
-                console.log('⚠️  GHL refresh token has expired. Please re-authenticate.');
-                console.log('   → Go to your GHL OAuth settings to generate new tokens');
+                console.log('❌ GHL token refresh failed: Refresh token expired - re-authentication required');
             } else {
                 console.log(`❌ GHL token refresh failed: ${error.message}`);
             }
-            
-            // Clear invalid tokens
-            this.accessToken = null;
-            this.tokenExpiry = null;
             
             throw new Error('GHL authentication required');
         }

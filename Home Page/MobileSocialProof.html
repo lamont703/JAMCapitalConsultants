@@ -1,0 +1,1165 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+
+<style>
+    .social-testimonials-section {
+        padding: 4rem 2rem;
+        background: #f8f9fa;
+        text-align: center;
+    }
+
+    .social-section-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 3rem;
+    }
+
+    .social-testimonial-container {
+        display: flex;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding: 1rem 0;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+
+        /* Add these properties for the 3D effect */
+        box-shadow:
+            inset 15px 0 15px -10px rgba(0, 0, 0, 0.15),
+            inset -15px 0 15px -10px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(to right,
+                rgba(248, 249, 250, 0.9) 0%,
+                rgba(248, 249, 250, 0.5) 5%,
+                rgba(248, 249, 250, 0) 20%,
+                rgba(248, 249, 250, 0) 80%,
+                rgba(248, 249, 250, 0.5) 95%,
+                rgba(248, 249, 250, 0.9) 100%);
+    }
+
+    .social-testimonial-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .social-testimonial-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Add pseudo-elements for enhanced 3D effect */
+    .social-testimonial-container::before,
+    .social-testimonial-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 60px;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .social-testimonial-container::before {
+        left: 0;
+        background: linear-gradient(to right,
+                rgba(248, 249, 250, 0.95) 0%,
+                rgba(248, 249, 250, 0.7) 50%,
+                rgba(248, 249, 250, 0) 100%);
+        box-shadow: 10px 0 10px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-testimonial-container::after {
+        right: 0;
+        background: linear-gradient(to left,
+                rgba(248, 249, 250, 0.95) 0%,
+                rgba(248, 249, 250, 0.7) 50%,
+                rgba(248, 249, 250, 0) 100%);
+        box-shadow: -10px 0 10px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-testimonial-wrapper {
+        display: flex;
+        gap: 2rem;
+        transition: transform 0.5s ease;
+        padding: 0.5rem 0;
+        will-change: transform;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .social-testimonial-card {
+        flex: 0 0 auto;
+        width: 300px;
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .social-testimonial-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        z-index: 2;
+    }
+
+    .social-stars {
+        color: #09ccfc;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .social-quote {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+
+    .social-author {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .social-stat {
+        margin-top: 0.5rem;
+        color: #09ccfc;
+        font-weight: 500;
+    }
+
+    .social-trust-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 4rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-metric {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .social-metric i {
+        color: #09ccfc;
+        font-size: 1.5rem;
+    }
+
+    .social-cta-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 3rem;
+        text-align: center;
+    }
+
+    .social-cta-section h3 {
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        color: #333;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .quiz-button-container-social {
+        margin-top: 0px;
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    .credit-quiz-btn {
+        background-color: #09ccfc;
+        color: #FFFFFF;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        border: none;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    .credit-quiz-btn:hover {
+        background-color: #08b6e2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(9, 204, 252, 0.2);
+    }
+
+    /* Scroll navigation buttons */
+    .social-scroll-controls {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .social-scroll-btn {
+        background-color: #f5f5f5;
+        border: none;
+        color: #333;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-scroll-btn:hover {
+        background-color: #09ccfc;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .social-testimonial-card {
+            width: 260px;
+            padding: 1.5rem;
+        }
+
+        .social-section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-quote {
+            font-size: 1rem;
+        }
+
+        .social-trust-metrics {
+            grid-template-columns: 1fr;
+            text-align: left;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .social-metric {
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+        }
+
+        .social-metric i {
+            font-size: 1.2rem;
+            min-width: 24px;
+        }
+
+        .social-cta-section h3 {
+            font-size: 1.5rem;
+        }
+
+        .credit-quiz-btn {
+            padding: 0.8rem 1.8rem;
+            font-size: 1rem;
+        }
+
+        .social-testimonial-container {
+            padding: 1rem 1.5rem;
+        }
+
+        .social-testimonial-container::before,
+        .social-testimonial-container::after {
+            width: 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .social-section-title {
+            font-size: 1.5rem;
+        }
+
+        .social-testimonial-card {
+            width: 240px;
+            padding: 1.25rem;
+        }
+
+        .social-stars {
+            font-size: 1.2rem;
+        }
+
+        .social-metric {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .social-metric i {
+            margin-bottom: 0.25rem;
+        }
+
+        .social-testimonial-container {
+            padding: 1rem;
+        }
+
+        .social-testimonial-container::before,
+        .social-testimonial-container::after {
+            width: 30px;
+        }
+    }
+
+    @media (hover: none) {
+        .social-testimonial-card {
+            transform: none !important;
+        }
+
+        .credit-quiz-btn {
+            padding: 1rem 2rem;
+        }
+
+        .credit-quiz-btn:active {
+            background: #09ccfc;
+            transform: scale(0.98);
+        }
+    }
+
+    /* Modal Styles */
+    .social-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .social-modal-content {
+        background-color: #fff;
+        margin: 0;
+        padding: 15px;
+        width: 92%;
+        max-width: 750px;
+        border-radius: 8px;
+        position: relative;
+        height: 92vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .social-close-modal {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        font-size: 24px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 5px 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .social-close-modal:hover {
+        color: #333;
+    }
+
+    #social_aI0peBKAcSgXeFySGo0P_1746244862558 {
+        flex: 1;
+        width: 100% !important;
+        height: 150vh !important;
+        border: none;
+        margin: 0;
+        padding: 0;
+        transform: scale(0.98);
+        transform-origin: center center;
+    }
+
+    @media (max-width: 768px) {
+        .social-modal-content {
+            width: 100%;
+            height: 100vh;
+            border-radius: 0;
+            padding: 12px;
+            margin: 0;
+            overflow-y: auto;
+        }
+
+        #social_aI0peBKAcSgXeFySGo0P_1746244862558 {
+            transform: scale(0.96);
+            height: 200vh !important;
+            min-height: 1200px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .social-modal-content {
+            padding: 8px;
+        }
+
+        .social-close-modal {
+            right: 10px;
+            top: 10px;
+        }
+
+        #social_aI0peBKAcSgXeFySGo0P_1746244862558 {
+            transform: scale(0.94);
+        }
+    }
+
+    /* ENHANCED MOBILE RESPONSIVENESS */
+
+    /* Extra Small Devices (phones, up to 575px) */
+    @media (max-width: 575.98px) {
+        .social-testimonials-section {
+            padding: 2rem 1rem;
+        }
+
+        .social-section-title {
+            font-size: 1.6rem;
+            margin-bottom: 2rem;
+            line-height: 1.3;
+            padding: 0 0.5rem;
+        }
+
+        .social-testimonial-container {
+            padding: 1rem;
+            margin: 0 -1rem;
+            box-shadow: none;
+            background: transparent;
+            border-radius: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+        }
+
+        .social-testimonial-container::before,
+        .social-testimonial-container::after {
+            display: none;
+        }
+
+        .social-testimonial-card {
+            width: 260px;
+            padding: 1.5rem;
+            border-radius: 12px;
+            scroll-snap-align: center;
+            touch-action: manipulation;
+            transition: all 0.2s ease;
+        }
+
+        .social-testimonial-card:active {
+            transform: scale(0.98);
+            background: #f8fcff;
+        }
+
+        .social-testimonial-card:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-stars {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .social-quote {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+        }
+
+        .social-author {
+            font-size: 0.95rem;
+        }
+
+        .social-stat {
+            margin-top: 0.375rem;
+            font-size: 0.9rem;
+        }
+
+        .social-scroll-controls {
+            display: none;
+        }
+
+        .social-trust-metrics {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin: 2.5rem auto;
+            padding: 1.5rem 1rem;
+            border-radius: 12px;
+        }
+
+        .social-metric {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .social-metric i {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .social-cta-section {
+            margin-top: 2rem;
+            padding: 0 1rem;
+        }
+
+        .social-cta-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.3;
+        }
+
+        .quiz-button-container-social {
+            max-width: 100%;
+            padding: 0;
+            margin-top: 0.5rem;
+        }
+
+        .credit-quiz-btn {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .credit-quiz-btn:active {
+            transform: scale(0.98);
+        }
+    }
+
+    /* Small Devices (landscape phones, 576px and up) */
+    @media (min-width: 576px) and (max-width: 767.98px) {
+        .social-testimonials-section {
+            padding: 2.5rem 1.25rem;
+        }
+
+        .social-section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2.25rem;
+        }
+
+        .social-testimonial-container {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .social-testimonial-card {
+            width: 280px;
+            padding: 1.75rem;
+        }
+
+        .social-trust-metrics {
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+            margin: 3rem auto;
+            padding: 1.75rem 1.25rem;
+        }
+
+        .social-metric {
+            flex-direction: row;
+            text-align: left;
+            gap: 1rem;
+            padding: 1.25rem;
+        }
+
+        .social-cta-section h3 {
+            font-size: 1.6rem;
+        }
+
+        .quiz-button-container-social {
+            max-width: 350px;
+        }
+    }
+
+    /* Medium Devices (tablets, 768px and up) */
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .social-testimonials-section {
+            padding: 3rem 1.5rem;
+        }
+
+        .social-section-title {
+            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .social-testimonial-container {
+            padding: 1.5rem 2rem;
+        }
+
+        .social-testimonial-card {
+            width: 320px;
+            padding: 2rem;
+        }
+
+        .social-trust-metrics {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 3.5rem auto;
+        }
+
+        .social-metric {
+            flex-direction: row;
+            text-align: left;
+            gap: 1rem;
+        }
+
+        .social-cta-section h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    /* Large Devices (desktops, 992px and up) */
+    @media (min-width: 992px) {
+        .social-testimonials-section {
+            padding: 4rem 2rem;
+        }
+
+        .social-testimonial-card {
+            width: 300px;
+        }
+
+        .social-trust-metrics {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 4rem auto;
+            padding: 2rem;
+        }
+    }
+
+    /* Extra Large Devices (large desktops, 1200px and up) */
+    @media (min-width: 1200px) {
+        .social-testimonials-section {
+            padding: 5rem 2rem;
+        }
+
+        .social-section-title {
+            font-size: 2.8rem;
+        }
+
+        .social-testimonial-card {
+            width: 320px;
+            padding: 2.5rem;
+        }
+
+        .social-trust-metrics {
+            max-width: 1400px;
+            gap: 2.5rem;
+        }
+    }
+
+    /* Landscape Orientation Adjustments */
+    @media (max-width: 767.98px) and (orientation: landscape) {
+        .social-testimonials-section {
+            padding: 1.5rem 1rem;
+        }
+
+        .social-section-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-testimonial-container {
+            padding: 0.75rem;
+        }
+
+        .social-testimonial-card {
+            width: 240px;
+            padding: 1.25rem;
+        }
+
+        .social-quote {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .social-trust-metrics {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .social-metric {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            padding: 0.75rem;
+        }
+
+        .social-metric i {
+            font-size: 1.2rem;
+        }
+
+        .social-cta-section {
+            margin-top: 1.5rem;
+        }
+
+        .social-cta-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .credit-quiz-btn {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .social-testimonial-card:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .credit-quiz-btn:hover {
+            background-color: #09ccfc;
+            transform: none;
+        }
+
+        .social-testimonial-card,
+        .credit-quiz-btn,
+        .social-scroll-btn {
+            -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+        }
+
+        /* Prevent text selection on touch devices */
+        .social-stars {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Enhanced mobile scroll performance */
+        .social-testimonial-container {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        .social-testimonial-wrapper {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: transform;
+        }
+
+        .social-testimonial-card {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: auto;
+        }
+    }
+
+    /* High DPI Displays */
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+        .social-testimonial-card {
+            will-change: transform;
+        }
+
+        .social-trust-metrics {
+            will-change: auto;
+        }
+    }
+
+    /* iOS Safari specific adjustments */
+    @supports (-webkit-touch-callout: none) {
+        .social-testimonial-container {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .social-testimonial-container::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+
+        .social-testimonial-card,
+        .social-testimonial-wrapper,
+        .credit-quiz-btn {
+            transition: none;
+        }
+
+        .social-testimonial-card:hover,
+        .social-testimonial-card:active {
+            transform: none;
+        }
+
+        .credit-quiz-btn:active {
+            transform: none;
+        }
+
+        /* Disable auto-scroll animation */
+        .social-testimonial-wrapper {
+            animation: none;
+        }
+    }
+
+
+
+    /* Print Styles */
+    @media print {
+        .social-testimonials-section {
+            padding: 1rem 0;
+            background: white;
+        }
+
+        .social-testimonial-container {
+            display: block;
+            overflow: visible;
+            box-shadow: none;
+            background: none;
+        }
+
+        .social-testimonial-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .social-testimonial-card {
+            width: auto;
+            box-shadow: none;
+            border: 1px solid #000;
+            page-break-inside: avoid;
+        }
+
+        .social-scroll-controls,
+        .quiz-button-container-social {
+            display: none;
+        }
+
+        .social-trust-metrics {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        .social-metric {
+            background: none;
+        }
+    }
+</style>
+
+<section class="social-testimonials-section">
+    <h2 class="social-section-title">Real People. Real Credit Wins.</h2>
+
+    <div class="social-testimonial-container">
+        <!-- Testimonial Card 1 -->
+        <div class="social-testimonial-card" data-aos="fade-up">
+            <div class="social-stars">★★★★★</div>
+            <p class="social-quote">"I tried doing it myself, but JAM made the process stress-free. My score jumped 112
+                points
+                in just 3 months."</p>
+            <div class="social-author">— Marcus D.</div>
+            <div class="social-stat">+112 points in 90 days</div>
+        </div>
+
+        <!-- Testimonial Card 2 -->
+        <div class="social-testimonial-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="social-stars">★★★★★</div>
+            <p class="social-quote">"Their AI credit quiz helped me finally understand what was hurting my score.
+                Booking that
+                strategy call was the best move I made."</p>
+            <div class="social-author">— A. Johnson</div>
+            <div class="social-stat">4 deletions in 45 days</div>
+        </div>
+
+        <!-- Testimonial Card 3 -->
+        <div class="social-testimonial-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="social-stars">★★★★★</div>
+            <p class="social-quote">"I was skeptical… but round after round, they delivered results. Highly recommend."
+            </p>
+            <div class="social-author">— Simone L.</div>
+            <div class="social-stat">Score increased by 85 points</div>
+        </div>
+
+        <!-- NEW Testimonial Card 4 -->
+        <div class="social-testimonial-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="social-stars">★★★★★</div>
+            <p class="social-quote">"After years of struggling with my credit, JAM ENGINE helped me qualify for my first
+                mortgage. Life-changing!"</p>
+            <div class="social-author">— David R.</div>
+            <div class="social-stat">+95 points in 60 days</div>
+        </div>
+
+        <!-- NEW Testimonial Card 5 -->
+        <div class="social-testimonial-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="social-stars">★★★★★</div>
+            <p class="social-quote">"The personalized plan they created for me was exactly what I needed. No more
+                guesswork or wasted time."</p>
+            <div class="social-author">— Jennifer K.</div>
+            <div class="social-stat">7 negative items removed</div>
+        </div>
+
+        <!-- NEW Testimonial Card 6 -->
+        <div class="social-testimonial-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="social-stars">★★★★★</div>
+            <p class="social-quote">"From 580 to 720 in 5 months! I never thought it was possible until I started
+                working with JAM."</p>
+            <div class="social-author">— Michael T.</div>
+            <div class="social-stat">+140 points in 5 months</div>
+        </div>
+    </div>
+
+    <!-- Add scroll navigation buttons right after the testimonial container -->
+    <div class="social-scroll-controls">
+        <button class="social-scroll-btn" id="scrollLeft">←</button>
+        <button class="social-scroll-btn" id="scrollRight">→</button>
+    </div>
+
+    <div class="social-trust-metrics">
+        <div class="social-metric">
+            <i class="fas fa-chart-line"></i>
+            <span>87% of clients see score improvement in 60 days</span>
+        </div>
+        <div class="social-metric">
+            <i class="fas fa-dollar-sign"></i>
+            <span>Over $250,000 in debt removed across our client base</span>
+        </div>
+        <div class="social-metric">
+            <i class="fas fa-check-circle"></i>
+            <span>Registered and operating in Texas under all compliance regulations</span>
+        </div>
+    </div>
+
+    <div class="social-cta-section">
+        <h3>Ready to be our next success story?</h3>
+        <div class="quiz-button-container-social">
+            <!-- Main Button 
+            <button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
+                Start JAM Engine
+            </button>-->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://link.msgsndr.com/js/form_embed.js"></script>
+    <script>
+        // Testimonial infinite carousel functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.querySelector('.social-testimonial-container');
+            const scrollLeftBtn = document.getElementById('scrollLeft');
+            const scrollRightBtn = document.getElementById('scrollRight');
+
+            // First, wrap all cards in a wrapper div for easier manipulation
+            const cards = Array.from(container.querySelectorAll('.social-testimonial-card'));
+            const wrapper = document.createElement('div');
+            wrapper.className = 'social-testimonial-wrapper';
+
+            // Remove all cards from container and add them to wrapper
+            cards.forEach(card => {
+                container.removeChild(card);
+                wrapper.appendChild(card);
+            });
+
+            // Add wrapper to container
+            container.appendChild(wrapper);
+
+            // Clone cards for infinite effect
+            cards.forEach(card => {
+                const clone = card.cloneNode(true);
+                wrapper.appendChild(clone);
+            });
+
+            // Set initial position
+            let position = 0;
+            let cardWidth = cards[0].offsetWidth + 32; // Card width + gap
+            let animationId = null;
+            let isScrolling = false;
+
+            // Function to update carousel position
+            function updateCarouselPosition() {
+                wrapper.style.transform = `translate3d(${-position}px, 0, 0)`;
+            }
+
+            // Function to handle infinite scroll effect
+            function handleInfiniteScroll() {
+                const totalOriginalWidth = cardWidth * cards.length;
+
+                // If we've scrolled past all original cards, reset to beginning
+                if (position >= totalOriginalWidth) {
+                    // Jump back to start without animation
+                    position = 0;
+                    wrapper.style.transition = 'none';
+                    updateCarouselPosition();
+
+                    // Force reflow
+                    wrapper.offsetHeight;
+
+                    // Restore transition
+                    wrapper.style.transition = 'transform 0.5s ease';
+                }
+
+                // If we've scrolled backwards past the beginning
+                if (position < 0) {
+                    position = totalOriginalWidth;
+                    wrapper.style.transition = 'none';
+                    updateCarouselPosition();
+
+                    // Force reflow
+                    wrapper.offsetHeight;
+
+                    // Restore transition
+                    wrapper.style.transition = 'transform 0.5s ease';
+                }
+            }
+
+            // Auto scroll animation with RAF for smoother performance
+            function startAutoScroll() {
+                if (animationId) return; // Prevent multiple intervals
+
+                let lastTime = 0;
+                // Adjust scroll speed based on device type - much slower for comfortable reading
+                const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+                const scrollSpeed = isMobile ? 0.08 : 0.12; // Much slower for casual reading
+
+                function animate(currentTime) {
+                    if (currentTime - lastTime >= 16) { // ~60fps
+                        position += scrollSpeed * (currentTime - lastTime);
+                        updateCarouselPosition();
+                        handleInfiniteScroll();
+                        lastTime = currentTime;
+                    }
+                    animationId = requestAnimationFrame(animate);
+                }
+
+                animationId = requestAnimationFrame(animate);
+            }
+
+            function stopAutoScroll() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+
+            // Scroll left button
+            if (scrollLeftBtn) {
+                scrollLeftBtn.addEventListener('click', function () {
+                    stopAutoScroll();
+                    position -= cardWidth;
+                    wrapper.style.transition = 'transform 0.5s ease';
+                    updateCarouselPosition();
+                    handleInfiniteScroll();
+                    setTimeout(startAutoScroll, 5000);
+                });
+            }
+
+            // Scroll right button
+            if (scrollRightBtn) {
+                scrollRightBtn.addEventListener('click', function () {
+                    stopAutoScroll();
+                    position += cardWidth;
+                    wrapper.style.transition = 'transform 0.5s ease';
+                    updateCarouselPosition();
+                    handleInfiniteScroll();
+                    setTimeout(startAutoScroll, 5000);
+                });
+            }
+
+            // Enhanced touch events for mobile swipe with momentum
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartTime = 0;
+            let lastTouchX = 0;
+            let velocity = 0;
+            let isDragging = false;
+
+            container.addEventListener('touchstart', function (e) {
+                touchStartX = e.changedTouches[0].screenX;
+                lastTouchX = touchStartX;
+                touchStartTime = Date.now();
+                velocity = 0;
+                isDragging = true;
+                stopAutoScroll();
+                wrapper.style.transition = 'none';
+            }, { passive: true });
+
+            container.addEventListener('touchmove', function (e) {
+                if (!isDragging) return;
+
+                const currentX = e.changedTouches[0].screenX;
+                const diff = lastTouchX - currentX;
+                const timeDiff = Date.now() - touchStartTime;
+
+                // Calculate velocity for momentum
+                velocity = diff / Math.max(timeDiff, 1);
+
+                position += diff * 0.8; // Smoother movement with damping
+                lastTouchX = currentX;
+                updateCarouselPosition();
+            }, { passive: true });
+
+            container.addEventListener('touchend', function (e) {
+                if (!isDragging) return;
+
+                isDragging = false;
+                touchEndX = e.changedTouches[0].screenX;
+
+                // Add momentum based on swipe velocity
+                const momentum = velocity * 100;
+                position += momentum;
+
+                wrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+                // Snap to nearest card
+                position = Math.round(position / cardWidth) * cardWidth;
+                updateCarouselPosition();
+                handleInfiniteScroll();
+
+                setTimeout(startAutoScroll, 3000);
+            }, { passive: true });
+
+            // Pause auto-scroll when user interacts with the container
+            container.addEventListener('mouseenter', stopAutoScroll);
+            container.addEventListener('mouseleave', startAutoScroll);
+
+            // Ensure auto-scroll stops when page is not visible
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAutoScroll();
+                } else {
+                    startAutoScroll();
+                }
+            });
+
+            // Initialize carousel
+            window.addEventListener('resize', () => {
+                cardWidth = cards[0].offsetWidth + 32; // Update card width on resize
+            });
+
+            // Start auto-scroll after a delay
+            setTimeout(startAutoScroll, 2000);
+        });
+    </script>
+</section>

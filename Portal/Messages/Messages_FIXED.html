@@ -444,7 +444,7 @@
 
                     console.log('🔍 Making API request for user:', userId);
 
-                    const response = await fetch(`http://localhost:3000/api/admin/get-user-notifications/${userId}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/admin/get-user-notifications/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -760,7 +760,7 @@
                         return [];
                     }
 
-                    const response = await fetch(`http://localhost:3000/api/user/dispute-reports/${userId}`, {
+                    const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/user/dispute-reports/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,

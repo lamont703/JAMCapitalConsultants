@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Calendar - JAM Credit Solutions</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,16 +11,26 @@
     <style>
         :root {
             --primary: #09ccfc;
-            --primary-dark: #09ccfc;
-            --primary-light: #e6f7f7;
+            --primary-dark: #08b6e2;
+            --primary-light: #e6f9ff;
             --success: #28a745;
             --warning: #ffc107;
             --danger: #dc3545;
             --gray-100: #f8f9fa;
             --gray-200: #e9ecef;
             --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
             --gray-600: #6c757d;
+            --gray-700: #495057;
             --gray-800: #343a40;
+            --gray-900: #212529;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
         }
 
         * {
@@ -35,45 +45,57 @@
             color: var(--gray-800);
             line-height: 1.6;
             padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Calendar Widget Styles */
         .calendar-container {
-            padding: 1rem;
-            max-width: 800px;
+            padding: 1.5rem;
+            max-width: 900px;
             margin: 0 auto;
             position: relative;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
         .calendar-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--gray-200);
+            gap: 1rem;
+        }
+
+        .calendar-header-content {
+            flex: 1;
+            min-width: 0;
+            /* Allows text to wrap properly */
         }
 
         .calendar-title {
             font-size: 1.5rem;
             font-weight: 600;
             color: var(--primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
         }
 
         .calendar-subtitle {
             font-size: 1rem;
             color: var(--gray-600);
-            margin-top: 0.5rem;
+            line-height: 1.4;
         }
 
         .calendar-back-button {
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
             background: var(--gray-200);
             border: none;
-            border-radius: 4px;
+            border-radius: var(--border-radius-sm);
             cursor: pointer;
             font-weight: 500;
             color: var(--gray-800);
@@ -81,39 +103,394 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.9rem;
+            min-height: 44px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .calendar-back-button:hover {
             background: var(--gray-300);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .calendar-back-button:active {
+            transform: translateY(0);
+            background: var(--gray-400);
         }
 
         .calendar-iframe {
             min-height: 700px;
             width: 100%;
             border: none;
-            overflow: hidden;
+            border-radius: var(--border-radius-sm);
+            background: var(--white);
+            box-shadow: inset 0 0 0 1px var(--gray-200);
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .calendar-container {
+        .calendar-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: var(--gray-600);
+            font-size: 1rem;
+        }
+
+        .calendar-loading i {
+            margin-right: 0.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* COMPREHENSIVE MOBILE RESPONSIVENESS */
+
+        /* Extra Small Devices (phones, up to 575px) */
+        @media (max-width: 575.98px) {
+            body {
                 padding: 0.75rem;
+                font-size: 14px;
+            }
+
+            .calendar-container {
+                padding: 1rem;
                 margin: 0;
-                border-radius: 8px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-lg);
+                min-height: calc(100vh - 1.5rem);
             }
 
             .calendar-header {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
                 gap: 1rem;
+                margin-bottom: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .calendar-header-content {
+                text-align: center;
+            }
+
+            .calendar-title {
+                font-size: 1.3rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.2;
+            }
+
+            .calendar-subtitle {
+                font-size: 0.9rem;
+                line-height: 1.4;
+                color: var(--gray-600);
             }
 
             .calendar-back-button {
                 align-self: flex-start;
+                padding: 0.875rem 1.25rem;
+                font-size: 0.9rem;
+                border-radius: 12px;
+                min-height: 48px;
+                font-weight: 600;
+                background: var(--primary-light);
+                color: var(--primary);
+                border: 1px solid rgba(9, 204, 252, 0.2);
+            }
+
+            .calendar-back-button:hover,
+            .calendar-back-button:active {
+                background: var(--primary);
+                color: var(--white);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
+            }
+
+            .calendar-back-button i {
+                font-size: 1rem;
             }
 
             .calendar-iframe {
-                min-height: 600px;
+                min-height: calc(100vh - 200px);
+                border-radius: 12px;
+                box-shadow: var(--shadow);
+            }
+
+            .calendar-loading {
+                min-height: 300px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            body {
+                padding: 1rem;
+            }
+
+            .calendar-container {
+                padding: 1.25rem;
+                margin: 0;
+                border-radius: var(--border-radius);
+            }
+
+            .calendar-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .calendar-header-content {
+                text-align: center;
+            }
+
+            .calendar-title {
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .calendar-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .calendar-back-button {
+                align-self: flex-start;
+                padding: 0.875rem 1.25rem;
+                min-height: 48px;
+                border-radius: 10px;
+            }
+
+            .calendar-iframe {
+                min-height: 650px;
+                border-radius: 10px;
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            body {
+                padding: 1.25rem;
+            }
+
+            .calendar-container {
+                padding: 1.5rem;
+                margin: 0 auto;
+                max-width: 750px;
+            }
+
+            .calendar-header {
+                margin-bottom: 1.5rem;
+                align-items: center;
+            }
+
+            .calendar-header-content {
+                text-align: left;
+            }
+
+            .calendar-title {
+                font-size: 1.5rem;
+            }
+
+            .calendar-subtitle {
+                font-size: 1rem;
+            }
+
+            .calendar-back-button {
+                padding: 0.75rem 1.25rem;
+                min-height: 46px;
+            }
+
+            .calendar-iframe {
+                min-height: 680px;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            .calendar-container {
+                padding: 2rem;
+                max-width: 900px;
+            }
+
+            .calendar-header {
+                margin-bottom: 2rem;
+            }
+
+            .calendar-title {
+                font-size: 1.6rem;
+            }
+
+            .calendar-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .calendar-back-button {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .calendar-iframe {
+                min-height: 750px;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .calendar-back-button:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .calendar-back-button:active {
+                background: var(--primary);
+                color: var(--white);
+                transform: scale(0.98);
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+
+            .calendar-title,
+            .calendar-subtitle {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
+
+        /* Landscape Orientation on Mobile */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .calendar-container {
+                padding: 1rem;
+                min-height: calc(100vh - 1rem);
+            }
+
+            .calendar-header {
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+            }
+
+            .calendar-header-content {
+                text-align: left;
+            }
+
+            .calendar-title {
+                font-size: 1.2rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .calendar-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .calendar-back-button {
+                padding: 0.625rem 1rem;
+                font-size: 0.85rem;
+                min-height: 40px;
+            }
+
+            .calendar-iframe {
+                min-height: calc(100vh - 150px);
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            .calendar-back-button,
+            .calendar-loading i {
+                transition: none;
+                animation: none;
+            }
+
+            .calendar-back-button:hover,
+            .calendar-back-button:active {
+                transform: none;
+            }
+        }
+
+        /* iOS Safe Area Support */
+        @supports (padding: max(0px)) {
+            @media (max-width: 575.98px) {
+                body {
+                    padding-left: max(0.75rem, env(safe-area-inset-left));
+                    padding-right: max(0.75rem, env(safe-area-inset-right));
+                    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+                }
+
+                .calendar-container {
+                    margin-bottom: max(0, env(safe-area-inset-bottom));
+                }
+            }
+        }
+
+        /* Dark Mode Support (if needed) */
+        @media (prefers-color-scheme: dark) {
+            /* Uncomment if dark mode is desired
+            :root {
+                --gray-100: #1a1a1a;
+                --gray-200: #2d2d2d;
+                --gray-300: #404040;
+                --gray-600: #a0a0a0;
+                --gray-800: #e0e0e0;
+                --white: #2d2d2d;
+            }
+
+            body {
+                background: var(--gray-100);
+                color: var(--gray-800);
+            }
+
+            .calendar-container {
+                background: var(--white);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .calendar-iframe {
+                box-shadow: inset 0 0 0 1px var(--gray-300);
+            }
+            */
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .calendar-container {
+                box-shadow: none;
+                border: 1px solid var(--gray-300);
+            }
+
+            .calendar-back-button {
+                display: none;
+            }
+
+            .calendar-iframe {
+                min-height: auto;
+                height: 600px;
             }
         }
     </style>
@@ -144,11 +521,11 @@
                 // Merge custom settings with defaults
                 settings = { ...defaultSettings, ...customSettings };
 
-                // Insert the calendar HTML
+                // Insert the calendar HTML with loading state
                 container.innerHTML = `
                     <div class="calendar-container" id="calendar-container">
                         <div class="calendar-header">
-                            <div>
+                            <div class="calendar-header-content">
                                 <h2 class="calendar-title">${settings.title}</h2>
                                 <p class="calendar-subtitle">${settings.subtitle}</p>
                             </div>
@@ -158,34 +535,116 @@
                                 </button>
                             ` : ''}
                         </div>
+                        <div class="calendar-loading" id="calendar-loading">
+                            <i class="fas fa-spinner"></i>
+                            Loading calendar...
+                        </div>
                         <iframe 
                             src="${settings.calendarUrl}" 
                             class="calendar-iframe"
                             id="calendar-iframe"
-                            scrolling="no">
+                            scrolling="no"
+                            style="display: none;"
+                            onload="handleIframeLoad()">
                         </iframe>
                     </div>
                 `;
 
                 // Add the required script for Go High Level booking widget
-                const script = document.createElement('script');
-                script.src = "https://api.leadconnectorhq.com/js/form_embed.js";
-                script.type = "text/javascript";
-                document.body.appendChild(script);
+                if (!document.querySelector('script[src*="form_embed.js"]')) {
+                    const script = document.createElement('script');
+                    script.src = "https://api.leadconnectorhq.com/js/form_embed.js";
+                    script.type = "text/javascript";
+                    script.async = true;
+                    document.body.appendChild(script);
+                }
 
                 // Set up back button if enabled
                 if (settings.showBackButton) {
                     const backButton = document.getElementById('calendar-back-button');
                     if (backButton) {
-                        backButton.addEventListener('click', function () {
+                        backButton.addEventListener('click', function (e) {
+                            e.preventDefault();
                             if (typeof settings.onBackButtonClick === 'function') {
                                 settings.onBackButtonClick();
                             }
                         });
+
+                        // Add touch feedback for mobile
+                        backButton.addEventListener('touchstart', function () {
+                            this.style.transform = 'scale(0.98)';
+                        });
+
+                        backButton.addEventListener('touchend', function () {
+                            this.style.transform = '';
+                        });
                     }
                 }
 
+                // Handle iframe loading
+                const iframe = document.getElementById('calendar-iframe');
+                if (iframe) {
+                    // Show iframe after a delay to ensure it's loaded
+                    setTimeout(() => {
+                        const loading = document.getElementById('calendar-loading');
+                        if (loading) loading.style.display = 'none';
+                        iframe.style.display = 'block';
+                    }, 2000);
+
+                    // Fallback: show iframe after 5 seconds regardless
+                    setTimeout(() => {
+                        const loading = document.getElementById('calendar-loading');
+                        if (loading) loading.style.display = 'none';
+                        iframe.style.display = 'block';
+                    }, 5000);
+                }
+
+                // Add mobile-specific optimizations
+                addMobileOptimizations();
+
                 return true;
+            }
+
+            // Add mobile-specific optimizations
+            function addMobileOptimizations() {
+                // Detect mobile device
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    // Add mobile class to container
+                    const container = document.getElementById('calendar-container');
+                    if (container) {
+                        container.classList.add('mobile-optimized');
+                    }
+
+                    // Prevent zoom on input focus (if any inputs are added later)
+                    document.addEventListener('focusin', function (e) {
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                            const viewport = document.querySelector('meta[name="viewport"]');
+                            if (viewport) {
+                                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                            }
+                        }
+                    });
+
+                    document.addEventListener('focusout', function (e) {
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                            const viewport = document.querySelector('meta[name="viewport"]');
+                            if (viewport) {
+                                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Handle iframe load event
+            window.handleIframeLoad = function () {
+                const loading = document.getElementById('calendar-loading');
+                const iframe = document.getElementById('calendar-iframe');
+
+                if (loading) loading.style.display = 'none';
+                if (iframe) iframe.style.display = 'block';
             }
 
             // Update calendar settings

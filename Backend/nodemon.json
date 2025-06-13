@@ -1,0 +1,15 @@
+{
+  "ignore": [
+    "config/ghl-tokens.json",
+    "*.log",
+    "*.tmp",
+    "node_modules/*",
+    "uploads/*",
+    "cache/*",
+    ".env"
+  ],
+  "ext": "js,json",
+  "env": {
+    "NODE_ENV": "development"
+  }
+} 

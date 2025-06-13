@@ -99,6 +99,8 @@ export class GoHighLevelService {
         try {
             const response = await this.client.post('/contacts/search', {
                 locationId: this.ghlConfig.getLocationId(),
+                pageLimit: 20,
+                page: 1,
                 filters: [
                     {
                         field: 'email',
@@ -179,5 +181,211 @@ export class GoHighLevelService {
 
     async testConnection() {
         return await this.ghlConfig.testConnection();
+    }
+
+    // ===== SUBSCRIPTION MANAGEMENT METHODS =====
+
+    /**
+     * Cancel a subscription in GoHighLevel
+     * @param {string} subscriptionId - GHL subscription ID
+     * @param {string} reason - Cancellation reason
+     * @returns {Object} Cancellation result
+     */
+    async cancelSubscription(subscriptionId, reason = 'user_requested') {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            console.log('⚠️ GHL client not available - skipping GHL cancellation');
+            return {
+                success: false,
+                error: 'GHL client not available',
+                localOnly: true
+            };
+        }
+
+        try {
+            console.log(`🔄 Cancelling GHL subscription: ${subscriptionId}, reason: ${reason}`);
+            
+            // GHL API endpoint for subscription cancellation
+            const response = await this.client.delete(`/payments/subscriptions/${subscriptionId}`, {
+                data: {
+                    cancellationReason: reason,
+                    cancellationType: 'end_of_period' // or 'immediate'
+                }
+            });
+
+            console.log(`✅ Successfully cancelled GHL subscription: ${subscriptionId}`);
+            
+            return {
+                success: true,
+                subscriptionId: subscriptionId,
+                cancellationData: response.data,
+                ghlResponse: response.data
+            };
+
+        } catch (error) {
+            console.error('❌ Error cancelling GHL subscription:', error.response?.data || error.message);
+            
+            // If it's a 404, the subscription might already be cancelled
+            if (error.response?.status === 404) {
+                console.log('📝 Subscription not found in GHL - may already be cancelled');
+                return {
+                    success: true,
+                    subscriptionId: subscriptionId,
+                    warning: 'Subscription not found in GHL - may already be cancelled'
+                };
+            }
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message,
+                subscriptionId: subscriptionId
+            };
+        }
+    }
+
+    /**
+     * Pause a subscription in GoHighLevel
+     * @param {string} subscriptionId - GHL subscription ID  
+     * @param {number} pauseDurationMonths - How many months to pause
+     * @returns {Object} Pause result
+     */
+    async pauseSubscription(subscriptionId, pauseDurationMonths = 3) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            console.log('⚠️ GHL client not available - skipping GHL pause');
+            return {
+                success: false,
+                error: 'GHL client not available',
+                localOnly: true
+            };
+        }
+
+        try {
+            console.log(`⏸️ Pausing GHL subscription: ${subscriptionId} for ${pauseDurationMonths} months`);
+            
+            // Calculate pause end date
+            const pauseEndDate = new Date();
+            pauseEndDate.setMonth(pauseEndDate.getMonth() + pauseDurationMonths);
+            
+            // GHL API endpoint for subscription pause
+            const response = await this.client.put(`/payments/subscriptions/${subscriptionId}/pause`, {
+                pauseUntil: pauseEndDate.toISOString(),
+                pauseDurationMonths: pauseDurationMonths
+            });
+
+            console.log(`✅ Successfully paused GHL subscription: ${subscriptionId}`);
+            
+            return {
+                success: true,
+                subscriptionId: subscriptionId,
+                pauseUntil: pauseEndDate.toISOString(),
+                pauseData: response.data,
+                ghlResponse: response.data
+            };
+
+        } catch (error) {
+            console.error('❌ Error pausing GHL subscription:', error.response?.data || error.message);
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message,
+                subscriptionId: subscriptionId
+            };
+        }
+    }
+
+    /**
+     * Get subscription details from GoHighLevel
+     * @param {string} subscriptionId - GHL subscription ID
+     * @returns {Object} Subscription details
+     */
+    async getSubscription(subscriptionId) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            return {
+                success: false,
+                error: 'GHL client not available'
+            };
+        }
+
+        try {
+            const response = await this.client.get(`/payments/subscriptions/${subscriptionId}`);
+            
+            return {
+                success: true,
+                subscription: response.data
+            };
+
+        } catch (error) {
+            console.error('❌ Error fetching GHL subscription:', error.response?.data || error.message);
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message
+            };
+        }
+    }
+
+    /**
+     * Find subscription by contact email
+     * @param {string} email - Contact email
+     * @returns {Object} Subscription search result
+     */
+    async findSubscriptionByEmail(email) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            return {
+                success: false,
+                error: 'GHL client not available'
+            };
+        }
+
+        try {
+            // First find the contact
+            const contact = await this.findContactByEmail(email);
+            
+            if (!contact) {
+                console.log(`📝 Contact not found for email: ${email}`);
+                return {
+                    success: false,
+                    error: 'Contact not found'
+                };
+            }
+
+            console.log(`🔍 Found contact: ${contact.id}, searching for subscriptions...`);
+
+            // Then search for subscriptions for this contact with required altId and altType
+            const response = await this.client.get('/payments/subscriptions/', {
+                params: {
+                    contactId: contact.id,
+                    altId: this.locationId,
+                    altType: 'location'
+                }
+            });
+
+            const activeSubscriptions = response.data.subscriptions?.filter(
+                sub => sub.status === 'active' || sub.status === 'trialing'
+            ) || [];
+
+            console.log(`📊 Found ${activeSubscriptions.length} active subscriptions for contact`);
+
+            return {
+                success: true,
+                subscriptions: activeSubscriptions,
+                contact: contact
+            };
+
+        } catch (error) {
+            console.error('❌ Error finding subscription by email:', error.response?.data || error.message);
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message
+            };
+        }
     }
 } 

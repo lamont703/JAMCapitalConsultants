@@ -337,6 +337,718 @@
                 justify-content: center;
             }
         }
+
+        /* COMPREHENSIVE MOBILE RESPONSIVENESS */
+
+        /* Base mobile styles */
+        @media (max-width: 991.98px) {
+            .dispute-progress-container {
+                padding: 15px;
+                max-width: 100%;
+            }
+
+            .dispute-score-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .dispute-round-card {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Extra Small Devices (phones, up to 575px) */
+        @media (max-width: 575.98px) {
+            .dispute-progress-container {
+                padding: 5px;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            /* Mobile Header - More Compact for Interface */
+            .dispute-progress-header {
+                margin-bottom: 15px;
+                text-align: center;
+                padding: 0 5px;
+            }
+
+            .dispute-progress-title {
+                font-size: 1.3rem;
+                margin-bottom: 6px;
+                line-height: 1.2;
+                color: var(--primary);
+                font-weight: 600;
+            }
+
+            .dispute-progress-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 12px;
+                line-height: 1.3;
+                padding: 0 8px;
+                color: var(--gray-600);
+            }
+
+            /* Mobile Credit Score Section - Enhanced */
+            .dispute-score-section {
+                padding: 15px;
+                margin-bottom: 15px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #002742, #004080);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .dispute-score-header {
+                flex-direction: column;
+                text-align: center;
+                margin-bottom: 15px;
+                gap: 5px;
+            }
+
+            .dispute-score-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+
+            .dispute-score-date {
+                font-size: 0.8rem;
+                opacity: 0.9;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .dispute-score-display {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .dispute-score-value {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #09ccfc;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                margin-bottom: 10px;
+            }
+
+            .dispute-score-change {
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .dispute-score-change i {
+                font-size: 1rem;
+            }
+
+            .dispute-score-meter {
+                height: 6px;
+                background-color: rgba(255, 255, 255, 0.2);
+                border-radius: 3px;
+                margin-bottom: 8px;
+                overflow: hidden;
+            }
+
+            .dispute-score-progress {
+                height: 100%;
+                background: linear-gradient(90deg, #09ccfc 0%, #00a8cc 100%);
+                border-radius: 3px;
+                transition: width 1s ease-in-out;
+                box-shadow: 0 0 8px rgba(9, 204, 252, 0.4);
+            }
+
+            .dispute-score-range {
+                font-size: 0.75rem;
+                opacity: 0.8;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            /* Score breakdown on mobile */
+            .score-breakdown {
+                margin-top: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .score-breakdown div {
+                font-size: 0.8rem;
+                margin-bottom: 2px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            /* Mobile Round Cards - Enhanced */
+            .dispute-round-card {
+                margin-bottom: 12px;
+                border-radius: 12px;
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                background: white;
+                border: 1px solid var(--gray-200);
+                transition: all 0.2s ease;
+            }
+
+            .dispute-round-card:active {
+                transform: scale(0.98);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .dispute-round-header {
+                padding: 12px 15px;
+                background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+                border-bottom: 1px solid var(--gray-200);
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .dispute-round-title {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .dispute-round-title i {
+                font-size: 1.1rem;
+                color: var(--primary);
+            }
+
+            .dispute-round-date {
+                font-size: 0.8rem;
+                color: var(--gray-600);
+                margin-top: 2px;
+            }
+
+            .dispute-round-content {
+                padding: 12px 15px;
+            }
+
+            .dispute-round-summary {
+                font-size: 0.85rem;
+                line-height: 1.4;
+                color: var(--gray-700);
+                margin-bottom: 15px;
+                background: var(--gray-50);
+                padding: 10px;
+                border-radius: 8px;
+                border-left: 3px solid var(--primary);
+            }
+
+            /* Mobile Stats Grid - Enhanced */
+            .dispute-round-stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .dispute-stat {
+                background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+                border-radius: 10px;
+                padding: 12px;
+                text-align: center;
+                border: 1px solid var(--gray-200);
+                min-height: 80px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                transition: all 0.2s ease;
+            }
+
+            .dispute-stat:active {
+                transform: scale(0.96);
+                background: var(--primary-light);
+            }
+
+            .dispute-stat-value {
+                font-size: 1.4rem;
+                font-weight: 700;
+                margin-bottom: 4px;
+                color: var(--gray-800);
+            }
+
+            .dispute-stat-removed .dispute-stat-value {
+                color: var(--success);
+            }
+
+            .dispute-stat-pending .dispute-stat-value {
+                color: var(--warning);
+            }
+
+            .dispute-stat-verified .dispute-stat-value {
+                color: var(--danger);
+            }
+
+            .dispute-stat-label {
+                font-size: 0.75rem;
+                color: var(--gray-600);
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Mobile Items List - Enhanced */
+            .dispute-items-list {
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .dispute-item {
+                padding: 10px;
+                border-radius: 8px;
+                background: var(--gray-50);
+                border: 1px solid var(--gray-200);
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .dispute-item:active {
+                transform: scale(0.98);
+                background: var(--primary-light);
+            }
+
+            .dispute-item-status {
+                margin-right: 0;
+                font-size: 1.1rem;
+                padding-top: 2px;
+                flex-shrink: 0;
+            }
+
+            .dispute-item-details {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .dispute-item-creditor {
+                font-weight: 600;
+                margin-bottom: 4px;
+                font-size: 0.9rem;
+                color: var(--gray-800);
+                line-height: 1.2;
+            }
+
+            .dispute-item-description {
+                font-size: 0.8rem;
+                color: var(--gray-600);
+                margin-bottom: 6px;
+                line-height: 1.3;
+            }
+
+            .dispute-item-bureau {
+                font-size: 0.7rem;
+                background: var(--primary-light);
+                color: var(--primary-dark);
+                padding: 3px 8px;
+                border-radius: 12px;
+                display: inline-block;
+                font-weight: 500;
+                border: 1px solid var(--primary);
+            }
+
+            /* Mobile Action Buttons - Enhanced */
+            .dispute-round-actions {
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid var(--gray-200);
+            }
+
+            .dispute-action-button {
+                width: 100%;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                border-radius: 10px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                touch-action: manipulation;
+                transition: all 0.2s ease;
+                border: none;
+                cursor: pointer;
+            }
+
+            .dispute-action-primary {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: white;
+                box-shadow: 0 3px 8px rgba(0, 128, 128, 0.3);
+            }
+
+            .dispute-action-primary:active {
+                transform: scale(0.96);
+                box-shadow: 0 2px 6px rgba(0, 128, 128, 0.4);
+            }
+
+            .dispute-action-secondary {
+                background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+                color: var(--gray-700);
+                border: 1px solid var(--gray-300);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .dispute-action-secondary:active {
+                transform: scale(0.96);
+                background: var(--gray-200);
+            }
+
+            .dispute-action-button i {
+                font-size: 1rem;
+            }
+
+            /* Mobile Empty State - Enhanced */
+            .dispute-empty-state {
+                padding: 2rem 1rem;
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+                text-align: center;
+                border: 1px solid var(--gray-200);
+            }
+
+            .dispute-empty-icon {
+                font-size: 2.5rem;
+                color: var(--gray-300);
+                margin-bottom: 15px;
+                background: var(--gray-50);
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 15px;
+            }
+
+            .dispute-empty-title {
+                font-size: 1.2rem;
+                color: var(--gray-800);
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .dispute-empty-message {
+                color: var(--gray-600);
+                max-width: 300px;
+                margin: 0 auto 20px;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+
+            /* Touch-friendly enhancements */
+            .dispute-action-button,
+            .dispute-round-card {
+                -webkit-tap-highlight-color: rgba(0, 128, 128, 0.2);
+                touch-action: manipulation;
+            }
+
+            /* Better text selection */
+            .dispute-action-button,
+            .dispute-stat {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            .dispute-item-description,
+            .dispute-round-summary {
+                -webkit-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+        }
+
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .dispute-progress-container {
+                padding: 10px;
+            }
+
+            .dispute-progress-title {
+                font-size: 1.5rem;
+            }
+
+            .dispute-progress-subtitle {
+                font-size: 1rem;
+            }
+
+            .dispute-score-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .dispute-score-value {
+                font-size: 2.8rem;
+            }
+
+            .dispute-round-card {
+                margin-bottom: 15px;
+            }
+
+            .dispute-round-content {
+                padding: 15px 20px;
+            }
+
+            .dispute-round-stats {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+
+            .dispute-stat {
+                min-height: 90px;
+                padding: 15px;
+            }
+
+            .dispute-action-button {
+                width: auto;
+                min-width: 120px;
+                display: inline-flex;
+            }
+
+            .dispute-round-actions {
+                flex-direction: row;
+                justify-content: center;
+                gap: 12px;
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .dispute-progress-container {
+                padding: 15px;
+            }
+
+            .dispute-progress-title {
+                font-size: 1.6rem;
+            }
+
+            .dispute-score-section {
+                padding: 25px;
+            }
+
+            .dispute-round-card {
+                margin-bottom: 20px;
+            }
+
+            .dispute-round-content {
+                padding: 20px 25px;
+            }
+
+            .dispute-round-stats {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .dispute-stat {
+                flex: 1;
+                min-width: 120px;
+                padding: 15px;
+            }
+
+            .dispute-action-button {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .dispute-progress-container {
+                max-width: 1200px;
+                padding: 25px;
+            }
+
+            .dispute-score-section {
+                padding: 30px;
+            }
+
+            .dispute-round-card {
+                margin-bottom: 25px;
+            }
+
+            .dispute-round-content {
+                padding: 25px 30px;
+            }
+        }
+
+        /* Landscape Orientation Adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .dispute-progress-header {
+                margin-bottom: 10px;
+            }
+
+            .dispute-progress-title {
+                font-size: 1.2rem;
+                margin-bottom: 4px;
+            }
+
+            .dispute-progress-subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 8px;
+            }
+
+            .dispute-score-section {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .dispute-score-value {
+                font-size: 2rem;
+            }
+
+            .dispute-round-card {
+                margin-bottom: 8px;
+            }
+
+            .dispute-round-content {
+                padding: 10px 12px;
+            }
+
+            .dispute-round-stats {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+
+            .dispute-stat {
+                padding: 8px;
+                min-height: 70px;
+            }
+
+            .dispute-stat-value {
+                font-size: 1.2rem;
+                margin-bottom: 2px;
+            }
+
+            .dispute-stat-label {
+                font-size: 0.7rem;
+            }
+
+            .dispute-item {
+                padding: 8px;
+            }
+
+            .dispute-action-button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                min-height: 40px;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .dispute-action-button:hover {
+                background: inherit;
+                transform: none;
+            }
+
+            .dispute-round-card:hover {
+                transform: none;
+            }
+
+            .dispute-stat:hover {
+                background: inherit;
+            }
+
+            /* Prevent text selection on interactive elements */
+            .dispute-action-button,
+            .dispute-stat,
+            .dispute-round-header {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .dispute-score-progress {
+                transform: translateZ(0);
+            }
+
+            .dispute-action-button {
+                will-change: transform;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .dispute-progress-container {
+                min-height: -webkit-fill-available;
+            }
+
+            .dispute-round-card {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            .dispute-round-card,
+            .dispute-action-button,
+            .dispute-stat {
+                transition: none;
+            }
+
+            .dispute-score-progress {
+                transition: none;
+            }
+
+            .dispute-round-card:active,
+            .dispute-action-button:active,
+            .dispute-stat:active {
+                transform: none;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .dispute-action-button {
+                display: none;
+            }
+
+            .dispute-round-card {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .dispute-score-section {
+                box-shadow: none;
+                border: 1px solid #000;
+                background: white !important;
+                color: black !important;
+            }
+
+            .dispute-progress-container {
+                max-width: none;
+                padding: 0;
+            }
+        }
     </style>
 </head>
 
@@ -823,7 +1535,7 @@
                         return null;
                     }
 
-                    const response = await fetch('http://localhost:3000/api/user/notifications', {
+                    const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/user/notifications', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,

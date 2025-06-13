@@ -436,4 +436,219 @@ function getTierName(tier) {
 
 console.log('✅ Activity routes registered');
 
+// Add before the export statement
+router.patch('/update-user-role', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }),
+    adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }),
+    async (req, res) => {
+        try {
+            const { email, role } = req.body;
+
+            if (!email || !role) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Email and role are required'
+                });
+            }
+
+            const validRoles = ['user', 'admin', 'administrator', 'super_admin'];
+            if (!validRoles.includes(role)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid role. Must be one of: ${validRoles.join(', ')}`
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            
+            // Find user by email
+            const user = await cosmosService.getUserByEmail(email);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
+
+            // Update user role
+            await cosmosService.updateDocument(user.id, 'user', {
+                role: role,
+                updatedAt: new Date().toISOString()
+            });
+
+            console.log(`✅ Admin ${req.user.email} updated role for ${email} to ${role}`);
+
+            res.json({
+                success: true,
+                message: `User role updated to ${role}`,
+                user: {
+                    email: user.email,
+                    name: user.name,
+                    role: role
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Error updating user role:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update user role'
+            });
+        }
+    }
+);
+
+// Add migration endpoint before the export statement
+router.post('/migrate-roles', 
+    authMiddleware?.authenticateToken || ((req, res, next) => { console.error('❌ Missing authMiddleware.authenticateToken'); next(); }),
+    adminMiddleware?.requireAdmin || ((req, res, next) => { console.error('❌ Missing adminMiddleware.requireAdmin'); next(); }),
+    async (req, res) => {
+        try {
+            console.log('🚀 Starting role migration via API...');
+            const cosmosService = req.app.locals.cosmosService;
+            
+            // Get all users
+            const query = 'SELECT * FROM c WHERE c.type = @type';
+            const parameters = [{ name: '@type', value: 'user' }];
+            const users = await cosmosService.queryDocuments(query, parameters);
+            
+            console.log(`📊 Found ${users.length} users to migrate`);
+
+            let migratedCount = 0;
+            let skippedCount = 0;
+            let errorCount = 0;
+
+            for (const user of users) {
+                try {
+                    if (user.role) {
+                        console.log(`⏭️ Skipping ${user.email} - already has role: ${user.role}`);
+                        skippedCount++;
+                        continue;
+                    }
+
+                    // Add role field
+                    const updateData = {
+                        role: 'user',
+                        updatedAt: new Date().toISOString()
+                    };
+
+                    await cosmosService.updateDocument(user.id, 'user', updateData);
+                    console.log(`✅ Migrated ${user.email} - added role: user`);
+                    migratedCount++;
+
+                } catch (error) {
+                    console.error(`❌ Error migrating user ${user.email}:`, error.message);
+                    errorCount++;
+                }
+            }
+
+            const summary = {
+                total: users.length,
+                migrated: migratedCount,
+                skipped: skippedCount,
+                errors: errorCount
+            };
+
+            console.log('📊 Migration Summary:', summary);
+
+            res.json({
+                success: true,
+                message: 'Role migration completed',
+                summary: summary
+            });
+
+        } catch (error) {
+            console.error('❌ Migration failed:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Migration failed',
+                error: error.message
+            });
+        }
+    }
+);
+
+// Add temporary public migration endpoint (REMOVE AFTER INITIAL SETUP)
+router.post('/initial-migration-setup', async (req, res) => {
+    try {
+        // Security check - only allow if no admin users exist yet
+        const cosmosService = req.app.locals.cosmosService;
+        const adminQuery = 'SELECT * FROM c WHERE c.type = @type AND c.role = @role';
+        const adminParams = [
+            { name: '@type', value: 'user' },
+            { name: '@role', value: 'admin' }
+        ];
+        const existingAdmins = await cosmosService.queryDocuments(adminQuery, adminParams);
+        
+        if (existingAdmins.length > 0) {
+            return res.status(403).json({
+                success: false,
+                message: 'Initial setup already completed. Use /migrate-roles endpoint with admin auth.'
+            });
+        }
+
+        console.log('🚀 Starting initial role migration setup...');
+        
+        // Get all users
+        const query = 'SELECT * FROM c WHERE c.type = @type';
+        const parameters = [{ name: '@type', value: 'user' }];
+        const users = await cosmosService.queryDocuments(query, parameters);
+        
+        console.log(`📊 Found ${users.length} users to migrate`);
+
+        let migratedCount = 0;
+        let skippedCount = 0;
+        let errorCount = 0;
+
+        for (const user of users) {
+            try {
+                if (user.role) {
+                    console.log(`⏭️ Skipping ${user.email} - already has role: ${user.role}`);
+                    skippedCount++;
+                    continue;
+                }
+
+                // Add role field - make lamont703@gmail.com admin, others user
+                const role = user.email === 'lamont703@gmail.com' ? 'admin' : 'user';
+                const updateData = {
+                    role: role,
+                    updatedAt: new Date().toISOString()
+                };
+
+                await cosmosService.updateDocument(user.id, 'user', updateData);
+                console.log(`✅ Migrated ${user.email} - added role: ${role}`);
+                migratedCount++;
+
+            } catch (error) {
+                console.error(`❌ Error migrating user ${user.email}:`, error.message);
+                errorCount++;
+            }
+        }
+
+        const summary = {
+            total: users.length,
+            migrated: migratedCount,
+            skipped: skippedCount,
+            errors: errorCount
+        };
+
+        console.log('📊 Initial Migration Summary:', summary);
+
+        res.json({
+            success: true,
+            message: 'Initial role migration setup completed',
+            summary: summary,
+            note: 'This endpoint is now disabled. Use /migrate-roles with admin auth for future migrations.'
+        });
+
+    } catch (error) {
+        console.error('❌ Initial migration failed:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Initial migration failed',
+            error: error.message
+        });
+    }
+});
+
 export default router; 

@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { ghlSyncMiddleware } from '../middleware/ghlSyncMiddleware.js';
+import { User } from '../models/User.js';
 
 export const authController = {
     async register(req, res) {
@@ -49,29 +50,23 @@ export const authController = {
                 .pbkdf2Sync(normalizedAnswer, securitySalt, 10000, 64, 'sha512')
                 .toString('hex');
 
-            // Create user document
-            const userDocument = {
-                id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                type: 'user',
+            // Create user using User model to ensure Free Tier subscription is assigned
+            const user = new User({
                 name: name.trim(),
                 email: email.toLowerCase().trim(),
                 password: hashedPassword,
                 phone: phone ? phone.trim() : '',
                 company: company ? company.trim() : '',
-                isActive: true,
-                role: 'user',
                 securityQuestion: securityQuestion,
                 securityAnswerHash: securityAnswerHash,
                 securitySalt: securitySalt,
                 ghlContactId: null,
-                ghlSyncStatus: 'pending',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
+                ghlSyncStatus: 'pending'
+            });
 
             console.log('💾 Saving user to database...');
-            // Save user to CosmosDB
-            const savedUser = await cosmosService.createDocument(userDocument, 'user');
+            // Save user using User model's save method to ensure proper validation and subscription assignment
+            const savedUser = await user.save();
             console.log('✅ User saved to database:', savedUser.id);
 
             // Sync to GoHighLevel CRM

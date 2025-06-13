@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test - JAM Capital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        button {
+            background: #09ccfc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #08b5e0;
+        }
+
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>🔐 JAM Capital Authentication Test</h1>
+
+        <div class="test-section info">
+            <h3>Authentication Status</h3>
+            <p><strong>Token Present:</strong> <span id="tokenStatus">Checking...</span></p>
+            <p><strong>User Data:</strong> <span id="userStatus">Checking...</span></p>
+            <p><strong>Is Authenticated:</strong> <span id="authStatus">Checking...</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Actions</h3>
+            <button onclick="testAuthStatus()">Check Auth Status</button>
+            <button onclick="testAPICall()">Test API Call</button>
+            <button onclick="clearAuth()">Clear Auth Data</button>
+            <button onclick="simulateLogin()">Simulate Login</button>
+        </div>
+
+        <div class="test-section">
+            <h3>API Test Results</h3>
+            <div id="apiResults" class="log">No tests run yet...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>Console Log</h3>
+            <div id="consoleLog" class="log">Waiting for auth manager...</div>
+        </div>
+    </div>
+
+    <!-- Auth Utility -->
+    <script src="js/auth.js"></script>
+
+    <script>
+        let logContent = '';
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logContent += `[${timestamp}] ${message}\n`;
+            document.getElementById('consoleLog').textContent = logContent;
+            console.log(message);
+        }
+
+        function updateStatus() {
+            if (!window.authManager) {
+                document.getElementById('tokenStatus').textContent = 'Auth Manager Not Loaded';
+                document.getElementById('userStatus').textContent = 'Auth Manager Not Loaded';
+                document.getElementById('authStatus').textContent = 'Auth Manager Not Loaded';
+                return;
+            }
+
+            const token = window.authManager.getAuthToken();
+            const userData = window.authManager.getUserData();
+            const isAuth = window.authManager.isAuthenticated();
+
+            document.getElementById('tokenStatus').textContent = token ? '✅ Present' : '❌ Missing';
+            document.getElementById('userStatus').textContent = userData ? `✅ ${userData.email || 'Unknown'}` : '❌ Missing';
+            document.getElementById('authStatus').textContent = isAuth ? '✅ Authenticated' : '❌ Not Authenticated';
+        }
+
+        function testAuthStatus() {
+            log('🔍 Testing authentication status...');
+
+            if (!window.authManager) {
+                log('❌ Auth manager not available');
+                return;
+            }
+
+            const token = window.authManager.getAuthToken();
+            const userData = window.authManager.getUserData();
+            const isAuth = window.authManager.isAuthenticated();
+
+            log(`Token: ${token ? 'Present (' + token.substring(0, 20) + '...)' : 'Missing'}`);
+            log(`User Data: ${userData ? JSON.stringify(userData, null, 2) : 'Missing'}`);
+            log(`Is Authenticated: ${isAuth}`);
+
+            updateStatus();
+        }
+
+        async function testAPICall() {
+            log('🌐 Testing API call...');
+
+            if (!window.authManager) {
+                log('❌ Auth manager not available');
+                return;
+            }
+
+            try {
+                const response = await window.authManager.authenticatedFetch('/api/subscriptions/dashboard');
+                const data = await response.json();
+
+                log(`✅ API call successful: ${response.status}`);
+                log(`Response: ${JSON.stringify(data, null, 2)}`);
+
+                document.getElementById('apiResults').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('apiResults').parentElement.className = 'test-section success';
+
+            } catch (error) {
+                log(`❌ API call failed: ${error.message}`);
+                document.getElementById('apiResults').textContent = `Error: ${error.message}`;
+                document.getElementById('apiResults').parentElement.className = 'test-section error';
+            }
+        }
+
+        function clearAuth() {
+            log('🧹 Clearing authentication data...');
+
+            if (!window.authManager) {
+                log('❌ Auth manager not available');
+                return;
+            }
+
+            window.authManager.clearAuth();
+            log('✅ Authentication data cleared');
+            updateStatus();
+        }
+
+        function simulateLogin() {
+            log('🔑 Simulating login...');
+
+            if (!window.authManager) {
+                log('❌ Auth manager not available');
+                return;
+            }
+
+            // Simulate a successful login response
+            const mockLoginData = {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3RfdXNlciIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwODY0MDB9.test_signature',
+                user: {
+                    id: 'test_user',
+                    email: 'test@example.com',
+                    name: 'Test User',
+                    role: 'user'
+                }
+            };
+
+            try {
+                window.authManager.handleLoginSuccess(mockLoginData);
+                log('✅ Mock login successful');
+                updateStatus();
+            } catch (error) {
+                log(`❌ Mock login failed: ${error.message}`);
+            }
+        }
+
+        // Initialize when auth manager is ready
+        function initTest() {
+            if (!window.authManager) {
+                log('⏳ Waiting for auth manager...');
+                setTimeout(initTest, 100);
+                return;
+            }
+
+            log('✅ Auth manager loaded');
+            testAuthStatus();
+        }
+
+        // Start the test
+        document.addEventListener('DOMContentLoaded', initTest);
+    </script>
+</body>
+
+</html>

@@ -202,13 +202,20 @@
             text-decoration: none;
             font-weight: 500;
             font-size: 0.9rem;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
+            padding: 0.75rem 1rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            min-height: 44px;
+            white-space: nowrap;
         }
 
         .back-to-home:hover {
-            background-color: rgba(0, 128, 128, 0.1);
+            background: white;
+            transform: translateY(-1px);
         }
 
         .back-to-home i {
@@ -258,58 +265,399 @@
             background-color: #08b6e2;
         }
 
-        @media (max-width: 480px) {
+        /* COMPREHENSIVE MOBILE RESPONSIVENESS */
+
+        /* Extra Small Devices (phones, up to 575px) */
+        @media (max-width: 575.98px) {
             .login-section {
                 padding: 0 1rem;
                 min-height: 100vh;
-                margin-top: -3vh;
+                margin-top: 0;
+                padding-top: 1rem;
             }
 
             .login-container {
-                transform: translateY(-3vh);
-                padding: 2rem;
-                border-radius: 12px;
+                transform: none;
+                padding: 1.5rem;
+                border-radius: 16px;
+                margin: 5rem 0 1rem 0;
+                /* Top margin accounts for fixed nav header */
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             }
 
             .login-title {
-                font-size: 1.5rem;
-                margin-bottom: 0.25rem;
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.3;
             }
 
             .login-subtitle {
                 font-size: 0.9rem;
                 margin-bottom: 1.5rem;
+                line-height: 1.4;
             }
 
             .login-logo {
                 margin-bottom: 1.5rem;
-                max-width: 150px;
+                max-width: 140px;
+                height: auto;
+            }
+
+            .tab-container {
+                margin-bottom: 1.5rem;
+                border-radius: 12px;
+                overflow: hidden;
+            }
+
+            .tab {
+                padding: 1rem 0.5rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .input-group {
+                margin-bottom: 1rem;
+                position: relative;
+            }
+
+            .input-group i {
+                font-size: 16px;
+                color: #666;
+            }
+
+            .login-input {
+                padding: 1rem 1rem 1rem 3rem;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                border-radius: 12px;
+                min-height: 44px;
+                border: 2px solid #e0e0e0;
+                transition: all 0.3s ease;
+            }
+
+            .login-input:focus {
+                border-color: #09ccfc;
+                box-shadow: 0 0 0 3px rgba(9, 204, 252, 0.1);
+            }
+
+            .login-button,
+            .register-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+                border-radius: 12px;
+                min-height: 50px;
+                font-weight: 600;
+                width: 100%;
+                margin: 1rem 0;
+                transition: all 0.3s ease;
+            }
+
+            .login-button:hover,
+            .register-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(9, 204, 252, 0.3);
+            }
+
+            .forgot-password-link {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .forgot-password-link a {
+                color: #09ccfc;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .support-text {
+                font-size: 0.875rem;
+                margin-top: 1.5rem;
+                text-align: center;
+                padding: 1rem;
+                background: #f8f9fa;
+                border-radius: 12px;
+            }
+
+            .nav-header {
+                position: fixed;
+                top: env(safe-area-inset-top, 1rem);
+                left: 1rem;
+                right: 1rem;
+                z-index: 1000;
+                display: flex;
+                justify-content: flex-start;
+                padding-top: 0.5rem;
+            }
+
+            .back-to-home {
+                padding: 0.875rem 1.25rem;
+                font-size: 0.9rem;
+                border-radius: 30px;
+                background: rgba(255, 255, 255, 0.95);
+                -webkit-backdrop-filter: blur(15px);
+                backdrop-filter: blur(15px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                transition: all 0.3s ease;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                border: 1px solid rgba(9, 204, 252, 0.2);
+                max-width: fit-content;
+            }
+
+            .back-to-home:hover,
+            .back-to-home:active {
+                background: rgba(255, 255, 255, 1);
+                transform: translateY(-1px);
+                box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+                border-color: rgba(9, 204, 252, 0.3);
+            }
+
+            .back-to-home i {
+                font-size: 1rem;
+                margin-right: 0.5rem;
+            }
+
+            .alert {
+                padding: 1rem;
+                border-radius: 12px;
+                margin-bottom: 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .login-container {
+                padding: 2rem;
+                max-width: 480px;
+                margin: 2rem auto;
+                margin-top: 4rem;
+                /* Account for fixed nav header */
+            }
+
+            .login-title {
+                font-size: 1.6rem;
+            }
+
+            .login-subtitle {
+                font-size: 1rem;
+            }
+
+            .login-logo {
+                max-width: 160px;
+            }
+
+            .login-input {
+                font-size: 16px;
+                padding: 1rem 1rem 1rem 3rem;
+            }
+
+            .nav-header {
+                position: fixed;
+                top: env(safe-area-inset-top, 1rem);
+                left: 1rem;
+                right: 1rem;
+                z-index: 1000;
+                display: flex;
+                justify-content: flex-start;
+                padding-top: 0.5rem;
+            }
+
+            .back-to-home {
+                padding: 0.875rem 1.25rem;
+                font-size: 0.9rem;
+                border-radius: 30px;
+                background: rgba(255, 255, 255, 0.95);
+                -webkit-backdrop-filter: blur(15px);
+                backdrop-filter: blur(15px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                min-height: 48px;
+                font-weight: 600;
+                border: 1px solid rgba(9, 204, 252, 0.2);
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .login-section {
+                padding: 2rem;
+            }
+
+            .login-container {
+                padding: 2.5rem;
+                max-width: 500px;
+                margin: 3rem auto;
+            }
+
+            .login-title {
+                font-size: 1.8rem;
+            }
+
+            .tab {
+                padding: 1.25rem;
+                font-size: 1rem;
+            }
+
+            .login-input {
+                padding: 1rem 1rem 1rem 3rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .login-container {
+                padding: 3rem;
+                max-width: 450px;
+            }
+
+            .login-input {
+                font-size: 1rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .login-input {
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+            }
+
+            .tab:hover {
+                background-color: transparent;
+            }
+
+            .login-button:hover,
+            .register-button:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .back-to-home:hover {
+                transform: none;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .login-logo {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+
+        /* Landscape Orientation on Mobile */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .login-section {
+                padding: 1rem;
+                margin-top: 0;
+            }
+
+            .login-container {
+                transform: none;
+                margin: 1rem auto;
+                padding: 1.5rem;
+                margin-top: 4rem;
+                /* Account for fixed nav header */
+            }
+
+            .login-logo {
+                max-width: 120px;
+                margin-bottom: 1rem;
+            }
+
+            .login-title {
+                font-size: 1.3rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .tab-container {
+                margin-bottom: 1rem;
             }
 
             .input-group {
                 margin-bottom: 0.75rem;
             }
 
-            .login-input {
-                padding: 0.75rem 1rem 0.75rem 2.5rem;
+            .nav-header {
+                position: fixed;
+                top: 0.5rem;
+                left: 1rem;
+                right: auto;
+                padding-top: 0.25rem;
             }
 
-            .forgot-password {
-                font-size: 0.875rem;
-                padding: 0.5rem;
-                display: inline-block;
+            .back-to-home {
+                padding: 0.625rem 1rem;
+                font-size: 0.85rem;
+                min-height: 40px;
+                border-radius: 25px;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            .login-input,
+            .login-button,
+            .register-button,
+            .back-to-home {
+                transition: none;
+            }
+
+            .login-button:hover,
+            .register-button:hover,
+            .back-to-home:hover {
+                transform: none;
+            }
+        }
+
+        /* Dark Mode 
+        @media (prefers-color-scheme: dark) {
+            .login-section {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            }
+
+            .login-container {
+                background: #333;
+                color: #fff;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .login-input {
+                background: #444;
+                border-color: #555;
+                color: #fff;
+            }
+
+            .login-input::placeholder {
+                color: #aaa;
+            }
+
+            .tab {
+                color: #ccc;
+            }
+
+            .tab.active {
+                color: #09ccfc;
             }
 
             .support-text {
-                font-size: 0.875rem;
-                margin-top: 1rem;
+                background: #444;
+                color: #ccc;
             }
-
-            .nav-header {
-                top: 0.5rem;
-                left: 0.5rem;
-            }
-        }
+        }*/
 
         @supports (-webkit-touch-callout: none) {
             .login-section {
@@ -509,8 +857,8 @@
             </div>
 
             <p class="support-text">
-                Contact our support team at <a href="mailto:support@jamcreditsolutions.com"
-                    class="support-link">support@jamcreditsolutions.com</a>
+                Contact our support team at <a href="mailto:support@jamcapitalconsultants.com"
+                    class="support-link">support@jamcapitalconsultants.com</a>
             </p>
 
             <a href="https://www.jamcapitalconsultants.com" class="home-link">
@@ -576,7 +924,7 @@
             button.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/login', {
+                const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -587,9 +935,8 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store token and user data
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    // Use auth manager to handle login
+                    window.authManager.handleLoginSuccess(data);
 
                     // Track successful login
                     if (typeof analytics !== 'undefined') {
@@ -653,7 +1000,7 @@
             button.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/register', {
+                const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -671,9 +1018,8 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store token and user data
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    // Use auth manager to handle registration success
+                    window.authManager.handleLoginSuccess(data);
 
                     // Track successful registration
                     if (typeof analytics !== 'undefined') {
@@ -777,7 +1123,7 @@
             button.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/get-security-question', {
+                const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/auth/get-security-question', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -828,7 +1174,7 @@
             button.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/verify-security-answer', {
+                const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/auth/verify-security-answer', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -887,7 +1233,7 @@
             button.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/reset-password-with-security', {
+                const response = await fetch('https://jam-capital-backend.azurewebsites.net/api/auth/reset-password-with-security', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1005,6 +1351,239 @@
             button.innerHTML = originalText;
             button.disabled = false;
         }
+    </script>
+
+    <!-- Inline Auth Utility -->
+    <script>
+        /**
+         * JAM Capital Consultants - Authentication Utility
+         * Centralized token management and authentication helpers
+         */
+        class AuthManager {
+            constructor() {
+                this.API_BASE_URL = 'https://jam-capital-backend.azurewebsites.net';
+                this.TOKEN_KEY = 'authToken';
+                this.USER_DATA_KEY = 'userData';
+                this.listeners = [];
+            }
+
+            /**
+             * Get authentication token from storage
+             * @returns {string|null} JWT token or null if not found
+             */
+            getAuthToken() {
+                // Try multiple storage locations for backwards compatibility
+                const token = localStorage.getItem(this.TOKEN_KEY) ||
+                    sessionStorage.getItem(this.TOKEN_KEY) ||
+                    localStorage.getItem('userToken') ||
+                    sessionStorage.getItem('userToken');
+
+                if (!token) {
+                    console.warn('⚠️ No authentication token found');
+                    return null;
+                }
+
+                // Validate token format (basic check)
+                if (!token.includes('.')) {
+                    console.warn('⚠️ Invalid token format found');
+                    this.clearAuth();
+                    return null;
+                }
+
+                return token;
+            }
+
+            /**
+             * Store authentication token
+             * @param {string} token - JWT token
+             */
+            setAuthToken(token) {
+                if (!token) {
+                    console.error('❌ Cannot store empty token');
+                    return;
+                }
+
+                localStorage.setItem(this.TOKEN_KEY, token);
+                console.log('✅ Auth token stored successfully');
+                this.notifyListeners('tokenUpdated', token);
+            }
+
+            /**
+             * Get user data from storage
+             * @returns {object|null} User data object or null if not found
+             */
+            getUserData() {
+                try {
+                    const userData = localStorage.getItem(this.USER_DATA_KEY) ||
+                        sessionStorage.getItem(this.USER_DATA_KEY);
+
+                    if (!userData) {
+                        console.warn('⚠️ No user data found');
+                        return null;
+                    }
+
+                    return JSON.parse(userData);
+                } catch (error) {
+                    console.error('❌ Error parsing user data:', error);
+                    this.clearAuth();
+                    return null;
+                }
+            }
+
+            /**
+             * Store user data
+             * @param {object} userData - User data object
+             */
+            setUserData(userData) {
+                if (!userData) {
+                    console.error('❌ Cannot store empty user data');
+                    return;
+                }
+
+                localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userData));
+                console.log('✅ User data stored successfully');
+                this.notifyListeners('userDataUpdated', userData);
+            }
+
+            /**
+             * Get user ID from stored user data
+             * @returns {string|null} User ID or null if not found
+             */
+            getUserId() {
+                const userData = this.getUserData();
+                return userData?.id || null;
+            }
+
+            /**
+             * Check if user is authenticated
+             * @returns {boolean} True if user has valid token and data
+             */
+            isAuthenticated() {
+                const token = this.getAuthToken();
+                const userData = this.getUserData();
+
+                const isAuth = !!(token && userData?.id);
+                console.log('🔍 Authentication check:', isAuth ? 'AUTHENTICATED' : 'NOT AUTHENTICATED');
+
+                return isAuth;
+            }
+
+            /**
+             * Check if user has admin role
+             * @returns {boolean} True if user is admin
+             */
+            isAdmin() {
+                const userData = this.getUserData();
+                const role = userData?.role || userData?.userRole;
+                return role === 'admin';
+            }
+
+            /**
+             * Clear all authentication data
+             */
+            clearAuth() {
+                // Clear from both localStorage and sessionStorage
+                localStorage.removeItem(this.TOKEN_KEY);
+                localStorage.removeItem(this.USER_DATA_KEY);
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem(this.TOKEN_KEY);
+                sessionStorage.removeItem(this.USER_DATA_KEY);
+                sessionStorage.removeItem('userToken');
+                sessionStorage.removeItem('user');
+
+                console.log('🧹 Authentication data cleared');
+                this.notifyListeners('authCleared');
+            }
+
+            /**
+             * Handle login success
+             * @param {object} data - Login response data
+             */
+            handleLoginSuccess(data) {
+                if (data.token && data.user) {
+                    this.setAuthToken(data.token);
+                    this.setUserData(data.user);
+                    console.log('✅ Login success handled');
+                    this.notifyListeners('loginSuccess', data);
+                } else {
+                    console.error('❌ Invalid login response data');
+                    throw new Error('Invalid login response');
+                }
+            }
+
+            /**
+             * Handle logout
+             */
+            handleLogout() {
+                this.clearAuth();
+                console.log('👋 User logged out');
+                this.notifyListeners('logout');
+                window.location.href = '/';
+            }
+
+            /**
+             * Add event listener for auth events
+             * @param {function} callback - Callback function
+             */
+            addListener(callback) {
+                this.listeners.push(callback);
+            }
+
+            /**
+             * Remove event listener
+             * @param {function} callback - Callback function to remove
+             */
+            removeListener(callback) {
+                const index = this.listeners.indexOf(callback);
+                if (index > -1) {
+                    this.listeners.splice(index, 1);
+                }
+            }
+
+            /**
+             * Notify all listeners of auth events
+             * @param {string} event - Event name
+             * @param {*} data - Event data
+             */
+            notifyListeners(event, data) {
+                this.listeners.forEach(callback => {
+                    try {
+                        callback(event, data);
+                    } catch (error) {
+                        console.error('❌ Error in auth listener:', error);
+                    }
+                });
+            }
+
+            /**
+             * Initialize auth manager
+             */
+            init() {
+                console.log('🚀 AuthManager initialized');
+
+                // Check if user is authenticated on init
+                if (this.isAuthenticated()) {
+                    console.log('✅ User is authenticated');
+                } else {
+                    console.log('ℹ️ User is not authenticated');
+                }
+            }
+        }
+
+        // Create global instance
+        window.authManager = new AuthManager();
+
+        // Legacy function support for backwards compatibility
+        window.getAuthToken = () => window.authManager.getAuthToken();
+        window.getUserId = () => window.authManager.getUserId();
+        window.getUserData = () => window.authManager.getUserData();
+        window.isAuthenticated = () => window.authManager.isAuthenticated();
+
+        // Initialize auth manager
+        window.authManager.init();
+
+        console.log('🔧 JAM Capital Auth utility loaded');
     </script>
 </body>
 

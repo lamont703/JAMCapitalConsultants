@@ -10,6 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Prevent horizontal overflow on all screen sizes */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
         .hero-section {
             position: relative;
             width: 100%;
@@ -20,6 +32,11 @@
             overflow: hidden;
             transform: translateY(-10px);
             transition: all 0.5s ease;
+            /* Ensure no horizontal overflow */
+            box-sizing: border-box;
+            /* Additional centering for embedded containers */
+            display: block;
+            text-align: center;
         }
 
         .hero-section:hover {
@@ -29,8 +46,13 @@
 
         .hero-image {
             width: 100%;
+            max-width: 100%;
+            height: auto;
             display: block;
             transition: transform 0.5s ease;
+            /* Prevent image overflow */
+            object-fit: cover;
+            box-sizing: border-box;
         }
 
         .hero-section:hover .hero-image {
@@ -183,6 +205,453 @@
 
             .credit-quiz-btn {
                 width: 100%;
+            }
+        }
+
+        /* ENHANCED MOBILE RESPONSIVENESS */
+
+        /* Extra Small Devices (phones, up to 575px) */
+        @media (max-width: 575.98px) {
+            .hero-section {
+                width: 100%;
+                max-width: 100%;
+                margin: 0 auto;
+                border-radius: 0;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                transform: none;
+                /* Center within parent container */
+                position: relative;
+                left: auto;
+                right: auto;
+            }
+
+            .hero-section:hover {
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+                transform: none;
+            }
+
+            .hero-image {
+                width: 100%;
+                height: auto;
+                min-height: 400px;
+                object-fit: cover;
+            }
+
+            .hero-section:hover .hero-image {
+                transform: none;
+            }
+
+            .hero-text-overlay {
+                top: 35%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 320px;
+                text-align: center;
+                padding: 0 1rem;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.2;
+                display: block;
+                width: 100%;
+            }
+
+            .jam-engine-container {
+                display: block;
+                margin: 0.5rem 0;
+            }
+
+            .jam-engine-logo {
+                height: 2rem;
+                width: auto;
+                max-width: 120px;
+                margin: 0;
+                vertical-align: middle;
+            }
+
+            .quiz-button-container {
+                position: absolute;
+                bottom: 10%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 280px;
+                text-align: center;
+                top: auto;
+            }
+
+            .credit-quiz-btn {
+                width: 100%;
+                min-width: 100%;
+                padding: 1rem;
+                font-size: 0.9rem;
+                border-radius: 8px;
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            .credit-quiz-btn:active {
+                transform: scale(0.98);
+            }
+
+            .credit-quiz-btn .subtext {
+                font-size: 0.8rem;
+            }
+
+            .floating-element {
+                display: none;
+            }
+        }
+
+        /* Small Devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .hero-section {
+                width: 100%;
+                max-width: 100%;
+                margin: 0 auto;
+                border-radius: 4px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            }
+
+            .hero-text-overlay {
+                top: 40%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 85%;
+                max-width: 400px;
+                text-align: center;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 2.2rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.1;
+            }
+
+            .jam-engine-logo {
+                height: 2.2rem;
+                width: auto;
+                max-width: 140px;
+            }
+
+            .quiz-button-container {
+                bottom: 12%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 85%;
+                max-width: 320px;
+            }
+
+            .credit-quiz-btn {
+                width: 100%;
+                padding: 1rem 1.25rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Medium Devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .hero-section {
+                max-width: 100%;
+                border-radius: 6px;
+            }
+
+            .hero-text-overlay {
+                top: 45%;
+                left: 8%;
+                transform: translateY(-50%);
+                width: 60%;
+                max-width: 500px;
+                text-align: left;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .jam-engine-logo {
+                height: 15rem;
+                width: 20rem;
+                margin-top: -6rem;
+                margin-right: 2rem;
+            }
+
+            .quiz-button-container {
+                bottom: 18%;
+                left: 8%;
+                transform: none;
+                width: auto;
+                max-width: 300px;
+            }
+
+            .credit-quiz-btn {
+                min-width: 220px;
+                width: auto;
+            }
+        }
+
+        /* Large Devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .hero-section {
+                max-width: 1400px;
+            }
+
+            .hero-text-overlay {
+                top: 50%;
+                left: -30px;
+                max-width: 600px;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 4.5rem;
+            }
+
+            .jam-engine-logo {
+                height: 25rem;
+                width: 35rem;
+                margin-top: -10rem;
+                margin-right: 3rem;
+            }
+
+            .quiz-button-container {
+                bottom: 20%;
+                left: 8%;
+            }
+        }
+
+        /* Extra Large Devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .hero-section {
+                max-width: 1600px;
+            }
+
+            .hero-text-overlay {
+                left: -50px;
+                max-width: 650px;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 5rem;
+            }
+
+            .jam-engine-logo {
+                height: 30rem;
+                width: 40rem;
+                margin-top: -12.5rem;
+                margin-right: 4rem;
+            }
+
+            .quiz-button-container {
+                left: 10%;
+            }
+        }
+
+        /* Landscape Orientation Adjustments */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .hero-section {
+                border-radius: 0;
+            }
+
+            .hero-image {
+                min-height: 350px;
+            }
+
+            .hero-text-overlay {
+                top: 30%;
+                left: 10%;
+                transform: translateY(-50%);
+                width: 45%;
+                max-width: 300px;
+                text-align: left;
+            }
+
+            .hero-text-overlay h1 {
+                font-size: 1.6rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.1;
+            }
+
+            .jam-engine-container {
+                display: inline-block;
+                margin: 0;
+            }
+
+            .jam-engine-logo {
+                height: 1.5rem;
+                width: auto;
+                max-width: 80px;
+                vertical-align: middle;
+                margin: 0 0.5rem;
+            }
+
+            .quiz-button-container {
+                position: absolute;
+                bottom: 8%;
+                right: 10%;
+                left: auto;
+                transform: none;
+                width: 40%;
+                max-width: 200px;
+                text-align: right;
+            }
+
+            .credit-quiz-btn {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+                min-height: 40px;
+            }
+
+            .credit-quiz-btn .subtext {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .hero-section:hover {
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 20px 30px rgba(0, 0, 0, 0.2);
+                transform: translateY(-10px);
+            }
+
+            .hero-section:hover .hero-image {
+                transform: none;
+            }
+
+            .credit-quiz-btn:hover {
+                background-color: #09ccfc;
+                transform: none;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .credit-quiz-btn {
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .hero-image {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+
+            .jam-engine-logo {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+
+        /* iOS Safari specific adjustments */
+        @supports (-webkit-touch-callout: none) {
+            .hero-section {
+                min-height: -webkit-fill-available;
+            }
+
+            .quiz-button-container {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .hero-section {
+                transition: none;
+            }
+
+            .hero-image {
+                transition: none;
+            }
+
+            .credit-quiz-btn {
+                transition: none;
+            }
+
+            .hero-section:hover,
+            .hero-section:hover .hero-image {
+                transform: none;
+            }
+
+            .credit-quiz-btn:hover,
+            .credit-quiz-btn:active {
+                transform: none;
+            }
+
+            .floating-element {
+                animation: none;
+                display: none;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .hero-section {
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 20px 30px rgba(0, 0, 0, 0.4);
+            }
+
+            .hero-section:hover {
+                box-shadow: 0 40px 70px rgba(0, 0, 0, 0.6), 0 25px 40px rgba(0, 0, 0, 0.5);
+            }
+
+            .hero-text-overlay {
+                text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            }
+
+            .credit-quiz-btn {
+                background-color: #0bb8e6;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+
+            .credit-quiz-btn:hover {
+                background-color: #09ccfc;
+                box-shadow: 0 6px 16px rgba(11, 184, 230, 0.4);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .hero-section {
+                box-shadow: none;
+                border: 1px solid #000;
+                page-break-inside: avoid;
+            }
+
+            .hero-image {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .quiz-button-container {
+                display: none;
+            }
+
+            .animated-bg-elements {
+                display: none;
+            }
+
+            .hero-text-overlay {
+                color: black;
+                text-shadow: none;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 1rem;
+                border-radius: 4px;
+            }
+
+            .highlight-engine {
+                color: #000;
             }
         }
     </style>

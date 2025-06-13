@@ -26,7 +26,8 @@ export class GoHighLevelConfig {
                 baseURL: 'https://services.leadconnectorhq.com',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Version': '2021-07-28'
                 }
             });
             

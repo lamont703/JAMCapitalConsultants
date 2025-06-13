@@ -295,7 +295,16 @@
         }
 
         .dispute-section-header h2 {
+            color: #2c3e50;
             font-size: 2.5rem;
+        }
+
+        .dispute-subheading {
+            color: #666;
+        }
+
+        .dispute-ai-tip {
+            color: #09ccfc;
         }
     }
 
@@ -303,6 +312,18 @@
         .dispute-prompt-cards {
             grid-template-columns: repeat(2, 1fr);
             gap: 1.2rem;
+        }
+
+        .dispute-section-header h2 {
+            color: #2c3e50;
+        }
+
+        .dispute-subheading {
+            color: #666;
+        }
+
+        .dispute-ai-tip {
+            color: #09ccfc;
         }
     }
 
@@ -316,7 +337,16 @@
         }
 
         .dispute-section-header h2 {
+            color: #2c3e50;
             font-size: 2rem;
+        }
+
+        .dispute-subheading {
+            color: #666;
+        }
+
+        .dispute-ai-tip {
+            color: #09ccfc;
         }
 
         .dispute-modal-content {
@@ -329,74 +359,520 @@
         }
     }
 
-    /* Modal Styles */
-    .dispute-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-        overflow-y: auto;
+    /* ENHANCED MOBILE RESPONSIVENESS */
+
+    /* Extra Small Devices (phones, up to 575px) */
+    @media (max-width: 575.98px) {
+        .dispute-letters-section {
+            padding: 1.5rem 0;
+        }
+
+        .dispute-container {
+            padding: 0 0.75rem;
+        }
+
+        .dispute-section-header {
+            margin-bottom: 2rem;
+            padding: 0;
+        }
+
+        .dispute-section-header h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+            padding: 0 0.5rem;
+        }
+
+        .dispute-subheading {
+            color: #666;
+            font-size: 0.95rem;
+            padding: 0 0.25rem;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .dispute-ai-tip {
+            color: #09ccfc;
+            font-size: 0.85rem;
+            padding: 0 0.25rem;
+            margin-top: 0.75rem;
+        }
+
+        .dispute-prompt-cards {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            padding: 0;
+            margin: 1.5rem auto;
+            max-width: 100%;
+        }
+
+        .dispute-prompt-card {
+            min-height: 200px;
+            margin-bottom: 0.75rem;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .dispute-card-header {
+            margin-bottom: 0.875rem;
+            padding-bottom: 0.625rem;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .dispute-ai-icon {
+            font-size: 1.3rem;
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+            align-self: center;
+        }
+
+        .dispute-card-header h3 {
+            font-size: 1rem;
+            line-height: 1.25;
+            text-align: center;
+            width: 100%;
+        }
+
+        .dispute-card-description {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 0.5rem 0 1rem;
+            text-align: left;
+        }
+
+        .dispute-flip-btn {
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+
+        .dispute-flip-btn:active {
+            transform: scale(0.98);
+        }
+
+        .dispute-card-back h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .dispute-prompt-content {
+            gap: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .dispute-prompt-content pre {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dispute-button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .dispute-copy-btn,
+        .dispute-link {
+            font-size: 0.8rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            min-height: 44px;
+            touch-action: manipulation;
+            width: 100%;
+        }
+
+        .dispute-copy-btn:active,
+        .dispute-link:active {
+            transform: scale(0.98);
+        }
+
+        .dispute-jam-button {
+            min-width: 100%;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .dispute-modal-content {
+            width: 95%;
+            max-width: none;
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .dispute-close-modal {
+            right: 15px;
+            top: 15px;
+            font-size: 20px;
+        }
     }
 
-    .dispute-modal-content {
-        background-color: white;
-        width: 90%;
-        max-width: 800px;
-        border-radius: 12px;
-        padding: 20px;
-        position: relative;
-        max-height: 90vh;
-        overflow-y: auto;
+    /* Small Devices (landscape phones, 576px and up) */
+    @media (min-width: 576px) and (max-width: 767.98px) {
+        .dispute-letters-section {
+            padding: 2rem 0;
+        }
+
+        .dispute-container {
+            padding: 0 1rem;
+        }
+
+        .dispute-section-header h2 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-subheading {
+            color: #666;
+            font-size: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .dispute-ai-tip {
+            color: #09ccfc;
+            font-size: 0.9rem;
+            padding: 0 0.5rem;
+        }
+
+        .dispute-prompt-cards {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 0;
+            max-width: 500px;
+        }
+
+        .dispute-prompt-card {
+            min-height: 240px;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            padding: 1.25rem;
+        }
+
+        .dispute-card-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .dispute-card-description {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .dispute-flip-btn {
+            padding: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .dispute-card-back h4 {
+            font-size: 1rem;
+        }
+
+        .dispute-prompt-content pre {
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .dispute-copy-btn,
+        .dispute-link {
+            font-size: 0.85rem;
+            padding: 0.6rem 0.8rem;
+        }
     }
 
-    .dispute-close-modal {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-        font-size: 24px;
-        cursor: pointer;
-        color: #666;
-        transition: color 0.2s;
-        z-index: 10;
+    /* Landscape Orientation Adjustments */
+    @media (max-width: 767.98px) and (orientation: landscape) {
+        .dispute-letters-section {
+            padding: 1rem 0;
+        }
+
+        .dispute-section-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .dispute-section-header h2 {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dispute-subheading {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dispute-ai-tip {
+            color: #09ccfc;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .dispute-prompt-cards {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .dispute-prompt-card {
+            min-height: 180px;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            padding: 0.875rem;
+        }
+
+        .dispute-card-header {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .dispute-ai-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0;
+        }
+
+        .dispute-card-header h3 {
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .dispute-card-description {
+            font-size: 0.8rem;
+            line-height: 1.3;
+            margin: 0.4rem 0 0.8rem;
+        }
+
+        .dispute-flip-btn {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            min-height: 36px;
+        }
+
+        .dispute-prompt-content pre {
+            font-size: 0.7rem;
+            line-height: 1.3;
+        }
+
+        .dispute-button-container {
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+
+        .dispute-copy-btn,
+        .dispute-link {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            min-height: 32px;
+        }
     }
 
-    .dispute-close-modal:hover {
-        color: #000;
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .dispute-card-inner:hover {
+            transform: none;
+        }
+
+        .dispute-flip-btn:hover,
+        .dispute-copy-btn:hover,
+        .dispute-link:hover {
+            background: initial;
+            border-color: initial;
+        }
+
+        .dispute-flip-btn,
+        .dispute-copy-btn,
+        .dispute-link,
+        .dispute-jam-button {
+            -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+        }
+
+        /* Prevent text selection on touch devices */
+        .dispute-ai-icon {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
     }
 
-    /* Add this new style for immediate hiding */
-    .dispute-card-inner.flipping .dispute-flip-btn {
-        opacity: 0;
-        transition: opacity 0.1s;
+    /* High DPI Displays */
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+        .dispute-card-inner {
+            will-change: transform;
+        }
+
+        .dispute-prompt-cards {
+            will-change: auto;
+        }
     }
 
-    .dispute-jam-button {
-        background-color: #09ccfc;
-        color: #FFFFFF;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        border: none;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-block;
-        text-align: center;
-        min-width: 200px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* iOS Safari specific adjustments */
+    @supports (-webkit-touch-callout: none) {
+        .dispute-card-back {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dispute-letters-section {
+            min-height: -webkit-fill-available;
+        }
+
+        .dispute-modal {
+            -webkit-overflow-scrolling: touch;
+        }
     }
 
-    .dispute-jam-button:hover {
-        background-color: #08b6e2;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(9, 204, 252, 0.3);
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+        .dispute-card-inner {
+            transition: none;
+        }
+
+        .dispute-flip-btn,
+        .dispute-copy-btn,
+        .dispute-link,
+        .dispute-jam-button {
+            transition: none;
+        }
+
+        .dispute-flip-btn:active,
+        .dispute-copy-btn:active,
+        .dispute-link:active {
+            transform: none;
+        }
+
+        .dispute-jam-button:hover {
+            transform: none;
+        }
+    }
+
+    /* Dark Mode Support 
+    @media (prefers-color-scheme: dark) {
+        .dispute-letters-section {
+            background-color: rgba(240, 242, 245, 0.85);
+            color: #ffffff;
+        }
+
+        .dispute-section-header h2 {
+            color: #ffffff;
+        }
+
+        .dispute-subheading {
+            color: #cccccc;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            background-color: #1a2332;
+            border-left-color: #0bb8e6;
+        }
+
+        .dispute-flip-btn {
+            background: rgba(11, 184, 230, 0.15);
+            border-color: rgba(11, 184, 230, 0.4);
+        }
+
+        .dispute-flip-btn:hover,
+        .dispute-flip-btn:active {
+            background: rgba(11, 184, 230, 0.25);
+            border-color: rgba(11, 184, 230, 0.6);
+        }
+
+        .dispute-card-back h4 {
+            color: #0bb8e6;
+        }
+
+        .dispute-prompt-content pre {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .dispute-modal-content {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .dispute-close-modal {
+            color: #cccccc;
+        }
+
+        .dispute-close-modal:hover {
+            color: #ffffff;
+        }
+    }*/
+
+    /* Print Styles */
+    @media print {
+        .dispute-letters-section {
+            padding: 1rem 0;
+            background-color: rgba(240, 242, 245, 0.85);
+        }
+
+        .dispute-letters-section::before {
+            display: none;
+        }
+
+        .dispute-prompt-cards {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            page-break-inside: avoid;
+        }
+
+        .dispute-prompt-card {
+            min-height: auto;
+            page-break-inside: avoid;
+        }
+
+        .dispute-card-inner {
+            transform: none;
+        }
+
+        .dispute-card-front,
+        .dispute-card-back {
+            position: static;
+            background: white;
+            color: black;
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        .dispute-card-back {
+            margin-top: 1rem;
+        }
+
+        .dispute-flip-btn,
+        .dispute-copy-btn {
+            display: none;
+        }
+
+        .dispute-link {
+            color: black;
+            background: none;
+            border: 1px solid black;
+        }
+
+        .dispute-modal {
+            display: none;
+        }
     }
 </style>
 
@@ -429,7 +905,7 @@
                     <div class="dispute-card-back">
                         <div class="dispute-prompt-content">
                             <h4>Late Payment Removal Prompt</h4>
-                            <pre><code>[Your Full Name] [Your Address] [City State ZIP Code] [Email Address] [Phone Number] Date: [Insert Date]
+                            <pre><code>[Your Full Name][Your Address][City State ZIP Code][Email Address][Phone Number]Date: [Insert Date]
                             To Whom It May Concern
                             I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit
                             report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
@@ -440,9 +916,9 @@
                             I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or
                             goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
                             Thank you for your time and for considering my request. I genuinely appreciate it.
-                            Sincerely [Your Full Name]</code></pre>
+                            Sincerely[Your Full Name]</code></pre>
                             <div class="dispute-button-container">
-                                <button class="dispute-copy-btn" data-prompt="[Your Full Name] [Your Address] [City State ZIP Code] [Email Address] [Phone Number] Date: [Insert Date]
+                                <button class="dispute-copy-btn" data-prompt="[Your Full Name][Your Address][City State ZIP Code][Email Address][Phone Number]Date: [Insert Date]
                             To Whom It May Concern
                             I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit
                             report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
@@ -453,7 +929,7 @@
                             I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or
                             goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
                             Thank you for your time and for considering my request. I genuinely appreciate it.
-                            Sincerely [Your Full Name]">
+                            Sincerely[Your Full Name]">
                                     <span class="dispute-copy-icon">📋</span> Copy Prompt
                                 </button>
                                 <button class="dispute-flip-btn">← Back</button>
@@ -677,12 +1153,12 @@
 
         // Get the JAM Engine button
         const jamEngineBtn = document.getElementById('disputeJamEngineBtn');
-        
+
         // Add click event listener
         if (jamEngineBtn) {
-            jamEngineBtn.addEventListener('click', function(e) {
+            jamEngineBtn.addEventListener('click', function (e) {
                 e.preventDefault();
-                
+
                 // Call the openQuizModal function from NavGetStarted.html
                 if (typeof window.openQuizModal === 'function') {
                     window.openQuizModal();
@@ -692,7 +1168,7 @@
                     if (navQuizModal) {
                         navQuizModal.style.display = 'flex';
                         document.body.style.overflow = 'hidden';
-                        
+
                         // Reset to first step if possible
                         if (typeof showStep === 'function') {
                             showStep(1);
@@ -701,7 +1177,7 @@
                         console.error("nav-quizModal element not found!");
                     }
                 }
-                
+
                 // Track button click if analytics is available
                 if (typeof analytics !== 'undefined') {
                     analytics.track('JamEngineStarted', {
@@ -711,7 +1187,7 @@
                 }
             });
         }
-        
+
         // Remove the booking modal since we're not using it anymore
         const bookingModal = document.getElementById('disputeToolBookingModal');
         if (bookingModal && bookingModal.parentNode) {
