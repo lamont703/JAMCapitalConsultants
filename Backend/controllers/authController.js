@@ -9,10 +9,17 @@ export const authController = {
         try {
             const { name, email, password, phone, company, securityQuestion, securityAnswer, ...otherData } = req.body;
             
+            console.log('🔍 === REGISTRATION DEBUG START ===');
             console.log('🔍 Registration started for:', email);
+            console.log('🔍 Request body keys:', Object.keys(req.body));
+            console.log('🔍 Environment check:');
+            console.log('  - JWT_SECRET exists:', !!process.env.JWT_SECRET);
+            console.log('  - JWT_SECRET length:', process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 'undefined');
             
             // Get CosmosService from app.locals
             const cosmosService = req.app.locals.cosmosService;
+            console.log('🔍 CosmosService check:', !!cosmosService);
+            
             if (!cosmosService) {
                 console.error('❌ CosmosService not available');
                 return res.status(503).json({
@@ -23,12 +30,14 @@ export const authController = {
 
             // Validate security question and answer
             if (!securityQuestion || !securityAnswer) {
+                console.log('❌ Missing security question/answer');
                 return res.status(400).json({
                     success: false,
                     message: 'Security question and answer are required'
                 });
             }
 
+            console.log('🔍 Checking for existing user...');
             // Check if user already exists
             const existingUser = await cosmosService.getUserByEmail(email);
             if (existingUser) {
@@ -38,18 +47,24 @@ export const authController = {
                     message: 'User already exists with this email'
                 });
             }
+            console.log('✅ No existing user found');
 
+            console.log('🔍 Hashing password...');
             // Hash password
             const saltRounds = 12;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
+            console.log('✅ Password hashed successfully');
 
+            console.log('🔍 Hashing security answer...');
             // Hash security answer with salt
             const securitySalt = crypto.randomBytes(16).toString('hex');
             const normalizedAnswer = securityAnswer.trim().toLowerCase();
             const securityAnswerHash = crypto
                 .pbkdf2Sync(normalizedAnswer, securitySalt, 10000, 64, 'sha512')
                 .toString('hex');
+            console.log('✅ Security answer hashed successfully');
 
+            console.log('🔍 Creating User model...');
             // Create user using User model to ensure Free Tier subscription is assigned
             const user = new User({
                 name: name.trim(),
@@ -63,59 +78,76 @@ export const authController = {
                 ghlContactId: null,
                 ghlSyncStatus: 'pending'
             });
+            console.log('✅ User model created');
 
             console.log('💾 Saving user to database...');
             // Save user using User model's save method to ensure proper validation and subscription assignment
             const savedUser = await user.save();
             console.log('✅ User saved to database:', savedUser.id);
 
+            console.log('🔍 Starting GHL sync...');
             // Sync to GoHighLevel CRM
-            console.log('🔄 Starting GHL sync for user:', savedUser.email);
-            
-            const ghlResult = await ghlSyncMiddleware.syncNewUser({
-                id: savedUser.id,
-                name: savedUser.name,
-                email: savedUser.email,
-                phone: savedUser.phone,
-                company: savedUser.company,
-                ...otherData
-            });
-
-            console.log('📊 GHL sync result:', JSON.stringify(ghlResult, null, 2));
-
-            // Update user record with GHL contact ID if successful
-            if (ghlResult.success && ghlResult.ghlContactId) {
-                console.log('✅ GHL sync successful, updating user record...');
-                await cosmosService.updateDocument(savedUser.id, 'user', {
-                    ghlContactId: ghlResult.ghlContactId,
-                    ghlSyncStatus: 'synced',
-                    updatedAt: new Date().toISOString()
+            try {
+                const ghlResult = await ghlSyncMiddleware.syncNewUser({
+                    id: savedUser.id,
+                    name: savedUser.name,
+                    email: savedUser.email,
+                    phone: savedUser.phone,
+                    company: savedUser.company,
+                    ...otherData
                 });
-                console.log('✅ User record updated with GHL contact ID:', ghlResult.ghlContactId);
-            } else if (!ghlResult.success) {
-                console.log('❌ GHL sync failed, updating status...');
-                await cosmosService.updateDocument(savedUser.id, 'user', {
-                    ghlSyncStatus: 'failed',
-                    updatedAt: new Date().toISOString()
-                });
-                console.log('❌ GHL sync error:', ghlResult.error);
+
+                console.log('📊 GHL sync result:', JSON.stringify(ghlResult, null, 2));
+
+                // Update user record with GHL contact ID if successful
+                if (ghlResult.success && ghlResult.ghlContactId) {
+                    console.log('✅ GHL sync successful, updating user record...');
+                    await cosmosService.updateDocument(savedUser.id, 'user', {
+                        ghlContactId: ghlResult.ghlContactId,
+                        ghlSyncStatus: 'synced',
+                        updatedAt: new Date().toISOString()
+                    });
+                    console.log('✅ User record updated with GHL contact ID:', ghlResult.ghlContactId);
+                } else if (!ghlResult.success) {
+                    console.log('❌ GHL sync failed, updating status...');
+                    await cosmosService.updateDocument(savedUser.id, 'user', {
+                        ghlSyncStatus: 'failed',
+                        updatedAt: new Date().toISOString()
+                    });
+                    console.log('❌ GHL sync error:', ghlResult.error);
+                }
+            } catch (ghlError) {
+                console.error('❌ GHL sync threw exception:', ghlError);
+                // Continue with registration even if GHL fails
             }
 
+            console.log('🔍 Generating JWT token...');
+            console.log('🔍 JWT_SECRET check before signing:', !!process.env.JWT_SECRET);
+            
             // Generate JWT token
-            const token = jwt.sign(
-                { 
-                    userId: savedUser.id, 
-                    email: savedUser.email,
-                    role: savedUser.role || 'user'
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: '7d' }
-            );
+            let token;
+            try {
+                token = jwt.sign(
+                    { 
+                        userId: savedUser.id, 
+                        email: savedUser.email,
+                        role: savedUser.role || 'user'
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '7d' }
+                );
+                console.log('✅ JWT token generated successfully');
+            } catch (jwtError) {
+                console.error('❌ JWT token generation failed:', jwtError);
+                throw new Error(`JWT generation failed: ${jwtError.message}`);
+            }
 
+            console.log('🔍 Preparing response...');
             // Remove sensitive data from response
             const { password: _, securityAnswerHash: __, securitySalt: ___, ...userResponse } = savedUser;
 
             console.log('✅ Registration successful for:', email);
+            console.log('🔍 === REGISTRATION DEBUG END ===');
 
             res.status(201).json({
                 success: true,
@@ -125,7 +157,13 @@ export const authController = {
             });
 
         } catch (error) {
-            console.error('❌ Registration error:', error);
+            console.error('❌ === REGISTRATION ERROR DETAILS ===');
+            console.error('❌ Error name:', error.name);
+            console.error('❌ Error message:', error.message);
+            console.error('❌ Error stack:', error.stack);
+            console.error('❌ Full error object:', error);
+            console.error('❌ === END ERROR DETAILS ===');
+            
             res.status(500).json({ 
                 success: false, 
                 error: 'Registration failed. Please try again.' 
