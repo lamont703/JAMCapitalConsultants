@@ -144,7 +144,16 @@ export const authController = {
 
             console.log('🔍 Preparing response...');
             // Remove sensitive data from response
-            const { password: _, securityAnswerHash: __, securitySalt: ___, ...userResponse } = savedUser;
+            // Convert to plain object to avoid circular references
+            const userPlainObject = JSON.parse(JSON.stringify(savedUser, (key, value) => {
+                // Skip circular references and internal properties
+                if (key.startsWith('_') || typeof value === 'function') {
+                    return undefined;
+                }
+                return value;
+            }));
+            
+            const { password: _, securityAnswerHash: __, securitySalt: ___, ...userResponse } = userPlainObject;
 
             console.log('✅ Registration successful for:', email);
             console.log('🔍 === REGISTRATION DEBUG END ===');
