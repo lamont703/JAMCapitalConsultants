@@ -52,110 +52,110 @@
 
         /* FAQ Item Styles - Enhanced */
         .plan-faq-item {
-            margin-bottom: 1rem;
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
             overflow: hidden;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-        }
-
-        .plan-faq-item:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-light);
-        }
-
-        .plan-faq-item.active {
-            border-color: var(--primary);
-            box-shadow: 0 4px 16px rgba(9, 204, 252, 0.15);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         /* FAQ Question Styles - Enhanced */
         .plan-faq-question {
+            padding: 20px;
+            background-color: white;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.25rem;
-            color: var(--gray-700);
-            background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
-            border-bottom: 1px solid var(--gray-200);
-            transition: all 0.2s ease;
-            min-height: 60px;
-            line-height: 1.4;
+            transition: background-color 0.3s;
         }
 
         .plan-faq-question:hover {
-            background: linear-gradient(135deg, #e8f4f8 0%, var(--primary-light) 100%);
+            background-color: var(--primary-light);
+        }
+
+        .plan-faq-question.active {
+            background-color: var(--primary-light);
             color: var(--primary-dark);
         }
 
-        .plan-faq-item.active .plan-faq-question {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-bottom-color: var(--primary-dark);
+        .question-mark {
+            color: #09ccfc;
+            margin: 0;
+            padding: 0;
+            display: inline;
+            font-weight: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            letter-spacing: 0;
+            word-spacing: 0;
+            margin-left: -0.1em;
         }
 
-        .plan-faq-question-text {
-            flex: 1;
-            margin-right: 1rem;
-            font-size: 1rem;
-        }
-
-        .plan-faq-toggle {
-            background: var(--gray-200);
-            color: var(--gray-600);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .plan-faq-question:hover .plan-faq-toggle {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .plan-faq-item.active .plan-faq-question .plan-faq-toggle {
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
             background: white;
-            color: var(--primary);
-            transform: rotate(180deg);
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
         }
 
         /* FAQ Answer Styles - Enhanced */
         .plan-faq-answer {
-            display: none;
-            padding: 1.5rem;
-            color: var(--gray-600);
-            line-height: 1.6;
-            background: var(--gray-50);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+            background-color: white;
+        }
+
+        .plan-faq-answer.open {
+            opacity: 1;
+            visibility: visible;
+            padding: 0;
+        }
+
+        .plan-faq-answer div {
+            padding: 20px;
             border-top: 1px solid var(--gray-200);
-            animation: fadeInAnswer 0.3s ease;
-        }
-
-        .plan-faq-answer.active {
-            display: block;
-        }
-
-        @keyframes fadeInAnswer {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
         .plan-faq-answer strong {
@@ -189,30 +189,69 @@
             }
 
             .plan-faq-question {
-                padding: 1rem;
-                min-height: 56px;
-                flex-direction: row;
-                align-items: flex-start;
-            }
-
-            .plan-faq-question-text {
+                padding: 12px 15px;
                 font-size: 0.95rem;
-                margin-right: 0.75rem;
+                border-radius: 8px 8px 0 0;
+                min-height: 44px;
+                touch-action: manipulation;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
                 line-height: 1.3;
             }
 
-            .plan-faq-toggle {
-                width: 28px;
-                height: 28px;
-                font-size: 1rem;
-                margin-top: 0.2rem;
-                flex-shrink: 0;
+            .plan-faq-question:active {
+                transform: scale(0.98);
+            }
+
+            .question-mark {
+                color: #09ccfc !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+                font-weight: inherit !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                letter-spacing: 0 !important;
+                word-spacing: 0 !important;
+                margin-left: -0.1em !important;
+            }
+
+            .typing-indicator {
+                padding: 10px 15px;
+                border-radius: 0;
+            }
+
+            .dots {
+                gap: 3px;
+            }
+
+            .dot {
+                width: 6px;
+                height: 6px;
             }
 
             .plan-faq-answer {
-                padding: 1rem;
-                font-size: 0.9rem;
-                line-height: 1.5;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+                background-color: white;
+            }
+
+            .plan-faq-answer.open {
+                opacity: 1;
+                visibility: visible;
+                padding: 0;
+            }
+
+            .plan-faq-answer div {
+                padding: 12px 15px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+                border-top: 1px solid var(--gray-200);
             }
 
             /* Touch enhancements */
@@ -243,23 +282,46 @@
                 border-radius: 10px;
             }
 
+            .question-mark {
+                color: #09ccfc !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+                font-weight: inherit !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                letter-spacing: 0 !important;
+                word-spacing: 0 !important;
+                margin-left: -0.1em !important;
+            }
+
             .plan-faq-question {
-                padding: 1.1rem;
-            }
-
-            .plan-faq-question-text {
-                font-size: 0.98rem;
-            }
-
-            .plan-faq-toggle {
-                width: 30px;
-                height: 30px;
-                font-size: 1.1rem;
+                padding: 16px 20px;
+                font-size: 1rem;
+                min-height: 48px;
             }
 
             .plan-faq-answer {
-                padding: 1.25rem;
-                font-size: 0.95rem;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+                background-color: white;
+            }
+
+            .plan-faq-answer.open {
+                opacity: 1;
+                visibility: visible;
+                padding: 0;
+            }
+
+            .plan-faq-answer div {
+                padding: 12px 15px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+                border-top: 1px solid var(--gray-200);
             }
         }
 
@@ -276,11 +338,32 @@
             }
 
             .plan-faq-question {
-                padding: 1.15rem;
+                padding: 18px 25px;
+                font-size: 1.05rem;
+                min-height: 50px;
             }
 
             .plan-faq-answer {
-                padding: 1.35rem;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+                background-color: white;
+            }
+
+            .plan-faq-answer.open {
+                opacity: 1;
+                visibility: visible;
+                padding: 0;
+            }
+
+            .plan-faq-answer div {
+                padding: 12px 15px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+                border-top: 1px solid var(--gray-200);
             }
         }
 
@@ -292,11 +375,14 @@
             }
 
             .plan-faq-question {
-                padding: 1.25rem;
+                padding: 20px;
+                font-size: 1rem;
             }
 
-            .plan-faq-answer {
-                padding: 1.5rem;
+            .plan-faq-answer div {
+                padding: 20px;
+                font-size: 1rem;
+                line-height: 1.5;
             }
         }
 
@@ -312,16 +398,14 @@
             }
 
             .plan-faq-question {
-                padding: 1.5rem;
-            }
-
-            .plan-faq-question-text {
+                padding: 20px;
                 font-size: 1.1rem;
             }
 
-            .plan-faq-answer {
-                padding: 2rem;
+            .plan-faq-answer div {
+                padding: 20px;
                 font-size: 1.05rem;
+                line-height: 1.5;
             }
         }
 
@@ -342,73 +426,85 @@
                 border-radius: 6px;
             }
 
+            .question-mark {
+                color: #09ccfc !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+                font-weight: inherit !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                letter-spacing: 0 !important;
+                word-spacing: 0 !important;
+                margin-left: -0.1em !important;
+            }
+
             .plan-faq-question {
-                padding: 0.75rem;
-                min-height: 48px;
-            }
-
-            .plan-faq-question-text {
-                font-size: 0.85rem;
-                line-height: 1.2;
-            }
-
-            .plan-faq-toggle {
-                width: 24px;
-                height: 24px;
+                padding: 12px;
                 font-size: 0.9rem;
+                min-height: 40px;
             }
 
             .plan-faq-answer {
-                padding: 0.75rem;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+                background-color: white;
+            }
+
+            .plan-faq-answer.open {
+                opacity: 1;
+                visibility: visible;
+                padding: 0;
+            }
+
+            .plan-faq-answer div {
+                padding: 12px 15px;
                 font-size: 0.85rem;
                 line-height: 1.4;
+                border-top: 1px solid var(--gray-200);
             }
         }
 
         /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
-            .plan-faq-item:hover {
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                border-color: var(--gray-200);
-            }
-
-            .plan-faq-item.active:hover {
-                border-color: var(--primary);
-                box-shadow: 0 4px 16px rgba(9, 204, 252, 0.15);
-            }
-
             .plan-faq-question:hover {
-                background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%);
-                color: var(--gray-700);
-            }
-
-            .plan-faq-item.active .plan-faq-question:hover {
-                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-                color: white;
-            }
-
-            .plan-faq-question:hover .plan-faq-toggle {
-                background: var(--gray-200);
-                color: var(--gray-600);
+                background-color: initial;
                 transform: none;
             }
 
-            .plan-faq-item.active .plan-faq-question:hover .plan-faq-toggle {
-                background: white;
-                color: var(--primary);
-            }
-
-            /* Enhanced tap highlighting */
             .plan-faq-question {
-                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.1);
+                -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
             }
 
-            /* Prevent text selection on interactive elements */
+            /* Enhanced touch targets */
+            .plan-faq-question {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Prevent text selection on touch devices */
             .plan-faq-question {
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
                 user-select: none;
+            }
+
+            .plan-faq-answer {
+                -webkit-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+                user-select: text;
+            }
+
+            /* Better touch feedback */
+            .plan-faq-question:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
             }
         }
 
@@ -594,154 +690,248 @@
 
                 console.log('Initializing PlanFaq module with content');
 
-                // Enhanced FAQ content with more questions
+                // Updated FAQ content focused on Full-Service plans only
                 container.innerHTML = `
                     <div class="plan-faq-container">
                         <h2 class="plan-faq-title">Frequently Asked Questions</h2>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">What's the difference between your pricing plans?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                What's the difference between your payment options<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                We offer three plan categories: <strong>Free Plan ($0/forever)</strong> gives you JAM Engine access, 
-                                Dispute Library, and 2 lifetime dispute letter credits. <strong>DIY Plans ($29-$99/month)</strong> 
-                                add monthly dispute letter credits (5-50 per month) with email/phone support. 
-                                <strong>Done For You Plans (starting $197/month)</strong> provide full-service credit disputes 
-                                where we handle everything for you, with 4 different payment options to fit your budget.
+                                <div>
+                                    All our plans provide the same premium full-service credit dispute experience with a dedicated specialist. 
+                                    The only difference is the payment structure: <strong>Elite JumpStart</strong> ($399 setup + $197/month), 
+                                    <strong>Momentum Builder</strong> (2 x $250 weekly + $197/month - Most Popular), 
+                                    <strong>Strategic Start</strong> (4 x $150 weekly + $197/month), and 
+                                    <strong>Platinum Commitment</strong> ($1,499 one-time includes 6 months). Choose based on your budget preference.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">How do the DIY plan dispute letter credits work?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                What's included in all Full-Service plans<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                DIY Starter ($29/month) includes 5 dispute letter credits, DIY Professional ($59/month) 
-                                includes 15 credits, and DIY Premium ($99/month) includes 50 credits. These credits 
-                                renew monthly and let you generate professional dispute letters using our JAM Dispute Bot. 
-                                All DIY plans include everything from the Free plan plus these monthly credits.
+                                <div>
+                                    Every plan includes: <strong>JAM Engine Credit Management Platform</strong>, dedicated credit dispute specialist, 
+                                    unlimited custom dispute letters, priority processing of all disputes, monthly credit score updates, 
+                                    direct creditor negotiations, weekly progress updates, and personalized credit building strategy. 
+                                    You get the same white-glove service regardless of which payment option you choose.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">What are the Done For You payment options?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                Which payment option is most popular and why<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                We offer 4 payment structures for the same premium service: <strong>Elite JumpStart</strong> 
-                                ($399 setup + $197/month), <strong>Momentum Builder</strong> (2 weekly $250 payments + $197/month - Most Popular), 
-                                <strong>Strategic Start</strong> (4 weekly $150 payments + $197/month), and 
-                                <strong>Platinum Commitment</strong> ($1,499 one-time includes 6 months). All provide identical 
-                                white-glove service with a dedicated specialist handling everything.
+                                <div>
+                                    <strong>Momentum Builder</strong> (2 x $250 weekly + $197/month) is our most popular option because it 
+                                    spreads the startup cost over just 2 weeks, making it easier to budget while still getting started quickly. 
+                                    Many clients prefer this balance between affordability and fast access to our full-service credit dispute program.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">How long does credit disputes take?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                How long does the credit dispute process take<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                Most clients see initial results within 30-45 days, with significant improvements 
-                                typically occurring within 3-6 months. Complex cases may take longer. DIY plan users 
-                                can work at their own pace, while Done For You clients get weekly progress updates 
-                                and dedicated specialist management to optimize timing.
+                                <div>
+                                    Most clients see initial results within 30-45 days, with significant improvements typically occurring 
+                                    within 3-6 months. Your dedicated specialist will provide weekly progress updates and work continuously 
+                                    on your behalf. Complex cases may take longer, but we maintain consistent effort throughout the process 
+                                    to maximize your results.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">What's included in the JAM Engine Credit Management Platform?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                What does my dedicated credit dispute specialist do<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                JAM Engine is our comprehensive credit management platform included in all plans. 
-                                It provides credit report analysis, tracks your progress, manages dispute documentation, 
-                                offers personalized recommendations, and integrates with our JAM Dispute Bot for 
-                                seamless credit dispute workflow. It's your central hub for all credit improvement activities.
+                                <div>
+                                    Your specialist handles everything: analyzes your credit reports, writes and sends custom dispute letters, 
+                                    follows up with credit bureaus, negotiates directly with creditors on your behalf, tracks all responses, 
+                                    provides weekly progress updates, and develops your personalized credit building strategy. You can relax 
+                                    while they do all the work.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">Can I upgrade or downgrade my plan anytime?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                Can I change my payment plan after starting<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                Yes! You can upgrade from Free to DIY plans, between DIY tiers, or from DIY to Done For You 
-                                service at any time. Downgrades are processed at your next billing cycle. The Free plan 
-                                never expires and requires no payment information, so you can always return to it if needed.
+                                <div>
+                                    Once you've completed your initial payment structure (setup fee or weekly payments), all plans transition 
+                                    to the same $197/month service fee. The Platinum Commitment includes 6 months of service, after which 
+                                    you can continue at the standard monthly rate if desired. Contact your specialist to discuss any 
+                                    payment adjustments.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">What's the difference between DIY and Done For You service?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                What makes your service different from other credit dispute companies<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                DIY plans give you all the tools and resources to dispute your credit yourself - dispute letter 
-                                generation, credit analysis, educational resources, and support. Done For You service assigns 
-                                you a dedicated credit dispute specialist who handles everything: writing disputes, sending letters, 
-                                following up with creditors, negotiating on your behalf, and providing weekly progress updates.
+                                <div>
+                                    We provide true white-glove service with dedicated specialists, not generic form letters. Our JAM Engine 
+                                    platform uses advanced technology for credit analysis and strategy development. You get weekly updates, 
+                                    direct creditor negotiations, and unlimited custom dispute letters. Plus, we offer flexible payment 
+                                    options to fit any budget while maintaining the same premium service quality.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">Is there a guarantee for credit score improvement?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                Is there a guarantee for credit score improvement<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                While we cannot legally guarantee specific point increases (no credit dispute company can), 
-                                our methods have helped thousands of clients improve their credit scores. We offer a 30-day 
-                                money-back guarantee on all paid plans. Done For You clients also get a 6-month minimum 
-                                commitment guarantee - if you follow our program and don't see meaningful results, we'll work 
-                                with you to make it right.
+                                <div>
+                                    While no credit dispute company can legally guarantee specific point increases, our proven methods have 
+                                    helped thousands of clients improve their credit scores. We offer a <strong>30-day money-back guarantee</strong> 
+                                    on all plans. If you follow our program and don't see meaningful progress, we'll work with you to make it right. 
+                                    Our specialists are committed to your success.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">What do I need to provide to get started?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                What do I need to provide to get started<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                For the Free plan, just create your account. For paid plans, you'll need a credit monitoring 
-                                account (we'll recommend 3 trusted options) and ID verification (license + utility bill). 
-                                Done For You clients get white-glove onboarding where your specialist walks you through 
-                                everything step-by-step.
+                                <div>
+                                    You'll need access to your credit reports (we'll recommend trusted monitoring services), basic identification 
+                                    (driver's license), and a recent utility bill for verification. Your dedicated specialist will guide you 
+                                    through the entire onboarding process step-by-step, making it as easy as possible to get started with 
+                                    your credit improvement journey.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">How does the JAM Dispute Bot work?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                How does the JAM Engine Credit Management Platform work<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                JAM Dispute Bot analyzes your credit reports, identifies potential errors or discrepancies, 
-                                and generates professional dispute letters. Free plan users get 2 lifetime credits, DIY plans 
-                                get monthly credits (5-50 depending on tier), and Done For You clients get unlimited usage 
-                                as part of their specialist's service. It also includes credit education and strategic guidance.
+                                <div>
+                                    JAM Engine is your comprehensive credit management dashboard that tracks your progress, stores all 
+                                    dispute documentation, provides credit analysis, and offers personalized recommendations. Your specialist 
+                                    uses this platform to manage your case, and you have access to view your progress, updates, and 
+                                    educational resources 24/7.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">What support do I get with each plan?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                What kind of support do I get during the process<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                Free plan includes self-service resources and documentation. DIY Starter and Professional 
-                                include email support, while DIY Premium adds phone support. Done For You plans include 
-                                a dedicated credit dispute specialist, weekly progress updates, direct creditor negotiations, 
-                                and priority support for any questions or concerns.
+                                <div>
+                                    You get comprehensive support including: a dedicated credit dispute specialist assigned to your case, 
+                                    weekly progress updates via email or phone, direct access to contact your specialist with questions, 
+                                    priority customer service, and educational resources through the JAM Engine platform. We're here to 
+                                    support you every step of the way.
+                                </div>
                             </div>
                         </div>
                         <div class="plan-faq-item">
                             <div class="plan-faq-question">
-                                <span class="plan-faq-question-text">Is my personal information secure?</span>
-                                <span class="plan-faq-toggle">+</span>
+                                Is my personal information secure<span class="question-mark">?</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
                             </div>
                             <div class="plan-faq-answer">
-                                Yes, we use bank-level 256-bit SSL encryption and security measures to protect your personal 
-                                information. All plans include secure document storage for your credit reports and dispute 
-                                documentation. We're fully compliant with data protection regulations and never share your 
-                                information with third parties without your explicit consent.
+                                <div>
+                                    Absolutely. We use bank-level 256-bit SSL encryption and advanced security measures to protect your 
+                                    personal information. All credit reports and dispute documentation are stored securely in our encrypted 
+                                    JAM Engine platform. We're fully compliant with data protection regulations and never share your 
+                                    information with third parties without your explicit consent.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -756,25 +946,54 @@
                 questions.forEach((question, index) => {
                     question.addEventListener('click', function () {
                         console.log('Question clicked:', index);
-                        const answer = this.nextElementSibling;
-                        const faqItem = this.closest('.plan-faq-item');
-                        const toggle = this.querySelector('.plan-faq-toggle');
+                        const typingIndicator = this.nextElementSibling;
+                        const answer = typingIndicator.nextElementSibling;
+                        const isOpen = answer.classList.contains('open');
 
-                        // Toggle active states
-                        answer.classList.toggle('active');
-                        faqItem.classList.toggle('active');
+                        // Close all other answers and hide typing indicators
+                        container.querySelectorAll('.plan-faq-answer').forEach(item => {
+                            item.style.maxHeight = '0px';
+                            item.classList.remove('open');
+                        });
 
-                        // Update toggle icon with smooth transition
-                        toggle.textContent = answer.classList.contains('active') ? '-' : '+';
+                        container.querySelectorAll('.typing-indicator').forEach(item => {
+                            item.style.display = 'none';
+                        });
 
-                        // Update expanded questions array
-                        const isExpanded = answer.classList.contains('active');
-                        const questionIndex = expandedQuestions.indexOf(index);
+                        container.querySelectorAll('.plan-faq-question').forEach(item => {
+                            item.classList.remove('active');
+                        });
 
-                        if (isExpanded && questionIndex === -1) {
-                            expandedQuestions.push(index);
-                        } else if (!isExpanded && questionIndex !== -1) {
-                            expandedQuestions.splice(questionIndex, 1);
+                        // Toggle current answer
+                        if (!isOpen) {
+                            this.classList.add('active');
+
+                            // Show typing indicator first
+                            typingIndicator.style.display = 'block';
+
+                            // After 1.5 seconds, hide typing indicator and show answer
+                            setTimeout(() => {
+                                typingIndicator.style.display = 'none';
+                                answer.classList.add('open');
+                                answer.style.maxHeight = answer.scrollHeight + 'px';
+                            }, 1500);
+
+                            // Update expanded questions array
+                            if (!expandedQuestions.includes(index)) {
+                                expandedQuestions.push(index);
+                            }
+                        } else {
+                            // If clicking on an already open item, close it
+                            answer.style.maxHeight = '0px';
+                            answer.classList.remove('open');
+                            this.classList.remove('active');
+                            typingIndicator.style.display = 'none';
+
+                            // Remove from expanded questions array
+                            const questionIndex = expandedQuestions.indexOf(index);
+                            if (questionIndex !== -1) {
+                                expandedQuestions.splice(questionIndex, 1);
+                            }
                         }
 
                         console.log('Updated expandedQuestions:', expandedQuestions);
@@ -786,14 +1005,27 @@
                     // Restore expanded state
                     if (expandedQuestions.includes(index)) {
                         console.log('Restoring expanded state for question:', index);
-                        const answer = question.nextElementSibling;
-                        const faqItem = question.closest('.plan-faq-item');
-                        const toggle = question.querySelector('.plan-faq-toggle');
+                        const typingIndicator = question.nextElementSibling;
+                        const answer = typingIndicator.nextElementSibling;
 
-                        answer.classList.add('active');
-                        faqItem.classList.add('active');
-                        toggle.textContent = '-';
+                        answer.classList.add('open');
+                        question.classList.add('active');
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
                     }
+                });
+
+                // Initialize all FAQ answers as closed
+                container.querySelectorAll('.plan-faq-answer').forEach(answer => {
+                    answer.style.maxHeight = '0px';
+                    answer.classList.remove('open');
+                });
+
+                container.querySelectorAll('.plan-faq-question').forEach(question => {
+                    question.classList.remove('active');
+                });
+
+                container.querySelectorAll('.typing-indicator').forEach(indicator => {
+                    indicator.style.display = 'none';
                 });
 
                 isInitialized = true;

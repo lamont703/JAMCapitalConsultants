@@ -159,9 +159,23 @@ export class GHLOAuthExchange {
 
     async loadSavedTokens() {
         const tokensPath = path.join(__dirname, '../config/ghl-tokens.json');
+        
+        // First try to load from file (for local development)
         if (fs.existsSync(tokensPath)) {
             return JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
         }
+        
+        // Fallback to environment variables (for production Azure)
+        if (process.env.GHL_STORED_ACCESS_TOKEN && process.env.GHL_STORED_REFRESH_TOKEN) {
+            console.log('🔄 Loading GHL tokens from environment variables (production)');
+            return {
+                access_token: process.env.GHL_STORED_ACCESS_TOKEN,
+                refresh_token: process.env.GHL_STORED_REFRESH_TOKEN,
+                expires_at: process.env.GHL_TOKEN_EXPIRES_AT,
+                token_type: 'Bearer'
+            };
+        }
+        
         return null;
     }
 

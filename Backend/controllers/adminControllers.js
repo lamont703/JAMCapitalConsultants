@@ -1092,6 +1092,138 @@ const adminController = {
                 error: error.message
             });
         }
+    },
+
+    // Get user ID verification documents for admin retrieval
+    async getUserIdDocuments(req, res) {
+        try {
+            console.log('🆔 Get user ID documents request received');
+            const { userEmail, documentType, purpose } = req.body;
+            const adminId = req.user?.id;
+
+            // Validate required fields
+            if (!userEmail || !documentType || !purpose) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing required fields: userEmail, documentType, and purpose'
+                });
+            }
+
+            // Validate document type
+            const validDocumentTypes = ['government-id', 'utility-bill', 'both'];
+            if (!validDocumentTypes.includes(documentType)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid document type. Must be one of: government-id, utility-bill, both'
+                });
+            }
+
+            const cosmosService = req.app.locals.cosmosService;
+            if (!cosmosService) {
+                throw new Error('CosmosDB service not available');
+            }
+
+            // First, get the user ID from email
+            const user = await cosmosService.getUserByEmail(userEmail);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
+
+            console.log(`✅ User found: ${user.name || user.firstName} (${user.email})`);
+
+            // Build query based on document type requested
+            let documentsQuery;
+            let documentsParams;
+
+            if (documentType === 'both') {
+                // Get both government ID and utility bill
+                documentsQuery = `
+                    SELECT * FROM c 
+                    WHERE c.userId = @userId 
+                    AND c.type = 'document' 
+                    AND c.documentType = 'id-verification'
+                    AND (c.idType = 'government-id' OR c.idType = 'utility-bill')
+                    ORDER BY c.createdAt DESC
+                `;
+                documentsParams = [{ name: "@userId", value: user.id }];
+            } else {
+                // Get specific document type
+                documentsQuery = `
+                    SELECT * FROM c 
+                    WHERE c.userId = @userId 
+                    AND c.type = 'document' 
+                    AND c.documentType = 'id-verification'
+                    AND c.idType = @idType
+                    ORDER BY c.createdAt DESC
+                `;
+                documentsParams = [
+                    { name: "@userId", value: user.id },
+                    { name: "@idType", value: documentType }
+                ];
+            }
+
+            const documents = await cosmosService.queryDocuments(documentsQuery, documentsParams);
+            console.log(`✅ Found ${documents.length} ID verification documents for user:`, user.email);
+
+            // Log admin access for audit trail
+            const accessLog = {
+                id: `id_doc_access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'id_document_access_log',
+                adminId: adminId || 'system',
+                userEmail: userEmail,
+                userId: user.id,
+                documentType: documentType,
+                purpose: purpose,
+                documentsFound: documents.length,
+                accessTimestamp: new Date().toISOString(),
+                ipAddress: req.ip,
+                userAgent: req.get('User-Agent')
+            };
+
+            await cosmosService.createDocument(accessLog, 'id_document_access_log');
+            console.log(`📝 Logged ID document access: ${purpose} for ${userEmail}`);
+
+            // Format documents for frontend consumption
+            const formattedDocuments = documents.map(doc => ({
+                id: doc.id,
+                fileName: doc.fileName,
+                fileUrl: doc.fileUrl,
+                fileSize: doc.fileSize,
+                mimeType: doc.mimeType,
+                idType: doc.idType,
+                uploadDate: doc.createdAt || doc.uploadedAt,
+                displayName: doc.idType === 'government-id' ? 'Government ID' : 'Utility Bill'
+            }));
+
+            res.json({
+                success: true,
+                message: 'ID verification documents retrieved successfully',
+                userInfo: {
+                    name: user.name || user.firstName,
+                    email: user.email,
+                    userId: user.id
+                },
+                documents: formattedDocuments,
+                count: formattedDocuments.length,
+                documentType: documentType,
+                accessLog: {
+                    logId: accessLog.id,
+                    timestamp: accessLog.accessTimestamp,
+                    adminId: adminId
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Error fetching user ID documents:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to fetch user ID verification documents',
+                error: error.message
+            });
+        }
     }
 };
 

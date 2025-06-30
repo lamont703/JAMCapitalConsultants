@@ -1,0 +1,214 @@
+<!-- Add viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Styles for JAM Engine Button -->
+<style>
+    .nav-quiz-button-container {
+        margin: 0 auto;
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .nav-credit-quiz-btn {
+        background-color: #09ccfc;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: inline-block;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 0;
+        position: relative;
+        width: auto;
+    }
+
+    .nav-credit-quiz-btn:hover {
+        background-color: #08b6e2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Mobile responsiveness for button */
+    @media (max-width: 575.98px) {
+        .nav-quiz-button-container {
+            margin: 0 auto;
+            padding: 0;
+            max-width: 100%;
+        }
+
+        .nav-credit-quiz-btn {
+            padding: 1rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            min-height: 44px;
+            touch-action: manipulation;
+            width: 100%;
+            margin: 0;
+        }
+
+        .nav-credit-quiz-btn:active {
+            transform: scale(0.98);
+        }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+        .nav-credit-quiz-btn:hover {
+            background-color: #09ccfc;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-credit-quiz-btn {
+            -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+        }
+    }
+
+    /* Hidden container for JAM Get Started Module 
+    #jam-get-started-module-container {
+            display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    #jam-get-started-module-container.active {
+        display: block;
+    }*/
+</style>
+
+<!-- HTML Content -->
+<div class="nav-quiz-button-container">
+    <button class="nav-credit-quiz-btn" onclick="openJAMEngine()">
+        Start JAM Engine
+    </button>
+</div>
+
+<!-- Hidden container for JAM Get Started Module -->
+<div id="jam-get-started-module-container"></div>
+
+<!-- Load JAM Get Started Module -->
+<script src="NavGetStarted.html"></script>
+
+<!-- Initialize module -->
+<script>
+    let jamModuleInitialized = false;
+    let jamModuleContainer = null;
+
+    // Function to initialize JAM Get Started Module
+    function initJAMGetStartedModule() {
+        console.log('🚀 Initializing JAM Get Started Module...');
+
+        jamModuleContainer = document.getElementById('jam-get-started-module-container');
+
+        if (window.JAMGetStartedModule && jamModuleContainer) {
+            try {
+                const success = window.JAMGetStartedModule.init(jamModuleContainer);
+                if (success) {
+                    jamModuleInitialized = true;
+                    console.log('✅ JAM Get Started Module initialized successfully');
+
+                    // Override the close function to hide our container
+                    const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
+                    window.JAMGetStartedModule.closeQuiz = function () {
+                        originalCloseQuiz();
+                        jamModuleContainer.classList.remove('active');
+                    };
+
+                } else {
+                    console.error('❌ Failed to initialize JAM Get Started Module');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing JAM Get Started Module:', error);
+            }
+        } else {
+            console.warn('⚠️ JAM Get Started Module or container not found');
+        }
+    }
+
+    // Function to open JAM Engine
+    function openJAMEngine() {
+        console.log('🎯 Opening JAM Engine...');
+
+        // Check if module is initialized
+        if (!jamModuleInitialized) {
+            console.log('🔄 Module not initialized, attempting to initialize...');
+            initJAMGetStartedModule();
+        }
+
+        // Try to open the module
+        if (window.JAMGetStartedModule && jamModuleInitialized) {
+            try {
+                // Show our container
+                jamModuleContainer.classList.add('active');
+
+                // Open the quiz
+                window.JAMGetStartedModule.openQuiz();
+
+                console.log('✅ JAM Engine opened successfully');
+            } catch (error) {
+                console.error('❌ Error opening JAM Engine:', error);
+                showFallbackMessage();
+            }
+        } else {
+            console.error('❌ JAM Get Started Module not available');
+            showFallbackMessage();
+        }
+    }
+
+    // Fallback function if module fails to load
+    function showFallbackMessage() {
+        alert('JAM Engine is temporarily unavailable. Please try again later or contact support.');
+    }
+
+    // Wait for JAM Get Started Module to load
+    function waitForJAMModule() {
+        if (window.JAMGetStartedModule) {
+            console.log('✅ JAM Get Started Module detected');
+            initJAMGetStartedModule();
+        } else {
+            console.log('⏳ Waiting for JAM Get Started Module...');
+            setTimeout(waitForJAMModule, 100);
+        }
+    }
+
+    // Listen for module load event
+    window.addEventListener('jamGetStartedModuleLoaded', function () {
+        console.log('📡 JAM Get Started Module loaded event received');
+        initJAMGetStartedModule();
+    });
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('📄 DOM loaded, checking for JAM Get Started Module...');
+
+        // Start waiting for the module
+        setTimeout(waitForJAMModule, 100);
+    });
+
+    // Backup initialization after page load
+    window.addEventListener('load', function () {
+        if (!jamModuleInitialized) {
+            console.log('🔄 Page loaded, attempting backup initialization...');
+            setTimeout(function () {
+                if (window.JAMGetStartedModule && !jamModuleInitialized) {
+                    initJAMGetStartedModule();
+                }
+            }, 500);
+        }
+    });
+
+    // Global function for external access
+    window.openJAMEngine = openJAMEngine;
+</script>

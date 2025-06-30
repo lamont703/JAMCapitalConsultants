@@ -3051,8 +3051,9 @@
                             if (result.success) {
                                 console.log('✅ SmartCredit credentials stored/updated securely');
 
-                                // Check if this was an update or new credential
-                                const isUpdate = submitButton.querySelector('#smartcredit-submit-text').textContent.includes('Update');
+                                // Check if this was an update or new credential (BEFORE modifying the DOM)
+                                const submitTextElement = submitButton.querySelector('#smartcredit-submit-text');
+                                const isUpdate = submitTextElement && submitTextElement.textContent.includes('Update');
 
                                 if (isUpdate) {
                                     // Show updated credential status
@@ -3072,18 +3073,15 @@
                                     // Show success message
                                     showCredentialMessage(container, 'smartcredit', 'success', 'SmartCredit credentials updated successfully!');
                                 } else {
-                                    // Show success message for new credentials
-                                    smartCreditForm.innerHTML = `
-                                        <div style="text-align: center; padding: 20px;">
-                                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                            <h3 style="color: var(--success); margin-bottom: 10px;">SmartCredit Access Stored Securely</h3>
-                                            <p>Your SmartCredit credentials have been encrypted and stored securely. Our team can now access your credit reports to provide faster service.</p>
-                                            <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
-                                                <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                                                <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
-                                            </div>
-                                        </div>
-                                    `;
+                                    // Show credential status for new credentials
+                                    const credentialData = {
+                                        email: email,
+                                        updatedAt: new Date().toISOString()
+                                    };
+                                    showCredentialStatus(container, 'smartcredit', credentialData);
+
+                                    // Show success message
+                                    showCredentialMessage(container, 'smartcredit', 'success', 'SmartCredit credentials stored securely! You can now update or remove them using the buttons above.');
                                 }
                             } else {
                                 throw new Error(result.message || 'Failed to store credentials');
@@ -3248,8 +3246,9 @@
                             if (result.success) {
                                 console.log('✅ IdentityIQ credentials stored/updated securely');
 
-                                // Check if this was an update or new credential
-                                const isUpdate = submitButton.querySelector('#identityiq-submit-text').textContent.includes('Update');
+                                // Check if this was an update or new credential (BEFORE modifying the DOM)
+                                const submitTextElement = submitButton.querySelector('#identityiq-submit-text');
+                                const isUpdate = submitTextElement && submitTextElement.textContent.includes('Update');
 
                                 if (isUpdate) {
                                     // Show updated credential status
@@ -3269,18 +3268,15 @@
                                     // Show success message
                                     showCredentialMessage(container, 'identityiq', 'success', 'IdentityIQ credentials updated successfully!');
                                 } else {
-                                    // Show success message for new credentials
-                                    identityIQForm.innerHTML = `
-                                        <div style="text-align: center; padding: 20px;">
-                                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                            <h3 style="color: var(--success); margin-bottom: 10px;">IdentityIQ Access Stored Securely</h3>
-                                            <p>Your IdentityIQ credentials have been encrypted and stored securely. Our team can now access your identity monitoring data to enhance your credit dispute process.</p>
-                                            <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
-                                                <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                                                <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
-                                            </div>
-                                        </div>
-                                    `;
+                                    // Show credential status for new credentials
+                                    const credentialData = {
+                                        email: email,
+                                        updatedAt: new Date().toISOString()
+                                    };
+                                    showCredentialStatus(container, 'identityiq', credentialData);
+
+                                    // Show success message
+                                    showCredentialMessage(container, 'identityiq', 'success', 'IdentityIQ credentials stored securely! You can now update or remove them using the buttons above.');
                                 }
                             } else {
                                 throw new Error(result.message || 'Failed to store credentials');
@@ -3453,8 +3449,9 @@
                             if (result.success) {
                                 console.log('✅ MyScoreIQ credentials stored/updated securely');
 
-                                // Check if this was an update or new credential
-                                const isUpdate = submitButton.querySelector('#myscoreiq-submit-text').textContent.includes('Update');
+                                // Check if this was an update or new credential (BEFORE modifying the DOM)
+                                const submitTextElement = submitButton.querySelector('#myscoreiq-submit-text');
+                                const isUpdate = submitTextElement && submitTextElement.textContent.includes('Update');
 
                                 if (isUpdate) {
                                     // Show updated credential status
@@ -3474,18 +3471,15 @@
                                     // Show success message
                                     showCredentialMessage(container, 'myscoreiq', 'success', 'MyScoreIQ credentials updated successfully!');
                                 } else {
-                                    // Show success message for new credentials
-                                    myScoreIQForm.innerHTML = `
-                                        <div style="text-align: center; padding: 20px;">
-                                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                            <h3 style="color: var(--success); margin-bottom: 10px;">MyScoreIQ Access Stored Securely</h3>
-                                            <p>Your MyScoreIQ credentials have been encrypted and stored securely. Our team can now access your credit score tracking data to enhance our analysis capabilities.</p>
-                                            <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
-                                                <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                                                <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
-                                            </div>
-                                        </div>
-                                    `;
+                                    // Show credential status for new credentials
+                                    const credentialData = {
+                                        email: email,
+                                        updatedAt: new Date().toISOString()
+                                    };
+                                    showCredentialStatus(container, 'myscoreiq', credentialData);
+
+                                    // Show success message
+                                    showCredentialMessage(container, 'myscoreiq', 'success', 'MyScoreIQ credentials stored securely! You can now update or remove them using the buttons above.');
                                 }
                             } else {
                                 throw new Error(result.message || 'Failed to store credentials');
@@ -3578,8 +3572,9 @@
                             if (result.success) {
                                 console.log('✅ CFPB credentials stored/updated securely');
 
-                                // Check if this was an update or new credential
-                                const isUpdate = submitButton.querySelector('#cfpb-submit-text').textContent.includes('Update');
+                                // Check if this was an update or new credential (BEFORE modifying the DOM)
+                                const submitTextElement = submitButton.querySelector('#cfpb-submit-text');
+                                const isUpdate = submitTextElement && submitTextElement.textContent.includes('Update');
 
                                 if (isUpdate) {
                                     // Show updated credential status
@@ -3599,18 +3594,15 @@
                                     // Show success message
                                     showCredentialMessage(container, 'cfpb', 'success', 'CFPB credentials updated successfully!');
                                 } else {
-                                    // Show success message for new credentials
-                                    cfpbForm.innerHTML = `
-                                        <div style="text-align: center; padding: 20px;">
-                                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                            <h3 style="color: var(--success); margin-bottom: 10px;">CFPB Access Stored Securely</h3>
-                                            <p>Your Consumer Financial Protection Bureau credentials have been encrypted and stored securely. Our team can now access your complaint history and consumer protection resources to enhance your credit dispute process.</p>
-                                            <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
-                                                <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                                                <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
-                                            </div>
-                                        </div>
-                                    `;
+                                    // Show credential status for new credentials
+                                    const credentialData = {
+                                        email: email,
+                                        updatedAt: new Date().toISOString()
+                                    };
+                                    showCredentialStatus(container, 'cfpb', credentialData);
+
+                                    // Show success message
+                                    showCredentialMessage(container, 'cfpb', 'success', 'CFPB credentials stored securely! You can now update or remove them using the buttons above.');
                                 }
                             } else {
                                 throw new Error(result.message || 'Failed to store credentials');
@@ -3703,8 +3695,9 @@
                             if (result.success) {
                                 console.log('✅ AnnualCreditReport.com credentials stored/updated securely');
 
-                                // Check if this was an update or new credential
-                                const isUpdate = submitButton.querySelector('#annualcreditreport-submit-text').textContent.includes('Update');
+                                // Check if this was an update or new credential (BEFORE modifying the DOM)
+                                const submitTextElement = submitButton.querySelector('#annualcreditreport-submit-text');
+                                const isUpdate = submitTextElement && submitTextElement.textContent.includes('Update');
 
                                 if (isUpdate) {
                                     // Show updated credential status
@@ -3724,18 +3717,15 @@
                                     // Show success message
                                     showCredentialMessage(container, 'annualcreditreport', 'success', 'AnnualCreditReport.com credentials updated successfully!');
                                 } else {
-                                    // Show success message for new credentials
-                                    annualCreditReportForm.innerHTML = `
-                                        <div style="text-align: center; padding: 20px;">
-                                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
-                                            <h3 style="color: var(--success); margin-bottom: 10px;">AnnualCreditReport.com Access Stored Securely</h3>
-                                            <p>Your AnnualCreditReport.com credentials have been encrypted and stored securely. Our team can now access your official annual credit reports from all three bureaus to enhance your credit dispute process.</p>
-                                            <div style="margin-top: 15px; padding: 10px; background-color: #e6f7f7; border-radius: 5px; font-size: 0.9rem;">
-                                                <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                                                <strong>Security:</strong> Your credentials are encrypted with AES-256 encryption and stored securely.
-                                            </div>
-                                        </div>
-                                    `;
+                                    // Show credential status for new credentials
+                                    const credentialData = {
+                                        email: email,
+                                        updatedAt: new Date().toISOString()
+                                    };
+                                    showCredentialStatus(container, 'annualcreditreport', credentialData);
+
+                                    // Show success message
+                                    showCredentialMessage(container, 'annualcreditreport', 'success', 'AnnualCreditReport.com credentials stored securely! You can now update or remove them using the buttons above.');
                                 }
                             } else {
                                 throw new Error(result.message || 'Failed to store credentials');
@@ -5010,21 +5000,22 @@
                 });
             }
 
-            // Check for existing credentials when the page loads
+            // Check for existing credentials when the page loads (Updated Version)
             async function checkExistingCredentials(container) {
+                console.log('🔍 [DEBUG] Checking for existing credentials on page load...');
+
                 const services = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
+                const userId = getUserId();
+                const authToken = getAuthToken();
+
+                if (!userId || !authToken) {
+                    console.log('⚠️ [DEBUG] No authentication found, skipping credential check');
+                    return;
+                }
 
                 for (const service of services) {
                     try {
                         console.log(`🔍 [DEBUG] Checking existing credentials for ${service}...`);
-
-                        const userId = getUserId();
-                        const authToken = getAuthToken();
-
-                        if (!userId || !authToken) {
-                            console.log(`⚠️ [DEBUG] No authentication for ${service} credential check`);
-                            continue;
-                        }
 
                         const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/credentials/monitoring/check/${service}`, {
                             method: 'GET',
@@ -5034,21 +5025,33 @@
                             }
                         });
 
-                        if (response.ok) {
-                            const result = await response.json();
-                            if (result.exists) {
-                                console.log(`✅ [DEBUG] Found existing credentials for ${service}:`, result);
-                                showCredentialStatus(container, service, result.credential);
-                            } else {
-                                console.log(`📋 [DEBUG] No existing credentials for ${service}`);
-                            }
+                        const result = await response.json();
+                        console.log(`🔍 [DEBUG] ${service} credential check result:`, result);
+
+                        if (result.success && result.hasCredentials) {
+                            console.log(`✅ [DEBUG] Found existing ${service} credentials, showing status`);
+
+                            // Create credential data object for showCredentialStatus
+                            const credentialData = {
+                                email: result.currentEmail,
+                                updatedAt: result.lastUpdated,
+                                serviceType: result.serviceType
+                            };
+
+                            // Show the credential status
+                            showCredentialStatus(container, service, credentialData);
                         } else {
-                            console.log(`⚠️ [DEBUG] Failed to check credentials for ${service}:`, response.status);
+                            console.log(`ℹ️ [DEBUG] No existing ${service} credentials found`);
                         }
+
                     } catch (error) {
-                        console.error(`❌ [DEBUG] Error checking credentials for ${service}:`, error);
+                        console.error(`❌ [DEBUG] Error checking ${service} credentials:`, error);
+                        // Don't show error to user for credential checks on page load
+                        // This is just background checking
                     }
                 }
+
+                console.log('✅ [DEBUG] Finished checking existing credentials');
             }
 
             // Show credential status in the UI
@@ -5242,6 +5245,60 @@
                         messageDiv.remove();
                     }
                 }, 5000);
+            }
+
+            // Check for existing credentials on page load
+            async function checkExistingCredentials(container) {
+                console.log('🔍 [DEBUG] Checking for existing credentials on page load...');
+
+                const services = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
+                const userId = getUserId();
+                const authToken = getAuthToken();
+
+                if (!userId || !authToken) {
+                    console.log('⚠️ [DEBUG] No authentication found, skipping credential check');
+                    return;
+                }
+
+                for (const service of services) {
+                    try {
+                        console.log(`🔍 [DEBUG] Checking existing credentials for ${service}...`);
+
+                        const response = await fetch(`https://jam-capital-backend.azurewebsites.net/api/credentials/monitoring/check/${service}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        const result = await response.json();
+                        console.log(`🔍 [DEBUG] ${service} credential check result:`, result);
+
+                        if (result.success && result.hasCredentials) {
+                            console.log(`✅ [DEBUG] Found existing ${service} credentials, showing status`);
+
+                            // Create credential data object for showCredentialStatus
+                            const credentialData = {
+                                email: result.currentEmail,
+                                updatedAt: result.lastUpdated,
+                                serviceType: result.serviceType
+                            };
+
+                            // Show the credential status
+                            showCredentialStatus(container, service, credentialData);
+                        } else {
+                            console.log(`ℹ️ [DEBUG] No existing ${service} credentials found`);
+                        }
+
+                    } catch (error) {
+                        console.error(`❌ [DEBUG] Error checking ${service} credentials:`, error);
+                        // Don't show error to user for credential checks on page load
+                        // This is just background checking
+                    }
+                }
+
+                console.log('✅ [DEBUG] Finished checking existing credentials');
             }
 
             // Public API

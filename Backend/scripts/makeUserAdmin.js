@@ -35,4 +35,4 @@ async function makeUserAdmin(email) {
 }
 
 // Run the script
-makeUserAdmin('lamont703@gmail.com');
+makeUserAdmin('hello@diamondoutsourcing.com');

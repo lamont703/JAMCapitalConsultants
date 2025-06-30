@@ -132,6 +132,9 @@ router.delete('/delete-document', authMiddleware.authenticateToken, adminControl
 // Add this route to your existing adminRoutes.js file
 router.get('/get-user-documents', authMiddleware.authenticateToken, adminController.getUserDocuments);
 
+// Add route for retrieving user ID verification documents (for admin panel)
+router.post('/get-user-id-documents', authMiddleware.authenticateToken, adminMiddleware.requireAdmin, adminController.getUserIdDocuments);
+
 console.log('✅ Activity routes registered');
 
 // NEW: Subscription Management Endpoints for Admin

@@ -1,10 +1,12 @@
-name: Deploy JAM Capital Backend to Azure
+# Disabled - using Azure CLI direct deployment instead
+# on:
+#   push:
+#     branches: [main, master, production]
+#   pull_request:
+#     branches: [main, master]
+#   workflow_dispatch:
 
 on:
-  push:
-    branches: [main, master, production]
-  pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 env:

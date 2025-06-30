@@ -13,6 +13,9 @@ router.post('/logout', authController.logout);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
 router.post('/verify-security-answer', authController.verifySecurityAnswer);
+
+// TEST ENDPOINT - Remove after testing
+router.get('/test-token', authController.generateTestToken);
 router.post('/get-security-question', authController.getSecurityQuestion);
 router.post('/reset-password-with-security', authController.resetPasswordWithSecurity);
 router.post('/upload-report', 

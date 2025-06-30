@@ -217,7 +217,7 @@ az webapp config hostname add \
    - Update the `AZURE_WEBAPP_NAME` in the workflow file
    - Push to `main` branch to trigger deployment
 
-### Method 2: Azure CLI Direct Deployment
+### Method 2: Azure CLI Direct Deployment (RECOMMENDED)
 
 ```bash
 # Navigate to Backend directory
@@ -229,8 +229,88 @@ npm ci --only=production
 # Deploy to Azure
 az webapp up \
   --name jam-capital-backend \
-  --resource-group jam-capital-rg \
-  --plan jam-capital-plan
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+```
+
+**Note:** This method has proven most reliable for our JAM Capital backend deployments. It handles:
+
+- Automatic zip packaging
+- Build process in Azure
+- Runtime version management
+- Dependency installation
+
+**Typical deployment time:** 4-5 minutes including build and startup.
+
+#### Permission Issues Solution
+
+If you encounter permission errors like "Insufficient permissions to create a zip in current directory", use sudo:
+
+```bash
+# Deploy with elevated permissions
+sudo az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+```
+
+**Common Permission Error:**
+
+```
+Insufficient permissions to create a zip in current directory. Please re-run the command with administrator privileges
+```
+
+**Solution:** The Azure CLI needs to create temporary zip files during deployment. If you encounter permission issues, run the command with `sudo` to provide the necessary file system permissions.
+
+#### Common Deployment Errors and Solutions
+
+**Error 1: Incorrect Resource Group Name**
+
+```
+The webapp 'jam-capital-backend' exists in ResourceGroup 'JAM_resource_group' and does not match the value entered 'JAM_Website'.
+```
+
+**Solution:** Use the correct resource group name `JAM_resource_group`:
+
+```bash
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+```
+
+**Error 2: Location Mismatch**
+
+```
+The resource 'jam-capital-plan' already exists in location 'eastus2' in resource group 'JAM_resource_group'. A resource with the same name cannot be created in location 'eastus'.
+```
+
+**Solution:** Use the correct location where existing resources are deployed (`East US 2` = `eastus2`):
+
+```bash
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+```
+
+**Verified Working Command:**
+
+```bash
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
 ```
 
 ### Method 3: Azure DevOps (Alternative)
@@ -239,6 +319,110 @@ az webapp up \
 2. Connect to your GitHub repository
 3. Create build and release pipelines
 4. Configure service connections to Azure
+
+## GoHighLevel Integration Deployment
+
+### Prerequisites for GHL Integration
+
+Before deploying, ensure you have:
+
+1. Valid GHL OAuth tokens in `Backend/config/ghl-tokens.json`
+2. GHL environment variables configured in local `.env` file
+
+### Step 1: Add Missing GHL Environment Variables
+
+```bash
+# Run from Backend directory
+cd Backend
+
+# Add missing GHL environment variables to Azure
+az webapp config appsettings set \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --settings \
+    GHL_API_KEY="your-ghl-api-key" \
+    GHL_BASE_URL="https://services.leadconnectorhq.com" \
+    GHL_WEBHOOK_SECRET="your-webhook-secret" \
+    GHL_REDIRECT_URI="https://jamcapitalconsultants.com/oauth/callback" \
+    GHL_STARTER_ADDITIONAL_CREDITS_LINK="your-starter-link" \
+    GHL_PROFESSIONAL_ADDITIONAL_CREDITS_LINK="your-professional-link" \
+    GHL_PREMIUM_ADDITIONAL_CREDITS_LINK="your-premium-link"
+```
+
+### Step 2: Deploy GHL Tokens as Environment Variables
+
+```bash
+# Extract and set GHL tokens from local config
+./fix-ghl-tokens-via-env.sh
+```
+
+Or manually:
+
+```bash
+# Extract tokens from ghl-tokens.json and set as environment variables
+ACCESS_TOKEN=$(node -e "const tokens = require('./config/ghl-tokens.json'); console.log(tokens.access_token);")
+REFRESH_TOKEN=$(node -e "const tokens = require('./config/ghl-tokens.json'); console.log(tokens.refresh_token);")
+EXPIRES_AT=$(node -e "const tokens = require('./config/ghl-tokens.json'); console.log(tokens.expires_at);")
+
+az webapp config appsettings set \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --settings \
+    GHL_STORED_ACCESS_TOKEN="$ACCESS_TOKEN" \
+    GHL_STORED_REFRESH_TOKEN="$REFRESH_TOKEN" \
+    GHL_TOKEN_EXPIRES_AT="$EXPIRES_AT"
+```
+
+### Step 3: Deploy Code with GHL Support
+
+```bash
+# Use the standard deployment method
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --plan jam-capital-plan
+```
+
+### Step 4: Verify GHL Integration
+
+```bash
+# Test registration with GHL sync
+curl -X POST 'https://jam-capital-backend.azurewebsites.net/api/auth/register' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "+1234567890",
+    "password": "Test123!",
+    "securityQuestion": "mother_maiden_name",
+    "securityAnswer": "test"
+  }'
+
+# Check for successful GHL sync:
+# - ghlContactId should have a value
+# - ghlSyncStatus should be "success"
+```
+
+### Troubleshooting GHL Integration
+
+**Issue:** `ghlSyncStatus: "failed"` or `ghlContactId: ""`
+
+**Solutions:**
+
+1. Verify all GHL environment variables are set
+2. Check that GHL tokens are not expired
+3. Ensure the code includes environment variable fallback for tokens
+4. Restart the Azure App Service after setting new variables
+
+**Check Environment Variables:**
+
+```bash
+# List all app settings to verify GHL variables
+az webapp config appsettings list \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --query "[?contains(name, 'GHL')]"
+```
 
 ## Post-Deployment Configuration
 
@@ -366,6 +550,52 @@ az cosmosdb sql container throughput show \
 
 ## Troubleshooting
 
+### Deployment Issues
+
+#### 1. Resource Group Name Errors
+
+**Error Message:**
+
+```
+The webapp 'jam-capital-backend' exists in ResourceGroup 'JAM_resource_group' and does not match the value entered 'JAM_Website'.
+```
+
+**Cause:** Using incorrect resource group name in deployment command.
+
+**Solution:** Always use the correct resource group name `JAM_resource_group`:
+
+```bash
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+```
+
+#### 2. Location Mismatch Errors
+
+**Error Message:**
+
+```
+The resource 'jam-capital-plan' already exists in location 'eastus2' in resource group 'JAM_resource_group'. A resource with the same name cannot be created in location 'eastus'.
+```
+
+**Cause:** Attempting to deploy to a different location than where existing resources are located.
+
+**Solution:** Use the correct location `"East US 2"` (which maps to `eastus2`):
+
+```bash
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+```
+
+**Prevention:** Always include the full deployment parameters to avoid location/resource conflicts.
+
 ### Common Issues
 
 #### 1. App Won't Start
@@ -415,6 +645,49 @@ az webapp config show --name jam-capital-backend --resource-group jam-capital-rg
 - Optimize Cosmos DB queries
 - Enable auto-scaling
 - Review Application Insights performance data
+
+#### 5. GoHighLevel Integration Issues
+
+**Symptoms:** `ghlSyncStatus: "failed"`, empty `ghlContactId`, registrations not appearing in GHL
+
+**Root Causes:**
+
+- Missing GHL environment variables in production
+- Missing or expired OAuth tokens
+- Code not supporting environment variable fallback
+
+**Solutions:**
+
+```bash
+# 1. Verify GHL environment variables exist
+az webapp config appsettings list \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --query "[?contains(name, 'GHL')]"
+
+# 2. Set missing GHL environment variables
+az webapp config appsettings set \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --settings \
+    GHL_API_KEY="your-api-key" \
+    GHL_BASE_URL="https://services.leadconnectorhq.com" \
+    GHL_WEBHOOK_SECRET="your-secret"
+
+# 3. Deploy GHL tokens as environment variables
+cd Backend && ./fix-ghl-tokens-via-env.sh
+
+# 4. Restart app service
+az webapp restart \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group
+```
+
+**Prevention:**
+
+- Always deploy GHL tokens as environment variables for production
+- Include environment variable fallback in GHL token service code
+- Test GHL integration after each deployment
 
 ### Debugging Tools
 
@@ -482,8 +755,50 @@ In Kudu console, go to Environment tab to verify all settings.
 - [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
 - [Azure Support Plans](https://azure.microsoft.com/en-us/support/plans/)
 
+## Quick Reference: Standard Deployment Process
+
+For regular deployments with GHL integration:
+
+```bash
+# 1. Navigate to Backend directory
+cd Backend
+
+# 2. Ensure GHL tokens are current (if needed)
+# Check local config/ghl-tokens.json expiry date
+
+# 3. Deploy using verified working command
+az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+
+# If you encounter permission issues, use sudo:
+sudo az webapp up \
+  --name jam-capital-backend \
+  --resource-group JAM_resource_group \
+  --location "East US 2" \
+  --os-type "Linux" \
+  --runtime "node|18-lts"
+
+# 4. Verify deployment
+curl -s https://jam-capital-backend.azurewebsites.net/health
+
+# 5. Test GHL integration (optional)
+curl -X POST 'https://jam-capital-backend.azurewebsites.net/api/auth/register' \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Test","email":"test@example.com","phone":"+1234567890","password":"Test123!","securityQuestion":"mother_maiden_name","securityAnswer":"test"}'
+```
+
+**Expected Results:**
+
+- Deployment time: 4-5 minutes
+- Health check: Returns status information
+- Registration test: `ghlSyncStatus: "success"` and populated `ghlContactId`
+
 ---
 
-**Last Updated:** December 2024
-**Version:** 1.0
+**Last Updated:** June 2025
+**Version:** 2.0
 **Maintainer:** JAM Capital Consultants Development Team

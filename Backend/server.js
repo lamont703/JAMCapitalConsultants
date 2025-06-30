@@ -132,8 +132,36 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Explicit preflight handler for credential routes
-app.options('/api/credentials/*', cors(corsOptions));
+// Comprehensive preflight handling for ALL credential endpoints
+app.options('/api/credentials/*', (req, res) => {
+    console.log('🔍 CORS Preflight for credentials:', req.method, req.url, 'Origin:', req.headers.origin);
+    
+    // Set all necessary CORS headers for preflight
+    res.header('Access-Control-Allow-Origin', req.headers.origin || 'https://jamcapitalconsultants.com');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    
+    // Send successful preflight response
+    res.status(200).end();
+});
+
+// Specific middleware for credential monitoring endpoints
+app.use('/api/credentials/monitoring', (req, res, next) => {
+    console.log('🔍 CORS Middleware for monitoring:', req.method, req.url, 'Origin:', req.headers.origin);
+    
+    // Ensure CORS headers are always set for credential monitoring endpoints
+    const origin = req.headers.origin;
+    const allowedOrigin = ['https://jamcapitalconsultants.com', 'https://www.jamcapitalconsultants.com', 'http://localhost:3000'].includes(origin) ? origin : 'https://jamcapitalconsultants.com';
+    
+    res.header('Access-Control-Allow-Origin', allowedOrigin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers');
+    
+    next();
+});
 
 // Body parsing middleware with size limits
 app.use(express.json({ 
@@ -158,7 +186,7 @@ app.get('/system-health', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'system-health-check.html'));
 });
 
-// API Routes
+// API Routes - IMPORTANT: More specific routes must come before general routes
 app.use('/api/chat', chatRoutesModule);
 app.use('/api/chatGptService', chatRoutesModule);
 app.use('/api/auth', authRoutes);
@@ -166,8 +194,9 @@ app.use('/api/ghl', ghlRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/credentials', credentialRoutes);
+// Mount credential monitoring routes BEFORE general credential routes
 app.use('/api/credentials/monitoring', credentialsRoutes);
+app.use('/api/credentials', credentialRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/dispute', disputeRoutes);

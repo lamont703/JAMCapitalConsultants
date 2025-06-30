@@ -24,8 +24,8 @@
 
         .hero-section {
             position: relative;
-            width: 100%;
-            max-width: 1600px;
+            width: 90%;
+            max-width: 100%;
             margin: auto;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 20px 30px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
@@ -39,12 +39,12 @@
             text-align: center;
         }
 
-        .hero-section:hover {
+        /*.hero-section:hover {
             box-shadow: 0 40px 70px rgba(0, 0, 0, 0.35), 0 25px 40px rgba(0, 0, 0, 0.25);
-            transform: translateY(-15px);
-        }
+            transform: translateY(-5px);
+        }*/
 
-        .hero-image {
+        .desktop-hero-image {
             width: 100%;
             max-width: 100%;
             height: auto;
@@ -55,44 +55,71 @@
             box-sizing: border-box;
         }
 
-        .hero-section:hover .hero-image {
+        .hero-section:hover .desktop-hero-image {
             transform: scale(1.02);
         }
 
-        .hero-text-overlay {
+        .hero-content-group {
             position: absolute;
-            top: 55%;
-            left: -50px;
-            transform: translateY(-50%);
-            max-width: 650px;
-            text-align: left;
+            top: 50%;
+            left: 42%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            z-index: 5;
+        }
+
+        .hero-text-overlay {
+            position: relative;
+            top: auto;
+            left: -30%;
+            transform: none;
+            max-width: 100%;
+            text-align: center;
             color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
         }
 
         .hero-text-overlay h1 {
             font-size: 5rem;
             margin-bottom: 0px;
             line-height: 1.1;
-            display: inline-block;
+            display: block;
             text-align: center;
-            width: auto;
+            width: 100%;
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .jam-engine-container {
-            display: inline-block;
-            vertical-align: middle;
+            display: block;
+            text-align: center;
+            width: 100%;
+            max-height: 75px;
+            margin-left: -75px;
         }
 
         .jam-engine-logo {
-            height: 30rem;
-            width: 40rem;
-            vertical-align: bottom;
-            margin-top: -12.5rem;
-            margin-bottom: 1rem;
-            margin-right: 4rem;
+            height: 2.5rem;
+            max-height: 75px;
+            width: auto;
+            max-width: 100%;
+            object-fit: cover;
+            object-position: center;
         }
 
         .highlight-engine {
@@ -102,13 +129,17 @@
 
         /* Quiz Button Styles */
         .quiz-button-container {
-            position: absolute;
-            bottom: 20%;
-            left: 10%;
-            top: 63%;
-            width: auto;
-            text-align: left;
+            position: relative;
+            bottom: auto;
+            left: auto;
+            top: auto;
+            width: 100%;
+            text-align: center;
             z-index: 10;
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .credit-quiz-btn {
@@ -174,33 +205,37 @@
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
+            .hero-content-group {
+                max-width: 90%;
+                padding: 0 1rem;
+            }
+
             .jam-engine-logo {
                 height: 2.5rem;
+                width: auto;
+                max-width: 200px;
             }
 
             .hero-text-overlay {
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 85%;
-                max-width: none;
-                text-align: center;
+                margin-bottom: 0;
+                padding: 0;
+                gap: 5px;
             }
 
             .hero-text-overlay h1 {
                 font-size: 2.5rem;
                 display: block;
                 width: 100%;
+                text-align: center;
             }
 
             .quiz-button-container {
-                top: auto;
-                bottom: 15%;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 80%;
+                margin-top: 5px;
+                width: 100%;
                 max-width: 300px;
-                text-align: center;
-                margin-top: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .credit-quiz-btn {
@@ -230,57 +265,58 @@
                 transform: none;
             }
 
-            .hero-image {
+            .desktop-hero-image {
                 width: 100%;
                 height: auto;
                 min-height: 400px;
                 object-fit: cover;
             }
 
-            .hero-section:hover .hero-image {
+            .hero-section:hover .desktop-hero-image {
                 transform: none;
             }
 
+            .hero-content-group {
+                max-width: 95%;
+                padding: 0 0.5rem;
+            }
+
             .hero-text-overlay {
-                top: 35%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 90%;
-                max-width: 320px;
-                text-align: center;
-                padding: 0 1rem;
+                margin-bottom: 0;
+                padding: 0;
+                gap: 5px;
             }
 
             .hero-text-overlay h1 {
                 font-size: 1.8rem;
-                margin-bottom: 0.5rem;
+                margin-bottom: 0px;
                 line-height: 1.2;
                 display: block;
                 width: 100%;
+                text-align: center;
             }
 
             .jam-engine-container {
                 display: block;
-                margin: 0.5rem 0;
+                margin: 5px 0;
+                width: 100%;
             }
 
             .jam-engine-logo {
                 height: 2rem;
                 width: auto;
                 max-width: 120px;
-                margin: 0;
+                margin: 0 auto;
                 vertical-align: middle;
             }
 
             .quiz-button-container {
-                position: absolute;
-                bottom: 10%;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 90%;
+                margin-top: 5px;
+                width: 100%;
                 max-width: 280px;
-                text-align: center;
-                top: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .credit-quiz-btn {
@@ -316,19 +352,21 @@
                 box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
             }
 
+            .hero-content-group {
+                max-width: 90%;
+                padding: 0 1rem;
+            }
+
             .hero-text-overlay {
-                top: 40%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 85%;
-                max-width: 400px;
-                text-align: center;
+                margin-bottom: 0;
+                gap: 5px;
             }
 
             .hero-text-overlay h1 {
                 font-size: 2.2rem;
-                margin-bottom: 0.75rem;
+                margin-bottom: 0px;
                 line-height: 1.1;
+                text-align: center;
             }
 
             .jam-engine-logo {
@@ -338,11 +376,12 @@
             }
 
             .quiz-button-container {
-                bottom: 12%;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 85%;
+                margin-top: 5px;
+                width: 100%;
                 max-width: 320px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .credit-quiz-btn {
@@ -359,13 +398,13 @@
                 border-radius: 6px;
             }
 
+            .hero-content-group {
+                max-width: 85%;
+                padding: 0 2rem;
+            }
+
             .hero-text-overlay {
-                top: 45%;
-                left: 8%;
-                transform: translateY(-50%);
-                width: 60%;
-                max-width: 500px;
-                text-align: left;
+                margin-bottom: 2rem;
             }
 
             .hero-text-overlay h1 {
@@ -376,14 +415,11 @@
             .jam-engine-logo {
                 height: 15rem;
                 width: 20rem;
-                margin-top: -6rem;
-                margin-right: 2rem;
+                margin: 0 auto;
             }
 
             .quiz-button-container {
-                bottom: 18%;
-                left: 8%;
-                transform: none;
+                margin-top: 2rem;
                 width: auto;
                 max-width: 300px;
             }
@@ -400,26 +436,36 @@
                 max-width: 1400px;
             }
 
+            .hero-content-group {
+                max-width: 80%;
+                padding: 0 3rem;
+            }
+
             .hero-text-overlay {
-                top: 50%;
-                left: -30px;
-                max-width: 600px;
+                margin-bottom: 0;
+                gap: 5px;
             }
 
             .hero-text-overlay h1 {
                 font-size: 4.5rem;
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .jam-engine-logo {
                 height: 25rem;
                 width: 35rem;
-                margin-top: -10rem;
-                margin-right: 3rem;
+                margin: 0 auto;
             }
 
             .quiz-button-container {
-                bottom: 20%;
-                left: 8%;
+                margin-top: 5px;
+                width: 100%;
+                max-width: 350px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
         }
 
@@ -429,24 +475,36 @@
                 max-width: 1600px;
             }
 
+            .hero-content-group {
+                max-width: 75%;
+                padding: 0 4rem;
+            }
+
             .hero-text-overlay {
-                left: -50px;
-                max-width: 650px;
+                margin-bottom: 0;
+                gap: 5px;
             }
 
             .hero-text-overlay h1 {
                 font-size: 5rem;
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .jam-engine-logo {
                 height: 30rem;
                 width: 40rem;
-                margin-top: -12.5rem;
-                margin-right: 4rem;
+                margin: 0 auto;
             }
 
             .quiz-button-container {
-                left: 10%;
+                margin-top: 5px;
+                width: 100%;
+                max-width: 400px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
         }
 
@@ -456,7 +514,7 @@
                 border-radius: 0;
             }
 
-            .hero-image {
+            .desktop-hero-image {
                 min-height: 350px;
             }
 
@@ -515,10 +573,10 @@
         @media (hover: none) and (pointer: coarse) {
             .hero-section:hover {
                 box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 20px 30px rgba(0, 0, 0, 0.2);
-                transform: translateY(-10px);
+                transform: none;
             }
 
-            .hero-section:hover .hero-image {
+            .hero-section:hover .desktop-hero-image {
                 transform: none;
             }
 
@@ -536,7 +594,7 @@
         /* High DPI Displays */
         @media (-webkit-min-device-pixel-ratio: 2),
         (min-resolution: 192dpi) {
-            .hero-image {
+            .desktop-hero-image {
                 image-rendering: -webkit-optimize-contrast;
                 image-rendering: crisp-edges;
             }
@@ -564,7 +622,7 @@
                 transition: none;
             }
 
-            .hero-image {
+            .desktop-hero-image {
                 transition: none;
             }
 
@@ -573,7 +631,7 @@
             }
 
             .hero-section:hover,
-            .hero-section:hover .hero-image {
+            .hero-section:hover .desktop-hero-image {
                 transform: none;
             }
 
@@ -629,7 +687,7 @@
                 page-break-inside: avoid;
             }
 
-            .hero-image {
+            .desktop-hero-image {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -660,20 +718,19 @@
 <body>
     <div class="hero-section">
         <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/6819aa74ef825fa41b34dd79.png"
-            alt="Credit Blueprint Hero" class="hero-image" />
+            alt="Credit Blueprint Hero" class="desktop-hero-image" />
 
-        <div class="hero-text-overlay">
-            <h1>Boost <br>Your Credit <br>With <br><span class="jam-engine-container">
+        <div class="hero-content-group">
+            <div class="hero-text-overlay">
+                <h1>Boost <br>Your Credit <br>With</h1>
+
+                <div class="jam-engine-container">
                     <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/681bce267fc2d260912232f3.png"
                         alt="JAM ENGINE" class="jam-engine-logo">
-                </span></h1>
-        </div>
+                </div>
 
-        <div class="quiz-button-container">
-            <button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
-                Start JAM Engine
-                <span class="subtext">Get Results In Weeks - Not Guesses</span>
-            </button>
+
+            </div>
         </div>
 
         <div class="animated-bg-elements">
@@ -707,47 +764,7 @@
                 bgContainer.appendChild(element);
             }
 
-            // Get the button element
-            const jamEngineButton = document.querySelector('#creditQuizButton');
 
-            // Update the click event to trigger the nav-quizModal
-            if (jamEngineButton) {
-                // Remove old event listeners by cloning the node
-                const newButton = jamEngineButton.cloneNode(true);
-                jamEngineButton.parentNode.replaceChild(newButton, jamEngineButton);
-
-                // Add new event listener that opens the nav-quizModal
-                newButton.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    // Call the openQuizModal function from NavGetStarted.html
-                    if (typeof window.openQuizModal === 'function') {
-                        window.openQuizModal();
-                    } else {
-                        // Fallback if the function isn't available yet
-                        const navQuizModal = document.getElementById('nav-quizModal');
-                        if (navQuizModal) {
-                            navQuizModal.style.display = 'flex';
-                            document.body.style.overflow = 'hidden';
-
-                            // Reset to first step if possible
-                            if (typeof showStep === 'function') {
-                                showStep(1);
-                            }
-                        } else {
-                            console.error("nav-quizModal element not found!");
-                        }
-                    }
-
-                    // Track quiz start if analytics is available
-                    if (typeof analytics !== 'undefined') {
-                        analytics.track('CreditQuizStarted', {
-                            location: 'Hero Section',
-                            timestamp: new Date().toISOString()
-                        });
-                    }
-                });
-            }
         });
     </script>
 </body>

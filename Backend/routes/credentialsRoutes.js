@@ -16,4 +16,10 @@ router.delete('/remove/:serviceType', authenticateToken, credentialsController.r
 // Get all credentials for a user (admin only)
 router.get('/user/:userId', authenticateToken, requireAdmin, credentialsController.getUserCredentials);
 
+// Admin retrieve credentials with decryption (admin only)
+router.post('/admin/retrieve', authenticateToken, requireAdmin, credentialsController.adminRetrieveCredentials);
+
+// Get audit log for credential access (admin only)
+router.get('/admin/audit-log', authenticateToken, requireAdmin, credentialsController.getAuditLog);
+
 export default router; 

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isaiah Chat Agent</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #000;
+            color: #25CC32;
+        }
+
+        #isaiah-chat-container {
+            max-width: 400px;
+            margin: 40px auto;
+            background-color: #111;
+            border-radius: 16px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            border: 2px solid #25CC32;
+        }
+
+        #isaiah-chat-header {
+            background-color: #25CC32;
+            color: #000;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #isaiah-chat-body {
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: #000;
+        }
+
+        .chat-message {
+            margin-bottom: 12px;
+        }
+
+        .isaiah {
+            text-align: left;
+            color: #25CC32;
+        }
+
+        .user-response {
+            text-align: right;
+            color: #fff;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .chat-btn {
+            padding: 10px 16px;
+            background-color: #000;
+            color: #25CC32;
+            border: 2px solid #25CC32;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-btn:hover {
+            background-color: #25CC32;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="isaiah-chat-container">
+        <div id="isaiah-chat-header">Isaiah - AI Chat Agent</div>
+        <div id="isaiah-chat-body"></div>
+    </div>
+
+    <script>
+        const chatBody = document.getElementById('isaiah-chat-body');
+
+        const chatData = {
+            intro: {
+                message: "Hey! I'm Isaiah, your AI Chat Agent. 👋 How can I help you today?",
+                options: [
+                    { text: "I need a website", next: "website" },
+                    { text: "I want automation", next: "automation" },
+                    { text: "Just exploring", next: "explore" }
+                ]
+            },
+            website: {
+                message: "Awesome! We build full-stack websites with integrated AI, automation, and crypto payments. Want to talk to Lamont, our lead developer?",
+                options: [
+                    { text: "Yes, connect me", next: "leadForm" },
+                    { text: "Tell me more first", next: "moreWeb" }
+                ]
+            },
+            automation: {
+                message: "Great choice! We offer AI Voice Agents, Chatbots, CRM setups and more. Want to chat with Lamont about your idea?",
+                options: [
+                    { text: "Yes, connect me", next: "leadForm" },
+                    { text: "Show me examples", next: "moreAuto" }
+                ]
+            },
+            explore: {
+                message: "Explore all you want, but Isaiah says connecting with Lamont is where the magic happens 😉",
+                options: [
+                    { text: "Fine, connect me!", next: "leadForm" },
+                    { text: "Not yet", next: "exit" }
+                ]
+            },
+            moreWeb: {
+                message: "We specialize in AI-driven, mobile-ready, and scalable web platforms. Still want to connect with Lamont?",
+                options: [
+                    { text: "Yes, connect me", next: "leadForm" },
+                    { text: "No thanks", next: "exit" }
+                ]
+            },
+            moreAuto: {
+                message: "Imagine a 24/7 AI agent that handles booking, follow-up, and customer service. Want in?",
+                options: [
+                    { text: "Yes, let's go!", next: "leadForm" },
+                    { text: "Not yet", next: "exit" }
+                ]
+            },
+            leadForm: {
+                message: "Perfect! Please send a quick message or text us directly at <strong>1-844-699-1191</strong>. Or click below to book a call or start voice chat with me 👇",
+                options: [
+                    { text: "📅 Book a Call", link: "#cNGehnSMaY7PcToQHNvs_1750037189488" },
+                    { text: "🗣️ Start Voice Chat", link: "#isaiah-widget" }
+                ]
+            },
+            exit: {
+                message: "No worries! I’ll be right here when you’re ready. 👋",
+                options: []
+            }
+        };
+
+        function renderMessage(role, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', role);
+            messageDiv.innerHTML = text;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function renderOptions(options) {
+            const group = document.createElement('div');
+            group.className = 'button-group';
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'chat-btn';
+                btn.textContent = option.text;
+                btn.onclick = () => {
+                    renderMessage('user-response', option.text);
+                    group.remove();
+                    if (option.next) {
+                        nextStep(option.next);
+                    } else if (option.link) {
+                        window.location.href = option.link;
+                    }
+                };
+                group.appendChild(btn);
+            });
+            chatBody.appendChild(group);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function nextStep(stepKey) {
+            const step = chatData[stepKey];
+            if (step) {
+                renderMessage('isaiah', step.message);
+                if (step.options && step.options.length > 0) {
+                    setTimeout(() => renderOptions(step.options), 600);
+                }
+            }
+        }
+
+        // Start the chat
+        nextStep('intro');
+    </script>
+</body>
+
+</html>

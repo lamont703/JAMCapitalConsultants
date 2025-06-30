@@ -1,214 +1,619 @@
-<!-- Add viewport meta tag -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!DOCTYPE html>
+<html lang="en">
 
-<!-- Styles for JAM Engine Button -->
-<style>
-    .nav-quiz-button-container {
-        margin: 0 auto;
-        text-align: center;
-        width: 100%;
-        max-width: 400px;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    .nav-credit-quiz-btn {
-        background-color: #09ccfc;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 5px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-align: center;
-        display: inline-block;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin: 0;
-        position: relative;
-        width: auto;
-    }
-
-    .nav-credit-quiz-btn:hover {
-        background-color: #08b6e2;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Mobile responsiveness for button */
-    @media (max-width: 575.98px) {
-        .nav-quiz-button-container {
-            margin: 0 auto;
-            padding: 0;
-            max-width: 100%;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Capital Consultants - Mobile Start JAM Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
         }
 
-        .nav-credit-quiz-btn {
-            padding: 1rem;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            min-height: 44px;
-            touch-action: manipulation;
-            width: 100%;
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
         }
 
-        .nav-credit-quiz-btn:active {
-            transform: scale(0.98);
-        }
-    }
-
-    @media (hover: none) and (pointer: coarse) {
-        .nav-credit-quiz-btn:hover {
-            background-color: #09ccfc;
-            transform: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
         }
 
-        .nav-credit-quiz-btn {
-            -webkit-tap-highlight-color: rgba(9, 204, 252, 0.2);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-    }
 
-    /* Hidden container for JAM Get Started Module 
-    #jam-get-started-module-container {
-            display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10000;
-        background: rgba(0, 0, 0, 0.5);
-    }
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+            padding: 80px 0;
+            text-align: center;
+        }
 
-    #jam-get-started-module-container.active {
-        display: block;
-    }*/
-</style>
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
 
-<!-- HTML Content -->
-<div class="nav-quiz-button-container">
-    <button class="nav-credit-quiz-btn" onclick="openJAMEngine()">
-        Start JAM Engine
-    </button>
-</div>
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--gray-600);
+        }
 
-<!-- Hidden container for JAM Get Started Module -->
-<div id="jam-get-started-module-container"></div>
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+        }
 
-<!-- Load JAM Get Started Module -->
-<script src="NavGetStarted.html"></script>
+        .cta-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
 
-<!-- Initialize module -->
-<script>
-    let jamModuleInitialized = false;
-    let jamModuleContainer = null;
+        .cta-section p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
 
-    // Function to initialize JAM Get Started Module
-    function initJAMGetStartedModule() {
-        console.log('🚀 Initializing JAM Get Started Module...');
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-        jamModuleContainer = document.getElementById('jam-get-started-module-container');
+        .cta-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
 
-        if (window.JAMGetStartedModule && jamModuleContainer) {
-            try {
-                const success = window.JAMGetStartedModule.init(jamModuleContainer);
-                if (success) {
-                    jamModuleInitialized = true;
-                    console.log('✅ JAM Get Started Module initialized successfully');
+        .cta-btn-primary {
+            background-color: white;
+            color: var(--primary);
+        }
 
-                    // Override the close function to hide our container
-                    const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
-                    window.JAMGetStartedModule.closeQuiz = function () {
-                        originalCloseQuiz();
-                        jamModuleContainer.classList.remove('active');
-                    };
+        .cta-btn-primary:hover {
+            background-color: var(--gray-100);
+            transform: translateY(-3px);
+        }
 
-                } else {
-                    console.error('❌ Failed to initialize JAM Get Started Module');
-                }
-            } catch (error) {
-                console.error('❌ Error initializing JAM Get Started Module:', error);
+        .cta-btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .cta-btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
             }
-        } else {
-            console.warn('⚠️ JAM Get Started Module or container not found');
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+
+            .cta-section p {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .cta-btn {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
         }
-    }
 
-    // Function to open JAM Engine
-    function openJAMEngine() {
-        console.log('🎯 Opening JAM Engine...');
+        /* Extra Small Devices (phones, up to 575px) */
+        @media (max-width: 575.98px) {
+            .container {
+                padding: 0 15px;
+            }
 
-        // Check if module is initialized
-        if (!jamModuleInitialized) {
-            console.log('🔄 Module not initialized, attempting to initialize...');
-            initJAMGetStartedModule();
+            .hero {
+                padding: 30px 0;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+                margin-bottom: 15px;
+                line-height: 1.2;
+                padding: 0 10px;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 25px;
+                padding: 0 10px;
+                line-height: 1.5;
+            }
+
+            .cta-section {
+                padding: 30px 0;
+            }
+
+            .cta-section h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+                padding: 0 10px;
+                line-height: 1.2;
+            }
+
+            .cta-section p {
+                font-size: 0.95rem;
+                margin-bottom: 20px;
+                padding: 0 10px;
+                line-height: 1.4;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .cta-btn {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+                width: 90%;
+                max-width: 280px;
+                min-height: 44px;
+                border-radius: 6px;
+                text-align: center;
+                display: block;
+            }
+
+            .cta-btn:active {
+                transform: scale(0.98);
+            }
         }
 
-        // Try to open the module
-        if (window.JAMGetStartedModule && jamModuleInitialized) {
-            try {
-                // Show our container
-                jamModuleContainer.classList.add('active');
+        /* JAM Get Started Module Container Styles */
+        #jam-get-started-module-container {
+            /* Simple container - let the module handle its own modal positioning */
+            position: relative;
+            z-index: 1;
+        }
 
-                // Open the quiz
-                window.JAMGetStartedModule.openQuiz();
+        /* Remove conflicting styles that prevent modal visibility */
+        #jam-get-started-module-container .nav-quiz-modal {
+            /* Let the module's own styles handle this */
+        }
 
-                console.log('✅ JAM Engine opened successfully');
-            } catch (error) {
-                console.error('❌ Error opening JAM Engine:', error);
+        #jam-get-started-module-container .nav-modal-content {
+            /* Let the module's own styles handle this */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Hidden container for JAM Get Started Module -->
+    <div id="jam-get-started-module-container"></div>
+
+    <button class="cta-btn cta-btn-primary" id="start-jam-engine-btn">Start JAM
+        Engine</button>
+
+
+
+    <!-- Load JAM Get Started Module -->
+    <script src="JAMGetStartedModule.js?v=2.0"></script>
+
+    <script>
+        // JAM Engine Module Integration - Same as LandingPagePricing
+        let jamModuleInitialized = false;
+        let jamModuleContainer = null;
+        let moduleLoadAttempts = 0;
+        const maxLoadAttempts = 10;
+
+        // Add event listener to the Start JAM Engine button
+        document.addEventListener('DOMContentLoaded', function () {
+            const startButton = document.querySelector('#start-jam-engine-btn');
+            if (startButton) {
+                console.log('🔍 Found Start JAM Engine button, adding event listener...');
+                startButton.addEventListener('click', function () {
+                    console.log('🎯 Start JAM Engine button clicked!');
+                    openJAMEngine();
+                });
+                console.log('✅ Event listener added to Start JAM Engine button');
+            } else {
+                console.error('❌ Start JAM Engine button not found!');
+            }
+        });
+
+        // Function to wait for JAM Get Started Module to load
+        function waitForJAMModule() {
+            console.log('🔍 Waiting for JAM Get Started Module... (Attempt ' + (moduleLoadAttempts + 1) + ')');
+
+            if (window.JAMGetStartedModule) {
+                console.log('✅ JAM Get Started Module found!');
+                initJAMGetStartedModule();
+                return;
+            }
+
+            moduleLoadAttempts++;
+            if (moduleLoadAttempts >= maxLoadAttempts) {
+                console.error('❌ JAM Get Started Module failed to load after ' + maxLoadAttempts + ' attempts');
                 showFallbackMessage();
+                return;
             }
-        } else {
-            console.error('❌ JAM Get Started Module not available');
-            showFallbackMessage();
+
+            // Try again in 500ms
+            setTimeout(waitForJAMModule, 500);
         }
-    }
 
-    // Fallback function if module fails to load
-    function showFallbackMessage() {
-        alert('JAM Engine is temporarily unavailable. Please try again later or contact support.');
-    }
+        // Function to initialize JAM Get Started Module
+        function initJAMGetStartedModule() {
+            console.log('🚀 Initializing JAM Get Started Module...');
 
-    // Wait for JAM Get Started Module to load
-    function waitForJAMModule() {
-        if (window.JAMGetStartedModule) {
-            console.log('✅ JAM Get Started Module detected');
-            initJAMGetStartedModule();
-        } else {
-            console.log('⏳ Waiting for JAM Get Started Module...');
-            setTimeout(waitForJAMModule, 100);
-        }
-    }
+            jamModuleContainer = document.getElementById('jam-get-started-module-container');
 
-    // Listen for module load event
-    window.addEventListener('jamGetStartedModuleLoaded', function () {
-        console.log('📡 JAM Get Started Module loaded event received');
-        initJAMGetStartedModule();
-    });
+            if (window.JAMGetStartedModule && jamModuleContainer) {
+                try {
+                    const success = window.JAMGetStartedModule.init(jamModuleContainer);
+                    if (success) {
+                        jamModuleInitialized = true;
+                        console.log('✅ JAM Get Started Module initialized successfully');
 
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('📄 DOM loaded, checking for JAM Get Started Module...');
+                        // Override the close function to hide our container
+                        const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
+                        window.JAMGetStartedModule.closeQuiz = function () {
+                            originalCloseQuiz();
+                            jamModuleContainer.classList.remove('active');
+                        };
 
-        // Start waiting for the module
-        setTimeout(waitForJAMModule, 100);
-    });
-
-    // Backup initialization after page load
-    window.addEventListener('load', function () {
-        if (!jamModuleInitialized) {
-            console.log('🔄 Page loaded, attempting backup initialization...');
-            setTimeout(function () {
-                if (window.JAMGetStartedModule && !jamModuleInitialized) {
-                    initJAMGetStartedModule();
+                    } else {
+                        console.error('❌ Failed to initialize JAM Get Started Module');
+                    }
+                } catch (error) {
+                    console.error('❌ Error initializing JAM Get Started Module:', error);
                 }
-            }, 500);
+            } else {
+                console.warn('⚠️ JAM Get Started Module or container not found');
+                if (!window.JAMGetStartedModule) {
+                    console.error('❌ window.JAMGetStartedModule is not available');
+                }
+                if (!jamModuleContainer) {
+                    console.error('❌ jam-get-started-module-container not found');
+                }
+            }
         }
-    });
 
-    // Global function for external access
-    window.openJAMEngine = openJAMEngine;
-</script>
+        // Function to open JAM Engine - Same as LandingPagePricing
+        function openJAMEngine() {
+            alert('UPDATED VERSION v2.0 - Modal moving functionality active!');
+            console.log('🎯 Opening JAM Engine... (UPDATED VERSION - v2.0)');
+            console.log('🔍 This is the updated mobile page with modal moving functionality');
+
+            // Check if module is available globally
+            if (!window.JAMGetStartedModule) {
+                console.error('❌ JAM Get Started Module not available');
+                console.log('🔍 Available global objects:', Object.keys(window).filter(key => key.includes('JAM')));
+                showFallbackMessage();
+                return;
+            }
+
+            // Get or create container
+            jamModuleContainer = document.getElementById('jam-get-started-module-container');
+
+            if (!jamModuleContainer) {
+                console.error('❌ JAM Get Started Module container not found');
+                showFallbackMessage();
+                return;
+            }
+
+            // Force complete reset of container and state
+            jamModuleContainer.innerHTML = '';
+            jamModuleContainer.classList.remove('active');
+            jamModuleContainer.style.display = 'none';
+            jamModuleInitialized = false;
+
+            // Small delay to ensure clean state
+            setTimeout(() => {
+                try {
+                    console.log('🔄 Initializing JAM Get Started Module...');
+                    const success = window.JAMGetStartedModule.init(jamModuleContainer);
+
+                    if (success) {
+                        jamModuleInitialized = true;
+                        console.log('✅ JAM Get Started Module initialized successfully');
+
+                        // Override the close function to ensure proper cleanup
+                        const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
+                        window.JAMGetStartedModule.closeQuiz = function () {
+                            console.log('🔴 Closing JAM Engine...');
+                            originalCloseQuiz();
+                            // Reset the initialization flag
+                            jamModuleInitialized = false;
+                            // Additional cleanup for our container
+                            jamModuleContainer.classList.remove('active');
+                            jamModuleContainer.style.display = 'none';
+                            console.log('🧹 JAM overlay cleaned up');
+                        };
+
+                        // Show our container overlay
+                        jamModuleContainer.classList.add('active');
+                        jamModuleContainer.style.display = 'block';
+
+                        // Open the quiz using the module's method
+                        console.log('🚀 Calling openQuiz()...');
+                        window.JAMGetStartedModule.openQuiz();
+
+                        // Enhanced modal moving mechanism - runs after modal is opened
+                        setTimeout(() => {
+                            console.log('🔍 Enhanced modal moving mechanism starting...');
+
+                            // Try to find modal in multiple locations
+                            let modal = jamModuleContainer.querySelector('#nav-quizModal');
+                            if (!modal) {
+                                modal = document.querySelector('#nav-quizModal');
+                            }
+
+                            if (modal) {
+                                console.log('🔍 Modal found for moving:', modal);
+                                console.log('🔍 Modal current parent:', modal.parentElement);
+                                console.log('🔍 Modal current styles:');
+                                const computedStyles = window.getComputedStyle(modal);
+                                console.log('  - display:', computedStyles.display);
+                                console.log('  - position:', computedStyles.position);
+                                console.log('  - z-index:', computedStyles.zIndex);
+                                console.log('  - width:', computedStyles.width);
+                                console.log('  - height:', computedStyles.height);
+
+                                // Move modal to document body FIRST (this is the key fix!)
+                                document.body.appendChild(modal);
+                                console.log('✅ Modal moved to document body');
+
+                                // Force modal to be a proper overlay with !important
+                                modal.style.setProperty('display', 'flex', 'important');
+                                modal.style.setProperty('position', 'fixed', 'important');
+                                modal.style.setProperty('top', '0', 'important');
+                                modal.style.setProperty('left', '0', 'important');
+                                modal.style.setProperty('width', '100vw', 'important');
+                                modal.style.setProperty('height', '100vh', 'important');
+                                modal.style.setProperty('z-index', '10000', 'important');
+                                modal.style.setProperty('background-color', 'rgba(0, 0, 0, 0.5)', 'important');
+                                modal.style.setProperty('align-items', 'center', 'important');
+                                modal.style.setProperty('justify-content', 'center', 'important');
+                                modal.style.setProperty('min-width', '100vw', 'important');
+                                modal.style.setProperty('min-height', '100vh', 'important');
+                                modal.style.setProperty('visibility', 'visible', 'important');
+                                modal.style.setProperty('opacity', '1', 'important');
+
+                                console.log('✅ Modal moved to body and forced visible!');
+
+                                // Debug modal position and styles after moving
+                                console.log('🔍 Modal position check after moving:');
+                                console.log('  - display:', modal.style.display);
+                                console.log('  - position:', modal.style.position);
+                                console.log('  - z-index:', modal.style.zIndex);
+                                console.log('  - top:', modal.style.top);
+                                console.log('  - left:', modal.style.left);
+                                console.log('  - width:', modal.style.width);
+                                console.log('  - height:', modal.style.height);
+                                console.log('  - background:', modal.style.backgroundColor);
+                                console.log('  - visibility:', modal.style.visibility);
+                                console.log('  - opacity:', modal.style.opacity);
+
+                                // Check if modal content is visible
+                                const modalContent = modal.querySelector('.nav-modal-content');
+                                if (modalContent) {
+                                    console.log('🔍 Modal content found:', modalContent);
+                                    console.log('🔍 Modal content styles:');
+                                    console.log('  - display:', window.getComputedStyle(modalContent).display);
+                                    console.log('  - width:', window.getComputedStyle(modalContent).width);
+                                    console.log('  - height:', window.getComputedStyle(modalContent).height);
+                                    console.log('  - background:', window.getComputedStyle(modalContent).backgroundColor);
+                                } else {
+                                    console.error('❌ Modal content not found!');
+                                }
+
+                                // Re-attach event listeners after moving
+                                reattachEventListeners();
+                            } else {
+                                console.error('❌ Modal not found anywhere for moving');
+                            }
+                        }, 200); // Increased delay to ensure modal is fully opened
+
+                        console.log('✅ JAM Engine opened successfully');
+                    } else {
+                        console.error('❌ Failed to initialize JAM Get Started Module');
+                        showFallbackMessage();
+                    }
+                } catch (error) {
+                    console.error('❌ Error opening JAM Engine:', error);
+                    showFallbackMessage();
+                }
+            }, 100); // Small delay to ensure clean state
+        }
+
+        // Function to re-attach event listeners after moving modal to body
+        function reattachEventListeners() {
+            console.log('🔧 Re-attaching event listeners...');
+
+            // Close button - Fixed selector to match NavGetStarted.html
+            const closeBtn = document.querySelector('.nav-close-button');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    if (window.JAMGetStartedModule) {
+                        window.JAMGetStartedModule.closeQuiz();
+                    }
+                });
+            } else {
+                console.warn('⚠️ Close button not found with selector .nav-close-button');
+            }
+
+            // Option buttons
+            const optionBtns = document.querySelectorAll('.nav-option-btn');
+            optionBtns.forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    if (window.JAMGetStartedModule && window.JAMGetStartedModule.handleOptionSelect) {
+                        window.JAMGetStartedModule.handleOptionSelect(e);
+                    }
+                });
+            });
+
+            // Next button
+            const nextBtn = document.querySelector('#nav-nextBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function () {
+                    if (window.JAMGetStartedModule) {
+                        const currentStep = window.JAMGetStartedModule.currentStep();
+                        const totalSteps = window.JAMGetStartedModule.totalSteps();
+                        if (currentStep < totalSteps) {
+                            window.JAMGetStartedModule.showStep(currentStep + 1);
+                        } else {
+                            window.JAMGetStartedModule.submitRegistration();
+                        }
+                    }
+                });
+            }
+
+            // Previous button
+            const prevBtn = document.querySelector('#nav-prevBtn');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function () {
+                    if (window.JAMGetStartedModule) {
+                        const currentStep = window.JAMGetStartedModule.currentStep();
+                        if (currentStep > 1) {
+                            window.JAMGetStartedModule.showStep(currentStep - 1);
+                        }
+                    }
+                });
+            }
+
+            // Form validation for registration step
+            const formInputs = document.querySelectorAll('#nav-registration-form input, #nav-registration-form select');
+            formInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    if (window.JAMGetStartedModule && window.JAMGetStartedModule.validateRegistrationForm) {
+                        window.JAMGetStartedModule.validateRegistrationForm();
+                    }
+                });
+            });
+
+            console.log('✅ Event listeners re-attached');
+        }
+
+        // Fallback function if module fails to load
+        function showFallbackMessage() {
+            alert('JAM Engine is temporarily unavailable. Please try again later or contact support.');
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('📄 DOM loaded, waiting for JAM Get Started Module...');
+            waitForJAMModule();
+        });
+
+        // Listen for module load event
+        window.addEventListener('jamGetStartedModuleLoaded', function () {
+            console.log('📡 JAM Get Started Module loaded event received');
+            initJAMGetStartedModule();
+        });
+
+        // Global function for external access
+        window.openJAMEngine = openJAMEngine;
+
+        // Additional safety mechanism to ensure overlay is removed
+        function cleanupJAMOverlay() {
+            const container = document.getElementById('jam-get-started-module-container');
+            if (container) {
+                container.classList.remove('active');
+                container.style.display = 'none';
+                container.style.opacity = '0';
+                container.style.visibility = 'hidden';
+                console.log('🧹 JAM overlay manually cleaned up');
+            }
+        }
+
+        // Global cleanup function
+        window.cleanupJAMOverlay = cleanupJAMOverlay;
+
+        // Listen for escape key to close overlay
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const container = document.getElementById('jam-get-started-module-container');
+                if (container && container.classList.contains('active')) {
+                    if (window.JAMGetStartedModule) {
+                        window.JAMGetStartedModule.closeQuiz();
+                    } else {
+                        cleanupJAMOverlay();
+                    }
+                }
+            }
+        });
+
+        // Listen for clicks outside the modal to close
+        document.addEventListener('click', function (e) {
+            const container = document.getElementById('jam-get-started-module-container');
+            if (container && container.classList.contains('active')) {
+                const modal = container.querySelector('.nav-modal-content');
+                if (modal && !modal.contains(e.target) && !container.contains(e.target)) {
+                    if (window.JAMGetStartedModule) {
+                        window.JAMGetStartedModule.closeQuiz();
+                    } else {
+                        cleanupJAMOverlay();
+                    }
+                }
+            }
+        });
+
+        // Ensure overlay is cleaned up when page is unloaded
+        window.addEventListener('beforeunload', function () {
+            cleanupJAMOverlay();
+        });
+    </script>
+</body>
+
+</html>

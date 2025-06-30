@@ -4,19 +4,21 @@ import crypto from 'crypto';
 console.log('🔐 Loading credentialsController module...');
 
 // Encryption key for credentials (should be in environment variables)
-const ENCRYPTION_KEY = process.env.CREDENTIAL_ENCRYPTION_KEY || crypto.randomBytes(32);
-const ALGORITHM = 'aes-256-gcm';
+// For AES-256-CBC, we need exactly 32 bytes (256 bits)
+const ENCRYPTION_KEY = process.env.CREDENTIAL_ENCRYPTION_KEY ? 
+    crypto.createHash('sha256').update(process.env.CREDENTIAL_ENCRYPTION_KEY).digest() : 
+    crypto.createHash('sha256').update('default-key-for-local-development').digest();
+const ALGORITHM = 'aes-256-cbc';
 
 // Encrypt credentials
 function encryptCredentials(text) {
     try {
         const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipher(ALGORITHM, ENCRYPTION_KEY);
+        const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
         
         let encrypted = cipher.update(text, 'utf8', 'hex');
         encrypted += cipher.final('hex');
         
-        // Note: For simplicity, using older cipher method. In production, use authenticated encryption
         return {
             encrypted: encrypted,
             iv: iv.toString('hex')
@@ -30,7 +32,8 @@ function encryptCredentials(text) {
 // Decrypt credentials (if needed for future use)
 function decryptCredentials(encryptedData) {
     try {
-        const decipher = crypto.createDecipher(ALGORITHM, ENCRYPTION_KEY);
+        const iv = Buffer.from(encryptedData.iv, 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
         
         let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
@@ -48,14 +51,19 @@ const credentialsController = {
         try {
             console.log('🔐 Processing credential storage request...');
             
-            const { userId, serviceType, email, password, purpose } = req.body;
+            // Ensure CORS headers are set
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
+            const { serviceType, email, password, purpose } = req.body;
+            const userId = req.user.id; // Get userId from authenticated user
             const cosmosService = req.app.locals.cosmosService;
             
             // Validate required fields
-            if (!userId || !serviceType || !email || !password) {
+            if (!serviceType || !email || !password) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Missing required fields: userId, serviceType, email, password'
+                    message: 'Missing required fields: serviceType, email, password'
                 });
             }
 
@@ -91,7 +99,8 @@ const credentialsController = {
                     encryptedPassword: encryptedPassword,
                     purpose: purpose || existing.purpose,
                     updatedAt: timestamp,
-                    lastUpdatedBy: req.user.id
+                    lastUpdatedBy: req.user.id,
+                    isActive: true
                 };
                 
                 await cosmosService.updateDocument(existing.id, 'credential', credentialData);
@@ -147,6 +156,11 @@ const credentialsController = {
 
         } catch (error) {
             console.error('❌ Error storing credentials:', error);
+            
+            // Ensure CORS headers are set even in error responses
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
             res.status(500).json({
                 success: false,
                 message: 'Failed to store credentials',
@@ -159,6 +173,10 @@ const credentialsController = {
     async checkCredentials(req, res) {
         try {
             console.log('🔍 Checking existing credentials...');
+            
+            // Ensure CORS headers are set
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
             
             const { serviceType } = req.params;
             const userId = req.user.id; // From auth middleware
@@ -187,23 +205,25 @@ const credentialsController = {
                 
                 res.json({
                     success: true,
-                    exists: true,
-                    credential: {
-                        email: credential.email,
-                        serviceType: credential.serviceType,
-                        createdAt: credential.createdAt,
-                        updatedAt: credential.updatedAt
-                    }
+                    hasCredentials: true,
+                    currentEmail: credential.email,
+                    lastUpdated: credential.updatedAt,
+                    serviceType: credential.serviceType
                 });
             } else {
                 res.json({
                     success: true,
-                    exists: false
+                    hasCredentials: false
                 });
             }
 
         } catch (error) {
             console.error('❌ Error checking credentials:', error);
+            
+            // Ensure CORS headers are set even in error responses
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
             res.status(500).json({
                 success: false,
                 message: 'Failed to check credentials',
@@ -217,18 +237,13 @@ const credentialsController = {
         try {
             console.log('🗑️ Removing credentials...');
             
+            // Ensure CORS headers are set
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
             const { serviceType } = req.params;
-            const { userId } = req.body;
-            const requestingUserId = req.user.id; // From auth middleware
+            const userId = req.user.id; // Get userId from authenticated user
             const cosmosService = req.app.locals.cosmosService;
-
-            // Validate that user can only remove their own credentials (unless admin)
-            if (userId !== requestingUserId && req.user.role !== 'admin') {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Unauthorized to remove credentials for another user'
-                });
-            }
 
             // Validate service type
             const validServices = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
@@ -261,7 +276,7 @@ const credentialsController = {
                 ...credential,
                 isActive: false,
                 deletedAt: new Date().toISOString(),
-                deletedBy: requestingUserId
+                deletedBy: userId
             };
             
             await cosmosService.updateDocument(credential.id, 'credential', updatedCredential);
@@ -278,7 +293,7 @@ const credentialsController = {
                 timestamp: new Date().toISOString(),
                 ipAddress: req.ip || req.connection.remoteAddress,
                 userAgent: req.get('User-Agent'),
-                performedBy: requestingUserId
+                performedBy: userId
             };
             
             await cosmosService.createDocument(auditLog);
@@ -293,6 +308,11 @@ const credentialsController = {
 
         } catch (error) {
             console.error('❌ Error removing credentials:', error);
+            
+            // Ensure CORS headers are set even in error responses
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
             res.status(500).json({
                 success: false,
                 message: 'Failed to remove credentials',
@@ -341,6 +361,170 @@ const credentialsController = {
             res.status(500).json({
                 success: false,
                 message: 'Failed to get user credentials',
+                error: error.message
+            });
+        }
+    },
+
+    // Admin retrieve credentials with decryption
+    async adminRetrieveCredentials(req, res) {
+        try {
+            console.log('🛡️ Admin retrieving credentials...');
+            
+            // Ensure CORS headers are set
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
+            const { userEmail, serviceType, purpose } = req.body;
+            const cosmosService = req.app.locals.cosmosService;
+
+            // Validate required fields
+            if (!userEmail || !serviceType || !purpose) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'User email, service type, and purpose are required'
+                });
+            }
+
+            // Validate service type
+            const validServices = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
+            if (!validServices.includes(serviceType)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid service type'
+                });
+            }
+
+            console.log(`🔍 Looking for user with email: ${userEmail}`);
+
+            // First, find the user by email
+            const users = await cosmosService.queryDocuments(
+                `SELECT * FROM c WHERE c.email = '${userEmail}' AND c.type = 'user'`
+            );
+
+            if (users.length === 0) {
+                console.log('❌ User not found');
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
+
+            const user = users[0];
+            console.log(`✅ Found user: ${user.id}`);
+
+            // Find the user's credentials for the specified service
+            const credentials = await cosmosService.queryDocuments(
+                `SELECT * FROM c 
+                 WHERE c.userId = '${user.id}' 
+                 AND c.type = 'credential' 
+                 AND c.serviceType = '${serviceType}'
+                 AND c.isActive = true`
+            );
+
+            if (credentials.length === 0) {
+                console.log('❌ No credentials found for this service');
+                return res.status(404).json({
+                    success: false,
+                    message: `No ${serviceType} credentials found for this user`
+                });
+            }
+
+            const credential = credentials[0];
+            console.log(`✅ Found credentials for service: ${serviceType}`);
+
+            // Decrypt the password
+            const decryptedPassword = decryptCredentials(credential.encryptedPassword);
+
+            // Create audit log for admin access
+            const auditLogId = `audit_admin_access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const auditLog = {
+                id: auditLogId,
+                type: 'audit_log',
+                action: 'admin_credential_access',
+                adminId: req.user.id,
+                adminEmail: req.user.email,
+                targetUserId: user.id,
+                targetUserEmail: userEmail,
+                serviceType: serviceType,
+                purpose: purpose,
+                accessTimestamp: new Date().toISOString(),
+                ipAddress: req.ip || req.connection.remoteAddress,
+                userAgent: req.get('User-Agent')
+            };
+
+            await cosmosService.createDocument(auditLog);
+
+            // Update the credential with last accessed info
+            const updatedCredential = {
+                ...credential,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedBy: req.user.id
+            };
+
+            await cosmosService.updateDocument(credential.id, 'credential', updatedCredential);
+
+            console.log(`✅ Admin access logged and credentials retrieved for ${serviceType}`);
+
+            // Return decrypted credentials
+            res.json({
+                success: true,
+                data: {
+                    serviceType: serviceType,
+                    email: credential.email,
+                    password: decryptedPassword,
+                    lastAccessed: credential.lastAccessed,
+                    createdAt: credential.createdAt,
+                    updatedAt: credential.updatedAt
+                },
+                userInfo: {
+                    name: user.name || user.firstName + ' ' + user.lastName || 'Unknown',
+                    email: user.email
+                },
+                accessLog: auditLog
+            });
+
+        } catch (error) {
+            console.error('❌ Error retrieving credentials for admin:', error);
+            
+            // Ensure CORS headers are set even in error responses
+            res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            
+            res.status(500).json({
+                success: false,
+                message: 'Failed to retrieve credentials',
+                error: error.message
+            });
+        }
+    },
+
+    // Get audit log for admin access
+    async getAuditLog(req, res) {
+        try {
+            console.log('📊 Getting credential audit log...');
+            
+            const cosmosService = req.app.locals.cosmosService;
+
+            // Get recent audit logs (last 100 entries)
+            const auditLogs = await cosmosService.queryDocuments(
+                `SELECT * FROM c 
+                 WHERE c.type = 'audit_log' 
+                 AND c.action = 'admin_credential_access'
+                 ORDER BY c.accessTimestamp DESC
+                 OFFSET 0 LIMIT 100`
+            );
+
+            res.json({
+                success: true,
+                data: auditLogs
+            });
+
+        } catch (error) {
+            console.error('❌ Error getting audit log:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to get audit log',
                 error: error.message
             });
         }

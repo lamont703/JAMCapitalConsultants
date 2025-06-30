@@ -317,6 +317,61 @@
             color: var(--primary-dark);
         }
 
+        .question-mark {
+            color: #09ccfc;
+            margin: 0;
+            padding: 0;
+            display: inline;
+            font-weight: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            letter-spacing: 0;
+            word-spacing: 0;
+            margin-left: -0.1em;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+        }
+
         .faq-answer {
             padding: 0;
             max-height: 0;
@@ -340,13 +395,7 @@
             line-height: 1.5;
         }
 
-        .faq-question i {
-            transition: transform 0.3s ease;
-        }
 
-        .faq-question.active i {
-            transform: rotate(180deg);
-        }
 
         /* CTA Section */
         .cta-section {
@@ -683,6 +732,33 @@
                 transform: scale(0.98);
             }
 
+            .question-mark {
+                color: #09ccfc !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+                font-weight: inherit !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                letter-spacing: 0 !important;
+                word-spacing: 0 !important;
+                margin-left: -0.1em !important;
+            }
+
+            .typing-indicator {
+                padding: 10px 15px;
+                border-radius: 0;
+            }
+
+            .dots {
+                gap: 3px;
+            }
+
+            .dot {
+                width: 6px;
+                height: 6px;
+            }
+
             .faq-answer {
                 padding: 0;
                 max-height: 0;
@@ -789,6 +865,19 @@
 
         /* Small Devices (landscape phones, 576px and up) */
         @media (min-width: 576px) and (max-width: 767.98px) {
+            .question-mark {
+                color: #09ccfc !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+                font-weight: inherit !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                letter-spacing: 0 !important;
+                word-spacing: 0 !important;
+                margin-left: -0.1em !important;
+            }
+
             .hero {
                 padding: 40px 0;
             }
@@ -1139,6 +1228,19 @@
 
         /* Landscape Orientation Adjustments */
         @media (max-width: 767.98px) and (orientation: landscape) {
+            .question-mark {
+                color: #09ccfc !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+                font-weight: inherit !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                letter-spacing: 0 !important;
+                word-spacing: 0 !important;
+                margin-left: -0.1em !important;
+            }
+
             .hero {
                 padding: 30px 0;
             }
@@ -1562,17 +1664,52 @@
             }
         }
 
+        /* JAM Get Started Module Container Styles */
+        #jam-get-started-module-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #jam-get-started-module-container.active {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Ensure the module's modal displays properly within our container */
+        #jam-get-started-module-container .nav-quiz-modal {
+            display: flex !important;
+            position: relative;
+            background: transparent;
+        }
+
+        #jam-get-started-module-container .nav-modal-content {
+            position: relative;
+            margin: auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
         /* Responsive grid adjustments */
         @media (max-width: 1200px) {
             .pricing-plans {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 25px;
             }
         }
 
         @media (max-width: 992px) {
             .pricing-plans {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 20px;
             }
         }
@@ -1581,11 +1718,6 @@
             .pricing-plans {
                 grid-template-columns: 1fr;
                 gap: 20px;
-            }
-
-            .pricing-plans>div[style*="grid-column"] {
-                padding: 1rem;
-                margin: 1rem 0;
             }
         }
 
@@ -1859,128 +1991,23 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>Choose Your Credit Dispute Plan</h1>
-            <p>From our completely free plan to full-service white-glove credit disputes, we have the perfect solution
-                for
-                your budget and needs. Start with our Free Plan and upgrade anytime as your needs grow.</p>
+            <h1>Professional Credit Dispute Services</h1>
+            <p>Let our experts handle everything while you relax. Choose from our flexible payment options for premium
+                full-service credit disputes. Our dedicated specialists manage your entire credit improvement journey
+                from start to finish.</p>
         </div>
     </section>
 
     <!-- Pricing Section -->
-    <section class="pricing-section">
+    <section class="pricing-section" id="pricing-plans">
         <div class="container">
             <div class="section-header">
-                <h2>Our Pricing Plans</h2>
-                <p>We offer flexible options from completely free to full-service credit disputes. Choose between DIY
-                    plans with powerful tools and dispute letter credits, or Done For You service where our experts
-                    handle everything for you.</p>
+                <h2>Full-Service Credit Dispute Plans</h2>
+                <p>Choose the payment option that works best for your budget. All plans include the same premium
+                    white-glove service with a dedicated credit dispute specialist handling everything for you.</p>
             </div>
 
             <div class="pricing-plans">
-                <!-- Free Plan -->
-                <div class="pricing-plan free-plan">
-                    <div class="pricing-header">
-                        <h3 class="plan-name">Free Plan</h3>
-                        <div class="plan-price">$0<span class="plan-period">/forever</span></div>
-                        <div class="plan-target">Perfect for getting started with professional credit disputes</div>
-                    </div>
-                    <div class="pricing-body">
-                        <div class="plan-description">
-                            Get started with our comprehensive suite of credit dispute tools - completely free! Access
-                            professional-grade features to begin improving your credit score today.
-                        </div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
-                            <li><i class="fas fa-check"></i> Dispute Library access</li>
-                            <li><i class="fas fa-check"></i> 2 Free Dispute Letter Credits</li>
-                            <li><i class="fas fa-check"></i> JAM Dispute Bot Credit Analysis</li>
-                            <li><i class="fas fa-check"></i> JAM Dispute Bot Credit Educator</li>
-                            <li><i class="fas fa-check"></i> Secure Document Storage</li>
-                        </ul>
-                        <button class="plan-button">Start JAM Engine</button>
-                    </div>
-                </div>
-
-                <!-- DIY Starter Plan -->
-                <div class="pricing-plan">
-                    <div class="pricing-header">
-                        <h3 class="plan-name">DIY Starter</h3>
-                        <div class="plan-price">$29<span class="plan-period">/month</span></div>
-                        <div class="plan-target">Perfect for beginners</div>
-                    </div>
-                    <div class="pricing-body">
-                        <div class="plan-description">
-                            Essential credit dispute tools with everything from Free plan plus 5 monthly dispute letter
-                            credits.
-                        </div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> Everything in Free Plan included</li>
-                            <li><i class="fas fa-check"></i> 5 dispute letter credits per month</li>
-                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
-                            <li><i class="fas fa-check"></i> Full JAM Dispute Bot access</li>
-                            <li><i class="fas fa-check"></i> Unlimited credit analysis</li>
-                            <li><i class="fas fa-check"></i> Email support</li>
-                        </ul>
-                        <button class="plan-button">Start JAM Engine</button>
-                    </div>
-                </div>
-
-                <!-- DIY Professional Plan -->
-                <div class="pricing-plan guided-plan">
-                    <div class="popular-tag">Most Popular</div>
-                    <div class="pricing-header">
-                        <h3 class="plan-name">DIY Professional</h3>
-                        <div class="plan-price">$59<span class="plan-period">/month</span></div>
-                        <div class="plan-target">Most popular choice</div>
-                    </div>
-                    <div class="pricing-body">
-                        <div class="plan-description">
-                            Comprehensive credit dispute tools with everything from Free plan plus 15 monthly dispute
-                            letter credits.
-                        </div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> Everything in Free Plan included</li>
-                            <li><i class="fas fa-check"></i> 15 dispute letter credits per month</li>
-                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
-                            <li><i class="fas fa-check"></i> Full JAM Dispute Bot access</li>
-                            <li><i class="fas fa-check"></i> Unlimited credit analysis</li>
-                            <li><i class="fas fa-check"></i> Priority email support</li>
-                        </ul>
-                        <button class="plan-button">Start JAM Engine</button>
-                    </div>
-                </div>
-
-                <!-- DIY Premium Plan -->
-                <div class="pricing-plan">
-                    <div class="pricing-header">
-                        <h3 class="plan-name">DIY Premium</h3>
-                        <div class="plan-price">$99<span class="plan-period">/month</span></div>
-                        <div class="plan-target">For serious credit disputes</div>
-                    </div>
-                    <div class="pricing-body">
-                        <div class="plan-description">
-                            Everything you need for comprehensive credit disputes with 50 monthly dispute letter credits
-                            and premium features.
-                        </div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> Everything in Free Plan included</li>
-                            <li><i class="fas fa-check"></i> 50 dispute letter credits per month</li>
-                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
-                            <li><i class="fas fa-check"></i> Full JAM Dispute Bot access</li>
-                            <li><i class="fas fa-check"></i> Unlimited credit analysis</li>
-                            <li><i class="fas fa-check"></i> Phone & email support</li>
-                        </ul>
-                        <button class="plan-button">Start JAM Engine</button>
-                    </div>
-                </div>
-
-                <!-- Full-Service Plans Section Header -->
-                <div style="grid-column: 1 / -1; text-align: center; margin: 2rem 0 1rem 0;">
-                    <h3 style="color: var(--primary); font-size: 1.5rem; margin-bottom: 0.5rem;">Full-Service Plans</h3>
-                    <p style="color: var(--gray-600); font-size: 1rem;">Let our experts handle everything while you
-                        relax. Choose the payment option that works best for your budget.</p>
-                </div>
-
                 <!-- Elite JumpStart Plan -->
                 <div class="pricing-plan">
                     <div class="pricing-header">
@@ -1991,8 +2018,7 @@
                     <div class="pricing-body">
                         <div class="plan-description">
                             Get started immediately with a low setup fee, then enjoy our full-service credit disputes
-                            with
-                            monthly payments.
+                            with monthly payments.
                         </div>
                         <ul class="plan-features">
                             <li><i class="fas fa-check"></i> Dedicated credit dispute specialist</li>
@@ -2001,8 +2027,9 @@
                             <li><i class="fas fa-check"></i> Monthly credit score updates</li>
                             <li><i class="fas fa-check"></i> Direct creditor negotiations</li>
                             <li><i class="fas fa-check"></i> Weekly progress updates</li>
+                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
+                            <li><i class="fas fa-check"></i> Complete dispute documentation</li>
                         </ul>
-                        <button class="plan-button">Start JAM Engine</button>
                     </div>
                 </div>
 
@@ -2026,8 +2053,9 @@
                             <li><i class="fas fa-check"></i> Monthly credit score updates</li>
                             <li><i class="fas fa-check"></i> Direct creditor negotiations</li>
                             <li><i class="fas fa-check"></i> Weekly progress updates</li>
+                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
+                            <li><i class="fas fa-check"></i> Complete dispute documentation</li>
                         </ul>
-                        <button class="plan-button">Start JAM Engine</button>
                     </div>
                 </div>
 
@@ -2049,8 +2077,9 @@
                             <li><i class="fas fa-check"></i> Monthly credit score updates</li>
                             <li><i class="fas fa-check"></i> Direct creditor negotiations</li>
                             <li><i class="fas fa-check"></i> Weekly progress updates</li>
+                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
+                            <li><i class="fas fa-check"></i> Complete dispute documentation</li>
                         </ul>
-                        <button class="plan-button">Start JAM Engine</button>
                     </div>
                 </div>
 
@@ -2073,8 +2102,9 @@
                             <li><i class="fas fa-check"></i> No monthly payments for 6 months</li>
                             <li><i class="fas fa-check"></i> Priority processing of all disputes</li>
                             <li><i class="fas fa-check"></i> Weekly progress updates</li>
+                            <li><i class="fas fa-check"></i> JAM Engine Credit Management Platform</li>
+                            <li><i class="fas fa-check"></i> Complete dispute documentation</li>
                         </ul>
-                        <button class="plan-button">Start JAM Engine</button>
                     </div>
                 </div>
             </div>
@@ -2086,9 +2116,8 @@
         <div class="container">
             <div class="section-header">
                 <h2>Plan Comparison</h2>
-                <p>Compare our plans to find the perfect fit for your credit dispute needs. From our Free Plan to
-                    premium
-                    Done For You service, see exactly what's included in each option.</p>
+                <p>Compare our full-service payment options to find the perfect fit for your budget. All plans include
+                    identical premium white-glove credit dispute service.</p>
             </div>
 
             <div class="comparison-table-wrapper">
@@ -2096,124 +2125,95 @@
                     <thead>
                         <tr>
                             <th>Features</th>
-                            <th>Free</th>
-                            <th>DIY Starter</th>
-                            <th>DIY Professional</th>
-                            <th>DIY Premium</th>
-                            <th>Full-Service</th>
+                            <th>Elite JumpStart</th>
+                            <th>Momentum Builder</th>
+                            <th>Strategic Start</th>
+                            <th>Platinum Commitment</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>Setup Cost</td>
+                            <td>$399</td>
+                            <td>2 x $250 weekly</td>
+                            <td>4 x $150 weekly</td>
+                            <td>$1,499 (includes 6 months)</td>
+                        </tr>
+                        <tr>
+                            <td>Monthly Service Fee</td>
+                            <td>$197/month</td>
+                            <td>$197/month</td>
+                            <td>$197/month</td>
+                            <td>Included for 6 months</td>
+                        </tr>
+                        <tr>
+                            <td>Dedicated Credit Dispute Specialist</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Unlimited Custom Dispute Letters</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>We Handle All Disputes</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Priority Processing</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Monthly Credit Score Updates</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Direct Creditor Negotiations</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Weekly Progress Updates</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
                         <tr>
                             <td>JAM Engine Credit Management Platform</td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
                         </tr>
                         <tr>
-                            <td>Dispute Library Access</td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>JAM Dispute Bot Credit Analysis</td>
-                            <td><i class="fas fa-check"></i></td>
+                            <td>Complete Dispute Documentation</td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
                         </tr>
                         <tr>
-                            <td>JAM Dispute Bot Credit Educator</td>
+                            <td>Phone & Email Support</td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
                             <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Secure Document Storage</td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Monthly Dispute Letter Credits</td>
-                            <td>2 Free</td>
-                            <td>5 Credits</td>
-                            <td>15 Credits</td>
-                            <td>50 Credits</td>
-                            <td>Unlimited</td>
-                        </tr>
-                        <tr>
-                            <td>Full JAM Dispute Bot Access</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Unlimited Credit Analysis</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Priority Support</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Phone Support</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Dedicated Credit Repair Specialist</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>We Handle All Disputes</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Direct Creditor Negotiations</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Weekly Progress Updates</td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
-                            <td><i class="fas fa-times"></i></td>
                             <td><i class="fas fa-check"></i></td>
                         </tr>
                     </tbody>
@@ -2233,166 +2233,215 @@
             <div class="faq-container">
                 <div class="faq-item">
                     <div class="faq-question">
-                        What's the difference between your pricing plans?
-                        <i class="fas fa-chevron-down"></i>
+                        What's the difference between your payment plans<span class="question-mark">?</span>
                     </div>
-                    <div class="faq-answer">
-                        <div>
-                            We offer three plan categories: <strong>Free Plan ($0/forever)</strong> gives you JAM Engine
-                            access,
-                            Dispute Library, and 2 lifetime dispute letter credits. <strong>DIY Plans
-                                ($29-$99/month)</strong>
-                            add monthly dispute letter credits (5-50 per month) with email/phone support.
-                            <strong>Done For You Plans (starting $197/month)</strong> provide full-service credit
-                            dispute
-                            where we handle everything for you, with 4 different payment options to fit your budget.
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
                         </div>
                     </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        How do the DIY plan dispute letter credits work?
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
                     <div class="faq-answer">
                         <div>
-                            DIY Starter ($29/month) includes 5 dispute letter credits, DIY Professional ($59/month)
-                            includes 15 credits, and DIY Premium ($99/month) includes 50 credits. These credits
-                            renew monthly and let you generate professional dispute letters using our JAM Dispute Bot.
-                            All DIY plans include everything from the Free plan plus these monthly credits.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        What are the Done For You payment options?
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div>
-                            We offer 4 payment structures for the same premium service: <strong>Elite JumpStart</strong>
+                            All our plans provide identical premium full-service credit dispute service with a dedicated
+                            specialist. The only difference is the payment structure: <strong>Elite JumpStart</strong>
                             ($399 setup + $197/month), <strong>Momentum Builder</strong> (2 weekly $250 payments +
-                            $197/month - Most Popular),
-                            <strong>Strategic Start</strong> (4 weekly $150 payments + $197/month), and
-                            <strong>Platinum Commitment</strong> ($1,499 one-time includes 6 months). All provide
-                            identical
-                            white-glove service with a dedicated specialist handling everything.
+                            $197/month - Most Popular), <strong>Strategic Start</strong> (4 weekly $150 payments +
+                            $197/month), and <strong>Platinum Commitment</strong> ($1,499 one-time includes 6 months).
+                            Choose the payment option that best fits your budget.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        How long does credit dispute take?
-                        <i class="fas fa-chevron-down"></i>
+                        What's included in your full-service credit dispute<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
-                            Most clients see initial results within 30-45 days, with significant improvements
-                            typically occurring within 3-6 months. Complex cases may take longer. DIY plan users
-                            can work at their own pace, while Done For You clients get weekly progress updates
-                            and dedicated specialist management to optimize timing.
+                            Every plan includes a dedicated credit dispute specialist who handles everything for you:
+                            unlimited custom dispute letters, priority processing, monthly credit score updates, direct
+                            creditor negotiations, weekly progress updates, JAM Engine Credit Management Platform
+                            access, complete dispute documentation, and phone & email support. You simply relax while we
+                            do all the work.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        What's included in the JAM Engine Credit Management Platform?
-                        <i class="fas fa-chevron-down"></i>
+                        Which payment option is most popular<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
-                            JAM Engine is our comprehensive credit management platform included in all plans.
-                            It provides credit report analysis, tracks your progress, manages dispute documentation,
-                            offers personalized recommendations, and integrates with our JAM Dispute Bot for
-                            seamless credit dispute workflow. It's your central hub for all credit improvement
-                            activities.
+                            <strong>Momentum Builder</strong> is our most popular choice. It allows you to spread your
+                            initial investment with 2 weekly payments of $250 each, then transition to the monthly
+                            service fee of $197. This provides a good balance between affordability and getting started
+                            quickly with our premium service.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        Can I upgrade or downgrade my plan anytime?
-                        <i class="fas fa-chevron-down"></i>
+                        How long does credit dispute take<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
-                            Yes! You can upgrade from Free to DIY plans, between DIY tiers, or from DIY to Done For You
-                            service at any time. Downgrades are processed at your next billing cycle. The Free plan
-                            never expires and requires no payment information, so you can always return to it if needed.
+                            Most clients see initial results within 30-45 days, with significant improvements typically
+                            occurring within 3-6 months. Complex cases may take longer. Your dedicated specialist will
+                            provide weekly progress updates and work continuously on your behalf to optimize timing and
+                            results.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        What's the difference between DIY and Done For You service?
-                        <i class="fas fa-chevron-down"></i>
+                        What's included in the JAM Engine Credit Management Platform<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
-                            DIY plans give you all the tools and resources to dispute your credit yourself - dispute
-                            letter
-                            generation, credit analysis, educational resources, and support. Done For You service
-                            assigns
-                            you a dedicated credit dispute specialist who handles everything: writing disputes, sending
-                            letters,
-                            following up with creditors, negotiating on your behalf, and providing weekly progress
-                            updates.
+                            JAM Engine is our comprehensive credit management platform included in all plans. It
+                            provides credit report analysis, tracks your progress, manages dispute documentation, offers
+                            personalized recommendations, and serves as your central hub for monitoring your credit
+                            improvement journey. Your specialist uses this platform to manage your case efficiently.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        Is there a guarantee for credit score improvement?
-                        <i class="fas fa-chevron-down"></i>
+                        Can I change my payment plan after starting<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            Once you've completed your initial payment structure (setup fees or weekly payments), all
+                            plans transition to the same $197/month service fee. The Platinum Commitment plan includes 6
+                            months of service, after which you can continue at the standard monthly rate or pause your
+                            service as needed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What makes your service different from DIY credit repair<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div>
+                            Our full-service approach means you don't have to learn credit law, write dispute letters,
+                            or manage creditor communications. Your dedicated specialist handles everything: analyzing
+                            your credit reports, crafting strategic disputes, negotiating with creditors, and providing
+                            ongoing guidance. You get professional expertise without the time investment or learning
+                            curve.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Is there a guarantee for credit score improvement<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
                             While we cannot legally guarantee specific point increases (no credit dispute company can),
                             our methods have helped thousands of clients improve their credit scores. We offer a 30-day
-                            money-back guarantee on all paid plans. Done For You clients also get a 6-month minimum
-                            commitment guarantee - if you follow our program and don't see meaningful results, we'll
-                            work
-                            with you to make it right.
+                            money-back guarantee on all plans. Our specialists work continuously on your behalf, and
+                            we're committed to achieving meaningful results for every client.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        How does the JAM Dispute Bot work?
-                        <i class="fas fa-chevron-down"></i>
+                        How does the dedicated specialist service work<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
-                            JAM Dispute Bot analyzes your credit reports, identifies potential errors or discrepancies,
-                            and generates professional dispute letters. Free plan users get 2 lifetime credits, DIY
-                            plans
-                            get monthly credits (5-50 depending on tier), and Done For You clients get unlimited usage
-                            as part of their specialist's service. It also includes credit education and strategic
-                            guidance.
+                            After enrollment, you'll be assigned a dedicated credit dispute specialist who becomes your
+                            personal advocate. They analyze your credit reports, develop a customized strategy, handle
+                            all dispute letters and creditor communications, negotiate on your behalf, and provide
+                            weekly progress updates. You have direct access to your specialist via phone and email for
+                            any questions or concerns.
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        What support do I get with each plan?
-                        <i class="fas fa-chevron-down"></i>
+                        What support do I get with my plan<span class="question-mark">?</span>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
                     </div>
                     <div class="faq-answer">
                         <div>
-                            Free plan includes self-service resources and documentation. DIY Starter and Professional
-                            include email support, while DIY Premium adds phone support. Done For You plans include
-                            a dedicated credit dispute specialist, weekly progress updates, direct creditor
-                            negotiations,
-                            and priority support for any questions or concerns.
+                            All plans include a dedicated credit dispute specialist, weekly progress updates, direct
+                            creditor negotiations, phone & email support, and access to our JAM Engine platform. Your
+                            specialist is your primary point of contact and handles all aspects of your credit dispute
+                            process while keeping you informed every step of the way.
                         </div>
                     </div>
                 </div>
@@ -2403,27 +2452,227 @@
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
-            <h2>Ready to Start Your Credit Dispute Journey?</h2>
-            <p>Choose the plan that works for you and take the first step toward better credit today. Start with our
-                Free Plan or jump straight to our most popular DIY Professional plan.</p>
+            <h2>Ready to Start Your Credit Improvement Journey?</h2>
+            <p>Choose the payment option that works for your budget and let our experts handle everything. Get started
+                today with our premium full-service credit dispute process.</p>
             <div class="cta-buttons">
-                <a href="#" class="cta-btn cta-btn-primary">Start JAM Engine</a>
-                <a href="#top" class="cta-btn cta-btn-secondary">View All Plans</a>
+                <a href="#pricing-plans" class="cta-btn cta-btn-primary">View All Plans</a>
             </div>
         </div>
     </section>
 
+    <!-- Hidden container for JAM Get Started Module -->
+    <div id="jam-get-started-module-container"></div>
+
     <script>
-        // Toggle FAQ answers
+        // JAM Engine Module Integration - Simplified
+        let jamModuleInitialized = false;
+        let jamModuleContainer = null;
+
+        // Function to initialize JAM Get Started Module
+        function initJAMGetStartedModule() {
+            console.log('🚀 Initializing JAM Get Started Module...');
+
+            jamModuleContainer = document.getElementById('jam-get-started-module-container');
+
+            if (window.JAMGetStartedModule && jamModuleContainer) {
+                try {
+                    const success = window.JAMGetStartedModule.init(jamModuleContainer);
+                    if (success) {
+                        jamModuleInitialized = true;
+                        console.log('✅ JAM Get Started Module initialized successfully');
+
+                        // Override the close function to hide our container
+                        const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
+                        window.JAMGetStartedModule.closeQuiz = function () {
+                            originalCloseQuiz();
+                            jamModuleContainer.classList.remove('active');
+                        };
+
+                    } else {
+                        console.error('❌ Failed to initialize JAM Get Started Module');
+                    }
+                } catch (error) {
+                    console.error('❌ Error initializing JAM Get Started Module:', error);
+                }
+            } else {
+                console.warn('⚠️ JAM Get Started Module or container not found');
+            }
+        }
+
+        // Function to open JAM Engine
+        function openJAMEngine() {
+            console.log('🎯 Opening JAM Engine...');
+
+            // Check if module is available globally
+            if (!window.JAMGetStartedModule) {
+                console.error('❌ JAM Get Started Module not available');
+                showFallbackMessage();
+                return;
+            }
+
+            // Get or create container
+            jamModuleContainer = document.getElementById('jam-get-started-module-container');
+
+            if (!jamModuleContainer) {
+                console.error('❌ JAM Get Started Module container not found');
+                showFallbackMessage();
+                return;
+            }
+
+            // Force complete reset of container and state
+            jamModuleContainer.innerHTML = '';
+            jamModuleContainer.classList.remove('active');
+            jamModuleContainer.style.display = 'none';
+            jamModuleInitialized = false;
+
+            // Small delay to ensure clean state
+            setTimeout(() => {
+                try {
+                    console.log('🔄 Initializing JAM Get Started Module...');
+                    const success = window.JAMGetStartedModule.init(jamModuleContainer);
+
+                    if (success) {
+                        jamModuleInitialized = true;
+                        console.log('✅ JAM Get Started Module initialized successfully');
+
+                        // Override the close function to ensure proper cleanup
+                        const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
+                        window.JAMGetStartedModule.closeQuiz = function () {
+                            console.log('🔴 Closing JAM Engine...');
+                            originalCloseQuiz();
+                            // Reset the initialization flag
+                            jamModuleInitialized = false;
+                            // Additional cleanup for our container
+                            jamModuleContainer.classList.remove('active');
+                            jamModuleContainer.style.display = 'none';
+                            console.log('🧹 JAM overlay cleaned up');
+                        };
+
+                        // Show our container overlay
+                        jamModuleContainer.classList.add('active');
+                        jamModuleContainer.style.display = 'block';
+
+                        // Open the quiz using the module's method
+                        console.log('🚀 Calling openQuiz()...');
+                        window.JAMGetStartedModule.openQuiz();
+
+                        // Ensure the modal is visible by checking and setting display
+                        setTimeout(() => {
+                            const modal = jamModuleContainer.querySelector('#nav-quizModal');
+                            if (modal) {
+                                console.log('🔍 Checking modal display...');
+                                if (modal.style.display !== 'flex') {
+                                    console.log('🔧 Setting modal display to flex...');
+                                    modal.style.display = 'flex';
+                                }
+                            } else {
+                                console.error('❌ Modal not found after openQuiz()');
+                            }
+                        }, 50);
+
+                        console.log('✅ JAM Engine opened successfully');
+                    } else {
+                        console.error('❌ Failed to initialize JAM Get Started Module');
+                        showFallbackMessage();
+                    }
+                } catch (error) {
+                    console.error('❌ Error opening JAM Engine:', error);
+                    showFallbackMessage();
+                }
+            }, 100); // Small delay to ensure clean state
+        }
+
+        // Improved version of openJAMEngine with better state management
+        function openJAMEngineImproved() {
+            console.log('🎯 Opening JAM Engine (Improved)...');
+
+            // Check if module is available globally
+            if (!window.JAMGetStartedModule) {
+                console.error('❌ JAM Get Started Module not available');
+                showFallbackMessage();
+                return;
+            }
+
+            // Get or create container
+            jamModuleContainer = document.getElementById('jam-get-started-module-container');
+
+            if (!jamModuleContainer) {
+                console.error('❌ JAM Get Started Module container not found');
+                showFallbackMessage();
+                return;
+            }
+
+            // Force complete reset
+            jamModuleContainer.innerHTML = '';
+            jamModuleContainer.classList.remove('active');
+            jamModuleContainer.style.display = 'none';
+            jamModuleInitialized = false;
+
+            // Small delay to ensure clean state
+            setTimeout(() => {
+                try {
+                    console.log('🔄 Initializing JAM Get Started Module (Improved)...');
+                    const success = window.JAMGetStartedModule.init(jamModuleContainer);
+
+                    if (success) {
+                        jamModuleInitialized = true;
+                        console.log('✅ JAM Get Started Module initialized successfully (Improved)');
+
+                        // Override the close function to ensure proper cleanup
+                        const originalCloseQuiz = window.JAMGetStartedModule.closeQuiz;
+                        window.JAMGetStartedModule.closeQuiz = function () {
+                            console.log('🔴 Closing JAM Engine (Improved)...');
+                            originalCloseQuiz();
+                            // Additional cleanup for our container
+                            jamModuleContainer.classList.remove('active');
+                            jamModuleContainer.style.display = 'none';
+                            jamModuleInitialized = false; // Reset the flag
+                            console.log('🧹 JAM overlay cleaned up (Improved)');
+                        };
+
+                        // Show our container overlay
+                        jamModuleContainer.classList.add('active');
+                        jamModuleContainer.style.display = 'block';
+
+                        // Open the quiz using the module's method
+                        console.log('🚀 Calling openQuiz() (Improved)...');
+                        window.JAMGetStartedModule.openQuiz();
+                        console.log('✅ JAM Engine opened successfully (Improved)');
+                    } else {
+                        console.error('❌ Failed to initialize JAM Get Started Module (Improved)');
+                        showFallbackMessage();
+                    }
+                } catch (error) {
+                    console.error('❌ Error opening JAM Engine (Improved):', error);
+                    showFallbackMessage();
+                }
+            }, 100);
+        }
+
+        // Test function to switch between versions
+        window.openJAMEngineImproved = openJAMEngineImproved;
+
+        // Fallback function if module fails to load
+        function showFallbackMessage() {
+            alert('JAM Engine is temporarily unavailable. Please try again later or contact support.');
+        }
+
+        // Toggle FAQ answers with typing indicator
         document.querySelectorAll('.faq-question').forEach(question => {
             question.addEventListener('click', () => {
-                const answer = question.nextElementSibling;
+                const typingIndicator = question.nextElementSibling;
+                const answer = typingIndicator.nextElementSibling;
                 const isOpen = answer.classList.contains('open');
 
-                // Close all other answers
+                // Close all other answers and hide typing indicators
                 document.querySelectorAll('.faq-answer').forEach(item => {
                     item.style.maxHeight = '0px';
                     item.classList.remove('open');
+                });
+
+                document.querySelectorAll('.typing-indicator').forEach(item => {
+                    item.style.display = 'none';
                 });
 
                 document.querySelectorAll('.faq-question').forEach(item => {
@@ -2433,16 +2682,22 @@
                 // Toggle current answer
                 if (!isOpen) {
                     question.classList.add('active');
-                    answer.classList.add('open');
-                    // Use setTimeout to ensure the class is applied before setting maxHeight
+
+                    // Show typing indicator first
+                    typingIndicator.style.display = 'block';
+
+                    // After 1.5 seconds, hide typing indicator and show answer
                     setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                        answer.classList.add('open');
                         answer.style.maxHeight = answer.scrollHeight + 'px';
-                    }, 10);
+                    }, 1500);
                 } else {
                     // If clicking on an already open item, close it
                     answer.style.maxHeight = '0px';
                     answer.classList.remove('open');
                     question.classList.remove('active');
+                    typingIndicator.style.display = 'none';
                 }
             });
         });
@@ -2457,14 +2712,23 @@
             document.querySelectorAll('.faq-question').forEach(question => {
                 question.classList.remove('active');
             });
+
+            document.querySelectorAll('.typing-indicator').forEach(indicator => {
+                indicator.style.display = 'none';
+            });
+
+            console.log('📄 DOM loaded, JAM Get Started Module should be available globally');
         });
 
-        // Plan selection
+        // Plan selection - Update to use JAM Engine
         document.querySelectorAll('.plan-button').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
                 const plan = this.parentElement.parentElement.querySelector('.plan-name').textContent.toLowerCase().split(' ')[0];
                 console.log(`Selected plan: ${plan}`);
-                // For now, buttons stay empty without navigation
+
+                // Open JAM Engine instead of just logging
+                openJAMEngine();
             });
         });
 
@@ -2484,6 +2748,58 @@
                     });
                 }
             });
+        });
+
+        // Global function for external access
+        window.openJAMEngine = openJAMEngine;
+
+        // Additional safety mechanism to ensure overlay is removed
+        function cleanupJAMOverlay() {
+            const container = document.getElementById('jam-get-started-module-container');
+            if (container) {
+                container.classList.remove('active');
+                container.style.display = 'none';
+                container.style.opacity = '0';
+                container.style.visibility = 'hidden';
+                console.log('🧹 JAM overlay manually cleaned up');
+            }
+        }
+
+        // Global cleanup function
+        window.cleanupJAMOverlay = cleanupJAMOverlay;
+
+        // Listen for escape key to close overlay
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const container = document.getElementById('jam-get-started-module-container');
+                if (container && container.classList.contains('active')) {
+                    if (window.JAMGetStartedModule) {
+                        window.JAMGetStartedModule.closeQuiz();
+                    } else {
+                        cleanupJAMOverlay();
+                    }
+                }
+            }
+        });
+
+        // Listen for clicks outside the modal to close
+        document.addEventListener('click', function (e) {
+            const container = document.getElementById('jam-get-started-module-container');
+            if (container && container.classList.contains('active')) {
+                const modal = container.querySelector('.nav-modal-content');
+                if (modal && !modal.contains(e.target) && !container.contains(e.target)) {
+                    if (window.JAMGetStartedModule) {
+                        window.JAMGetStartedModule.closeQuiz();
+                    } else {
+                        cleanupJAMOverlay();
+                    }
+                }
+            }
+        });
+
+        // Ensure overlay is cleaned up when page is unloaded
+        window.addEventListener('beforeunload', function () {
+            cleanupJAMOverlay();
         });
     </script>
 </body>
