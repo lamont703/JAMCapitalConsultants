@@ -11,9 +11,11 @@ import ghlRoutes from './routes/ghlRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import credentialRoutes from './routes/credentialRoutes.js';
+import credentialsRoutes from './routes/credentialsRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import disputeRoutes from './routes/disputeRoutes.js';
+import healthRoutes from './routes/healthRoutes.js';
 // Import routes
 import chatRoutesModule from './routes/chatRoutes.js';  // Changed to default import
 import adminRoutes from './routes/adminRoutes.js';
@@ -76,26 +78,62 @@ if (process.env.NODE_ENV === 'production') {
 // CORS configuration for Azure
 const corsOptions = {
     origin: function (origin, callback) {
+        console.log('🔍 CORS: Request from origin:', origin);
+        
         // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+        if (!origin) {
+            console.log('✅ CORS: Allowing request with no origin');
+            return callback(null, true);
+        }
 
         const allowedOrigins = process.env.CORS_ORIGIN 
-            ? process.env.CORS_ORIGIN.split(',')
-            : ['http://localhost:3000', 'http://localhost:8080'];
+            ? process.env.CORS_ORIGIN.split(',').map(url => url.trim())
+            : [
+                'http://localhost:3000', 
+                'http://localhost:8080',
+                'https://jamcapitalconsultants.com',
+                'https://www.jamcapitalconsultants.com',
+                'https://jam-capital-backend.azurewebsites.net'
+            ];
 
-        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+        console.log('🔍 CORS: Allowed origins:', allowedOrigins);
+        console.log('🔍 CORS: Checking if origin allowed:', allowedOrigins.includes(origin));
+
+        if (allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
+            console.log('✅ CORS: Origin allowed');
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.log('❌ CORS: Origin blocked');
+            callback(new Error(`Not allowed by CORS: ${origin}`));
         }
     },
     credentials: true,
     optionsSuccessStatus: 200,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-User-Email', 'X-User-ID']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
+    allowedHeaders: [
+        'Accept',
+        'Accept-Language',
+        'Authorization', 
+        'Content-Type', 
+        'Content-Language',
+        'X-Requested-With', 
+        'X-User-Email', 
+        'X-User-ID',
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers'
+    ],
+    exposedHeaders: [
+        'Access-Control-Allow-Origin',
+        'Access-Control-Allow-Credentials'
+    ],
+    preflightContinue: false
 };
 
 app.use(cors(corsOptions));
+
+// Explicit preflight handler for credential routes
+app.options('/api/credentials/*', cors(corsOptions));
 
 // Body parsing middleware with size limits
 app.use(express.json({ 
@@ -115,6 +153,11 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(express.static(path.join(__dirname, '../Frontend')));
 }
 
+// Serve the system health monitoring dashboard
+app.get('/system-health', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'system-health-check.html'));
+});
+
 // API Routes
 app.use('/api/chat', chatRoutesModule);
 app.use('/api/chatGptService', chatRoutesModule);
@@ -124,9 +167,11 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/credentials', credentialRoutes);
+app.use('/api/credentials/monitoring', credentialsRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/dispute', disputeRoutes);
+app.use('/api/health', healthRoutes);
 
 // Additional health check endpoints
 app.get('/api/health/detailed', (req, res) => {
@@ -155,6 +200,193 @@ app.get('/api/health/detailed', (req, res) => {
             ghl: ghlService ? 'connected' : 'disconnected',
             azureBlob: azureBlobService ? 'connected' : 'disconnected',
             applicationInsights: appInsightsClient ? 'connected' : 'disconnected'
+        }
+    });
+});
+
+// GHL Service Diagnostic Endpoint
+app.get('/api/debug/ghl-status', (req, res) => {
+    res.json({
+        timestamp: new Date().toISOString(),
+        ghlServiceStatus: {
+            globalVariable: {
+                exists: !!global.ghlService,
+                type: typeof global.ghlService,
+                hasInitialize: global.ghlService && typeof global.ghlService.initialize === 'function',
+                hasCreateContact: global.ghlService && typeof global.ghlService.createContact === 'function'
+            },
+            appLocals: {
+                exists: !!req.app.locals.ghlService,
+                type: typeof req.app.locals.ghlService,
+                hasInitialize: req.app.locals.ghlService && typeof req.app.locals.ghlService.initialize === 'function',
+                hasCreateContact: req.app.locals.ghlService && typeof req.app.locals.ghlService.createContact === 'function'
+            },
+            appLocalsKeys: Object.keys(req.app.locals),
+            comparison: {
+                sameInstance: global.ghlService === req.app.locals.ghlService,
+                bothExist: !!global.ghlService && !!req.app.locals.ghlService,
+                neitherExists: !global.ghlService && !req.app.locals.ghlService
+            }
+        }
+    });
+});
+
+// Specific User Lookup Test Endpoint
+app.get('/api/debug/user-lookup/:email', async (req, res) => {
+    try {
+        const email = req.params.email;
+        const cosmosService = req.app.locals.cosmosService;
+        
+        if (!cosmosService) {
+            return res.json({
+                status: 'error',
+                message: 'CosmosService not available in app.locals',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        console.log('🔍 [DEBUG] User lookup test for:', email);
+        
+        // Test basic connection
+        await cosmosService.initialize();
+        console.log('✅ [DEBUG] CosmosService initialized');
+        
+        // Test user query with detailed logging (same as getSecurityQuestion)
+        console.log('🔍 [DEBUG] Calling getUserByEmail with lowercase trim...');
+        const emailParam = email.toLowerCase().trim();
+        console.log('🔍 [DEBUG] Email parameter:', emailParam);
+        const testUser = await cosmosService.getUserByEmail(emailParam);
+        console.log('🔍 [DEBUG] getUserByEmail result:', !!testUser);
+        
+        // Also test the direct queryDocuments method
+        console.log('🔍 [DEBUG] Testing direct queryDocuments...');
+        const directResults = await cosmosService.queryDocuments(
+            "SELECT * FROM c WHERE c.email = @email AND c.type = @type",
+            [
+                { name: '@email', value: emailParam },
+                { name: '@type', value: 'user' }
+            ]
+        );
+        console.log('🔍 [DEBUG] Direct queryDocuments result:', directResults.length, 'users found');
+        
+        if (testUser) {
+            console.log('✅ [DEBUG] User found:', testUser.email, 'securityQuestion:', testUser.securityQuestion);
+        } else {
+            console.log('❌ [DEBUG] User not found via getUserByEmail');
+            
+            // Try direct query as backup
+            console.log('🔍 [DEBUG] Trying direct container query...');
+            const directQuery = await cosmosService.queryDocuments(
+                "SELECT * FROM c WHERE c.email = @email AND c.type = @type",
+                [
+                    { name: '@email', value: email.toLowerCase().trim() },
+                    { name: '@type', value: 'user' }
+                ]
+            );
+            console.log('🔍 [DEBUG] Direct query result:', directQuery.length, 'users found');
+        }
+        
+        res.json({
+            status: 'success',
+            timestamp: new Date().toISOString(),
+            email: email,
+            userFound: !!testUser,
+            userHasSecurityQuestion: !!(testUser && testUser.securityQuestion),
+            securityQuestion: testUser?.securityQuestion || null,
+            cosmosServiceInitialized: cosmosService.isInitialized
+        });
+        
+    } catch (error) {
+        console.error('❌ [DEBUG] User lookup error:', error);
+        res.status(500).json({
+            status: 'error',
+            timestamp: new Date().toISOString(),
+            error: error.message,
+            stack: error.stack?.split('\n').slice(0, 5)
+        });
+    }
+});
+
+// Database Connection Test Endpoint
+app.get('/api/debug/db-test', async (req, res) => {
+    try {
+        const cosmosService = req.app.locals.cosmosService;
+        
+        if (!cosmosService) {
+            return res.json({
+                status: 'error',
+                message: 'CosmosService not available in app.locals',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Test basic connection
+        await cosmosService.initialize();
+        
+        // Test user query
+        const testUser = await cosmosService.getUserByEmail('lamont703@gmail.com');
+        
+        res.json({
+            status: 'success',
+            timestamp: new Date().toISOString(),
+            cosmosService: {
+                available: true,
+                initialized: cosmosService.isInitialized
+            },
+            testQuery: {
+                email: 'lamont703@gmail.com',
+                found: !!testUser,
+                userType: testUser?.type || 'N/A',
+                userRole: testUser?.role || 'N/A'
+            }
+        });
+        
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            timestamp: new Date().toISOString(),
+            error: error.message,
+            stack: error.stack?.split('\n').slice(0, 5)
+        });
+    }
+});
+
+// Environment Variables Diagnostic Endpoint (Safe)
+app.get('/api/debug/env-check', (req, res) => {
+    const ghlEnvVars = {
+        GHL_CLIENT_ID: {
+            exists: !!process.env.GHL_CLIENT_ID,
+            length: process.env.GHL_CLIENT_ID ? process.env.GHL_CLIENT_ID.length : 0,
+            prefix: process.env.GHL_CLIENT_ID ? process.env.GHL_CLIENT_ID.substring(0, 8) + '...' : 'NOT SET'
+        },
+        GHL_CLIENT_SECRET: {
+            exists: !!process.env.GHL_CLIENT_SECRET,
+            length: process.env.GHL_CLIENT_SECRET ? process.env.GHL_CLIENT_SECRET.length : 0,
+            prefix: process.env.GHL_CLIENT_SECRET ? process.env.GHL_CLIENT_SECRET.substring(0, 8) + '...' : 'NOT SET'
+        },
+        GHL_ACCESS_TOKEN: {
+            exists: !!process.env.GHL_ACCESS_TOKEN,
+            length: process.env.GHL_ACCESS_TOKEN ? process.env.GHL_ACCESS_TOKEN.length : 0,
+            prefix: process.env.GHL_ACCESS_TOKEN ? process.env.GHL_ACCESS_TOKEN.substring(0, 20) + '...' : 'NOT SET'
+        },
+        GHL_REFRESH_TOKEN: {
+            exists: !!process.env.GHL_REFRESH_TOKEN,
+            length: process.env.GHL_REFRESH_TOKEN ? process.env.GHL_REFRESH_TOKEN.length : 0,
+            prefix: process.env.GHL_REFRESH_TOKEN ? process.env.GHL_REFRESH_TOKEN.substring(0, 20) + '...' : 'NOT SET'
+        },
+        GHL_LOCATION_ID: {
+            exists: !!process.env.GHL_LOCATION_ID,
+            value: process.env.GHL_LOCATION_ID || 'NOT SET'
+        }
+    };
+
+    res.json({
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        ghlEnvironmentVariables: ghlEnvVars,
+        summary: {
+            allGhlVarsPresent: Object.values(ghlEnvVars).every(v => v.exists),
+            missingVars: Object.entries(ghlEnvVars).filter(([key, val]) => !val.exists).map(([key]) => key)
         }
     });
 });
@@ -241,14 +473,25 @@ async function initializeApp() {
             console.log('🔄 Initializing GoHighLevel service...');
             ghlService = new GoHighLevelService();
             const ghlInitialized = await ghlService.initialize();
+            console.log('🔍 GHL initialization result:', ghlInitialized);
+            
             if (ghlInitialized) {
-                console.log('✅ GoHighLevel service initialized');
+                console.log('✅ GoHighLevel service initialized successfully');
                 app.locals.ghlService = ghlService;
+                global.ghlService = ghlService; // Also make it available globally
+                console.log('✅ GHL service set on app.locals and global');
             } else {
-                console.log('ℹ️  GoHighLevel service not configured');
+                console.log('❌ GoHighLevel service initialization returned false');
+                console.log('🔍 This means GHL service is not configured properly');
+                app.locals.ghlService = null;
+                global.ghlService = null;
             }
         } catch (error) {
-            console.log('ℹ️  Server will run without GHL integration:', error.message);
+            console.error('❌ GHL service initialization threw exception:', error.message);
+            console.error('❌ Full GHL error:', error);
+            console.log('ℹ️  Server will run without GHL integration');
+            app.locals.ghlService = null;
+            global.ghlService = null;
         }
 
         // Track successful initialization

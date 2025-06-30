@@ -1,0 +1,81 @@
+# Dependencies
+node_modules/
+Backend/node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+LogFiles/
+
+# Deployment packages
+*.zip
+backend-deployment.zip
+deployment.zip
+backend-clean.zip
+backend-final.zip
+backend-only.zip
+backend-working-fix.zip
+jam-backend-clean.zip
+latest-logs.zip
+app-logs.zip
+
+# Test files
+test-*.html
+test-*.js
+test_*.html
+test_*.js
+debug*.html
+debug*.js
+*test*.html
+*test*.js
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+
+# Scripts and test directories
+Backend/scripts/test*.js
+Backend/scripts/check*.js
+Backend/scripts/debug*.js
+Backend/scripts/update*.js
+Backend/test*.js
+Backend/run-*.js
+Backend/fix-*.js
+Backend/tests/
+Backend/deployments/
+deployments/
+
+# Azure deployment files
+Backend/add-azure-env-vars.sh
+Backend/check-azure-logs.sh
+Backend/deploy-*.sh
+Backend/fix-*.sh
+Backend/run-*.sh
+
+# Documentation that's not needed
+Backend/README-*.md
+Backend/GHL_TESTING_GUIDE.md
+Backend/PRODUCTION_DEPLOYMENT_CHECKLIST.md
+Backend/TAG_AUTOMATION_GUIDE.md
+README-*.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo 
