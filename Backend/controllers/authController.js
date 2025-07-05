@@ -88,28 +88,48 @@ export const authController = {
             console.log('🔍 Starting GHL sync...');
             // Sync to GoHighLevel CRM
             try {
-                const ghlService = req.app.locals.ghlService;
+                let ghlService = req.app.locals.ghlService;
                 console.log('🔍 GHL Service from app.locals:', !!ghlService);
                 console.log('🔍 Global GHL Service:', !!global.ghlService);
-                console.log('🔍 App.locals keys:', Object.keys(req.app.locals));
-                console.log('🔍 GHL service object check:', {
-                    appLocals: req.app.locals.ghlService ? 'EXISTS' : 'NULL',
-                    global: global.ghlService ? 'EXISTS' : 'NULL',
-                    appLocalsType: typeof req.app.locals.ghlService,
-                    globalType: typeof global.ghlService
-                });
                 
                 // Use the working GHL service (prefer app.locals, fallback to global)
-                const workingGhlService = ghlService || global.ghlService;
+                let workingGhlService = ghlService || global.ghlService;
+                
+                // If no service is available, create and initialize our own (like the manual script)
+                if (!workingGhlService) {
+                    console.log('❌ No GHL service available anywhere - attempting to create new instance...');
+                    
+                    try {
+                        // Import GoHighLevelService dynamically to avoid startup issues
+                        const { GoHighLevelService } = await import('../services/ghlService.js');
+                        
+                        console.log('🔄 Creating new GoHighLevel service instance...');
+                        const newGhlService = new GoHighLevelService();
+                        const initialized = await newGhlService.initialize();
+                        
+                        if (initialized) {
+                            console.log('✅ Successfully created and initialized new GHL service');
+                            workingGhlService = newGhlService;
+                            
+                            // Update app.locals for future requests
+                            req.app.locals.ghlService = newGhlService;
+                            global.ghlService = newGhlService;
+                        } else {
+                            console.log('❌ New GHL service initialization failed');
+                        }
+                    } catch (createError) {
+                        console.error('❌ Failed to create new GHL service:', createError.message);
+                    }
+                }
                 
                 if (!workingGhlService) {
-                    console.log('❌ No GHL service available anywhere - skipping sync');
+                    console.log('❌ Unable to create or find working GHL service - skipping sync');
                     await cosmosService.updateDocument(savedUser.id, 'user', {
                         ghlSyncStatus: 'skipped_no_service',
                         updatedAt: new Date().toISOString()
                     });
                 } else {
-                    console.log('✅ Using GHL service:', ghlService ? 'app.locals' : 'global fallback');
+                    console.log('✅ Using GHL service for sync');
                     
                     const ghlResult = await ghlSyncMiddleware.syncNewUser({
                         id: savedUser.id,

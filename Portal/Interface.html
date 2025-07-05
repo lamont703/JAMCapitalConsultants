@@ -1448,9 +1448,11 @@
             console.log('🔍 AuthManager available:', typeof window.authManager !== 'undefined');
             console.log('🔍 AuthManager instance:', window.authManager);
 
-            // Check if user is coming from registration
+            // Check if user is coming from registration or login
             const comingFromRegistration = sessionStorage.getItem('comingFromRegistration');
             const registrationTimestamp = sessionStorage.getItem('registrationTimestamp');
+            const comingFromLogin = sessionStorage.getItem('comingFromLogin');
+            const loginTimestamp = sessionStorage.getItem('loginTimestamp');
 
             if (comingFromRegistration && registrationTimestamp) {
                 const timeSinceRegistration = Date.now() - parseInt(registrationTimestamp);
@@ -1468,6 +1470,24 @@
                 // Clear registration flags
                 sessionStorage.removeItem('comingFromRegistration');
                 sessionStorage.removeItem('registrationTimestamp');
+            }
+
+            if (comingFromLogin && loginTimestamp) {
+                const timeSinceLogin = Date.now() - parseInt(loginTimestamp);
+                console.log('🔍 User coming from login, time since:', timeSinceLogin + 'ms');
+
+                // If login was very recent (within 10 seconds), wait a bit longer
+                if (timeSinceLogin < 10000) {
+                    console.log('⏳ Login very recent, waiting for auth data...');
+                    setTimeout(() => {
+                        checkAuthentication();
+                    }, 1000);
+                    return true; // Don't redirect yet
+                }
+
+                // Clear login flags
+                sessionStorage.removeItem('comingFromLogin');
+                sessionStorage.removeItem('loginTimestamp');
             }
 
             // Auth manager should be available now (with fallback)

@@ -983,6 +983,10 @@
                     // Use auth manager to handle login
                     window.authManager.handleLoginSuccess(data);
 
+                    // Set login flags for dashboard authentication check (similar to registration)
+                    sessionStorage.setItem('comingFromLogin', 'true');
+                    sessionStorage.setItem('loginTimestamp', Date.now().toString());
+
                     // Track successful login
                     if (typeof analytics !== 'undefined') {
                         analytics.track('LoginSuccess', {
@@ -994,10 +998,10 @@
                     // Show success message
                     showSuccess('Login successful! Redirecting...');
 
-                    // Redirect to dashboard
+                    // Redirect to dashboard with slightly longer delay to ensure auth data is stored
                     setTimeout(() => {
                         window.location.href = '/dashboard';
-                    }, 1000);
+                    }, 1500);
 
                 } else {
                     showError(data.error || 'Login failed');

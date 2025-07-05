@@ -2935,7 +2935,8 @@
                             <div class="form-group">
                                 <label class="form-label">User Email</label>
                                 <input type="email" class="form-input" id="user-email-notifications" 
-                                       placeholder="Enter user's email address..." required>
+                                       placeholder="Enter user's email address..." required
+                                       autocapitalize="off" spellcheck="false>
                                 <small class="form-hint">Enter the email address of the user you want to send a notification to</small>
                             </div>
                             <div class="form-group">
@@ -2992,7 +2993,8 @@
                                                name="userEmail"
                                                class="form-input" 
                                                placeholder="Enter user's email address"
-                                               required>
+                                               required
+                                               autocapitalize="off" spellcheck="false>
                                     </div>
 
                                     <!-- Report Date -->
@@ -3163,7 +3165,8 @@
                                 <div class="form-group">
                                     <label class="form-label" for="user-email-monitoring">User Email Address:</label>
                                     <input type="email" id="user-email-monitoring" class="form-input" required
-                                        placeholder="Enter user's email address">
+                                        placeholder="Enter user's email address"
+                                        autocapitalize="off" spellcheck="false>
                                 </div>
 
                                 <div class="form-group">
@@ -3227,7 +3230,8 @@
                                 <div class="form-group">
                                     <label class="form-label" for="user-email-documents">User Email Address:</label>
                                     <input type="email" id="user-email-documents" class="form-input" required
-                                        placeholder="Enter user's email address">
+                                        placeholder="Enter user's email address"
+                                        autocapitalize="off" spellcheck="false>
                                 </div>
 
                                 <div class="form-group">
@@ -3931,7 +3935,7 @@
                     return;
                 }
 
-                const userEmail = userEmailElement.value.trim();
+                const userEmail = userEmailElement.value.toLowerCase().trim();
                 const type = typeElement.value;
                 const subject = subjectElement.value.trim();
                 const message = messageElement.value.trim();
@@ -4243,7 +4247,7 @@
                     return;
                 }
 
-                const userEmail = userEmailInput.value.trim();
+                const userEmail = userEmailInput.value.toLowerCase().trim();
                 const reportDate = reportDateInput.value;
                 const reportType = reportTypeInput.value;
                 const file = fileInput.files[0];
@@ -4822,10 +4826,17 @@
                 e.preventDefault();
                 console.log('🛡️ Handling credential retrieval');
 
-                const userEmail = currentContainer.querySelector('#user-email-monitoring').value;
+                const userEmail = currentContainer.querySelector('#user-email-monitoring').value.toLowerCase().trim();
                 const serviceType = currentContainer.querySelector('#service-type-monitoring').value;
                 const purpose = currentContainer.querySelector('#access-purpose-monitoring').value;
                 const retrieveBtn = currentContainer.querySelector('#retrieve-credentials-btn');
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userEmail)) {
+                    showMessage('error', 'Please enter a valid email address.');
+                    return;
+                }
 
                 // Show loading state
                 const originalText = retrieveBtn.innerHTML;
@@ -5001,10 +5012,17 @@
                 e.preventDefault();
                 console.log('📁 Handling document retrieval');
 
-                const userEmail = currentContainer.querySelector('#user-email-documents').value;
+                const userEmail = currentContainer.querySelector('#user-email-documents').value.toLowerCase().trim();
                 const documentType = currentContainer.querySelector('#document-type-selection').value;
                 const purpose = currentContainer.querySelector('#document-access-purpose').value;
                 const retrieveBtn = currentContainer.querySelector('#retrieve-documents-btn');
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userEmail)) {
+                    showMessage('error', 'Please enter a valid email address.');
+                    return;
+                }
 
                 // Show loading state
                 const originalText = retrieveBtn.innerHTML;
