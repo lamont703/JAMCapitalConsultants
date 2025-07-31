@@ -12,26 +12,37 @@ dotenv.config();
  */
 
 const USER_DATA = {
-    "id": "user_1751598906824_rzjj3vfqn",
+    "id": "user_1752300689418_yawu7t57x",
     "type": "user",
-    "name": "LaDamien Sanders-Crawford",
-    "email": "ladamiencrawford@gmail.com",
-    "password": "$2b$12$eMRcTZDLLLOVbKyDX1srs..DAHbeTQt.x2s6CeMemxESDiCjpTuQi",
-    "phone": "7133578921",
+    "name": "Reata Johnson",
+    "email": "bigsexyy74@icloud.com",
+    "password": "$2b$12$8nHpKd3msxxKrEmq1ZXVbu7XBP5YIA568iInCyBv9sKQ9kj3JSexq",
+    "phone": "2545001433",
     "company": "",
     "ghlContactId": null,
     "ghlSyncStatus": "failed",
     "role": "user",
     "isActive": true,
     "securityQuestion": "mother_maiden_name",
-    "securityAnswerHash": "a46c4b46d80ff756c1b9472bd7c68311209a5002e1cc781c4cbc57157b7154e4819c606139597f18b613885af5f9effdd0e6e50594f2db0d789a439e90232af1",
-    "securitySalt": "dd057fa4f7fa3f3c7377c3ea429066c7",
-    "createdAt": "2025-07-04T03:15:06.830Z",
-    "updatedAt": "2025-07-04T03:15:07.462Z",
-    "ghlSyncError": {
-        "statusCode": 401,
-        "message": "Invalid JWT"
-    }
+    "securityAnswerHash": "a6ad605ae3bfb5e4a72830e7d761b7de50ebb7b983c6bc9b4cf39c95e1965ed897fc712b0440b10a3f1519d3f60c1714abb7ab58453fb0a5e6aef305fa0c53c3",
+    "securitySalt": "73a067ebba2fdb20eac886d38f1fbd3f",
+    "createdAt": "2025-07-12T06:11:29.420Z",
+    "updatedAt": "2025-07-12T06:11:29.955Z",
+    "subscription": {
+        "tier": "free",
+        "status": "active",
+        "remainingCredits": 2,
+        "totalCreditsUsed": 0,
+        "creditsIncluded": 2,
+        "subscriptionStartDate": "2025-07-12T06:11:29.420Z",
+        "subscriptionEndDate": null,
+        "lastCreditResetDate": "2025-07-12T06:11:29.420Z",
+        "hasTrialUsed": false,
+        "paymentProvider": null,
+        "externalSubscriptionId": null,
+        "planHistory": []
+    },
+    "ghlSyncError": null
 };
 
 async function syncUserToGHL() {

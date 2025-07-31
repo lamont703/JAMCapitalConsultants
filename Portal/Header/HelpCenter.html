@@ -171,6 +171,55 @@
             border-left-color: #09ccfc;
         }
 
+        .help-faq-answer div {
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Typing Animation Styles */
+        .help-typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+
+        .help-dots {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .help-dot {
+            width: 8px;
+            height: 8px;
+            background: #09ccfc;
+            border-radius: 50%;
+            animation: helpBounce 1.4s infinite;
+        }
+
+        .help-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .help-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes helpBounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+        }
+
         .help-contact-section {
             background: linear-gradient(135deg, #e6f9ff 0%, #ffffff 100%);
             border-radius: 8px;
@@ -518,6 +567,28 @@
                 padding: 16px 18px;
             }
 
+            .help-faq-answer div {
+                padding: 0;
+                color: #333;
+                line-height: 1.6;
+            }
+
+            /* Mobile Typing Animation */
+            .help-typing-indicator {
+                padding: 10px 18px;
+                border-radius: 0;
+            }
+
+            .help-dots {
+                gap: 3px;
+                justify-content: center;
+            }
+
+            .help-dot {
+                width: 6px;
+                height: 6px;
+            }
+
             .help-contact-section {
                 padding: 20px 15px;
                 margin-bottom: 25px;
@@ -693,6 +764,26 @@
 
             .help-faq-answer.active {
                 padding: 14px 15px;
+            }
+
+            .help-faq-answer div {
+                padding: 0;
+                color: #333;
+                line-height: 1.6;
+            }
+
+            /* Small Mobile Typing Animation */
+            .help-typing-indicator {
+                padding: 8px 15px;
+            }
+
+            .help-dots {
+                gap: 2px;
+            }
+
+            .help-dot {
+                width: 5px;
+                height: 5px;
             }
 
             .help-contact-section {
@@ -1205,8 +1296,15 @@
                                                     <span>${faq.question}</span>
                                                     <i class="fas fa-chevron-down"></i>
                                                 </div>
+                                                <div class="help-typing-indicator">
+                                                    <div class="help-dots">
+                                                        <div class="help-dot"></div>
+                                                        <div class="help-dot"></div>
+                                                        <div class="help-dot"></div>
+                                                    </div>
+                                                </div>
                                                 <div class="help-faq-answer" data-faq="${faq.id}">
-                                                    ${faq.answer}
+                                                    <div>${faq.answer}</div>
                                                 </div>
                                             </div>
                                         `).join('')}
@@ -1385,21 +1483,23 @@
                 activeArticleId = null;
             }
 
-            // Toggle FAQ
+            // Toggle FAQ with typing animation
             function toggleFAQ(faqId, container) {
                 console.log('Toggling FAQ:', faqId);
 
+                const faqItem = container.querySelector(`.help-faq-question[data-faq="${faqId}"]`).closest('.help-faq-item');
                 const faqQuestion = container.querySelector(`.help-faq-question[data-faq="${faqId}"]`);
                 const faqAnswer = container.querySelector(`.help-faq-answer[data-faq="${faqId}"]`);
+                const typingIndicator = faqItem.querySelector('.help-typing-indicator');
 
-                if (!faqQuestion || !faqAnswer) {
+                if (!faqQuestion || !faqAnswer || !typingIndicator) {
                     console.error('FAQ elements not found for ID:', faqId);
                     return;
                 }
 
                 const isCurrentlyActive = faqAnswer.classList.contains('active');
 
-                // Close all FAQs first
+                // Close all FAQs first and hide typing indicators
                 container.querySelectorAll('.help-faq-question').forEach(q => {
                     q.classList.remove('active');
                 });
@@ -1407,16 +1507,25 @@
                     a.classList.remove('active');
                     a.style.maxHeight = '0';
                 });
+                container.querySelectorAll('.help-typing-indicator').forEach(indicator => {
+                    indicator.style.display = 'none';
+                });
 
-                // If this FAQ wasn't active, open it
+                // If this FAQ wasn't active, open it with typing animation
                 if (!isCurrentlyActive) {
                     faqQuestion.classList.add('active');
-                    faqAnswer.classList.add('active');
 
-                    // Use scrollHeight for dynamic height
-                    faqAnswer.style.maxHeight = faqAnswer.scrollHeight + 20 + 'px'; // +20 for padding
+                    // Show typing indicator first
+                    typingIndicator.style.display = 'block';
 
-                    console.log('Opened FAQ:', faqId, 'ScrollHeight:', faqAnswer.scrollHeight);
+                    // After 1.5 seconds, hide typing indicator and show answer
+                    setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                        faqAnswer.classList.add('active');
+                        // Use scrollHeight for dynamic height
+                        faqAnswer.style.maxHeight = faqAnswer.scrollHeight + 20 + 'px'; // +20 for padding
+                        console.log('Opened FAQ:', faqId, 'ScrollHeight:', faqAnswer.scrollHeight);
+                    }, 1500);
                 } else {
                     console.log('Closed FAQ:', faqId);
                 }

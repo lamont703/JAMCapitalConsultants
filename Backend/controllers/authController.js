@@ -131,6 +131,22 @@ export const authController = {
                 } else {
                     console.log('✅ Using GHL service for sync');
                     
+                    // 🎯 PROACTIVE TOKEN REFRESH - Check token validity before sync
+                    try {
+                        console.log('🔍 Checking GHL token validity before sync...');
+                        const tokenInfo = await workingGhlService.getTokenInfo();
+                        
+                        if (!tokenInfo.success || tokenInfo.tokenInfo.isExpired) {
+                            console.log('⚠️ Token expired or invalid, attempting refresh...');
+                            // Force re-initialization to refresh token
+                            await workingGhlService.initialize();
+                        } else {
+                            console.log('✅ Token is valid for sync operation');
+                        }
+                    } catch (tokenError) {
+                        console.log('⚠️ Token check failed, continuing with sync attempt:', tokenError.message);
+                    }
+                    
                     const ghlResult = await ghlSyncMiddleware.syncNewUser({
                         id: savedUser.id,
                         name: savedUser.name,

@@ -11,23 +11,80 @@ export class GoHighLevelService {
     async initialize() {
         try {
             console.log('🔧 Initializing GoHighLevel service...');
+            
+            // First check if tokens are available
+            try {
+                const tokenInfo = await this.ghlConfig.tokenService.getTokenInfo();
+                console.log('🔍 Token info:', {
+                    hasAccess: tokenInfo.hasAccessToken,
+                    hasRefresh: tokenInfo.hasRefreshToken,
+                    isExpired: tokenInfo.isExpired,
+                    expiresAt: tokenInfo.expiresAt
+                });
+                
+                if (!tokenInfo.hasAccessToken && !tokenInfo.hasRefreshToken) {
+                    console.log('❌ No GHL tokens found - service will be unavailable');
+                    throw new Error('No GHL tokens available - authentication required');
+                }
+                
+                if (tokenInfo.isExpired && !tokenInfo.hasRefreshToken) {
+                    console.log('❌ Access token expired and no refresh token available');
+                    throw new Error('GHL tokens expired - re-authentication required');
+                }
+                
+            } catch (tokenError) {
+                console.log('❌ Token check failed:', tokenError.message);
+                throw tokenError;
+            }
+            
+            // Try to initialize client
             this.client = await this.ghlConfig.getClient();
             this.isInitialized = true;
             console.log('✅ GoHighLevel service initialized successfully');
+            
+            // Test connection to ensure everything works
+            const connectionTest = await this.testConnection();
+            if (!connectionTest.success) {
+                console.log('⚠️ GHL connection test failed:', connectionTest.error);
+                // Don't fail initialization for connection test - tokens might be valid
+            }
+            
             return true;
             
         } catch (error) {
-            console.log('⚠️  GoHighLevel service initialization failed - continuing without GHL features');
+            console.log('❌ GoHighLevel service initialization failed:', error.message);
+            console.log('📊 Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack?.split('\n')[0] // Just first line of stack
+            });
+            
             this.client = null;
             this.isInitialized = false;
             return false;
         }
     }
 
-    // Ensure client is initialized before any operation
+    // Ensure client is initialized and token is valid before any operation
     async ensureInitialized() {
         if (!this.isInitialized || !this.client) {
             await this.initialize();
+        } else {
+            // Check if token is expired and refresh if needed
+            try {
+                const tokenInfo = await this.ghlConfig.tokenService.getTokenInfo();
+                if (tokenInfo.isExpired) {
+                    console.log('🔄 Token expired, refreshing before operation...');
+                    await this.ghlConfig.tokenService.refreshTokenIfNeeded();
+                    // Re-initialize client with new token
+                    await this.ghlConfig.initializeClient();
+                    this.client = await this.ghlConfig.getClient();
+                    console.log('✅ Token refreshed and client updated');
+                }
+            } catch (error) {
+                console.log('⚠️ Token validation failed, attempting full re-initialization:', error.message);
+                await this.initialize();
+            }
         }
     }
 

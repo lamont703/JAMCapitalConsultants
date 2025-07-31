@@ -11,7 +11,6 @@ import ghlRoutes from './routes/ghlRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import credentialRoutes from './routes/credentialRoutes.js';
-import credentialsRoutes from './routes/credentialsRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import disputeRoutes from './routes/disputeRoutes.js';
@@ -194,8 +193,7 @@ app.use('/api/ghl', ghlRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
-// Mount credential monitoring routes BEFORE general credential routes
-app.use('/api/credentials/monitoring', credentialsRoutes);
+// Mount credential routes
 app.use('/api/credentials', credentialRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/webhooks', webhookRoutes);
@@ -500,6 +498,12 @@ async function initializeApp() {
         // GoHighLevel (non-critical)
         try {
             console.log('🔄 Initializing GoHighLevel service...');
+            console.log('🔍 Environment check:', {
+                nodeEnv: process.env.NODE_ENV,
+                hasLocationId: !!process.env.GHL_LOCATION_ID,
+                locationId: process.env.GHL_LOCATION_ID ? `${process.env.GHL_LOCATION_ID.substring(0, 8)}...` : 'NOT_SET'
+            });
+            
             ghlService = new GoHighLevelService();
             const ghlInitialized = await ghlService.initialize();
             console.log('🔍 GHL initialization result:', ghlInitialized);
@@ -509,9 +513,18 @@ async function initializeApp() {
                 app.locals.ghlService = ghlService;
                 global.ghlService = ghlService; // Also make it available globally
                 console.log('✅ GHL service set on app.locals and global');
+                
+                // Test the service immediately
+                try {
+                    const testConnection = await ghlService.testConnection();
+                    console.log('🔍 GHL connection test:', testConnection.success ? 'PASSED' : 'FAILED');
+                } catch (testError) {
+                    console.log('⚠️ GHL connection test failed:', testError.message);
+                }
             } else {
                 console.log('❌ GoHighLevel service initialization returned false');
-                console.log('🔍 This means GHL service is not configured properly');
+                console.log('🔍 This indicates token/authentication issues');
+                console.log('💡 Solution: Check GHL tokens and authentication in production');
                 app.locals.ghlService = null;
                 global.ghlService = null;
             }
@@ -519,6 +532,7 @@ async function initializeApp() {
             console.error('❌ GHL service initialization threw exception:', error.message);
             console.error('❌ Full GHL error:', error);
             console.log('ℹ️  Server will run without GHL integration');
+            console.log('💡 Common causes: Missing tokens, expired tokens, network issues');
             app.locals.ghlService = null;
             global.ghlService = null;
         }

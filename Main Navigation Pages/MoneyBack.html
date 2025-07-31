@@ -272,12 +272,67 @@
             color: var(--primary);
         }
 
+        .typing-indicator {
+            display: none;
+            padding: 15px 0;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+        }
+
         .faq-answer {
             padding: 0;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
             margin-bottom: 15px;
+        }
+
+        .faq-answer.open {
+            opacity: 1;
+            visibility: visible;
+            padding: 0;
+        }
+
+        .faq-answer div {
+            padding: 15px 0;
+            border-top: 1px solid var(--gray-200);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
         }
 
         /* CTA Section */
@@ -622,6 +677,21 @@
                 font-size: 0.85rem;
                 font-weight: 600;
                 color: #09ccfc;
+            }
+
+            .typing-indicator {
+                padding: 10px 15px;
+                border-radius: 0;
+            }
+
+            .dots {
+                gap: 3px;
+                justify-content: center;
+            }
+
+            .dot {
+                width: 6px;
+                height: 6px;
             }
 
             .cta-section {
@@ -1255,12 +1325,22 @@
                     What exactly is covered by the money-back guarantee?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Our money-back guarantee covers the monthly service fees you've paid for our credit dispute
-                    services.
-                    If you meet all the eligibility requirements and don't see any improvements in your credit report
-                    after 6 months, we'll refund the service fees you've paid during that period. Setup fees and
-                    third-party costs are not included in the refund.
+                    <div>
+                        Our money-back guarantee covers the monthly service fees you've paid for our credit dispute
+                        services.
+                        If you meet all the eligibility requirements and don't see any improvements in your credit
+                        report
+                        after 6 months, we'll refund the service fees you've paid during that period. Setup fees and
+                        third-party costs are not included in the refund.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1268,11 +1348,21 @@
                     How do you define "improvement" in my credit report?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Improvement is defined as any positive change in your credit report, such as the removal of
-                    inaccurate negative items, corrections to errors, or an increase in your credit score. Even the
-                    removal of a single inaccurate item is considered an improvement, as it contributes to the overall
-                    health of your credit profile.
+                    <div>
+                        Improvement is defined as any positive change in your credit report, such as the removal of
+                        inaccurate negative items, corrections to errors, or an increase in your credit score. Even the
+                        removal of a single inaccurate item is considered an improvement, as it contributes to the
+                        overall
+                        health of your credit profile.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1280,10 +1370,21 @@
                     What if I've only been using the service for 3 months?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Our money-back guarantee requires a minimum commitment of 6 consecutive months. Credit dispute is a
-                    process that takes time, and meaningful results typically begin to appear after several rounds of
-                    disputes. If you cancel before the 6-month period, you won't be eligible for the guarantee.
+                    <div>
+                        Our money-back guarantee requires a minimum commitment of 6 consecutive months. Credit dispute
+                        is a
+                        process that takes time, and meaningful results typically begin to appear after several rounds
+                        of
+                        disputes. If you cancel before the 6-month period, you won't be eligible for the guarantee.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1291,11 +1392,21 @@
                     How do I request a refund under the guarantee?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    To request a refund, contact our customer service team at support@jamcapitalconsultants.com. You'll
-                    need to provide documentation showing your active participation in the program,
-                    including dispute records and before/after credit reports. Our team will review your account and
-                    respond to your request within 10 business days.
+                    <div>
+                        To request a refund, contact our customer service team at support@jamcapitalconsultants.com.
+                        You'll
+                        need to provide documentation showing your active participation in the program,
+                        including dispute records and before/after credit reports. Our team will review your account and
+                        respond to your request within 10 business days.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1303,11 +1414,21 @@
                     Can I get a partial refund if I've seen some improvement but not as much as expected?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Our guarantee is based on whether there has been any improvement, not the degree of improvement. If
-                    any positive changes have occurred in your credit report, regardless of how small, the guarantee
-                    conditions have been met. Credit dispute results vary based on individual circumstances, and we
-                    cannot guarantee specific outcomes or point increases.
+                    <div>
+                        Our guarantee is based on whether there has been any improvement, not the degree of improvement.
+                        If
+                        any positive changes have occurred in your credit report, regardless of how small, the guarantee
+                        conditions have been met. Credit dispute results vary based on individual circumstances, and we
+                        cannot guarantee specific outcomes or point increases.
+                    </div>
                 </div>
             </div>
         </section>
@@ -1327,15 +1448,21 @@
     </div>
 
     <script>
-        // Toggle FAQ answers
+        // Toggle FAQ answers with typing indicator
         document.querySelectorAll('.faq-question').forEach(question => {
             question.addEventListener('click', () => {
-                const answer = question.nextElementSibling;
-                const isOpen = answer.style.maxHeight;
+                const typingIndicator = question.nextElementSibling;
+                const answer = typingIndicator.nextElementSibling;
+                const isOpen = answer.classList.contains('open');
 
-                // Close all other answers
+                // Close all other answers and hide typing indicators
                 document.querySelectorAll('.faq-answer').forEach(item => {
-                    item.style.maxHeight = null;
+                    item.style.maxHeight = '0px';
+                    item.classList.remove('open');
+                });
+
+                document.querySelectorAll('.typing-indicator').forEach(item => {
+                    item.style.display = 'none';
                 });
 
                 document.querySelectorAll('.faq-question').forEach(item => {
@@ -1345,8 +1472,39 @@
                 // Toggle current answer
                 if (!isOpen) {
                     question.classList.add('active');
-                    answer.style.maxHeight = answer.scrollHeight + 'px';
+
+                    // Show typing indicator first
+                    typingIndicator.style.display = 'block';
+
+                    // After 1.5 seconds, hide typing indicator and show answer
+                    setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                        answer.classList.add('open');
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                    }, 1500);
+                } else {
+                    // If clicking on an already open item, close it
+                    answer.style.maxHeight = '0px';
+                    answer.classList.remove('open');
+                    question.classList.remove('active');
+                    typingIndicator.style.display = 'none';
                 }
+            });
+        });
+
+        // Initialize all FAQ answers as closed
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.faq-answer').forEach(answer => {
+                answer.style.maxHeight = '0px';
+                answer.classList.remove('open');
+            });
+
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.classList.remove('active');
+            });
+
+            document.querySelectorAll('.typing-indicator').forEach(indicator => {
+                indicator.style.display = 'none';
             });
         });
     </script>

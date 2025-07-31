@@ -1723,6 +1723,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             console.log('DashboardHeader DOM loaded, setting up all buttons');
 
+            // Check if user has admin role - moved inside DOMContentLoaded scope
+            function hasAdminRole() {
+                try {
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userRole = userData.role || userData.userRole || userData.type || 'user';
+                    return userRole === 'admin' || userRole === 'administrator' || userRole === 'super_admin';
+                } catch (error) {
+                    console.error('Error checking admin role:', error);
+                    return false;
+                }
+            }
+
             // Notification bell click handler
             const notificationIcon = document.querySelector('.header-notification-icon');
             if (notificationIcon) {

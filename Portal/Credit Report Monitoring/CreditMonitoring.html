@@ -178,14 +178,27 @@
         }
 
         .faq-answer {
-            display: none;
-            padding: 0 0 15px;
-            color: #6c757d;
-            line-height: 1.6;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+            background-color: var(--white);
         }
 
-        .faq-active .faq-answer {
-            display: block;
+        .faq-answer.open {
+            opacity: 1;
+            visibility: visible;
+            padding: 0;
+        }
+
+        .faq-answer div {
+            padding: 20px;
+            border-top: 1px solid var(--gray-200);
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #6c757d;
         }
 
         @media (max-width: 768px) {
@@ -452,16 +465,30 @@
             }
 
             .faq-answer {
-                display: none;
-                padding: 0 15px 15px 15px;
-                color: var(--gray-700);
-                line-height: 1.4;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+                background-color: var(--white);
+            }
+
+            .faq-answer.open {
+                opacity: 1;
+                visibility: visible;
+                padding: 0;
+            }
+
+            .faq-answer div {
+                padding: 12px 15px;
+                border-top: 1px solid var(--gray-200);
                 font-size: 0.85rem;
-                background: white;
+                line-height: 1.4;
+                color: var(--gray-700);
             }
 
             .faq-active .faq-answer {
-                display: block;
                 animation: fadeInAnswer 0.3s ease-out;
             }
 
@@ -834,6 +861,18 @@
                                     <h4>Identity Protection</h4>
                                     <p>Protect yourself from identity theft with advanced monitoring and $1M identity theft insurance.</p>
                                 </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-calculator"></i>
+                                    <h4>Credit Score Simulator</h4>
+                                    <p>Understand how different financial actions could impact your credit score with interactive simulation tools.</p>
+                                </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-file-invoice"></i>
+                                    <h4>Dispute Letter Generator</h4>
+                                    <p>Access pre-written dispute letter templates and tools to help you challenge inaccurate items on your credit report.</p>
+                                </div>
                             </div>
                             
                             <div class="smartcredit-cta">
@@ -1011,6 +1050,18 @@
                                     <h4>Company Database</h4>
                                     <p>Research financial companies, view complaint trends, and see how companies respond to consumer issues before doing business with them.</p>
                                 </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <h4>Complaint Tracking</h4>
+                                    <p>Track the status of your submitted complaints and receive updates on company responses and regulatory actions.</p>
+                                </div>
+                                
+                                <div class="smartcredit-feature">
+                                    <i class="fas fa-newspaper"></i>
+                                    <h4>Consumer Alerts & Updates</h4>
+                                    <p>Stay informed about new consumer protection regulations, enforcement actions, and important financial industry updates.</p>
+                                </div>
                             </div>
                             
                             <div class="smartcredit-cta">
@@ -1094,10 +1145,19 @@
                                     Why do I need credit monitoring during credit disputes?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-1">
-                                    Credit monitoring is essential during the dispute process as it allows you to track changes to your credit report in real-time. 
-                                    You'll be able to see when negative items are removed, when your score changes, and verify that the dispute process is working. 
-                                    It also helps you catch any new negative items quickly so they can be addressed.
+                                    <div>
+                                        Credit monitoring is essential during the dispute process as it allows you to track changes to your credit report in real-time. 
+                                        You'll be able to see when negative items are removed, when your score changes, and verify that the dispute process is working. 
+                                        It also helps you catch any new negative items quickly so they can be addressed.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1106,10 +1166,19 @@
                                     Why do you recommend SmartCredit specifically?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-2">
-                                    We've evaluated many credit monitoring services and found SmartCredit to offer the best combination of features, 
-                                    usability, and value for our clients. Their 3-bureau monitoring, action tools, and user-friendly interface make 
-                                    it ideal for tracking your credit dispute progress. Additionally, they offer special pricing for our clients.
+                                    <div>
+                                        We've evaluated many credit monitoring services and found SmartCredit to offer the best combination of features, 
+                                        usability, and value for our clients. Their 3-bureau monitoring, action tools, and user-friendly interface make 
+                                        it ideal for tracking your credit dispute progress. Additionally, they offer special pricing for our clients.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1118,10 +1187,19 @@
                                     How often should I check my credit reports?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-3">
-                                    During active credit disputes, we recommend checking your credit reports at least once a week. 
-                                    SmartCredit makes this easy with their dashboard and alert system. This frequent monitoring helps 
-                                    you stay on top of changes and ensures you can quickly respond to any updates or issues.
+                                    <div>
+                                        During active credit disputes, we recommend checking your credit reports at least once a week. 
+                                        SmartCredit makes this easy with their dashboard and alert system. This frequent monitoring helps 
+                                        you stay on top of changes and ensures you can quickly respond to any updates or issues.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1130,10 +1208,19 @@
                                     Is my information safe with SmartCredit?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-4">
-                                    Yes, SmartCredit uses bank-level encryption and security measures to protect your personal information. 
-                                    They also include identity theft protection and insurance as part of their service, giving you additional 
-                                    peace of mind while monitoring your credit.
+                                    <div>
+                                        Yes, SmartCredit uses bank-level encryption and security measures to protect your personal information. 
+                                        They also include identity theft protection and insurance as part of their service, giving you additional 
+                                        peace of mind while monitoring your credit.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1142,10 +1229,19 @@
                                     What makes IdentityIQ different from other credit monitoring services?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-5">
-                                    IdentityIQ SecureMax+ goes beyond traditional credit monitoring by offering comprehensive identity protection 
-                                    including dark web monitoring, criminal database monitoring, and ScoreCasterIQ analysis tools. Their focus 
-                                    on identity theft prevention makes them ideal for clients who want maximum protection during credit disputes.
+                                    <div>
+                                        IdentityIQ SecureMax+ goes beyond traditional credit monitoring by offering comprehensive identity protection 
+                                        including dark web monitoring, criminal database monitoring, and ScoreCasterIQ analysis tools. Their focus 
+                                        on identity theft prevention makes them ideal for clients who want maximum protection during credit disputes.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1154,10 +1250,19 @@
                                     Should I use both SmartCredit and IdentityIQ?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-6">
-                                    While both services offer credit monitoring, they have different strengths. SmartCredit excels in credit 
-                                    dispute tools and user interface, while IdentityIQ provides superior identity theft protection and dark web 
-                                    monitoring. Some clients choose one based on their priorities, while others use both for maximum protection.
+                                    <div>
+                                        While both services offer credit monitoring, they have different strengths. SmartCredit excels in credit 
+                                        dispute tools and user interface, while IdentityIQ provides superior identity theft protection and dark web 
+                                        monitoring. Some clients choose one based on their priorities, while others use both for maximum protection.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1166,10 +1271,19 @@
                                     What is dark web monitoring and why do I need it?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-7">
-                                    Dark web monitoring scans hidden parts of the internet where criminals buy and sell stolen personal information. 
-                                    If your data appears on the dark web, it means you may be at risk for identity theft. IdentityIQ's dark web 
-                                    monitoring alerts you immediately if your information is found, allowing you to take protective action quickly.
+                                    <div>
+                                        Dark web monitoring scans hidden parts of the internet where criminals buy and sell stolen personal information. 
+                                        If your data appears on the dark web, it means you may be at risk for identity theft. IdentityIQ's dark web 
+                                        monitoring alerts you immediately if your information is found, allowing you to take protective action quickly.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1178,10 +1292,19 @@
                                     What makes MyScoreIQ different from other credit monitoring services?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-8">
-                                    MyScoreIQ focuses specifically on FICO® scores, which are the scores most lenders use for credit decisions. 
-                                    They provide access to your FICO® scores from all three bureaus, along with a powerful score simulator tool 
-                                    that helps you understand how different actions could impact your score. This makes it ideal for active credit dispute monitoring.
+                                    <div>
+                                        MyScoreIQ focuses specifically on FICO® scores, which are the scores most lenders use for credit decisions. 
+                                        They provide access to your FICO® scores from all three bureaus, along with a powerful score simulator tool 
+                                        that helps you understand how different actions could impact your score. This makes it ideal for active credit dispute monitoring.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1190,10 +1313,19 @@
                                     Why are FICO® scores important for credit disputes?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-9">
-                                    FICO® scores are used by 90% of top lenders when making credit decisions, making them the most important scores 
-                                    to monitor during credit disputes. MyScoreIQ's focus on FICO® scores ensures you're tracking the scores that 
-                                    matter most for loan approvals, credit cards, and mortgage applications.
+                                    <div>
+                                        FICO® scores are used by 90% of top lenders when making credit decisions, making them the most important scores 
+                                        to monitor during credit disputes. MyScoreIQ's focus on FICO® scores ensures you're tracking the scores that 
+                                        matter most for loan approvals, credit cards, and mortgage applications.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1202,11 +1334,20 @@
                                     Which credit monitoring service should I choose?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-10">
-                                    The choice depends on your priorities: SmartCredit offers excellent credit dispute tools and user interface; 
-                                    IdentityIQ provides the most comprehensive identity theft protection; and MyScoreIQ specializes in FICO® score 
-                                    monitoring with powerful simulation tools. Many clients choose based on their main concern: credit dispute tools, 
-                                    identity protection, or FICO® score tracking.
+                                    <div>
+                                        The choice depends on your priorities: SmartCredit offers excellent credit dispute tools and user interface; 
+                                        IdentityIQ provides the most comprehensive identity theft protection; and MyScoreIQ specializes in FICO® score 
+                                        monitoring with powerful simulation tools. Many clients choose based on their main concern: credit dispute tools, 
+                                        identity protection, or FICO® score tracking.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1215,11 +1356,20 @@
                                     What is the Consumer Financial Protection Bureau (CFPB) and how can it help me?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-11">
-                                    The CFPB is a federal agency that protects consumers in the financial marketplace. They can help you by providing 
-                                    a platform to submit complaints against financial companies, offering educational resources about your rights, 
-                                    and maintaining a database of company complaint patterns. If you're having issues with credit bureaus, debt collectors, 
-                                    or lenders, filing a CFPB complaint can be very effective in getting a response.
+                                    <div>
+                                        The CFPB is a federal agency that protects consumers in the financial marketplace. They can help you by providing 
+                                        a platform to submit complaints against financial companies, offering educational resources about your rights, 
+                                        and maintaining a database of company complaint patterns. If you're having issues with credit bureaus, debt collectors, 
+                                        or lenders, filing a CFPB complaint can be very effective in getting a response.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1228,11 +1378,20 @@
                                     Should I use AnnualCreditReport.com instead of paid monitoring services?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-12">
-                                    AnnualCreditReport.com is excellent for getting your free reports, but it doesn't provide monitoring, alerts, or scores. 
-                                    We recommend using both: get your free reports from AnnualCreditReport.com to review detailed information, and use 
-                                    a paid monitoring service for ongoing alerts, score tracking, and additional tools. This combination gives you the 
-                                    most comprehensive credit oversight during your dispute process.
+                                    <div>
+                                        AnnualCreditReport.com is excellent for getting your free reports, but it doesn't provide monitoring, alerts, or scores. 
+                                        We recommend using both: get your free reports from AnnualCreditReport.com to review detailed information, and use 
+                                        a paid monitoring service for ongoing alerts, score tracking, and additional tools. This combination gives you the 
+                                        most comprehensive credit oversight during your dispute process.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1241,11 +1400,20 @@
                                     How do I know if AnnualCreditReport.com is the real site?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-13">
-                                    Always go directly to AnnualCreditReport.com - it's the only official site authorized by Federal law. Be cautious 
-                                    of look-alike sites with similar names that charge fees or require credit card information. The genuine site will 
-                                    never ask for payment and is the only place where you can get truly free credit reports from all three bureaus 
-                                    as mandated by law.
+                                    <div>
+                                        Always go directly to AnnualCreditReport.com - it's the only official site authorized by Federal law. Be cautious 
+                                        of look-alike sites with similar names that charge fees or require credit card information. The genuine site will 
+                                        never ask for payment and is the only place where you can get truly free credit reports from all three bureaus 
+                                        as mandated by law.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1254,11 +1422,20 @@
                                     When should I file a CFPB complaint?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-14">
-                                    File a CFPB complaint when a financial company hasn't responded to your concerns, has provided inadequate responses, 
-                                    or you believe they've violated consumer protection laws. This includes issues with credit bureaus not processing 
-                                    disputes properly, debt collectors using illegal tactics, or lenders engaging in unfair practices. CFPB complaints 
-                                    often get faster responses than traditional complaint methods.
+                                    <div>
+                                        File a CFPB complaint when a financial company hasn't responded to your concerns, has provided inadequate responses, 
+                                        or you believe they've violated consumer protection laws. This includes issues with credit bureaus not processing 
+                                        disputes properly, debt collectors using illegal tactics, or lenders engaging in unfair practices. CFPB complaints 
+                                        often get faster responses than traditional complaint methods.
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1267,10 +1444,19 @@
                                     How often should I check my free credit reports from AnnualCreditReport.com?
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                </div>
                                 <div class="faq-answer" id="faq-15">
-                                    During active credit disputes, check your reports weekly if possible. Since the site now offers weekly access 
-                                    to reports from each bureau, you can monitor changes frequently without cost. This is especially important during 
-                                    the dispute process to verify that negative items are being removed and to catch any new issues quickly.
+                                    <div>
+                                        During active credit disputes, check your reports weekly if possible. Since the site now offers weekly access 
+                                        to reports from each bureau, you can monitor changes frequently without cost. This is especially important during 
+                                        the dispute process to verify that negative items are being removed and to catch any new issues quickly.
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1280,6 +1466,24 @@
                 // Set up event listeners
                 setupEventListeners();
 
+                // Initialize all FAQ answers as closed
+                document.querySelectorAll('.faq-answer').forEach(answer => {
+                    answer.style.maxHeight = '0px';
+                    answer.classList.remove('open');
+                });
+
+                document.querySelectorAll('.faq-question').forEach(question => {
+                    question.classList.remove('active');
+                });
+
+                document.querySelectorAll('.typing-indicator').forEach(indicator => {
+                    indicator.style.display = 'none';
+                });
+
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('faq-active');
+                });
+
                 // Mark as initialized
                 isInitialized = true;
                 return true;
@@ -1287,11 +1491,54 @@
 
             // Set up event listeners
             function setupEventListeners() {
-                // FAQ toggles
+                // FAQ toggles with typing animation
                 document.querySelectorAll('.faq-question').forEach(question => {
                     question.addEventListener('click', function () {
                         const faqItem = this.parentElement;
-                        faqItem.classList.toggle('faq-active');
+                        const typingIndicator = faqItem.querySelector('.typing-indicator');
+                        const answer = faqItem.querySelector('.faq-answer');
+                        const isOpen = answer.classList.contains('open');
+
+                        // Close all other answers and hide typing indicators
+                        document.querySelectorAll('.faq-answer').forEach(item => {
+                            item.style.maxHeight = '0px';
+                            item.classList.remove('open');
+                        });
+
+                        document.querySelectorAll('.typing-indicator').forEach(item => {
+                            item.style.display = 'none';
+                        });
+
+                        document.querySelectorAll('.faq-question').forEach(item => {
+                            item.classList.remove('active');
+                        });
+
+                        document.querySelectorAll('.faq-item').forEach(item => {
+                            item.classList.remove('faq-active');
+                        });
+
+                        // Toggle current answer
+                        if (!isOpen) {
+                            question.classList.add('active');
+                            faqItem.classList.add('faq-active');
+
+                            // Show typing indicator first
+                            typingIndicator.style.display = 'block';
+
+                            // After 1.5 seconds, hide typing indicator and show answer
+                            setTimeout(() => {
+                                typingIndicator.style.display = 'none';
+                                answer.classList.add('open');
+                                answer.style.maxHeight = answer.scrollHeight + 'px';
+                            }, 1500);
+                        } else {
+                            // If clicking on an already open item, close it
+                            answer.style.maxHeight = '0px';
+                            answer.classList.remove('open');
+                            question.classList.remove('active');
+                            faqItem.classList.remove('faq-active');
+                            typingIndicator.style.display = 'none';
+                        }
                     });
                 });
             }

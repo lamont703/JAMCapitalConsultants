@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit';
 // Rate limiting for credential operations
 export const credentialRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // limit each IP to 10 requests per windowMs
+    max: process.env.NODE_ENV === 'development' ? 50 : 10, // Higher limit for development
     message: {
         success: false,
         message: 'Too many credential operations. Please try again later.'
@@ -36,10 +36,21 @@ class CredentialController {
                 });
             }
 
-            const { userId, serviceType, email, password, purpose } = req.body;
+            const { serviceType, email, password, purpose } = req.body;
+            
+            // Debug: Check req.user object
+            console.log('🔍 Debug - req.user:', req.user);
+            
+            const userId = req.user?.id; // Get userId from authenticated user
 
-            // Validate required fields
+            // Validate required fields including userId
             if (!userId || !serviceType || !email || !password) {
+                console.log('❌ Validation failed:', { 
+                    hasUserId: !!userId, 
+                    hasServiceType: !!serviceType, 
+                    hasEmail: !!email, 
+                    hasPassword: !!password 
+                });
                 return res.status(400).json({
                     success: false,
                     message: 'Missing required fields: userId, serviceType, email, password'
@@ -72,14 +83,7 @@ class CredentialController {
                 });
             }
 
-            // Get user info from token (added by auth middleware)
-            const requestingUserId = req.user?.id;
-            if (userId !== requestingUserId) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Cannot store credentials for another user'
-                });
-            }
+            // User ID is now safely obtained from authenticated JWT token
 
             // Store credentials
             const result = await this.userCredentials.storeCredentials(
@@ -96,7 +100,7 @@ class CredentialController {
             // Audit log with request metadata
             await this.userCredentials.logCredentialAccess(
                 result.id, 
-                requestingUserId, 
+                userId, 
                 'credential_storage', 
                 req.ip, 
                 req.get('User-Agent')
