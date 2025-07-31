@@ -53,4 +53,50 @@ export class GHLTokenService {
             return false;
         }
     }
+
+    async getTokenInfo() {
+        try {
+            const tokens = await this.oauth.loadSavedTokens();
+            if (!tokens) {
+                return {
+                    hasAccessToken: false,
+                    hasRefreshToken: false,
+                    expiresAt: null,
+                    tokenType: null,
+                    isExpired: true
+                };
+            }
+
+            return {
+                hasAccessToken: !!tokens.access_token,
+                hasRefreshToken: !!tokens.refresh_token,
+                expiresAt: tokens.expires_at,
+                tokenType: tokens.token_type,
+                isExpired: this.oauth.isTokenExpired(tokens)
+            };
+        } catch (error) {
+            console.error('Error getting token info:', error);
+            throw error;
+        }
+    }
+
+    async refreshTokenIfNeeded() {
+        try {
+            const tokens = await this.oauth.loadSavedTokens();
+            if (!tokens) {
+                throw new Error('No tokens available');
+            }
+
+            if (this.oauth.isTokenExpired(tokens)) {
+                console.log('🔄 Token expired, refreshing...');
+                return await this.oauth.refreshAccessToken();
+            }
+
+            console.log('✅ Token still valid');
+            return tokens;
+        } catch (error) {
+            console.error('Error refreshing token:', error);
+            throw error;
+        }
+    }
 } 

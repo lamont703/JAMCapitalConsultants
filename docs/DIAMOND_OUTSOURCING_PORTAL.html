@@ -1,0 +1,2594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Outsourcing - Operations Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --accent-blue: #60a5fa;
+            --light-blue: #dbeafe;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --error-red: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--light-blue) 100%);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-left h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-left p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .current-time {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            width: 300px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-links {
+            list-style: none;
+        }
+
+        .sidebar-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-links a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .quick-stats {
+            background: var(--gray-50);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        /* Content Area */
+        .content-area {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .section-icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--light-blue);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--gray-600);
+            font-size: 1.1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .card-icon.primary {
+            background: var(--primary-blue);
+        }
+
+        .card-icon.success {
+            background: var(--success-green);
+        }
+
+        .card-icon.warning {
+            background: var(--warning-yellow);
+        }
+
+        .card-icon.error {
+            background: var(--error-red);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .card-subtitle {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .table tr:hover {
+            background: var(--gray-50);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge.primary {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .badge.success {
+            background: #dcfce7;
+            color: var(--success-green);
+        }
+
+        .badge.warning {
+            background: #fef3c7;
+            color: var(--warning-yellow);
+        }
+
+        .badge.error {
+            background: #fee2e2;
+            color: var(--error-red);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a8a;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            color: #92400e;
+            border-left: 4px solid var(--warning-yellow);
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-left: 4px solid var(--success-green);
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid var(--error-red);
+        }
+
+        /* Checklists */
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .checklist input[type="checkbox"]:checked {
+            background: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab:hover {
+            color: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Progress bars */
+        .progress {
+            width: 100%;
+            height: 0.5rem;
+            background: var(--gray-200);
+            border-radius: 0.25rem;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--success-green);
+            transition: width 0.5s ease;
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-700);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+        }
+
+        .mobile-sidebar {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 201;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .mobile-sidebar.active {
+            right: 0;
+        }
+
+        .mobile-sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
+        }
+
+        .mobile-sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-600);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-sidebar-close:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .mobile-nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-nav-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-nav-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            text-decoration: none;
+            color: var(--gray-700);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mobile-nav-menu a:hover,
+        .mobile-nav-menu a.active {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .mobile-search {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
+        }
+
+        .mobile-search input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .mobile-search input:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+        }
+
+        /* Table responsiveness */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-mobile {
+            display: none;
+        }
+
+        .table-mobile .mobile-row {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-mobile .mobile-row-header {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .table-mobile .mobile-row-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .table-mobile .mobile-row-content:last-child {
+            margin-bottom: 0;
+        }
+
+        .table-mobile .mobile-label {
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        /* Touch-friendly elements */
+        .touch-friendly {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .btn {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .nav-link {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .tab {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        /* Improved form elements for mobile */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            .nav-menu {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .header-left h1 {
+                font-size: 2rem;
+            }
+
+            .header-right {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .mobile-sidebar {
+                display: block;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+
+            .table {
+                display: none;
+            }
+
+            .table-mobile {
+                display: block;
+            }
+
+            .tabs {
+                flex-direction: column;
+                border-bottom: none;
+            }
+
+            .tab {
+                border-bottom: 1px solid var(--gray-200);
+                border-radius: 0;
+                text-align: left;
+                padding: 1rem;
+            }
+
+            .tab.active {
+                background: var(--light-blue);
+                border-bottom-color: var(--primary-blue);
+            }
+
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .header {
+                padding: 1rem 0;
+            }
+
+            .header-left h1 {
+                font-size: 1.75rem;
+            }
+
+            .header-left p {
+                font-size: 1rem;
+            }
+
+            .nav {
+                padding: 0.5rem 0;
+            }
+
+            .content-area {
+                padding: 0.75rem;
+                margin: 0.5rem 0;
+            }
+
+            .section-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1.25rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .card-icon {
+                width: 2rem;
+                height: 2rem;
+                font-size: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+            }
+
+            .alert {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .checklist li {
+                padding: 0.75rem 0;
+            }
+
+            .checklist input[type="checkbox"] {
+                width: 1.125rem;
+                height: 1.125rem;
+            }
+
+            .mobile-sidebar {
+                width: 280px;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 1rem 0;
+            }
+
+            .header-left h1 {
+                font-size: 1.5rem;
+            }
+
+            .nav {
+                padding: 0.5rem 0;
+            }
+
+            .main-content {
+                padding: 1rem 0;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
+            .card {
+                border-width: 0.5px;
+            }
+
+            .table th,
+            .table td {
+                border-bottom-width: 0.5px;
+            }
+        }
+
+        /* Hover effects only on non-touch devices */
+        @media (hover: hover) and (pointer: fine) {
+            .card:hover {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+        }
+
+        /* Reduce motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Print styles */
+        @media print {
+
+            .header,
+            .nav,
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .content-area {
+                box-shadow: none;
+                border: 1px solid var(--gray-300);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1><i class="fas fa-diamond"></i> Diamond Outsourcing</h1>
+                    <p>JAM Capital Consultants • Back Office Operations Portal</p>
+                </div>
+                <div class="header-right">
+                    <div class="status-badge">
+                        <i class="fas fa-check-circle"></i> System Online
+                    </div>
+                    <div class="current-time" id="current-time"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-container">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#overview" class="nav-link active">
+                            <i class="fas fa-home"></i> Overview
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#systems" class="nav-link">
+                            <i class="fas fa-laptop"></i> System Access
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#pipeline" class="nav-link">
+                            <i class="fas fa-project-diagram"></i> Pipeline
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#procedures" class="nav-link">
+                            <i class="fas fa-clipboard-list"></i> Procedures
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#training" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i> Training
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reference" class="nav-link">
+                            <i class="fas fa-book"></i> Quick Reference
+                        </a>
+                    </li>
+                </ul>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search documentation..." id="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Mobile Sidebar -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="mobile-sidebar-header">
+            <h3>Navigation</h3>
+            <button class="mobile-sidebar-close" id="mobile-sidebar-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="mobile-search">
+            <input type="text" placeholder="Search documentation..." id="mobile-search-input">
+        </div>
+
+        <ul class="mobile-nav-menu">
+            <li>
+                <a href="#overview" class="mobile-nav-link active">
+                    <i class="fas fa-home"></i> Overview
+                </a>
+            </li>
+            <li>
+                <a href="#systems" class="mobile-nav-link">
+                    <i class="fas fa-laptop"></i> System Access
+                </a>
+            </li>
+            <li>
+                <a href="#pipeline" class="mobile-nav-link">
+                    <i class="fas fa-project-diagram"></i> Pipeline
+                </a>
+            </li>
+            <li>
+                <a href="#procedures" class="mobile-nav-link">
+                    <i class="fas fa-clipboard-list"></i> Procedures
+                </a>
+            </li>
+            <li>
+                <a href="#training" class="mobile-nav-link">
+                    <i class="fas fa-graduation-cap"></i> Training
+                </a>
+            </li>
+            <li>
+                <a href="#reference" class="mobile-nav-link">
+                    <i class="fas fa-book"></i> Quick Reference
+                </a>
+            </li>
+        </ul>
+
+        <div class="mobile-sidebar-section">
+            <h4>Quick Stats</h4>
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <span>Pipeline Stages</span>
+                    <span class="stat-value">18</span>
+                </div>
+                <div class="stat-item">
+                    <span>Daily Target</span>
+                    <span class="stat-value">15-20</span>
+                </div>
+                <div class="stat-item">
+                    <span>Accuracy Target</span>
+                    <span class="stat-value">95%+</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-chart-line"></i> Quick Stats
+                    </h3>
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <span>Pipeline Stages</span>
+                            <span class="stat-value">18</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Daily Target</span>
+                            <span class="stat-value">15-20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Accuracy Target</span>
+                            <span class="stat-value">95%+</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Training Duration</span>
+                            <span class="stat-value">4 weeks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-bookmark"></i> Quick Links
+                    </h3>
+                    <ul class="sidebar-links">
+                        <li><a href="#daily-checklist">Daily Checklist</a></li>
+                        <li><a href="#system-logins">System Logins</a></li>
+                        <li><a href="#pipeline-stages">Pipeline Stages</a></li>
+                        <li><a href="#performance-targets">Performance Targets</a></li>
+                        <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        <li><a href="#emergency-contacts">Emergency Contacts</a></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-clock"></i> Current Status
+                    </h3>
+                    <div class="status-indicator">
+                        <div class="badge success">
+                            <i class="fas fa-check"></i> All Systems Online
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Overview Section -->
+                <section class="section active" id="overview">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Welcome to Diamond Outsourcing</h2>
+                            <p class="section-subtitle">Your comprehensive operations portal for JAM Capital Consultants
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Your Mission:</strong> Execute credit repair operations through systematic pipeline
+                            management, ensuring exceptional client outcomes and maintaining the highest quality
+                            standards.
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon primary">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Your Role</h3>
+                                    <p class="card-subtitle">Back Office Credit Dispute Management</p>
+                                </div>
+                            </div>
+                            <ul class="checklist">
+                                <li><i class="fas fa-check-circle" style="color: var(--success-green);"></i> Manage JAM
+                                    Engine Pipeline stages</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success-green);"></i> Process
+                                    credit disputes through Admin Panel</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success-green);"></i> Update
+                                    client progress in GoHighLevel</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success-green);"></i> Maintain
+                                    quality standards and metrics</li>
+                            </ul>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon success">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Key Objectives</h3>
+                                    <p class="card-subtitle">Performance targets and goals</p>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 95%"></div>
+                            </div>
+                            <p><strong>Daily Target:</strong> 15-20 clients advanced through pipeline</p>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 85%"></div>
+                            </div>
+                            <p><strong>Success Rate:</strong> 85%+ dispute success rate</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Critical Responsibilities</h3>
+                                <p class="card-subtitle">Manual stage transitions you control</p>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>From Stage</th>
+                                        <th>To Stage</th>
+                                        <th>Your Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Consultation Staging</td>
+                                        <td>1st Dispute Round Sent</td>
+                                        <td><span class="badge primary">Manual Move</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ready For 2nd Dispute Round</td>
+                                        <td>2nd Dispute Round Sent</td>
+                                        <td><span class="badge primary">Manual Move</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ready For 3rd Dispute Round</td>
+                                        <td>3rd Dispute Round Sent</td>
+                                        <td><span class="badge primary">Manual Move</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; font-style: italic;">Pattern
+                                            continues
+                                            through all 8 dispute rounds...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-mobile">
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">Initial Consultation</div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">From:</span>
+                                    <span>Consultation Staging</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">To:</span>
+                                    <span>1st Dispute Round Sent</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">Action:</span>
+                                    <span class="badge primary">Manual Move</span>
+                                </div>
+                            </div>
+
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">Round 2</div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">From:</span>
+                                    <span>Ready For 2nd Dispute Round</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">To:</span>
+                                    <span>2nd Dispute Round Sent</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">Action:</span>
+                                    <span class="badge primary">Manual Move</span>
+                                </div>
+                            </div>
+
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">Round 3</div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">From:</span>
+                                    <span>Ready For 3rd Dispute Round</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">To:</span>
+                                    <span>3rd Dispute Round Sent</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">Action:</span>
+                                    <span class="badge primary">Manual Move</span>
+                                </div>
+                            </div>
+
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">Remaining Rounds</div>
+                                <div class="mobile-row-content">
+                                    <span style="font-style: italic;">Pattern continues through all 8 dispute
+                                        rounds...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Systems Section -->
+                <section class="section" id="systems">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">System Access Guide</h2>
+                            <p class="section-subtitle">Step-by-step login procedures for all systems</p>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" data-tab="jam-engine">JAM Engine Portal</button>
+                        <button class="tab" data-tab="admin-panel">Admin Panel</button>
+                        <button class="tab" data-tab="gohighlevel">GoHighLevel</button>
+                    </div>
+
+                    <div class="tab-content active" id="jam-engine">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon primary">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">JAM Engine Portal Login</h3>
+                                    <p class="card-subtitle">Your primary system access point</p>
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div>
+                                    <h4>Login Steps:</h4>
+                                    <ol style="padding-left: 1.5rem;">
+                                        <li>Navigate to <strong>[https://jamcapitalconsultants.com/]</strong></li>
+                                        <li>Enter your assigned username</li>
+                                        <li>Enter your assigned password</li>
+                                        <li>Complete 2FA verification</li>
+                                        <li>Click "Login" and verify dashboard access</li>
+                                    </ol>
+                                </div>
+                                <div>
+                                    <h4>Troubleshooting:</h4>
+                                    <ul style="padding-left: 1.5rem;">
+                                        <li><strong>Invalid Credentials:</strong> Contact JAM Capital IT</li>
+                                        <li><strong>2FA Issues:</strong> Reset authenticator app</li>
+                                        <li><strong>Access Denied:</strong> Verify role permissions</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="admin-panel">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon success">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Admin Panel Features</h3>
+                                    <p class="card-subtitle">Four-tab interface for operations</p>
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div class="card">
+                                    <h4><i class="fas fa-bell"></i> Send Notifications</h4>
+                                    <p>Communicate with clients about updates, disputes, and progress</p>
+                                </div>
+                                <div class="card">
+                                    <h4><i class="fas fa-gavel"></i> Dispute Updates</h4>
+                                    <p>Submit complete dispute reports with documentation</p>
+                                </div>
+                                <div class="card">
+                                    <h4><i class="fas fa-shield-alt"></i> Monitoring Services</h4>
+                                    <p>Secure access to client credentials and documents</p>
+                                </div>
+                                <div class="card">
+                                    <h4><i class="fas fa-chart-line"></i> Recent Activity</h4>
+                                    <p>Monitor all administrative actions and audit trails</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="gohighlevel">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon warning">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">GoHighLevel Pipeline Management</h3>
+                                    <p class="card-subtitle">Client progression tracking system</p>
+                                </div>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <strong>Quick Access:</strong> Login at <code>https://app.innergcomplete.com/</code>
+                                    with your assigned credentials. Navigate to Opportunities → JAM Engine Pipeline to
+                                    manage client stages.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pipeline Section -->
+                <section class="section" id="pipeline">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">JAM Engine Pipeline</h2>
+                            <p class="section-subtitle">18-stage credit repair process management</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon primary">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Pipeline Overview</h3>
+                                <p class="card-subtitle">Complete 18-stage process flow</p>
+                            </div>
+                        </div>
+                        <div class="grid-3">
+                            <div class="card">
+                                <h4 style="color: var(--warning-yellow);">🔥 Lead Generation (1-3)</h4>
+                                <p><strong>Automated:</strong> New Lead → Portal User → Payment</p>
+                                <p><small>System handles lead conversion and payment processing</small></p>
+                            </div>
+                            <div class="card">
+                                <h4 style="color: var(--primary-blue);">🎯 Consultation (4)</h4>
+                                <p><strong>Your Action:</strong> Consultation Staging → 1st Dispute Sent</p>
+                                <p><small>You move clients when consultation is complete</small></p>
+                            </div>
+                            <div class="card">
+                                <h4 style="color: var(--success-green);">⚖️ Dispute Rounds (5-18)</h4>
+                                <p><strong>Pattern:</strong> Ready → Dispute Sent (You move)</p>
+                                <p><small>8 rounds total, payment triggers "Ready" stages</small></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon success">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Your Manual Responsibilities</h3>
+                                <p class="card-subtitle">Stages you control and manage</p>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Round</th>
+                                        <th>You Move From</th>
+                                        <th>You Move To</th>
+                                        <th>Trigger</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge primary">Initial</span></td>
+                                        <td>Consultation Staging</td>
+                                        <td>1st Dispute Round Sent</td>
+                                        <td>Consultation Complete</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge success">Round 2</span></td>
+                                        <td>Ready For 2nd Dispute Round</td>
+                                        <td>2nd Dispute Round Sent</td>
+                                        <td>Payment Received</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge success">Round 3</span></td>
+                                        <td>Ready For 3rd Dispute Round</td>
+                                        <td>3rd Dispute Round Sent</td>
+                                        <td>Payment Received</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; font-style: italic;">Pattern
+                                            continues
+                                            through Round 8...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-mobile">
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">
+                                    <span class="badge primary">Initial</span> Consultation
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">From:</span>
+                                    <span>Consultation Staging</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">To:</span>
+                                    <span>1st Dispute Round Sent</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">Trigger:</span>
+                                    <span>Consultation Complete</span>
+                                </div>
+                            </div>
+
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">
+                                    <span class="badge success">Round 2</span> Dispute
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">From:</span>
+                                    <span>Ready For 2nd Dispute Round</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">To:</span>
+                                    <span>2nd Dispute Round Sent</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">Trigger:</span>
+                                    <span>Payment Received</span>
+                                </div>
+                            </div>
+
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">
+                                    <span class="badge success">Round 3</span> Dispute
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">From:</span>
+                                    <span>Ready For 3rd Dispute Round</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">To:</span>
+                                    <span>3rd Dispute Round Sent</span>
+                                </div>
+                                <div class="mobile-row-content">
+                                    <span class="mobile-label">Trigger:</span>
+                                    <span>Payment Received</span>
+                                </div>
+                            </div>
+
+                            <div class="mobile-row">
+                                <div class="mobile-row-header">Remaining Rounds</div>
+                                <div class="mobile-row-content">
+                                    <span style="font-style: italic;">Pattern continues through Round 8...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Procedures Section -->
+                <section class="section" id="procedures">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Standard Operating Procedures</h2>
+                            <p class="section-subtitle">Step-by-step processes for daily operations</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="daily-checklist">
+                        <div class="card-header">
+                            <div class="card-icon primary">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Daily Checklist</h3>
+                                <p class="card-subtitle">Essential tasks for each day</p>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div>
+                                <h4>🌅 Morning Routine (15 minutes)</h4>
+                                <ul class="checklist">
+                                    <li><input type="checkbox"> Login to JAM Engine Portal</li>
+                                    <li><input type="checkbox"> Access Admin Panel - check all tabs</li>
+                                    <li><input type="checkbox"> Login to GoHighLevel</li>
+                                    <li><input type="checkbox"> Review JAM Engine Pipeline stages</li>
+                                    <li><input type="checkbox"> Check "Consultation Staging" for ready clients</li>
+                                    <li><input type="checkbox"> Review "Ready For [X] Dispute Round" stages</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>🏃 Midday Operations</h4>
+                                <ul class="checklist">
+                                    <li><input type="checkbox"> Process clients from Consultation Staging</li>
+                                    <li><input type="checkbox"> Move clients from Ready stages to Dispute Sent</li>
+                                    <li><input type="checkbox"> Submit dispute reports through Admin Panel</li>
+                                    <li><input type="checkbox"> Send client progress notifications</li>
+                                    <li><input type="checkbox"> Update client notes in GoHighLevel</li>
+                                    <li><input type="checkbox"> Quality check all stage movements</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon success">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Standard 4-Step Process</h3>
+                                <p class="card-subtitle">Follow this pattern for every client</p>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="card">
+                                <h4>Step 1: Check Client Readiness</h4>
+                                <ul>
+                                    <li>✓ Verify consultation completed</li>
+                                    <li>✓ Check credit reports uploaded</li>
+                                    <li>✓ Confirm dispute strategy approved</li>
+                                    <li>✓ Verify payment status current</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h4>Step 2: Prepare Dispute (Admin Panel)</h4>
+                                <ul>
+                                    <li>✓ Go to "Dispute Updates" tab</li>
+                                    <li>✓ Enter client email</li>
+                                    <li>✓ Upload dispute documents</li>
+                                    <li>✓ Submit dispute report</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h4>Step 3: Move in GoHighLevel</h4>
+                                <ul>
+                                    <li>✓ Find client in current stage</li>
+                                    <li>✓ Change to next "Dispute Round Sent"</li>
+                                    <li>✓ Add notes about actions taken</li>
+                                    <li>✓ Save changes</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h4>Step 4: Client Communication</h4>
+                                <ul>
+                                    <li>✓ Go to "Send Notifications" tab</li>
+                                    <li>✓ Send dispute update to client</li>
+                                    <li>✓ Include progress details</li>
+                                    <li>✓ Set timeline expectations</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Training Section -->
+                <section class="section" id="training">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Training Documentation</h2>
+                            <p class="section-subtitle">Complete system guides and operational documentation</p>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" data-tab="admin-panel-guide">Admin Panel Guide</button>
+                        <button class="tab" data-tab="pipeline-documentation">JAM Engine Pipeline</button>
+                    </div>
+
+                    <div class="tab-content active" id="admin-panel-guide">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon primary">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Admin Panel Usage Guide</h3>
+                                    <p class="card-subtitle">Complete guide to using the JAM Capital Admin Panel</p>
+                                </div>
+                            </div>
+
+                            <div class="training-content">
+                                <h3>📋 Overview</h3>
+                                <p>The Admin Panel is a comprehensive management interface that allows administrators to
+                                    manage user communications, dispute reports, credential monitoring, and system
+                                    activities. This guide provides step-by-step instructions for using all admin panel
+                                    features effectively.</p>
+
+                                <h3>🔒 Prerequisites</h3>
+                                <ul>
+                                    <li><strong>Admin Access Required:</strong> You must have administrator privileges
+                                        to access the Admin Panel</li>
+                                    <li><strong>Authentication:</strong> Must be logged in with valid admin credentials
+                                    </li>
+                                    <li><strong>Browser Requirements:</strong> Modern web browser with JavaScript
+                                        enabled</li>
+                                    <li><strong>Network Access:</strong> Requires connection to JAM Capital backend
+                                        services</li>
+                                </ul>
+
+                                <h3>🚀 Getting Started</h3>
+                                <h4>1. Accessing the Admin Panel</h4>
+                                <ol>
+                                    <li>Log in to your JAM Capital account</li>
+                                    <li>Navigate to the Admin Panel section</li>
+                                    <li>The system will automatically verify your admin privileges</li>
+                                    <li>If access is denied, contact your system administrator</li>
+                                </ol>
+
+                                <h4>2. Admin Panel Interface</h4>
+                                <p>The Admin Panel features a <strong>tab-based interface</strong> with the following
+                                    sections:</p>
+                                <ul>
+                                    <li><strong>📧 Send Notifications</strong> - Communicate with users</li>
+                                    <li><strong>⚖️ Dispute Updates</strong> - Manage dispute reports and credit scores
+                                    </li>
+                                    <li><strong>🛡️ Monitoring Services</strong> - Access user credentials and documents
+                                    </li>
+                                    <li><strong>📊 Recent Activity</strong> - View system activity logs</li>
+                                </ul>
+
+                                <h3>📧 Send Notifications</h3>
+                                <p><strong>Purpose:</strong> Send targeted notifications to users via email about
+                                    account updates, credit reports, disputes, or general announcements.</p>
+
+                                <h4>Step-by-Step Process:</h4>
+                                <ol>
+                                    <li><strong>Click the "Send Notifications" tab</strong> (should be active by
+                                        default)</li>
+                                    <li><strong>Enter User Email:</strong>
+                                        <ul>
+                                            <li>Type the user's email address in the "User Email" field</li>
+                                            <li>Email format will be automatically validated</li>
+                                            <li>The system will verify the user exists in the database</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Select Notification Type:</strong>
+                                        <ul>
+                                            <li><strong>Credit Report Update:</strong> For credit report related
+                                                notifications</li>
+                                            <li><strong>Account Notification:</strong> General account information</li>
+                                            <li><strong>Dispute Update:</strong> Updates on dispute progress</li>
+                                            <li><strong>General Announcement:</strong> System-wide announcements</li>
+                                            <li><strong>Security Alert:</strong> Important security-related messages
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Add Subject Line:</strong> Enter a clear, descriptive subject line</li>
+                                    <li><strong>Compose Message:</strong> Write your notification message professionally
+                                    </li>
+                                    <li><strong>Send Notification:</strong> Click "Send Notification" button</li>
+                                </ol>
+
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <strong>Important Notes:</strong>
+                                        <ul>
+                                            <li><strong>User Verification:</strong> The system automatically checks if
+                                                the email exists in the database</li>
+                                            <li><strong>Offline Storage:</strong> If the backend is unavailable,
+                                                notifications are stored locally for later delivery</li>
+                                            <li><strong>Activity Logging:</strong> All sent notifications are logged in
+                                                the Recent Activity section</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <h3>⚖️ Dispute Updates</h3>
+                                <p><strong>Purpose:</strong> Submit complete dispute reports with credit bureau scores
+                                    and supporting documentation.</p>
+
+                                <h4>Complete Dispute Report Process:</h4>
+                                <ol>
+                                    <li><strong>Click the "Dispute Updates" tab</strong></li>
+                                    <li><strong>Fill in Basic Information:</strong>
+                                        <ul>
+                                            <li><strong>User Email:</strong> Enter the user's email address</li>
+                                            <li><strong>Report Date:</strong> Select the date for the dispute report
+                                            </li>
+                                            <li><strong>Report Type:</strong> Pre-filled as "Dispute Report"</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Upload Supporting Documents:</strong>
+                                        <ul>
+                                            <li><strong>File Upload:</strong> Click the upload area or drag and drop
+                                                files</li>
+                                            <li><strong>Supported Formats:</strong> PDF, DOC, DOCX files only</li>
+                                            <li><strong>Size Limit:</strong> Maximum 10MB per file</li>
+                                            <li><strong>Remove File:</strong> Click the "×" button to remove selected
+                                                file</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Enter Dispute Summary:</strong>
+                                        <ul>
+                                            <li>Write a comprehensive summary (up to 1000 characters)</li>
+                                            <li>Include dispute reasons, affected accounts, and desired outcomes</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Credit Bureau Scores (Optional but Recommended):</strong>
+                                        <ul>
+                                            <li><strong>Experian Score:</strong> Enter score (300-850 range)</li>
+                                            <li><strong>Equifax Score:</strong> Enter score (300-850 range)</li>
+                                            <li><strong>TransUnion Score:</strong> Enter score (300-850 range)</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Submit Report:</strong> Click "Submit Complete Report" button</li>
+                                </ol>
+
+                                <h3>🛡️ Monitoring Services</h3>
+                                <div class="alert alert-error">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div>
+                                        <strong>⚠️ CRITICAL SECURITY NOTICE:</strong>
+                                        <ul>
+                                            <li>All access is logged and monitored</li>
+                                            <li>Credentials auto-hide after 45 seconds</li>
+                                            <li>Use only for legitimate business purposes</li>
+                                            <li>Never share or store accessed credentials</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <p><strong>Purpose:</strong> Securely access user credentials and identity documents for
+                                    customer support and compliance purposes.</p>
+
+                                <h4>🔐 Credential Retrieval Process:</h4>
+                                <ol>
+                                    <li><strong>Click the "Monitoring Services" tab</strong></li>
+                                    <li><strong>Complete Credential Request Form:</strong>
+                                        <ul>
+                                            <li><strong>User Email:</strong> Enter the user's email address</li>
+                                            <li><strong>Service Type:</strong> Select from SmartCredit, IdentityIQ,
+                                                MyScoreIQ, CFPB, AnnualCreditReport.com</li>
+                                            <li><strong>Access Purpose:</strong> Select Client Support, Credit Report
+                                                Access, Account Verification, Dispute Assistance, or Technical Support
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Submit Request:</strong> Click "Retrieve Credentials" button</li>
+                                    <li><strong>View Retrieved Credentials:</strong>
+                                        <ul>
+                                            <li>Login credentials will be displayed with copy functions</li>
+                                            <li>45-second countdown timer for auto-hide</li>
+                                            <li>All access is logged with timestamp and purpose</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+
+                                <h4>📄 Document Retrieval Process:</h4>
+                                <ol>
+                                    <li><strong>Navigate to Document Retrieval Section</strong></li>
+                                    <li><strong>Complete Document Request Form:</strong>
+                                        <ul>
+                                            <li><strong>User Email:</strong> Enter the user's email address</li>
+                                            <li><strong>Document Type:</strong> Select Government ID Only, Utility Bill
+                                                Only, or Both</li>
+                                            <li><strong>Access Purpose:</strong> Select appropriate reason for access
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Submit Request:</strong> Click "Retrieve Documents" button</li>
+                                    <li><strong>View Retrieved Documents:</strong> Preview, download, or hide documents
+                                        as needed</li>
+                                </ol>
+
+                                <h3>📊 Recent Activity</h3>
+                                <p><strong>Purpose:</strong> Monitor all administrative activities and system events in
+                                    real-time.</p>
+
+                                <h4>Activity Types Tracked:</h4>
+                                <ul>
+                                    <li><strong>📧 Notifications:</strong> Sent notifications and their recipients</li>
+                                    <li><strong>⚖️ Disputes:</strong> Dispute report submissions and updates</li>
+                                    <li><strong>📄 Reports:</strong> Document uploads and retrievals</li>
+                                    <li><strong>👤 Users:</strong> User account activities</li>
+                                    <li><strong>⚙️ System:</strong> System-level events</li>
+                                </ul>
+
+                                <h3>🔧 Common Troubleshooting</h3>
+                                <ul>
+                                    <li><strong>Access Denied:</strong> Check admin role, clear cache, re-login</li>
+                                    <li><strong>File Upload Failures:</strong> Check file size <10MB, format
+                                            PDF/DOC/DOCX</li>
+                                    <li><strong>Credential Retrieval Fails:</strong> Verify user email, check connection
+                                    </li>
+                                    <li><strong>Notifications Not Sending:</strong> Verify user exists in system</li>
+                                </ul>
+
+                                <h3>✅ Best Practices</h3>
+                                <ul>
+                                    <li><strong>Security:</strong> Use minimum time necessary for credential access</li>
+                                    <li><strong>Documentation:</strong> Always include supporting documents for disputes
+                                    </li>
+                                    <li><strong>Communication:</strong> Use professional, clear language in
+                                        notifications</li>
+                                    <li><strong>Monitoring:</strong> Check Recent Activity regularly for compliance</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="pipeline-documentation">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon success">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">JAM Engine Pipeline Documentation</h3>
+                                    <p class="card-subtitle">Complete guide to the 18-stage credit repair pipeline</p>
+                                </div>
+                            </div>
+
+                            <div class="training-content">
+                                <h3>📋 Pipeline Overview</h3>
+                                <ul>
+                                    <li><strong>Pipeline Name:</strong> JAM Engine Pipeline</li>
+                                    <li><strong>Purpose:</strong> Comprehensive credit repair process tracking from lead
+                                        acquisition through multiple dispute rounds</li>
+                                    <li><strong>Total Stages:</strong> 18 stages</li>
+                                    <li><strong>Process Type:</strong> Multi-round credit dispute and repair workflow
+                                    </li>
+                                </ul>
+
+                                <h3>🎯 Pipeline Objectives</h3>
+                                <ul>
+                                    <li><strong>Lead Management:</strong> Track new leads and convert them to active
+                                        users</li>
+                                    <li><strong>User Onboarding:</strong> Manage portal registration and payment
+                                        processing</li>
+                                    <li><strong>Consultation Process:</strong> Prepare users for credit repair journey
+                                    </li>
+                                    <li><strong>Dispute Management:</strong> Execute systematic 8-round dispute process
+                                    </li>
+                                    <li><strong>Progress Tracking:</strong> Monitor user advancement through each stage
+                                    </li>
+                                    <li><strong>Success Measurement:</strong> Track completion rates and outcomes</li>
+                                </ul>
+
+                                <h3>🔥 Lead Generation & Onboarding (Stages 1-3)</h3>
+
+                                <h4>Stage 1: New Lead</h4>
+                                <ul>
+                                    <li><strong>Purpose:</strong> Initial lead capture and qualification</li>
+                                    <li><strong>Duration:</strong> 1-3 days</li>
+                                    <li><strong>Activities:</strong> Lead information collection, initial contact and
+                                        qualification, interest assessment, lead scoring</li>
+                                    <li><strong>Next Action:</strong> Convert to portal user</li>
+                                </ul>
+
+                                <h4>Stage 2: New JAM Engine Portal User</h4>
+                                <ul>
+                                    <li><strong>Purpose:</strong> User registration and account setup</li>
+                                    <li><strong>Duration:</strong> 1-2 days</li>
+                                    <li><strong>Activities:</strong> Portal account creation, user profile setup,
+                                        initial credit assessment, service explanation</li>
+                                    <li><strong>Next Action:</strong> Process payment</li>
+                                </ul>
+
+                                <h4>Stage 3: Payment Made By User</h4>
+                                <ul>
+                                    <li><strong>Purpose:</strong> Financial commitment and service activation</li>
+                                    <li><strong>Duration:</strong> Same day</li>
+                                    <li><strong>Activities:</strong> Payment processing, service agreement execution,
+                                        access provision, initial documentation collection</li>
+                                    <li><strong>Next Action:</strong> Schedule consultation</li>
+                                </ul>
+
+                                <h3>🎯 Consultation & Preparation (Stage 4)</h3>
+
+                                <h4>Stage 4: Consultation Staging</h4>
+                                <ul>
+                                    <li><strong>Purpose:</strong> Comprehensive credit review and strategy development
+                                    </li>
+                                    <li><strong>Duration:</strong> 3-5 days</li>
+                                    <li><strong>Activities:</strong> Detailed credit report analysis, dispute strategy
+                                        planning, goal setting, client education</li>
+                                    <li><strong>Next Action:</strong> Initiate first dispute round</li>
+                                </ul>
+
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div>
+                                        <strong>⚠️ Your Critical Responsibility:</strong> You manually move clients from
+                                        "Consultation Staging" to "1st Dispute Round Sent" once consultation is
+                                        complete.
+                                    </div>
+                                </div>
+
+                                <h3>⚖️ Dispute Round Process (Stages 5-18)</h3>
+                                <p><strong>Structure:</strong> Each dispute round follows a consistent pattern:</p>
+                                <ol>
+                                    <li><strong>Preparation Stage</strong> ("Ready For X Dispute Round") - System
+                                        automatically moves clients here after payment</li>
+                                    <li><strong>Execution Stage</strong> ("X Dispute Round Sent") - You manually move
+                                        clients here</li>
+                                </ol>
+
+                                <h4>Round 1: Foundation Disputes (Stages 5-6)</h4>
+                                <ul>
+                                    <li><strong>Stage 5: 1st Dispute Round Sent</strong>
+                                        <ul>
+                                            <li><strong>Purpose:</strong> Initial dispute letter submission</li>
+                                            <li><strong>Duration:</strong> 30-45 days (response time)</li>
+                                            <li><strong>Activities:</strong> High-priority negative items
+                                                identification, first dispute letters drafted and sent</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Stage 6: Ready For 2nd Dispute Round</strong>
+                                        <ul>
+                                            <li><strong>Purpose:</strong> Response evaluation and next round preparation
+                                            </li>
+                                            <li><strong>Duration:</strong> 5-7 days</li>
+                                            <li><strong>Activities:</strong> Credit bureau response analysis, updated
+                                                credit report review, strategy adjustment</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                                <h4>Round 2: Targeted Disputes (Stages 7-8)</h4>
+                                <ul>
+                                    <li><strong>Stage 7: 2nd Dispute Round Sent</strong>
+                                        <ul>
+                                            <li><strong>Purpose:</strong> Follow-up disputes and new target items</li>
+                                            <li><strong>Duration:</strong> 30-45 days</li>
+                                            <li><strong>Activities:</strong> Follow-up on unresolved items, new dispute
+                                                angles, additional targeting</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Stage 8: Ready For 3rd Dispute Round</strong>
+                                        <ul>
+                                            <li><strong>Purpose:</strong> Mid-process evaluation and strategy refinement
+                                            </li>
+                                            <li><strong>Duration:</strong> 5-7 days</li>
+                                            <li><strong>Activities:</strong> Progress review, client progress report,
+                                                strategy optimization</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                                <h4>Rounds 3-8: Continuing the Pattern</h4>
+                                <p>The pattern continues through all 8 dispute rounds:</p>
+                                <ul>
+                                    <li><strong>Round 3:</strong> Intensive Disputes (Stages 9-10)</li>
+                                    <li><strong>Round 4:</strong> Specialized Disputes (Stages 11-12)</li>
+                                    <li><strong>Round 5:</strong> Persistence Disputes (Stages 13-14)</li>
+                                    <li><strong>Round 6:</strong> Advanced Disputes (Stages 15-16)</li>
+                                    <li><strong>Round 7:</strong> Precision Disputes (Stages 17-18)</li>
+                                    <li><strong>Round 8:</strong> Final Disputes (Stage 19)</li>
+                                </ul>
+
+                                <h3>🔄 Your Manual Responsibilities</h3>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <strong>What You Control:</strong> You are responsible for manually moving
+                                        clients from "Ready For [X] Dispute Round" stages to "[X] Dispute Round Sent"
+                                        stages after payments are received and you've prepared the disputes.
+                                    </div>
+                                </div>
+
+                                <h4>Manual Transitions You Make:</h4>
+                                <ul>
+                                    <li>Consultation Staging → 1st Dispute Round Sent</li>
+                                    <li>Ready For 2nd Dispute Round → 2nd Dispute Round Sent</li>
+                                    <li>Ready For 3rd Dispute Round → 3rd Dispute Round Sent</li>
+                                    <li>Ready For 4th Dispute Round → 4th Dispute Round Sent</li>
+                                    <li>Ready For 5th Dispute Round → 5th Dispute Round Sent</li>
+                                    <li>Ready For 6th Dispute Round → 6th Dispute Round Sent</li>
+                                    <li>Ready For 7th Dispute Round → 7th Dispute Round Sent</li>
+                                    <li>Ready For 8th Dispute Round → 8th Dispute Round Sent</li>
+                                </ul>
+
+                                <h4>Automatic Transitions (System Handles):</h4>
+                                <ul>
+                                    <li>Payment Made By User → Consultation Staging (after payment)</li>
+                                    <li>[X] Dispute Round Sent → Ready For [X+1] Dispute Round (after payment)</li>
+                                </ul>
+
+                                <h3>📊 Key Performance Indicators</h3>
+                                <ul>
+                                    <li><strong>Lead Conversion Rate:</strong> New Lead → Portal User</li>
+                                    <li><strong>Payment Conversion Rate:</strong> Portal User → Payment</li>
+                                    <li><strong>Stage Advancement Rate:</strong> Progression through stages</li>
+                                    <li><strong>Deletion Rate:</strong> Percentage of disputed items removed</li>
+                                    <li><strong>Credit Score Improvement:</strong> Average score increase</li>
+                                    <li><strong>Completion Rate:</strong> Percentage reaching final stage</li>
+                                </ul>
+
+                                <h3>📋 Daily Tasks for Diamond Outsourcing</h3>
+                                <ul>
+                                    <li><strong>Lead Review:</strong> Check new leads and qualify (if applicable)</li>
+                                    <li><strong>Stage Updates:</strong> Move clients from "Ready" stages to "Dispute
+                                        Sent" stages</li>
+                                    <li><strong>Response Monitoring:</strong> Check credit bureau responses</li>
+                                    <li><strong>Client Communication:</strong> Send updates and notifications through
+                                        Admin Panel</li>
+                                    <li><strong>Dispute Preparation:</strong> Prepare and submit dispute reports</li>
+                                </ul>
+
+                                <h3>✅ Best Practices for Pipeline Management</h3>
+                                <ul>
+                                    <li><strong>Timing:</strong> Respect credit bureau processing times (30-45 days)
+                                    </li>
+                                    <li><strong>Documentation:</strong> Maintain detailed dispute tracking</li>
+                                    <li><strong>Client Updates:</strong> Provide regular progress reports</li>
+                                    <li><strong>Quality Control:</strong> Review all submissions before sending</li>
+                                    <li><strong>Consistency:</strong> Follow standardized procedures for each stage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Reference Section -->
+                <section class="section" id="reference">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Quick Reference</h2>
+                            <p class="section-subtitle">Essential information at your fingertips</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="troubleshooting">
+                        <div class="card-header">
+                            <div class="card-icon warning">
+                                <i class="fas fa-wrench"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Common Issues</h3>
+                                <p class="card-subtitle">Quick solutions</p>
+                            </div>
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Access Denied:</strong> Check admin role, clear cache, re-login
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>File Won't Upload:</strong> Check size <10MB, format PDF/DOC/DOCX </div>
+                            </div>
+                            <div class="alert alert-error">
+                                <i class="fas fa-times-circle"></i>
+                                <div>
+                                    <strong>Pipeline Issue:</strong> Verify payment status and client readiness
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" id="emergency-contacts">
+                            <div class="card-header">
+                                <div class="card-icon error">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Emergency Contacts</h3>
+                                    <p class="card-subtitle">Get help when you need it</p>
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div>
+                                    <h4>Technical Support</h4>
+                                    <ul>
+                                        <li><strong>JAM Capital IT:</strong> [Contact Information]</li>
+                                        <li><strong>GoHighLevel Support:</strong> Platform support</li>
+                                        <li><strong>System Issues:</strong> Check documentation first</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4>Operational Support</h4>
+                                    <ul>
+                                        <li><strong>Supervisor:</strong> [Contact Information]</li>
+                                        <li><strong>Training Team:</strong> [Contact Information]</li>
+                                        <li><strong>Emergency Escalation:</strong> [Contact Information]</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remove active class from all nav links
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+                // Add active class to clicked link
+                this.classList.add('active');
+
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+
+                // Show target section
+                const target = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(target);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    targetSection.classList.add('fade-in');
+                }
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                const tabContainer = this.closest('.tabs');
+                const tabContents = tabContainer.nextElementSibling;
+
+                // Remove active class from all tabs
+                tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Hide all tab contents
+                const allTabContents = tabContents.parentElement.querySelectorAll('.tab-content');
+                allTabContents.forEach(content => content.classList.remove('active'));
+
+                // Show target tab content
+                const target = this.getAttribute('data-tab');
+                const targetContent = document.getElementById(target);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            const sections = document.querySelectorAll('.section');
+
+            if (searchTerm === '') {
+                // Show all sections
+                sections.forEach(section => section.style.display = 'block');
+                return;
+            }
+
+            sections.forEach(section => {
+                const content = section.textContent.toLowerCase();
+                if (content.includes(searchTerm)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // Checkbox functionality
+        document.querySelectorAll('.checklist input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const listItem = this.closest('li');
+                if (this.checked) {
+                    listItem.style.opacity = '0.7';
+                    listItem.style.textDecoration = 'line-through';
+                } else {
+                    listItem.style.opacity = '1';
+                    listItem.style.textDecoration = 'none';
+                }
+            });
+        });
+
+        // Progress bar animations
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }
+
+        // Animate progress bars on page load
+        document.addEventListener('DOMContentLoaded', animateProgressBars);
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile navigation functionality
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+        const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+
+        // Open mobile menu
+        mobileMenuToggle.addEventListener('click', function () {
+            mobileOverlay.classList.add('active');
+            mobileSidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Close mobile menu
+        function closeMobileMenu() {
+            mobileOverlay.classList.remove('active');
+            mobileSidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        mobileSidebarClose.addEventListener('click', closeMobileMenu);
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+
+        // Mobile navigation links
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remove active class from all mobile nav links
+                document.querySelectorAll('.mobile-nav-link').forEach(l => l.classList.remove('active'));
+
+                // Add active class to clicked link
+                this.classList.add('active');
+
+                // Also update desktop nav
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                const target = this.getAttribute('href').substring(1);
+                const desktopLink = document.querySelector(`.nav-link[href="#${target}"]`);
+                if (desktopLink) {
+                    desktopLink.classList.add('active');
+                }
+
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+
+                // Show target section
+                const targetSection = document.getElementById(target);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    targetSection.classList.add('fade-in');
+                }
+
+                // Close mobile menu
+                closeMobileMenu();
+            });
+        });
+
+        // Mobile search functionality
+        mobileSearchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            const sections = document.querySelectorAll('.section');
+
+            if (searchTerm === '') {
+                sections.forEach(section => section.style.display = 'block');
+                return;
+            }
+
+            sections.forEach(section => {
+                const content = section.textContent.toLowerCase();
+                if (content.includes(searchTerm)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function (event) {
+            touchStartX = event.changedTouches[0].screenX;
+            touchStartY = event.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', function (event) {
+            touchEndX = event.changedTouches[0].screenX;
+            touchEndY = event.changedTouches[0].screenY;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+
+            // Only trigger swipe if horizontal movement is greater than vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 50) {
+                    // Swipe right - close mobile menu if open
+                    if (mobileSidebar.classList.contains('active')) {
+                        closeMobileMenu();
+                    }
+                } else if (deltaX < -50) {
+                    // Swipe left - open mobile menu if closed
+                    if (!mobileSidebar.classList.contains('active') && window.innerWidth <= 768) {
+                        mobileOverlay.classList.add('active');
+                        mobileSidebar.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            }
+        }
+
+        // Close mobile menu on escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && mobileSidebar.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768 && mobileSidebar.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+    </script>
+</body>
+
+</html>

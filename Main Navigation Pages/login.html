@@ -433,6 +433,18 @@
                 margin-bottom: 1rem;
                 font-size: 0.9rem;
             }
+
+            .security-question-display {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .security-question-display h3,
+            #security-question-text {
+                font-size: 0.95rem;
+                line-height: 1.3;
+            }
         }
 
         /* Small Devices (landscape phones, 576px and up) */
@@ -690,6 +702,39 @@
         .alert i {
             font-size: 1rem;
         }
+
+        .security-question-display {
+            background: #f8f9fa;
+            border: 2px solid #09ccfc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .security-question-display h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        #security-question-text {
+            color: #09ccfc;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            padding: 0;
+        }
+
+        .security-hint {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -704,7 +749,7 @@
     <section class="login-section">
         <div class="login-container">
             <a href="https://www.jamcapitalconsultants.com">
-                <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/681bce267fc2d260912232f3.png"
+                <img src="https://assets.cdn.filesafe.space/gaOp7QAouTuwykUssx6C/media/68197e67ef825fea67348f8a.png"
                     alt="JAM Credit Solutions Logo" class="login-logo">
             </a>
 
@@ -717,7 +762,7 @@
             <!-- Login Form -->
             <div id="login" class="tab-content active">
                 <h1 class="login-title">Welcome Back</h1>
-                <p class="login-subtitle">Log in to access your credit repair dashboard</p>
+                <p class="login-subtitle">Log in to access your credit dispute dashboard</p>
 
                 <form class="login-form" onsubmit="handleLogin(event)">
                     <div class="input-group">
@@ -740,7 +785,7 @@
             <!-- Registration Form -->
             <div class="form-container" id="registerForm">
                 <h1 class="login-title">Create Account</h1>
-                <p class="login-subtitle">Sign up to start your credit repair journey</p>
+                <p class="login-subtitle">Sign up to start your credit dispute journey</p>
 
                 <form class="login-form" onsubmit="handleRegistration(event)">
                     <div class="input-group">
@@ -938,6 +983,10 @@
                     // Use auth manager to handle login
                     window.authManager.handleLoginSuccess(data);
 
+                    // Set login flags for dashboard authentication check (similar to registration)
+                    sessionStorage.setItem('comingFromLogin', 'true');
+                    sessionStorage.setItem('loginTimestamp', Date.now().toString());
+
                     // Track successful login
                     if (typeof analytics !== 'undefined') {
                         analytics.track('LoginSuccess', {
@@ -949,10 +998,10 @@
                     // Show success message
                     showSuccess('Login successful! Redirecting...');
 
-                    // Redirect to dashboard
+                    // Redirect to dashboard with slightly longer delay to ensure auth data is stored
                     setTimeout(() => {
                         window.location.href = '/dashboard';
-                    }, 1000);
+                    }, 1500);
 
                 } else {
                     showError(data.error || 'Login failed');
@@ -1137,9 +1186,30 @@
                     // Store email for later use
                     forgotPasswordEmail = email;
 
+                    // Debug logging
+                    console.log('Security Question API Response:', data);
+                    console.log('Security Question Key:', data.securityQuestion);
+
+                    // Check if backend is returning security question
+                    if (!data.securityQuestion) {
+                        showError('Backend Error: Security question not returned from server. Please contact support.');
+                        console.error('❌ BACKEND ISSUE: API returned success but no securityQuestion field');
+                        console.error('Expected: {success: true, securityQuestion: "question_key"}');
+                        console.error('Received:', data);
+                        return;
+                    }
+
                     // Display security question
                     const questionText = getSecurityQuestionText(data.securityQuestion);
-                    document.getElementById('security-question-text').textContent = questionText;
+                    console.log('Generated Question Text:', questionText);
+
+                    const questionElement = document.getElementById('security-question-text');
+                    if (questionElement) {
+                        questionElement.textContent = questionText;
+                        console.log('Question element updated successfully');
+                    } else {
+                        console.error('Security question element not found!');
+                    }
 
                     // Show step 2
                     document.getElementById('forgot-step-1').style.display = 'none';
@@ -1285,6 +1355,8 @@
         }
 
         function getSecurityQuestionText(questionKey) {
+            console.log('Looking up security question for key:', questionKey);
+
             const questions = {
                 'mother_maiden_name': "What is your mother's maiden name?",
                 'first_pet_name': "What was the name of your first pet?",
@@ -1296,7 +1368,21 @@
                 'childhood_friend': "What was your childhood best friend's name?"
             };
 
-            return questions[questionKey] || "Security Question";
+            // Check if questionKey exists and is valid
+            if (!questionKey) {
+                console.error('No security question key provided');
+                return "No security question found";
+            }
+
+            const question = questions[questionKey];
+            if (!question) {
+                console.error('Unknown security question key:', questionKey);
+                console.log('Available keys:', Object.keys(questions));
+                return `Unknown security question (${questionKey})`;
+            }
+
+            console.log('Found question:', question);
+            return question;
         }
 
         // Helper functions

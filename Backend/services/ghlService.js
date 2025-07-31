@@ -11,23 +11,80 @@ export class GoHighLevelService {
     async initialize() {
         try {
             console.log('🔧 Initializing GoHighLevel service...');
+            
+            // First check if tokens are available
+            try {
+                const tokenInfo = await this.ghlConfig.tokenService.getTokenInfo();
+                console.log('🔍 Token info:', {
+                    hasAccess: tokenInfo.hasAccessToken,
+                    hasRefresh: tokenInfo.hasRefreshToken,
+                    isExpired: tokenInfo.isExpired,
+                    expiresAt: tokenInfo.expiresAt
+                });
+                
+                if (!tokenInfo.hasAccessToken && !tokenInfo.hasRefreshToken) {
+                    console.log('❌ No GHL tokens found - service will be unavailable');
+                    throw new Error('No GHL tokens available - authentication required');
+                }
+                
+                if (tokenInfo.isExpired && !tokenInfo.hasRefreshToken) {
+                    console.log('❌ Access token expired and no refresh token available');
+                    throw new Error('GHL tokens expired - re-authentication required');
+                }
+                
+            } catch (tokenError) {
+                console.log('❌ Token check failed:', tokenError.message);
+                throw tokenError;
+            }
+            
+            // Try to initialize client
             this.client = await this.ghlConfig.getClient();
             this.isInitialized = true;
             console.log('✅ GoHighLevel service initialized successfully');
+            
+            // Test connection to ensure everything works
+            const connectionTest = await this.testConnection();
+            if (!connectionTest.success) {
+                console.log('⚠️ GHL connection test failed:', connectionTest.error);
+                // Don't fail initialization for connection test - tokens might be valid
+            }
+            
             return true;
             
         } catch (error) {
-            console.log('⚠️  GoHighLevel service initialization failed - continuing without GHL features');
+            console.log('❌ GoHighLevel service initialization failed:', error.message);
+            console.log('📊 Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack?.split('\n')[0] // Just first line of stack
+            });
+            
             this.client = null;
             this.isInitialized = false;
             return false;
         }
     }
 
-    // Ensure client is initialized before any operation
+    // Ensure client is initialized and token is valid before any operation
     async ensureInitialized() {
         if (!this.isInitialized || !this.client) {
             await this.initialize();
+        } else {
+            // Check if token is expired and refresh if needed
+            try {
+                const tokenInfo = await this.ghlConfig.tokenService.getTokenInfo();
+                if (tokenInfo.isExpired) {
+                    console.log('🔄 Token expired, refreshing before operation...');
+                    await this.ghlConfig.tokenService.refreshTokenIfNeeded();
+                    // Re-initialize client with new token
+                    await this.ghlConfig.initializeClient();
+                    this.client = await this.ghlConfig.getClient();
+                    console.log('✅ Token refreshed and client updated');
+                }
+            } catch (error) {
+                console.log('⚠️ Token validation failed, attempting full re-initialization:', error.message);
+                await this.initialize();
+            }
         }
     }
 
@@ -385,6 +442,364 @@ export class GoHighLevelService {
             return {
                 success: false,
                 error: error.response?.data || error.message
+            };
+        }
+    }
+
+    // ===== DEPRECATED: PIPELINE METHODS REMOVED =====
+    // Pipeline automation has been replaced with tag-based automation
+    // GoHighLevel now handles automation workflows internally based on tags
+
+    // ===== TAG MANAGEMENT METHODS =====
+
+    /**
+     * Add tags to a contact
+     * @param {string} contactId - Contact ID
+     * @param {Array|string} tags - Tag(s) to add
+     * @returns {Object} Result of tag addition
+     */
+    async addTagsToContact(contactId, tags) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            return {
+                success: false,
+                error: 'GHL client not available'
+            };
+        }
+
+        try {
+            // Ensure tags is an array
+            const tagArray = Array.isArray(tags) ? tags : [tags];
+            
+            console.log(`🏷️ Adding tags to contact ${contactId}:`, tagArray);
+            
+            const response = await this.client.post(`/contacts/${contactId}/tags`, {
+                tags: tagArray
+            });
+
+            console.log(`✅ Tags added successfully`);
+            
+            return {
+                success: true,
+                tags: tagArray,
+                contact: response.data.contact
+            };
+
+        } catch (error) {
+            console.error('❌ Error adding tags:', error.response?.data || error.message);
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message
+            };
+        }
+    }
+
+    /**
+     * Remove tags from a contact
+     * @param {string} contactId - Contact ID
+     * @param {Array|string} tags - Tag(s) to remove
+     * @returns {Object} Result of tag removal
+     */
+    async removeTagsFromContact(contactId, tags) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            return {
+                success: false,
+                error: 'GHL client not available'
+            };
+        }
+
+        try {
+            // Ensure tags is an array
+            const tagArray = Array.isArray(tags) ? tags : [tags];
+            
+            console.log(`🏷️ Removing tags from contact ${contactId}:`, tagArray);
+            
+            const response = await this.client.delete(`/contacts/${contactId}/tags`, {
+                data: {
+                    tags: tagArray
+                }
+            });
+
+            console.log(`✅ Tags removed successfully`);
+            
+            return {
+                success: true,
+                tags: tagArray,
+                contact: response.data.contact
+            };
+
+        } catch (error) {
+            console.error('❌ Error removing tags:', error.response?.data || error.message);
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message
+            };
+        }
+    }
+
+    /**
+     * Get all tags for a contact
+     * @param {string} contactId - Contact ID
+     * @returns {Array} Array of tags
+     */
+    async getContactTags(contactId) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            throw new Error('GHL client not available');
+        }
+
+        try {
+            console.log(`🔍 Getting tags for contact: ${contactId}`);
+            
+            const response = await this.client.get(`/contacts/${contactId}`);
+            const contact = response.data.contact;
+            const tags = contact.tags || [];
+            
+            console.log(`📊 Found ${tags.length} tags for contact`);
+            return tags;
+
+        } catch (error) {
+            console.error('❌ Error getting contact tags:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Replace all tags for a contact (removes existing, adds new)
+     * @param {string} contactId - Contact ID
+     * @param {Array} newTags - New tags to set
+     * @returns {Object} Result of tag replacement
+     */
+    async replaceContactTags(contactId, newTags) {
+        await this.ensureInitialized();
+        
+        if (!this.client) {
+            return {
+                success: false,
+                error: 'GHL client not available'
+            };
+        }
+
+        try {
+            console.log(`🔄 Replacing tags for contact ${contactId}`);
+            console.log(`New tags:`, newTags);
+            
+            // Get current tags
+            const currentTags = await this.getContactTags(contactId);
+            console.log(`Current tags:`, currentTags);
+            
+            // Remove old tags if any exist
+            if (currentTags.length > 0) {
+                await this.removeTagsFromContact(contactId, currentTags);
+            }
+            
+            // Add new tags
+            if (newTags.length > 0) {
+                const result = await this.addTagsToContact(contactId, newTags);
+                return result;
+            }
+            
+            return {
+                success: true,
+                tags: newTags
+            };
+
+        } catch (error) {
+            console.error('❌ Error replacing contact tags:', error.response?.data || error.message);
+            
+            return {
+                success: false,
+                error: error.response?.data || error.message
+            };
+        }
+    }
+
+    /**
+     * Generate credential status tags based on completion state
+     * @param {Object} credentialStatus - Status of each credential service
+     * @returns {Array} Array of tags to apply
+     */
+    generateCredentialTags(credentialStatus) {
+        const tags = [];
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
+        // Count completed credentials
+        const completedCount = Object.values(credentialStatus).filter(Boolean).length;
+        
+        // Progress tag
+        tags.push(`Credentials: ${completedCount}/3`);
+        
+        // Individual service tags
+        if (credentialStatus.smartcredit) tags.push('SmartCredit Complete');
+        if (credentialStatus.identityiq) tags.push('IdentityIQ Complete');
+        if (credentialStatus.myscoreiq) tags.push('MyScoreIQ Complete');
+        
+        // Status tags
+        if (completedCount === 3) {
+            tags.push('Ready for Consultation');
+            tags.push('AUTO: Consultation Staging');
+        } else if (completedCount > 0) {
+            tags.push('Credentials In Progress');
+        }
+        
+        // Date tracking
+        tags.push(`Updated: ${dateStr}`);
+        
+        return tags;
+    }
+
+    /**
+     * Update contact with credential completion tags
+     * @param {string} contactId - Contact ID
+     * @param {Object} credentialStatus - Status of each credential service
+     * @returns {Object} Result of tag update
+     */
+    async updateCredentialTags(contactId, credentialStatus) {
+        console.log('🏷️ Updating credential tags for contact:', contactId);
+        
+        try {
+            const newTags = this.generateCredentialTags(credentialStatus);
+            
+            // Replace all existing tags with the new credential tags
+            const result = await this.replaceContactTags(contactId, newTags);
+            
+            console.log(`✅ Updated credential tags for contact ${contactId}:`, newTags);
+            return {
+                success: true,
+                tags: newTags,
+                result: result
+            };
+            
+        } catch (error) {
+            console.error('❌ Failed to update credential tags:', error);
+            return {
+                success: false,
+                error: error.message,
+                tags: []
+            };
+        }
+    }
+
+    // ===== DEBUG AND TESTING METHODS =====
+
+    async getTokenInfo() {
+        try {
+            const tokenInfo = await this.ghlConfig.tokenService.getTokenInfo();
+            return {
+                success: true,
+                tokenInfo: tokenInfo
+            };
+        } catch (error) {
+            console.error('Error getting token info:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async getLocationInfo() {
+        await this.ensureInitialized();
+        
+        try {
+            const response = await this.client.get(`/locations/${this.locationId}`);
+            return {
+                success: true,
+                location: {
+                    id: response.data.location.id,
+                    name: response.data.location.name,
+                    address: response.data.location.address,
+                    city: response.data.location.city,
+                    state: response.data.location.state,
+                    country: response.data.location.country,
+                    timezone: response.data.location.timezone
+                }
+            };
+        } catch (error) {
+            console.error('Error getting location info:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async rawApiCall(endpoint, method = 'GET', data = null) {
+        await this.ensureInitialized();
+        
+        try {
+            let response;
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            switch (method.toUpperCase()) {
+                case 'GET':
+                    response = await this.client.get(`/${endpoint}`, config);
+                    break;
+                case 'POST':
+                    response = await this.client.post(`/${endpoint}`, data, config);
+                    break;
+                case 'PUT':
+                    response = await this.client.put(`/${endpoint}`, data, config);
+                    break;
+                case 'DELETE':
+                    response = await this.client.delete(`/${endpoint}`, config);
+                    break;
+                default:
+                    throw new Error(`Unsupported method: ${method}`);
+            }
+
+            return {
+                success: true,
+                status: response.status,
+                data: response.data,
+                headers: response.headers
+            };
+        } catch (error) {
+            console.error('Raw API call error:', error);
+            return {
+                success: false,
+                error: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            };
+        }
+    }
+
+    async getRecentContacts(limit = 10) {
+        await this.ensureInitialized();
+        
+        try {
+            const response = await this.client.get('/contacts/', {
+                params: {
+                    locationId: this.locationId,
+                    limit: limit,
+                    sortBy: 'date_created',
+                    sortOrder: 'desc'
+                }
+            });
+
+            return {
+                success: true,
+                contacts: response.data.contacts || [],
+                totalCount: response.data.totalCount || 0
+            };
+        } catch (error) {
+            console.error('Error getting recent contacts:', error);
+            return {
+                success: false,
+                error: error.message,
+                contacts: []
             };
         }
     }

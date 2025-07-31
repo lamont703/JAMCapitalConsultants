@@ -157,14 +157,16 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-background-color: transparent;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
         z-index: 1000;
         -webkit-overflow-scrolling: touch;
         box-sizing: border-box;
         align-items: center;
         justify-content: center;
+        min-width: 100vw;
+        min-height: 100vh;
     }
 
     .nav-modal-content {
@@ -179,11 +181,11 @@ background-color: transparent;
         box-sizing: border-box;
         width: 92%;
         max-width: 800px;
-        height: 92vh;
+        max-height: 92vh;
         border-radius: 8px;
         margin: auto;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-border: 1px solid #e0e0e0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e0e0e0;
     }
 
     .nav-close-button {
@@ -196,10 +198,28 @@ border: 1px solid #e0e0e0;
         color: #666;
         transition: color 0.3s ease;
         z-index: 1001;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        outline: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .nav-close-button:hover {
         color: #000;
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+
+    .nav-close-button:active {
+        transform: scale(0.95);
     }
 
 /* Mobile Responsive Styles */
@@ -295,6 +315,43 @@ justify-content: center;
         margin-bottom: 2rem;
         text-align: center;
         padding: 0 1rem;
+    }
+
+    /* Multiple choice indicator */
+    .nav-quiz-step[data-multiple="true"] .nav-question-title::after {
+        content: "";
+        display: block;
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+        font-weight: normal;
+    }
+
+    /* Enhanced styling for multiple selection options */
+    .nav-quiz-step[data-multiple="true"] .nav-option-btn {
+        position: relative;
+    }
+
+    .nav-quiz-step[data-multiple="true"] .nav-option-btn::before {
+        content: "☐";
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        font-size: 1.2rem;
+        color: #ccc;
+        transition: all 0.3s ease;
+    }
+
+    .nav-quiz-step[data-multiple="true"] .nav-option-btn.nav-active::before,
+    .nav-quiz-step[data-multiple="true"] .nav-option-btn.selected::before {
+        content: "☑";
+        color: #008080;
+    }
+
+    /* Override the checkmark for multiple choice */
+    .nav-quiz-step[data-multiple="true"] .nav-option-btn.nav-active::after,
+    .nav-quiz-step[data-multiple="true"] .nav-option-btn.selected::after {
+        display: none;
     }
 
     .nav-options-grid {
@@ -616,8 +673,8 @@ border-color: #e0e0e0;
                 </div>
 
                 <!-- Step 2 -->
-                <div class="nav-quiz-step" data-step="2" style="display: none;">
-                    <h2 class="nav-question-title">What's your main credit goal right now?</h2>
+                <div class="nav-quiz-step" data-step="2" data-multiple="true" style="display: none;">
+                    <h2 class="nav-question-title">What are your credit goals right now? (Select all that apply)</h2>
                     <div class="nav-options-grid">
                         <button class="nav-option-btn" data-value="buy_home">
                             <span class="nav-option-icon">🏠</span>
@@ -689,8 +746,8 @@ border-color: #e0e0e0;
                 </div>
 
                 <!-- Step 5 -->
-                <div class="nav-quiz-step" data-step="5" style="display: none;">
-                    <h2 class="nav-question-title">Which of these credit issues applies to you?</h2>
+                <div class="nav-quiz-step" data-step="5" data-multiple="true" style="display: none;">
+                    <h2 class="nav-question-title">Which of these credit issues applies to you? (Select all that apply)</h2>
                     <div class="nav-options-grid">
                         <button class="nav-option-btn" data-value="late_payments">
                             <span class="nav-option-icon">⏰</span>
@@ -854,14 +911,33 @@ border-color: #e0e0e0;
                 const nextBtn = currentContainer.querySelector('#nav-nextBtn');
                 const prevBtn = currentContainer.querySelector('#nav-prevBtn');
 
+                console.log('🔧 Setting up event listeners...');
+                console.log('Close button found:', !!closeButton);
+
                 // Open modal
                 if (quizButton) {
                     quizButton.addEventListener('click', openQuizModal);
                 }
 
-                // Close modal
+                // Close modal - Enhanced with better error handling
                 if (closeButton) {
-                    closeButton.addEventListener('click', closeQuizModal);
+                    console.log('✅ Close button event listener added');
+                    closeButton.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🔴 Close button clicked');
+                        closeQuizModal();
+                    });
+
+                    // Also add touch events for mobile
+                    closeButton.addEventListener('touchend', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🔴 Close button touched');
+                        closeQuizModal();
+                    });
+                } else {
+                    console.error('❌ Close button not found!');
                 }
 
                 // Navigation buttons
@@ -895,6 +971,7 @@ border-color: #e0e0e0;
                 if (quizModal) {
                     quizModal.addEventListener('click', function (event) {
                         if (event.target === quizModal) {
+                            console.log('🔴 Clicked outside modal - closing');
                             closeQuizModal();
                         }
                     });
@@ -903,17 +980,65 @@ border-color: #e0e0e0;
 
             // Open quiz modal
             function openQuizModal() {
+                console.log('🚀 openQuizModal() called');
+                console.log('🔍 currentContainer:', currentContainer);
+
                 const quizModal = currentContainer.querySelector('#nav-quizModal');
+                console.log('🔍 quizModal found:', !!quizModal);
+
                 if (quizModal) {
+                    console.log('✅ Setting modal display to flex');
                     quizModal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
                     currentStep = 1;
                     showStep(1);
+
+                    // Reset external container display properties
+                    const externalContainer = document.getElementById('jam-get-started-module-container');
+                    if (externalContainer) {
+                        console.log('🔧 Resetting external container display');
+                        externalContainer.style.display = 'block';
+                        externalContainer.style.opacity = '1';
+                        externalContainer.style.visibility = 'visible';
+                        externalContainer.classList.add('active');
+                    }
+
+                    console.log('✅ Modal opened successfully');
+                } else {
+                    console.error('❌ Quiz modal not found in currentContainer');
+                    console.log('🔍 currentContainer HTML:', currentContainer.innerHTML);
+
+                    // Try to find modal globally as fallback
+                    const globalModal = document.querySelector('#nav-quizModal');
+                    if (globalModal) {
+                        console.log('🔧 Found modal globally, updating currentContainer');
+                        currentContainer = globalModal.parentElement;
+                        globalModal.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                        currentStep = 1;
+                        showStep(1);
+
+                        // Reset external container display properties
+                        const externalContainer = document.getElementById('jam-get-started-module-container');
+                        if (externalContainer) {
+                            console.log('🔧 Resetting external container display (fallback)');
+                            externalContainer.style.display = 'block';
+                            externalContainer.style.opacity = '1';
+                            externalContainer.style.visibility = 'visible';
+                            externalContainer.classList.add('active');
+                        }
+
+                        console.log('✅ Modal opened successfully (fallback)');
+                    } else {
+                        console.error('❌ Modal not found anywhere');
+                    }
                 }
             }
 
             // Close quiz modal
             function closeQuizModal() {
+                console.log('🔴 Closing quiz modal...');
+
                 const quizModal = currentContainer.querySelector('#nav-quizModal');
                 if (quizModal) {
                     quizModal.style.display = 'none';
@@ -929,7 +1054,50 @@ border-color: #e0e0e0;
                     overlays.forEach(overlay => {
                         overlay.style.display = 'none';
                         overlay.style.background = 'transparent';
+                        overlay.classList.remove('active');
                     });
+
+                    // Clean up external container if it exists
+                    const externalContainer = document.getElementById('jam-get-started-module-container');
+                    if (externalContainer) {
+                        console.log('🧹 Cleaning up external container');
+                        externalContainer.classList.remove('active');
+                        externalContainer.style.display = 'none';
+                        externalContainer.style.opacity = '0';
+                        externalContainer.style.visibility = 'hidden';
+                    }
+
+                    // CRITICAL FIX: Hide the jam-get-started-container to unblock page interactions
+                    const jamContainer = document.getElementById('jam-get-started-container');
+                    if (jamContainer) {
+                        console.log('🧹 === HIDING JAM-GET-STARTED-CONTAINER ===');
+                        console.log('🔍 Container state before hiding:', {
+                            display: jamContainer.style.display,
+                            opacity: jamContainer.style.opacity,
+                            visibility: jamContainer.style.visibility,
+                            pointerEvents: jamContainer.style.pointerEvents
+                        });
+
+                        jamContainer.style.display = 'none';
+                        jamContainer.style.opacity = '0';
+                        jamContainer.style.visibility = 'hidden';
+                        jamContainer.style.pointerEvents = 'none';
+
+                        console.log('🔍 Container state after hiding:', {
+                            display: jamContainer.style.display,
+                            opacity: jamContainer.style.opacity,
+                            visibility: jamContainer.style.visibility,
+                            pointerEvents: jamContainer.style.pointerEvents
+                        });
+
+                        console.log('✅ jam-get-started-container hidden - page interactions restored');
+                    } else {
+                        console.log('🔍 jam-get-started-container not found');
+                    }
+
+                    console.log('✅ Quiz modal closed successfully');
+                } else {
+                    console.error('❌ Quiz modal not found for closing');
                 }
             }
 
@@ -944,16 +1112,36 @@ border-color: #e0e0e0;
 
                     if (step !== 7) {
                         const questionId = `question_${step}`;
-                        const selectedValue = quizData[questionId];
+                        const selectedData = quizData[questionId];
+                        const isMultipleChoice = currentStepEl.hasAttribute('data-multiple');
 
-                        if (selectedValue) {
-                            currentStepEl.querySelectorAll('.nav-option-btn').forEach(btn => {
-                                btn.classList.remove('nav-active', 'selected');
-                            });
+                        // Clear all selections first
+                        currentStepEl.querySelectorAll('.nav-option-btn').forEach(btn => {
+                            btn.classList.remove('nav-active', 'selected');
+                        });
 
-                            const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${selectedValue}"]`);
-                            if (selectedOption) {
-                                selectedOption.classList.add('nav-active', 'selected');
+                        if (selectedData) {
+                            if (isMultipleChoice && Array.isArray(selectedData)) {
+                                // Handle multiple selections
+                                selectedData.forEach(value => {
+                                    const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${value}"]`);
+                                    if (selectedOption) {
+                                        selectedOption.classList.add('nav-active', 'selected');
+                                    }
+                                });
+                            } else if (!isMultipleChoice) {
+                                // Handle single selection
+                                const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${selectedData}"]`);
+                                if (selectedOption) {
+                                    selectedOption.classList.add('nav-active', 'selected');
+                                }
+                            } else if (isMultipleChoice && !Array.isArray(selectedData)) {
+                                // Convert single value to array for multiple choice questions
+                                quizData[questionId] = [selectedData];
+                                const selectedOption = currentStepEl.querySelector(`.nav-option-btn[data-value="${selectedData}"]`);
+                                if (selectedOption) {
+                                    selectedOption.classList.add('nav-active', 'selected');
+                                }
                             }
                         }
                     }
@@ -995,7 +1183,16 @@ border-color: #e0e0e0;
                         validateRegistrationForm();
                     } else {
                         const questionId = `question_${current}`;
-                        const hasSelection = quizData[questionId] !== undefined;
+                        const currentStepEl = currentContainer.querySelector(`.nav-quiz-step[data-step="${current}"]`);
+                        const isMultipleChoice = currentStepEl && currentStepEl.hasAttribute('data-multiple');
+
+                        let hasSelection = false;
+                        if (isMultipleChoice) {
+                            hasSelection = Array.isArray(quizData[questionId]) && quizData[questionId].length > 0;
+                        } else {
+                            hasSelection = quizData[questionId] !== undefined;
+                        }
+
                         nextBtn.disabled = !hasSelection;
                     }
                 }
@@ -1008,21 +1205,69 @@ border-color: #e0e0e0;
                 if (!button) return;
 
                 const currentStepEl = currentContainer.querySelector(`.nav-quiz-step[data-step="${currentStep}"]`);
-                const options = currentStepEl.querySelectorAll('.nav-option-btn');
-
-                options.forEach(opt => {
-                    opt.classList.remove('nav-active', 'selected');
-                });
-
-                button.classList.add('nav-active', 'selected');
-
+                const isMultipleChoice = currentStepEl.hasAttribute('data-multiple');
                 const value = button.getAttribute('data-value');
                 const questionId = `question_${currentStep}`;
-                quizData[questionId] = value;
 
+                if (isMultipleChoice) {
+                    // Handle multiple selection
+                    if (!quizData[questionId]) {
+                        quizData[questionId] = [];
+                    }
+
+                    // Ensure quizData[questionId] is an array
+                    if (!Array.isArray(quizData[questionId])) {
+                        quizData[questionId] = [quizData[questionId]];
+                    }
+
+                    // Handle special cases for mutually exclusive options
+                    if (value === 'no_issues' || value === 'not_sure') {
+                        // Clear all other selections and select only this one
+                        const options = currentStepEl.querySelectorAll('.nav-option-btn');
+                        options.forEach(opt => {
+                            opt.classList.remove('nav-active', 'selected');
+                        });
+                        button.classList.add('nav-active', 'selected');
+                        quizData[questionId] = [value];
+                    } else {
+                        // Remove 'no_issues' and 'not_sure' if they were previously selected
+                        quizData[questionId] = quizData[questionId].filter(v => v !== 'no_issues' && v !== 'not_sure');
+
+                        // Clear their visual selection
+                        const noIssuesBtn = currentStepEl.querySelector('.nav-option-btn[data-value="no_issues"]');
+                        const notSureBtn = currentStepEl.querySelector('.nav-option-btn[data-value="not_sure"]');
+                        if (noIssuesBtn) noIssuesBtn.classList.remove('nav-active', 'selected');
+                        if (notSureBtn) notSureBtn.classList.remove('nav-active', 'selected');
+
+                        // Toggle the clicked option
+                        if (quizData[questionId].includes(value)) {
+                            // Remove from selection
+                            quizData[questionId] = quizData[questionId].filter(v => v !== value);
+                            button.classList.remove('nav-active', 'selected');
+                        } else {
+                            // Add to selection
+                            quizData[questionId].push(value);
+                            button.classList.add('nav-active', 'selected');
+                        }
+                    }
+                } else {
+                    // Handle single selection (existing behavior)
+                    const options = currentStepEl.querySelectorAll('.nav-option-btn');
+                    options.forEach(opt => {
+                        opt.classList.remove('nav-active', 'selected');
+                    });
+
+                    button.classList.add('nav-active', 'selected');
+                    quizData[questionId] = value;
+                }
+
+                // Update next button state
                 const nextBtn = currentContainer.querySelector('#nav-nextBtn');
                 if (nextBtn) {
-                    nextBtn.disabled = false;
+                    const hasSelection = isMultipleChoice ?
+                        (Array.isArray(quizData[questionId]) && quizData[questionId].length > 0) :
+                        (quizData[questionId] !== undefined);
+                    nextBtn.disabled = !hasSelection;
                 }
             }
 
@@ -1269,10 +1514,24 @@ border-color: #e0e0e0;
 
             // Reset module
             function reset() {
+                console.log('🔄 Resetting JAM Get Started Module...');
                 currentStep = 1;
                 quizData = {};
                 isInitialized = false;
-                currentContainer = null;
+
+                // Clear the current container reference
+                if (currentContainer) {
+                    currentContainer.innerHTML = '';
+                    currentContainer = null;
+                }
+
+                // Remove any existing modals from the DOM
+                const existingModals = document.querySelectorAll('#nav-quizModal');
+                existingModals.forEach(modal => {
+                    modal.remove();
+                });
+
+                console.log('✅ Module reset complete');
             }
 
             // Public API
@@ -1282,12 +1541,26 @@ border-color: #e0e0e0;
                 openQuiz: openQuizModal,
                 closeQuiz: closeQuizModal,
                 isInitialized: function () { return isInitialized; },
-                getQuizData: function () { return { ...quizData }; }
+                getQuizData: function () { return { ...quizData }; },
+                // Add a global close function for external access
+                closeModal: function () {
+                    console.log('🌐 Global close function called');
+                    closeQuizModal();
+                }
             };
         })();
 
         // Expose globally
         window.JAMGetStartedModule = JAMGetStartedModule;
+
+        // Add a global close function for easy access
+        window.closeJAMModal = function () {
+            if (window.JAMGetStartedModule) {
+                window.JAMGetStartedModule.closeModal();
+            } else {
+                console.error('❌ JAMGetStartedModule not available');
+            }
+        };
 
         // Auto-initialize if container exists
         document.addEventListener('DOMContentLoaded', function () {

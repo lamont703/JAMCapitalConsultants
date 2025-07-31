@@ -444,9 +444,9 @@
             box-shadow: none;
             background: transparent;
             border-radius: 0;
-            overflow-x: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x mandatory;
+            scroll-snap-type: none;
         }
 
         .social-testimonial-container::before,
@@ -458,7 +458,6 @@
             width: 260px;
             padding: 1.5rem;
             border-radius: 12px;
-            scroll-snap-align: center;
             touch-action: manipulation;
             transition: all 0.2s ease;
         }
@@ -956,9 +955,9 @@
         <h3>Ready to be our next success story?</h3>
         <div class="quiz-button-container-social">
             <!-- Main Button -->
-            <button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
+            <!--<button id="creditQuizButton" class="credit-quiz-btn" aria-label="Start AI Credit Assessment Quiz">
                 Start JAM Engine
-            </button>
+            </button>-->
         </div>
     </div>
 
@@ -971,8 +970,19 @@
             const scrollLeftBtn = document.getElementById('scrollLeft');
             const scrollRightBtn = document.getElementById('scrollRight');
 
+            if (!container) {
+                console.error('Social testimonial container not found');
+                return;
+            }
+
             // First, wrap all cards in a wrapper div for easier manipulation
             const cards = Array.from(container.querySelectorAll('.social-testimonial-card'));
+
+            if (cards.length === 0) {
+                console.error('No testimonial cards found');
+                return;
+            }
+
             const wrapper = document.createElement('div');
             wrapper.className = 'social-testimonial-wrapper';
 
@@ -991,24 +1001,40 @@
                 wrapper.appendChild(clone);
             });
 
-            // Set initial position
+            // Set initial position and variables
             let position = 0;
-            let cardWidth = cards[0].offsetWidth + 32; // Card width + gap
             let animationId = null;
-            let isScrolling = false;
+            let isDragging = false;
+            let isAutoScrollActive = false;
+            let isPageScrolling = false;
+            let pageScrollTimeout = null;
+
+            // Function to calculate card width dynamically
+            function getCardWidth() {
+                const firstCard = cards[0];
+                if (!firstCard) return 300;
+
+                const cardRect = firstCard.getBoundingClientRect();
+                const computedStyle = window.getComputedStyle(wrapper);
+                const gap = parseInt(computedStyle.gap) || 32;
+
+                return cardRect.width + gap;
+            }
 
             // Function to update carousel position
             function updateCarouselPosition() {
-                wrapper.style.transform = `translate3d(${-position}px, 0, 0)`;
+                if (wrapper && !isPageScrolling) {
+                    wrapper.style.transform = `translate3d(${-position}px, 0, 0)`;
+                }
             }
 
             // Function to handle infinite scroll effect
             function handleInfiniteScroll() {
+                const cardWidth = getCardWidth();
                 const totalOriginalWidth = cardWidth * cards.length;
 
                 // If we've scrolled past all original cards, reset to beginning
                 if (position >= totalOriginalWidth) {
-                    // Jump back to start without animation
                     position = 0;
                     wrapper.style.transition = 'none';
                     updateCarouselPosition();
@@ -1017,12 +1043,14 @@
                     wrapper.offsetHeight;
 
                     // Restore transition
-                    wrapper.style.transition = 'transform 0.5s ease';
+                    requestAnimationFrame(() => {
+                        if (wrapper) wrapper.style.transition = 'transform 0.5s ease';
+                    });
                 }
 
                 // If we've scrolled backwards past the beginning
                 if (position < 0) {
-                    position = totalOriginalWidth;
+                    position = totalOriginalWidth - cardWidth;
                     wrapper.style.transition = 'none';
                     updateCarouselPosition();
 
@@ -1030,26 +1058,56 @@
                     wrapper.offsetHeight;
 
                     // Restore transition
-                    wrapper.style.transition = 'transform 0.5s ease';
+                    requestAnimationFrame(() => {
+                        if (wrapper) wrapper.style.transition = 'transform 0.5s ease';
+                    });
                 }
+            }
+
+            // Detect page scrolling to pause carousel animation
+            function handlePageScroll() {
+                isPageScrolling = true;
+                clearTimeout(pageScrollTimeout);
+
+                // Resume carousel animation after page scroll stops
+                pageScrollTimeout = setTimeout(() => {
+                    isPageScrolling = false;
+                    if (!isDragging && !document.hidden && isAutoScrollActive) {
+                        updateCarouselPosition();
+                    }
+                }, 150);
             }
 
             // Auto scroll animation with RAF for smoother performance
             function startAutoScroll() {
-                if (animationId) return; // Prevent multiple intervals
+                if (animationId || isDragging || isAutoScrollActive) return;
 
-                let lastTime = 0;
-                // Adjust scroll speed based on device type - much slower for comfortable reading
-                const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
-                const scrollSpeed = isMobile ? 0.08 : 0.12; // Much slower for casual reading
+                isAutoScrollActive = true;
+                let lastTime = performance.now();
+
+                // Detect mobile device more reliably
+                const isMobile = window.innerWidth <= 768 ||
+                    'ontouchstart' in window ||
+                    navigator.maxTouchPoints > 0;
+
+                // Slower scroll speed for better readability and less jitter
+                const scrollSpeed = isMobile ? 0.1 : 0.15;
 
                 function animate(currentTime) {
-                    if (currentTime - lastTime >= 16) { // ~60fps
-                        position += scrollSpeed * (currentTime - lastTime);
+                    if (!isAutoScrollActive || isPageScrolling) {
+                        animationId = requestAnimationFrame(animate);
+                        return;
+                    }
+
+                    const deltaTime = currentTime - lastTime;
+
+                    if (deltaTime >= 16) { // ~60fps
+                        position += scrollSpeed * deltaTime;
                         updateCarouselPosition();
                         handleInfiniteScroll();
                         lastTime = currentTime;
                     }
+
                     animationId = requestAnimationFrame(animate);
                 }
 
@@ -1057,6 +1115,7 @@
             }
 
             function stopAutoScroll() {
+                isAutoScrollActive = false;
                 if (animationId) {
                     cancelAnimationFrame(animationId);
                     animationId = null;
@@ -1067,6 +1126,7 @@
             if (scrollLeftBtn) {
                 scrollLeftBtn.addEventListener('click', function () {
                     stopAutoScroll();
+                    const cardWidth = getCardWidth();
                     position -= cardWidth;
                     wrapper.style.transition = 'transform 0.5s ease';
                     updateCarouselPosition();
@@ -1079,6 +1139,7 @@
             if (scrollRightBtn) {
                 scrollRightBtn.addEventListener('click', function () {
                     stopAutoScroll();
+                    const cardWidth = getCardWidth();
                     position += cardWidth;
                     wrapper.style.transition = 'transform 0.5s ease';
                     updateCarouselPosition();
@@ -1087,16 +1148,14 @@
                 });
             }
 
-            // Enhanced touch events for mobile swipe with momentum
+            // Enhanced touch events for mobile swipe
             let touchStartX = 0;
-            let touchEndX = 0;
             let touchStartTime = 0;
             let lastTouchX = 0;
             let velocity = 0;
-            let isDragging = false;
 
             container.addEventListener('touchstart', function (e) {
-                touchStartX = e.changedTouches[0].screenX;
+                touchStartX = e.changedTouches[0].clientX;
                 lastTouchX = touchStartX;
                 touchStartTime = Date.now();
                 velocity = 0;
@@ -1108,7 +1167,7 @@
             container.addEventListener('touchmove', function (e) {
                 if (!isDragging) return;
 
-                const currentX = e.changedTouches[0].screenX;
+                const currentX = e.changedTouches[0].clientX;
                 const diff = lastTouchX - currentX;
                 const timeDiff = Date.now() - touchStartTime;
 
@@ -1124,15 +1183,16 @@
                 if (!isDragging) return;
 
                 isDragging = false;
-                touchEndX = e.changedTouches[0].screenX;
+                const touchEndX = e.changedTouches[0].clientX;
 
                 // Add momentum based on swipe velocity
-                const momentum = velocity * 100;
+                const momentum = velocity * 150;
                 position += momentum;
 
                 wrapper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
                 // Snap to nearest card
+                const cardWidth = getCardWidth();
                 position = Math.round(position / cardWidth) * cardWidth;
                 updateCarouselPosition();
                 handleInfiniteScroll();
@@ -1140,26 +1200,81 @@
                 setTimeout(startAutoScroll, 3000);
             }, { passive: true });
 
-            // Pause auto-scroll when user interacts with the container
-            container.addEventListener('mouseenter', stopAutoScroll);
-            container.addEventListener('mouseleave', startAutoScroll);
+            // Pause auto-scroll when user hovers (desktop only)
+            if (!('ontouchstart' in window)) {
+                container.addEventListener('mouseenter', stopAutoScroll);
+                container.addEventListener('mouseleave', startAutoScroll);
+            }
 
-            // Ensure auto-scroll stops when page is not visible
+            // Handle page scrolling to reduce jitter
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                handlePageScroll();
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (!isDragging && !document.hidden) {
+                        setTimeout(startAutoScroll, 500);
+                    }
+                }, 200);
+            }, { passive: true });
+
+            // Handle visibility changes
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     stopAutoScroll();
-                } else {
-                    startAutoScroll();
+                } else if (!isDragging && !isPageScrolling) {
+                    setTimeout(startAutoScroll, 1000);
                 }
             });
 
-            // Initialize carousel
-            window.addEventListener('resize', () => {
-                cardWidth = cards[0].offsetWidth + 32; // Update card width on resize
+            // Handle window focus/blur
+            window.addEventListener('blur', stopAutoScroll);
+            window.addEventListener('focus', () => {
+                if (!document.hidden && !isDragging && !isPageScrolling) {
+                    setTimeout(startAutoScroll, 1000);
+                }
             });
 
-            // Start auto-scroll after a delay
-            setTimeout(startAutoScroll, 2000);
+            // Handle resize events
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Recalculate position after resize
+                    const cardWidth = getCardWidth();
+                    position = Math.round(position / cardWidth) * cardWidth;
+                    updateCarouselPosition();
+
+                    if (!isDragging && !document.hidden && !isPageScrolling) {
+                        startAutoScroll();
+                    }
+                }, 250);
+            });
+
+            // Initialize carousel with proper error handling
+            function initializeCarousel() {
+                try {
+                    // Ensure wrapper is properly set up
+                    wrapper.style.display = 'flex';
+                    wrapper.style.gap = '2rem';
+                    wrapper.style.transition = 'transform 0.5s ease';
+                    wrapper.style.willChange = 'transform';
+
+                    // Start auto-scroll after a delay
+                    setTimeout(() => {
+                        if (!isDragging && !document.hidden && !isPageScrolling) {
+                            startAutoScroll();
+                        }
+                    }, 2000);
+
+                    console.log('Social testimonial carousel initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing carousel:', error);
+                }
+            }
+
+            // Initialize
+            initializeCarousel();
         });
     </script>
 </section>

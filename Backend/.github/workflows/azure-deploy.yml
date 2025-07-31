@@ -1,10 +1,12 @@
-name: Deploy JAM Capital Backend to Azure
+# Disabled - using Azure CLI direct deployment instead
+# on:
+#   push:
+#     branches: [main, master, production]
+#   pull_request:
+#     branches: [main, master]
+#   workflow_dispatch:
 
 on:
-  push:
-    branches: [main, production]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 env:
@@ -132,6 +134,74 @@ jobs:
             exit 1
           fi
 
+  deploy-master:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+
+    steps:
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+
+      - name: 🔓 Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 🚀 Deploy to Azure Web App (Production)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: deployment-package.zip
+
+      - name: ⚙️ Configure App Settings (Production)
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.50.0
+          inlinescript: |
+            # Configure production environment variables using your existing resources
+            az webapp config appsettings set \
+              --name ${{ env.AZURE_WEBAPP_NAME }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --settings \
+                NODE_ENV=production \
+                PORT=8080 \
+                COSMOS_DB_CONNECTION_STRING="${{ secrets.COSMOS_DB_CONNECTION_STRING }}" \
+                COSMOS_DB_DATABASE_NAME="jamdb" \
+                COSMOS_DB_CONTAINER_NAME="jamdbcontainer" \
+                AZURE_STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+                AZURE_STORAGE_CONTAINER_NAME="jamblobstorage" \
+                APPLICATIONINSIGHTS_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
+                OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
+                JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+                WEBSITE_NODE_DEFAULT_VERSION="~22" \
+                SCM_DO_BUILD_DURING_DEPLOYMENT=true
+
+      - name: 🏥 Production Health Check
+        run: |
+          echo "Waiting for production deployment to be ready..."
+          sleep 30
+
+          # Health check
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || echo "000")
+
+          if [ "$response" = "200" ]; then
+            echo "✅ Production deployment successful - Health check passed"
+          else
+            echo "❌ Production deployment failed - Health check returned: $response"
+            exit 1
+          fi
+
+      - name: 🔥 Warm up application
+        run: |
+          echo "Warming up production application..."
+          curl -s https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/health > /dev/null
+          curl -s https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/status > /dev/null
+          echo "✅ Application warmed up"
+
   deploy-production:
     if: github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
@@ -203,7 +273,7 @@ jobs:
   notify:
     if: always()
     runs-on: ubuntu-latest
-    needs: [build, deploy-staging, deploy-production]
+    needs: [build, deploy-staging, deploy-master, deploy-production]
 
     steps:
       - name: 📊 Deployment Summary
@@ -219,6 +289,11 @@ jobs:
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             echo "**Staging Deploy:** ${{ needs.deploy-staging.result }}" >> $GITHUB_STEP_SUMMARY
             echo "**Staging URL:** https://${{ env.AZURE_WEBAPP_NAME }}-staging.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "**Production Deploy:** ${{ needs.deploy-master.result }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Production URL:** https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [ "${{ github.ref }}" = "refs/heads/production" ]; then

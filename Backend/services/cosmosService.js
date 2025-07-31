@@ -211,19 +211,51 @@ export class CosmosService {
     }
 
     async getUserByEmail(email) {
-        const query = `
-            SELECT * FROM c 
-            WHERE c.email = @email 
-            AND c.type = @type
-        `;
-        
-        const parameters = [
-            { name: '@email', value: email },
-            { name: '@type', value: 'user' }
-        ];
+        try {
+            // Ensure initialization and normalize email
+            await this.initialize();
+            const normalizedEmail = email.toLowerCase().trim();
+            
+            console.log('🔍 [getUserByEmail] Looking for user:', normalizedEmail);
+            
+            const query = `
+                SELECT * FROM c 
+                WHERE c.email = @email 
+                AND c.type = @type
+            `;
+            
+            const parameters = [
+                { name: '@email', value: normalizedEmail },
+                { name: '@type', value: 'user' }
+            ];
 
-        const results = await this.queryDocuments(query, parameters);
-        return results.length > 0 ? results[0] : null;
+            const results = await this.queryDocuments(query, parameters);
+            console.log('🔍 [getUserByEmail] Query results:', results.length, 'users found');
+            
+            if (results.length > 0) {
+                console.log('✅ [getUserByEmail] User found:', results[0].email);
+                return results[0];
+            } else {
+                console.log('❌ [getUserByEmail] No user found for:', normalizedEmail);
+                
+                // Fallback: try direct container query as backup
+                console.log('🔄 [getUserByEmail] Trying direct container query...');
+                const container = this.cosmosConfig.getContainer();
+                const { resources: directResults } = await container.items.query({
+                    query: "SELECT * FROM c WHERE LOWER(c.email) = @email AND c.type = @type",
+                    parameters: [
+                        { name: '@email', value: normalizedEmail },
+                        { name: '@type', value: 'user' }
+                    ]
+                }).fetchAll();
+                
+                console.log('🔄 [getUserByEmail] Direct query results:', directResults.length, 'users found');
+                return directResults.length > 0 ? directResults[0] : null;
+            }
+        } catch (error) {
+            console.error('❌ [getUserByEmail] Error:', error);
+            throw error;
+        }
     }
 
     async updateUserLastLogin(userId) {

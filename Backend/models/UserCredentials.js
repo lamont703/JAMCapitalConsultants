@@ -53,7 +53,7 @@ export class UserCredentials {
                 throw new Error('Missing required fields: userId, serviceType, email, password');
             }
 
-            const validServices = ['smartcredit', 'identityiq', 'myscoreiq'];
+            const validServices = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
             if (!validServices.includes(serviceType.toLowerCase())) {
                 throw new Error(`Invalid service type. Must be one of: ${validServices.join(', ')}`);
             }

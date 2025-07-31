@@ -1,10 +1,10 @@
-import UserCredentials from '../models/UserCredentials.js';
+import { UserCredentials } from '../models/UserCredentials.js';
 import rateLimit from 'express-rate-limit';
 
 // Rate limiting for credential operations
 export const credentialRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // limit each IP to 10 requests per windowMs
+    max: process.env.NODE_ENV === 'development' ? 50 : 10, // Higher limit for development
     message: {
         success: false,
         message: 'Too many credential operations. Please try again later.'
@@ -36,10 +36,21 @@ class CredentialController {
                 });
             }
 
-            const { userId, serviceType, email, password, purpose } = req.body;
+            const { serviceType, email, password, purpose } = req.body;
+            
+            // Debug: Check req.user object
+            console.log('🔍 Debug - req.user:', req.user);
+            
+            const userId = req.user?.id; // Get userId from authenticated user
 
-            // Validate required fields
+            // Validate required fields including userId
             if (!userId || !serviceType || !email || !password) {
+                console.log('❌ Validation failed:', { 
+                    hasUserId: !!userId, 
+                    hasServiceType: !!serviceType, 
+                    hasEmail: !!email, 
+                    hasPassword: !!password 
+                });
                 return res.status(400).json({
                     success: false,
                     message: 'Missing required fields: userId, serviceType, email, password'
@@ -47,7 +58,7 @@ class CredentialController {
             }
 
             // Validate service type
-            const validServices = ['smartcredit', 'identityiq', 'myscoreiq'];
+            const validServices = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
             if (!validServices.includes(serviceType.toLowerCase())) {
                 return res.status(400).json({
                     success: false,
@@ -72,14 +83,7 @@ class CredentialController {
                 });
             }
 
-            // Get user info from token (added by auth middleware)
-            const requestingUserId = req.user?.id;
-            if (userId !== requestingUserId) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Cannot store credentials for another user'
-                });
-            }
+            // User ID is now safely obtained from authenticated JWT token
 
             // Store credentials
             const result = await this.userCredentials.storeCredentials(
@@ -96,11 +100,26 @@ class CredentialController {
             // Audit log with request metadata
             await this.userCredentials.logCredentialAccess(
                 result.id, 
-                requestingUserId, 
+                userId, 
                 'credential_storage', 
                 req.ip, 
                 req.get('User-Agent')
             );
+
+            // Get current credential completion status
+            const completionStatus = await this.checkCredentialCompletion(userId);
+            
+            // 🎯 TRIGGER AUTOMATION ON EVERY CREDENTIAL UPLOAD (regardless of completion)
+            console.log(`🚀 Credential uploaded for user ${userId} (${completionStatus.completedCount}/${completionStatus.totalRequired}) - triggering tag automation`);
+            
+            // Trigger tag automation immediately
+            await this.triggerTagAutomation(userId, completionStatus, req);
+            
+            if (completionStatus.allComplete) {
+                console.log(`✅ User ${userId} has now completed ALL credentials!`);
+            } else {
+                console.log(`📝 User ${userId} progress: ${completionStatus.completedCount}/${completionStatus.totalRequired} credentials complete`);
+            }
 
             res.status(201).json({
                 success: true,
@@ -167,6 +186,16 @@ class CredentialController {
                     lastUpdated: null
                 },
                 myscoreiq: {
+                    hasCredentials: false,
+                    status: 'not_provided',
+                    lastUpdated: null
+                },
+                cfpb: {
+                    hasCredentials: false,
+                    status: 'not_provided',
+                    lastUpdated: null
+                },
+                annualcreditreport: {
                     hasCredentials: false,
                     status: 'not_provided',
                     lastUpdated: null
@@ -471,13 +500,207 @@ class CredentialController {
     }
 
     /**
+     * Check if all required credit monitoring credentials are complete
+     */
+    async checkCredentialCompletion(userId) {
+        try {
+            const requiredServices = ['smartcredit', 'identityiq', 'myscoreiq'];
+            const credentialStatus = await this.userCredentials.getUserCredentialStatus(userId);
+            
+            const completedServices = requiredServices.filter(service => 
+                credentialStatus[service] && credentialStatus[service].status === 'active'
+            );
+            
+            const allComplete = completedServices.length === requiredServices.length;
+            
+            return {
+                allComplete,
+                completedCount: completedServices.length,
+                totalRequired: requiredServices.length,
+                completedServices,
+                missingServices: requiredServices.filter(service => !completedServices.includes(service))
+            };
+        } catch (error) {
+            console.error('❌ Error checking credential completion:', error);
+            return {
+                allComplete: false,
+                completedCount: 0,
+                totalRequired: 3,
+                completedServices: [],
+                missingServices: ['smartcredit', 'identityiq', 'myscoreiq']
+            };
+        }
+    }
+
+    /**
+     * Trigger tag-based automation on ANY credential upload (1/3, 2/3, or 3/3)
+     */
+    async triggerTagAutomation(userId, completionStatus, req) {
+        try {
+            console.log(`🚀 Starting tag-based automation for user ${userId}`);
+            console.log(`📊 Completion status:`, completionStatus);
+            
+            // Get user details from database
+            const userQuery = 'SELECT * FROM c WHERE c.id = @userId AND c.type = @type';
+            const userParams = [
+                { name: '@userId', value: userId },
+                { name: '@type', value: 'user' }
+            ];
+            const users = await req.app.locals.cosmosService.queryDocuments(userQuery, userParams);
+            const user = users.length > 0 ? users[0] : null;
+            if (!user) {
+                console.error(`❌ User ${userId} not found in database`);
+                return;
+            }
+
+            // Get GHL service
+            const ghlService = req.app.locals.ghlService;
+            if (!ghlService) {
+                console.error('❌ GHL service not available');
+                return;
+            }
+
+            // Find or create contact in GoHighLevel
+            console.log(`🔍 Finding GHL contact for: ${user.email}`);
+            let contact = await ghlService.findContactByEmail(user.email);
+            
+            if (!contact) {
+                console.log(`📝 Contact not found, creating new contact for: ${user.email}`);
+                const createResult = await ghlService.createContactFromRegistration({
+                    name: user.name,
+                    firstName: user.firstName || user.name?.split(' ')[0] || '',
+                    lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || '',
+                    email: user.email,
+                    phone: user.phone || '',
+                    company: user.company || ''
+                });
+                
+                if (createResult.success) {
+                    contact = { id: createResult.ghlContactId };
+                    console.log(`✅ Contact created: ${contact.id}`);
+                } else {
+                    console.error(`❌ Failed to create contact: ${createResult.error}`);
+                    return;
+                }
+            } else {
+                console.log(`✅ Found existing contact: ${contact.id}`);
+            }
+
+            // Get current credential status for tag generation
+            const credentialStatus = await this.userCredentials.getUserCredentialStatus(userId);
+            
+            // Create credential status object for tag generation
+            const statusForTags = {
+                smartcredit: credentialStatus.smartcredit?.status === 'active',
+                identityiq: credentialStatus.identityiq?.status === 'active',
+                myscoreiq: credentialStatus.myscoreiq?.status === 'active'
+            };
+
+            console.log(`🏷️ Credential status for tags:`, statusForTags);
+
+            // Update contact with credential completion tags
+            const tagResult = await ghlService.updateCredentialTags(contact.id, statusForTags);
+            
+            if (tagResult.success) {
+                console.log(`✅ Contact tags updated successfully`);
+                
+                // Log successful tag automation
+                await this.logTagAutomation(
+                    userId, 
+                    contact.id, 
+                    completionStatus, 
+                    'tag_automation_success',
+                    null,
+                    { appliedTags: ghlService.generateCredentialTags(statusForTags) }
+                );
+                
+                return {
+                    success: true,
+                    userId,
+                    contactId: contact.id,
+                    status: 'tag_automation_completed',
+                    appliedTags: ghlService.generateCredentialTags(statusForTags),
+                    completionCount: completionStatus.completedCount
+                };
+                
+            } else {
+                console.error(`❌ Failed to update contact tags: ${tagResult.error}`);
+                
+                // Log tag automation failure
+                await this.logTagAutomation(
+                    userId, 
+                    contact.id, 
+                    completionStatus, 
+                    'tag_automation_error', 
+                    tagResult.error
+                );
+                
+                return {
+                    success: false,
+                    userId,
+                    contactId: contact.id,
+                    status: 'tag_automation_failed',
+                    error: tagResult.error
+                };
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in tag-based automation:', error);
+            
+            // Log the error but don't fail the credential storage
+            await this.logTagAutomation(userId, null, completionStatus, 'automation_error', error.message);
+            
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Log tag automation events for audit and monitoring
+     */
+    async logTagAutomation(userId, contactId, completionStatus, eventType, errorMessage = null, additionalMetadata = {}) {
+        try {
+            const logEntry = {
+                id: `tag_automation_log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'tag_automation_log',
+                userId: userId,
+                contactId: contactId,
+                eventType: eventType,
+                completionStatus: completionStatus,
+                timestamp: new Date().toISOString(),
+                success: !eventType.includes('error'),
+                errorMessage: errorMessage,
+                metadata: {
+                    completedServices: completionStatus?.completedServices || [],
+                    totalCredentials: completionStatus?.totalRequired || 3,
+                    completionCount: completionStatus?.completedCount || 0,
+                    ...additionalMetadata
+                }
+            };
+
+            // Store in database for monitoring and debugging
+            await this.userCredentials.cosmosService.createDocument(logEntry, 'tag_automation_log');
+            
+            console.log(`📝 Tag automation logged: ${eventType} for user ${userId}`);
+            
+        } catch (error) {
+            console.error('❌ Error logging pipeline automation:', error);
+            // Don't throw - logging errors shouldn't break the main flow
+        }
+    }
+
+    /**
      * Helper function to get display name for services
      */
     getServiceDisplayName(serviceType) {
         const serviceNames = {
             'smartcredit': 'SmartCredit',
             'identityiq': 'IdentityIQ',
-            'myscoreiq': 'MyScoreIQ'
+            'myscoreiq': 'MyScoreIQ',
+            'cfpb': 'CFPB',
+            'annualcreditreport': 'AnnualCreditReport.com'
         };
         return serviceNames[serviceType.toLowerCase()] || serviceType;
     }

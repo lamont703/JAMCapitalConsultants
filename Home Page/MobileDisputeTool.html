@@ -1,19 +1,119 @@
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- Dispute Tool Container - Renders in place -->
+<div id="dispute-tool-container" data-dispute-tool-container="true">
+    <!-- The dispute tool module will inject content here -->
+</div>
 
+<script>
+    // JAM Capital Consultants - Dispute Tool Module
+    // Self-contained module that generates HTML and handles all functionality
+    (function () {
+        'use strict';
+
+        console.log('🚀 DISPUTE TOOL MODULE LOADING...');
+
+        // Configuration object for the dispute tool
+        const DISPUTE_CONFIG = {
+            sectionId: 'jam-dispute-tool-section',
+            toastId: 'jam-dispute-toast',
+            cards: [
+                {
+                    id: 'late-payment',
+                    icon: '🤖',
+                    title: 'Late Payment Removal',
+                    description: 'Use this prompt to request removal of a one-time late payment due to hardship.',
+                    prompt: `[Your Full Name][Your Address][City State ZIP Code][Email Address][Phone Number]Date: [Insert Date]
+To Whom It May Concern
+I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
+That moment was not a reflection of how I manage my responsibilities. I was going through a challenging time, and unfortunately the payment slipped through the cracks. As soon as I recognized the mistake I got back on track and brought the account current. Since then I've kept everything in good standing.
+I'm not making excuses. I'm simply asking that you take into consideration my overall payment history and the effort I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
+Thank you for your time and for considering my request. I genuinely appreciate it.
+Sincerely[Your Full Name]`
+                },
+                {
+                    id: 'collection-dispute',
+                    icon: '🤖',
+                    title: 'Collection Account Dispute',
+                    description: 'Challenge a collection account that you believe is inaccurate or unverifiable.',
+                    prompt: 'Write a dispute letter for a collection account from ABC Collections in the amount of $500. Request debt validation and state that this debt is not recognized. Include a request for original account documentation and verification of their right to collect.'
+                },
+                {
+                    id: 'hard-inquiry',
+                    icon: '🤖',
+                    title: 'Hard Inquiry Removal',
+                    description: 'Request removal of unauthorized or outdated hard inquiries from your credit report.',
+                    prompt: 'Write a dispute letter to Experian requesting removal of a hard inquiry from Chase Bank dated January 15, 2023. Explain that I never authorized this inquiry, I have no record of applying for credit with this company, and request verification or complete removal from my credit report.'
+                },
+                {
+                    id: 'duplicate-account',
+                    icon: '🤖',
+                    title: 'Duplicate Account Dispute',
+                    description: 'Challenge duplicate accounts appearing on your credit report that are inflating your debt profile.',
+                    prompt: 'Write a dispute letter to TransUnion regarding a duplicate Wells Fargo account appearing on my credit report. The original account number ends in 4567, while the duplicate shows the same balance and history but ends in 7890. Explain that this duplicate is artificially inflating my debt-to-income ratio and request its removal.'
+                },
+                {
+                    id: 'identity-theft',
+                    icon: '🤖',
+                    title: 'Identity Theft Item Removal',
+                    description: 'Dispute fraudulent accounts or charges that appeared on your credit report due to identity theft.',
+                    prompt: 'Write a dispute letter to Equifax regarding a fraudulent Discover credit card account opened in my name on November 10, 2023. Include that I have filed a police report (case #12345), placed a fraud alert on my credit file, and never authorized this account. Request complete removal and include a request for identity theft victim assistance.'
+                },
+                {
+                    id: 'goodwill-letter',
+                    icon: '🤖',
+                    title: 'Goodwill Letter Request',
+                    description: 'Request removal of negative items based on your positive payment history and relationship with the creditor.',
+                    prompt: 'Write a goodwill letter to American Express requesting removal of a 60-day late payment from August 2022. Explain that I have been a loyal customer for 5 years with an otherwise perfect payment history, the late payment was due to a medical emergency, and I have made all payments on time since then. Emphasize my commitment to financial responsibility and request this courtesy adjustment.'
+                }
+            ]
+        };
+
+        // HTML Template Generator
+        function generateHTML() {
+            const cardsHTML = DISPUTE_CONFIG.cards.map(card => `
+            <div class="dispute-prompt-card" data-card-id="${card.id}">
+                <div class="dispute-card-inner">
+                    <div class="dispute-card-front">
+                        <div class="dispute-front-content">
+                            <div class="dispute-card-header">
+                                <span class="dispute-ai-icon">${card.icon}</span>
+                                <h3>${card.title}</h3>
+                            </div>
+                            <p class="dispute-card-description">${card.description}</p>
+                            <div class="dispute-button-container">
+                                <button class="dispute-flip-btn" data-action="flip">View Prompt →</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dispute-card-back">
+                        <div class="dispute-back-content">
+                            <div class="dispute-card-header-back">
+                                <h4>${card.title} Prompt</h4>
+                                <pre><code>${card.prompt}</code></pre>
+                            </div>
+                            <div class="dispute-button-container-back">
+                                <button class="dispute-copy-btn" data-prompt="${card.prompt.replace(/"/g, '&quot;')}" data-action="copy">
+                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
+                                </button>
+                                <button class="dispute-flip-btn" data-action="flip">← Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+            return `
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-    /* Import headline font */
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
 
-    /* Modern, Clean Styling with enhanced mobile responsiveness */
     .dispute-letters-section {
         padding: 3rem 0;
         background-color: rgba(240, 242, 245, 0.85);
-        /* Semi-transparent grayish background */
         font-family: 'Poppins', sans-serif;
         position: relative;
     }
 
-    /* Add a subtle texture/pattern overlay */
     .dispute-letters-section::before {
         content: "";
         position: absolute;
@@ -80,25 +180,23 @@
     .dispute-prompt-card {
         perspective: 1000px;
         height: auto;
-        min-height: 280px;
+        min-height: 360px;
         width: 100%;
+        min-width: 300px; /* Ensure minimum width for button space */
         position: relative;
-        margin-bottom: 1rem;
+                    margin-bottom: 1.5rem;
     }
 
     .dispute-card-inner {
         position: relative;
         width: 100%;
         height: 100%;
+                    min-height: 320px;
         text-align: center;
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         transform-style: preserve-3d;
-        -webkit-transform-style: preserve-3d;
-        -moz-transform-style: preserve-3d;
         transform-origin: center center;
         backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        -moz-backface-visibility: hidden;
     }
 
     .dispute-card-front,
@@ -106,9 +204,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        -moz-backface-visibility: hidden;
+                    min-height: 320px;
         background-color: #002742;
         border-radius: 12px;
         padding: 1.5rem;
@@ -119,21 +215,36 @@
         overflow: hidden;
         transition: all 0.3s ease;
         box-sizing: border-box;
+        border-left: 4px solid #09ccfc;
     }
 
     .dispute-card-front {
-        border-left: 4px solid #09ccfc;
-        transform: rotateY(0deg);
-        -webkit-transform: rotateY(0deg);
-        -moz-transform: rotateY(0deg);
+        /* Front card is visible by default */
+        z-index: 10;
+        display: flex;
     }
 
     .dispute-card-back {
-        border-left: 4px solid #09ccfc;
-        transform: rotateY(180deg);
-        -webkit-transform: rotateY(180deg);
-        -moz-transform: rotateY(180deg);
+        /* Back card is hidden by default */
+        z-index: 1;
+        display: none;
         overflow-y: auto;
+        overflow-x: visible; /* Ensure buttons aren't clipped horizontally */
+    }
+    
+    /* When flipped, ensure proper visibility control */
+    .dispute-card-inner.flipped .dispute-card-front {
+        display: none !important;
+        z-index: 1 !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    .dispute-card-inner.flipped .dispute-card-back {
+        display: flex !important;
+        z-index: 10 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .dispute-card-header {
@@ -142,12 +253,14 @@
         margin-bottom: 1.2rem;
         padding-bottom: 0.8rem;
         border-bottom: 2px solid rgba(9, 204, 252, 0.3);
+                    flex-shrink: 0;
     }
 
     .dispute-ai-icon {
         font-size: 1.6rem;
         margin-right: 0.8rem;
         color: #09ccfc;
+                    flex-shrink: 0;
     }
 
     .dispute-card-header h3 {
@@ -162,68 +275,179 @@
         color: rgba(255, 255, 255, 0.9);
         font-size: 0.95rem;
         line-height: 1.5;
-        margin: 0.6rem 0 1.2rem;
+                    margin: 1rem 0 1.5rem;
         flex-grow: 1;
+                    padding: 0 0.25rem;
     }
 
     .dispute-flip-btn {
         margin-top: auto;
         background: rgba(9, 204, 252, 0.15);
         border: 2px solid rgba(9, 204, 252, 0.4);
-        padding: 0.7rem;
+                    padding: 0.8rem 1rem;
         border-radius: 8px;
         cursor: pointer;
         color: white;
         font-weight: 600;
         transition: all 0.2s;
         font-size: 0.9rem;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
         width: 100%;
-        position: relative !important;
-        z-index: 10 !important;
-        pointer-events: auto !important;
+                    min-height: 48px;
         user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
+                    touch-action: manipulation;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    z-index: 15000;
+                    pointer-events: auto;
+    }
+    
+    /* When flip button is in button container (back card), give it flex property */
+    .dispute-button-container .dispute-flip-btn {
+        flex: 1; /* Equal flex with back button for balanced width */
+        width: auto; /* Override width: 100% when in container */
     }
 
-    .dispute-card-back h4 {
+    /* Front card header styling */
+    .dispute-card-header h3 {
+        color: white;
+        font-size: 1.2rem;
+        margin: 0;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+    
+    /* Back card header styling */
+    .dispute-card-header-back {
+        margin-bottom: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .dispute-card-header-back h4 {
         color: #09ccfc;
         margin-bottom: 1rem;
         font-size: 1.1rem;
         text-align: left;
         line-height: 1.3;
+        padding: 0 0.25rem;
+    }
+    
+    /* Back card prompt styling */
+    .dispute-card-header-back pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        background: rgba(9, 204, 252, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(9, 204, 252, 0.3);
+        color: white;
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 180px;
+        word-wrap: break-word;
+        word-break: break-word;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(9, 204, 252, 0.5) rgba(9, 204, 252, 0.1);
+    }
+    
+    /* Back card scrollbar styling */
+    .dispute-card-header-back pre::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .dispute-card-header-back pre::-webkit-scrollbar-track {
+        background: rgba(9, 204, 252, 0.1);
+        border-radius: 4px;
+    }
+    
+    .dispute-card-header-back pre::-webkit-scrollbar-thumb {
+        background: rgba(9, 204, 252, 0.5);
+        border-radius: 4px;
+    }
+    
+    .dispute-card-header-back pre::-webkit-scrollbar-thumb:hover {
+        background: rgba(9, 204, 252, 0.7);
+    }
+                
+                .dispute-front-content,
+                .dispute-back-content {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                    padding-bottom: 1rem; /* Increased padding for button space */
+                    position: relative;
+                    z-index: 1;
+        overflow: hidden; /* Contain content within card boundaries */
+        width: 100%; /* Ensure content stays within card */
+        box-sizing: border-box; /* Include padding in width calculation */
     }
 
-    .dispute-prompt-content {
+        .dispute-prompt-content {
         height: 100%;
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        padding-bottom: 0.8rem;
-    }
-
-    .dispute-prompt-content pre {
-        margin: 0;
-        white-space: pre-wrap;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9rem;
-        line-height: 1.6;
-        background: rgba(9, 204, 252, 0.1);
-        padding: 1.2rem;
-        border-radius: 8px;
-        border: 1px solid rgba(9, 204, 252, 0.3);
-        color: white;
-        overflow-x: auto;
+                    padding-bottom: 0.5rem;
     }
 
     .dispute-button-container {
         display: flex;
-        gap: 10px;
-        margin-top: 0.6rem;
+                    gap: 0.75rem;
+                    margin-top: auto;
         width: 100%;
+                    flex-shrink: 0;
+                    padding-top: 0.5rem;
+                    position: relative;
+                    z-index: 1000;
+                    pointer-events: auto;
+        overflow: visible; /* Ensure buttons aren't clipped */
+        min-height: 60px; /* Ensure enough space for buttons */
+                }
+                
+                /* Front card button container styling */
+                .dispute-front-content .dispute-button-container {
+                    justify-content: center;
+                }
+                
+                /* Back card button container styling */
+                .dispute-button-container-back {
+                    display: flex;
+                    gap: 0.75rem;
+                    margin-top: auto;
+                    width: 100%;
+                    flex-shrink: 0;
+                    padding-top: 0.5rem;
+                    position: relative;
+                    z-index: 1000;
+                    pointer-events: auto;
+                    overflow: visible;
+                    min-height: 60px;
+                    justify-content: space-between;
+                    padding-bottom: 1rem;
+                    align-items: stretch; /* Ensure buttons have same height */
+    }
+    
+    /* Back card button sizing - make buttons more evenly sized */
+    .dispute-button-container-back .dispute-copy-btn {
+        flex: 1; /* Equal flex instead of 1.2 */
+        min-width: 0; /* Allow flex to work properly */
+        height: auto; /* Let container control height */
+    }
+    
+    .dispute-button-container-back .dispute-flip-btn {
+        flex: 1; /* Equal flex with copy button */
+        width: auto; /* Override width: 100% */
+        min-width: 0; /* Allow flex to work properly */
+        height: auto; /* Let container control height */
     }
 
     .dispute-copy-btn {
@@ -234,37 +458,18 @@
         color: white;
         border: 2px solid rgba(9, 204, 252, 0.4);
         border-radius: 8px;
-        padding: 0.7rem;
+                    padding: 0.8rem 1rem;
         cursor: pointer;
         transition: all 0.3s;
-        flex: 1;
+                    flex: 1.2; /* Reduced from flex: 2 for more balanced width */
         font-size: 0.85rem;
         font-weight: 600;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        margin-top: 0;
-        position: relative !important;
-        z-index: 10 !important;
-        pointer-events: auto !important;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-    }
-
-    .dispute-card-back .dispute-flip-btn {
-        flex: 1;
         min-height: 48px;
-        font-size: 0.8rem;
-        padding: 0.8rem;
+                    user-select: none;
+                    touch-action: manipulation;
         position: relative;
-        z-index: 10;
+                    z-index: 150;
         pointer-events: auto;
-        cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
     }
 
     .dispute-cta-section {
@@ -277,22 +482,6 @@
         font-size: 1.1rem;
         color: #2c3e50;
         margin-bottom: 1rem;
-    }
-
-    .dispute-cta-button {
-        display: inline-block;
-        background: #002742;
-        color: white;
-        padding: 0.9rem 1.8rem;
-        border-radius: 30px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: transform 0.2s, background 0.2s;
-    }
-
-    .dispute-cta-button:hover {
-        background: #003b63;
-        transform: translateY(-2px);
     }
 
     .dispute-toast {
@@ -317,66 +506,13 @@
         transform: translateY(0);
     }
 
-    /* Mobile optimization for toast notification */
-    @media (max-width: 768px) {
-        .dispute-toast {
-            font-size: 1rem;
-            padding: 1rem 1.25rem;
-            bottom: 2rem;
-            right: 1rem;
-            left: 1rem;
-            margin: 0 auto;
-            max-width: none;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-    }
-
-    @media (max-width: 480px) {
-        .dispute-toast {
-            font-size: 1.1rem;
-            padding: 1.1rem 1.5rem;
-            bottom: 3rem;
-            right: 0.75rem;
-            left: 0.75rem;
-            border-radius: 16px;
-            font-weight: 600;
-            background: #27ae60;
-            color: white;
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-        }
-    }
-
-    @media (max-width: 375px) {
-        .dispute-toast {
-            font-size: 1rem;
-            padding: 1rem 1.25rem;
-            bottom: 2.5rem;
-            right: 0.5rem;
-            left: 0.5rem;
-            border-radius: 14px;
-        }
-    }
-
-    /* Comprehensive mobile responsiveness */
     @media (max-width: 992px) {
         .dispute-prompt-cards {
             grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
         }
-
         .dispute-section-header h2 {
-            color: #2c3e50;
             font-size: 2.5rem;
-        }
-
-        .dispute-subheading {
-            color: #666;
-        }
-
-        .dispute-ai-tip {
-            color: #09ccfc;
         }
     }
 
@@ -384,859 +520,429 @@
         .dispute-prompt-cards {
             grid-template-columns: repeat(2, 1fr);
             gap: 1.2rem;
+                        max-width: 800px; /* Increased width for tablet view */
         }
-
         .dispute-prompt-card {
-            min-height: 320px;
-            max-height: 360px;
-            aspect-ratio: 0.95;
-        }
-
+                        min-height: 340px;
+                        margin-bottom: 1.2rem;
+                        min-width: 320px; /* Wider cards for tablet */
+                    }
+                    .dispute-card-inner {
+                        min-height: 340px;
+                    }
         .dispute-card-front,
         .dispute-card-back {
+                        min-height: 340px;
             padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+                        min-width: 320px; /* Ensure adequate width */
         }
-
-        .dispute-card-front {
-            justify-content: space-between;
-        }
-
         .dispute-card-description {
-            flex-grow: 1;
-            margin: 0.8rem 0 1rem;
+                        margin: 0.8rem 0 1.2rem;
+                        font-size: 0.9rem;
         }
-
         .dispute-flip-btn {
-            margin-top: auto;
-            flex-shrink: 0;
-            min-height: 44px;
-            padding: 0.8rem;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .dispute-section-header h2 {
-            color: #2c3e50;
-        }
-
-        .dispute-subheading {
-            color: #666;
-        }
-
-        .dispute-ai-tip {
-            color: #09ccfc;
-        }
+                        padding: 0.75rem 0.9rem;
+                        font-size: 0.85rem;
+                    }
+                    .dispute-copy-btn {
+                        padding: 0.75rem 0.9rem;
+                        font-size: 0.8rem;
+                    }
+                    /*.dispute-prompt-content pre {
+                        font-size: 0.8rem;
+                        padding: 0.9rem;
+                        max-height: 160px;
+        }*/
     }
 
     @media (max-width: 480px) {
         .dispute-prompt-cards {
             grid-template-columns: 1fr;
-            max-width: 350px;
+            max-width: 400px; /* Increased from 350px for better button space */
             margin-left: auto;
             margin-right: auto;
             padding: 0 1rem;
             gap: 1rem;
         }
-
         .dispute-prompt-card {
-            min-height: 300px;
-            max-height: 340px;
-            aspect-ratio: 0.9;
+                        min-height: 320px;
+                        margin-bottom: 1rem;
         }
-
+                    .dispute-card-inner {
+                        min-height: 320px;
+                    }
         .dispute-card-front,
         .dispute-card-back {
+                        min-height: 320px;
             padding: 1.2rem;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            box-sizing: border-box;
-        }
-
-        .dispute-card-front {
-            justify-content: space-between;
-        }
-
-        .dispute-card-header {
-            flex-shrink: 0;
-            margin-bottom: 1rem;
-        }
-
+            min-width: 300px; /* Ensure cards are wide enough for buttons */
+                    }
         .dispute-card-description {
-            flex-grow: 1;
-            margin: 0.5rem 0 1rem;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
+                        margin: 0.75rem 0 1rem;
+                        font-size: 0.88rem;
+                        padding: 0 0.1rem;
+                    }
         .dispute-flip-btn {
-            margin-top: auto;
-            flex-shrink: 0;
-            min-height: 48px;
-            padding: 0.9rem;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            touch-action: manipulation;
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .dispute-card-back {
-            overflow: hidden;
-        }
-
-        .dispute-prompt-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            gap: 0.75rem;
-        }
-
-        .dispute-card-back h4 {
-            flex-shrink: 0;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-        }
-
-        .dispute-prompt-content pre {
-            flex-grow: 1;
-            overflow-y: auto;
-            max-height: 140px;
-            font-size: 0.8rem;
+                        padding: 0.7rem 0.8rem;
+                        font-size: 0.8rem;
+                        min-height: 44px;
+                    }
+                    .dispute-copy-btn {
+                        padding: 0.7rem 0.8rem;
+                        font-size: 0.75rem;
+                        min-height: 44px;
+                    }
+        /*.dispute-prompt-content pre {
+                        font-size: 0.75rem;
+                        padding: 0.8rem;
+            height: 120px; /* Fixed height instead of max-height for consistent scrolling */
             line-height: 1.4;
-            padding: 0.9rem;
-            margin: 0;
-        }
-
+            overflow-x: hidden; /* Prevent horizontal overflow on mobile */
+            overflow-y: auto; /* Ensure scrolling is enabled on mobile */
+            word-wrap: break-word; /* Ensure text wraps properly */
+            word-break: break-word; /* Break long words on mobile */
+            width: 100%; /* Stay within container bounds */
+            max-width: 100%; /* Prevent any overflow */
+            /* Mobile scrolling enhancements */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: thin; /* Thin scrollbar on mobile Firefox */
+        }*/
         .dispute-button-container {
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: row;
-            gap: 0.75rem;
-            margin-top: auto;
-            padding-top: 0.75rem;
+                        gap: 0.6rem;
+            padding-bottom: 0.5rem; /* Extra padding to prevent clipping */
+            overflow: visible; /* Ensure buttons are fully visible */
+                    }
+        
+        /* Mobile styling for back card elements */
+        .dispute-button-container-back {
+            gap: 0.6rem;
+            padding-bottom: 0.5rem;
+            overflow: visible;
+            min-height: 50px;
+            align-items: stretch; /* Ensure equal height on mobile */
         }
-
-        .dispute-copy-btn {
-            flex: 2;
-            min-height: 48px;
-            font-size: 0.8rem;
+        
+        /* Mobile button sizing for back card */
+        .dispute-button-container-back .dispute-copy-btn,
+        .dispute-button-container-back .dispute-flip-btn {
+            flex: 1; /* Equal sizing on mobile */
+            min-width: 0;
+            height: auto;
+            min-height: 44px; /* Ensure minimum touch target */
+            font-size: 0.75rem; /* Consistent mobile font size */
+            padding: 0.7rem 0.8rem; /* Consistent mobile padding */
+        }
+        
+        .dispute-card-header-back pre {
+            font-size: 0.75rem;
             padding: 0.8rem;
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
+            height: 120px;
+            line-height: 1.4;
+            overflow-x: hidden;
+            overflow-y: auto;
+            word-wrap: break-word;
+            word-break: break-word;
+            width: 100%;
+            max-width: 100%;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
         }
-
-        .dispute-card-back .dispute-flip-btn {
-            flex: 1;
-            min-height: 48px;
-            font-size: 0.8rem;
-            padding: 0.8rem;
+        
+        .dispute-card-header-back h4 {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
         }
-
         .dispute-section-header h2 {
-            color: #2c3e50;
             font-size: 2rem;
         }
-
-        .dispute-subheading {
-            color: #666;
-        }
-
-        .dispute-ai-tip {
-            color: #09ccfc;
-        }
-
-        .dispute-modal-content {
-            padding: 8px;
-        }
-
-        .dispute-close-modal {
-            right: 10px;
-            top: 10px;
-        }
-    }
-
-    /* Extra small devices - iPhone SE, small Android phones */
-    @media (max-width: 375px) {
-        .dispute-prompt-card {
-            min-height: 280px;
-            max-height: 320px;
-            aspect-ratio: 0.88;
-        }
-
-        .dispute-card-front,
-        .dispute-card-back {
-            padding: 1rem;
-        }
-
-        .dispute-card-description {
-            font-size: 0.85rem;
-            margin: 0.5rem 0 0.75rem;
-        }
-
-        .dispute-flip-btn {
-            min-height: 44px;
-            padding: 0.75rem;
-            font-size: 0.8rem;
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .dispute-copy-btn,
-        .dispute-card-back .dispute-flip-btn {
-            min-height: 44px;
-            font-size: 0.75rem;
-            padding: 0.7rem;
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .dispute-prompt-content pre {
-            max-height: 120px;
-            font-size: 0.75rem;
-            padding: 0.75rem;
+                    .dispute-toast {
+                        bottom: 2rem;
+                        right: 1rem;
+                        left: 1rem;
+                        border-radius: 12px;
         }
     }
 </style>
 
-<section class="dispute-letters-section">
+            <section class="dispute-letters-section" id="${DISPUTE_CONFIG.sectionId}">
     <div class="dispute-container">
         <div class="dispute-section-header">
             <h2>AI Dispute Letter Generator</h2>
-            <p class="dispute-subheading">Use these AI generated letters to create personalized dispute letters for
-                common credit
-                issues. Copy any prompt and paste it into ChatGPT for a custom letter.</p>
+                        <p class="dispute-subheading">Use these AI generated letters to create personalized dispute letters for common credit issues. Copy any prompt and paste it into ChatGPT for a custom letter.</p>
             <p class="dispute-ai-tip">Pro Tip: Add your specific account details for more personalized results.</p>
         </div>
-
         <div class="dispute-prompt-cards">
-            <!-- Card 1 -->
-            <div class="dispute-prompt-card">
-                <div class="dispute-card-inner">
-                    <!-- Front of card -->
-                    <div class="dispute-card-front">
-                        <div class="dispute-card-header">
-                            <span class="dispute-ai-icon">🤖</span>
-                            <h3>Late Payment Removal</h3>
+                        ${cardsHTML}
                         </div>
-                        <p class="dispute-card-description">Use this prompt to request removal of a one-time late
-                            payment due to
-                            hardship.</p>
-                        <button class="dispute-flip-btn">View Prompt →</button>
-                    </div>
-                    <!-- Back of card -->
-                    <div class="dispute-card-back">
-                        <div class="dispute-prompt-content">
-                            <h4>Late Payment Removal Prompt</h4>
-                            <pre><code>[Your Full Name][Your Address][City State ZIP Code][Email Address][Phone Number]Date: [Insert Date]
-                            To Whom It May Concern
-                            I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit
-                            report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
-                            That moment was not a reflection of how I manage my responsibilities. I was going through a challenging time, and
-                            unfortunately the payment slipped through the cracks. As soon as I recognized the mistake I got back on track and
-                            brought the account current. Since then I've kept everything in good standing.
-                            I'm not making excuses. I'm simply asking that you take into consideration my overall payment history and the effort
-                            I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or
-                            goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
-                            Thank you for your time and for considering my request. I genuinely appreciate it.
-                            Sincerely[Your Full Name]</code></pre>
-                            <div class="dispute-button-container">
-                                <button class="dispute-copy-btn" data-prompt="[Your Full Name][Your Address][City State ZIP Code][Email Address][Phone Number]Date: [Insert Date]
-                            To Whom It May Concern
-                            I'm writing to request the removal of a late payment reported by [Creditor's Name] on [Insert Date] from my credit
-                            report. I take full ownership of that missed payment, but I want to be transparent about the circumstances.
-                            That moment was not a reflection of how I manage my responsibilities. I was going through a challenging time, and
-                            unfortunately the payment slipped through the cracks. As soon as I recognized the mistake I got back on track and
-                            brought the account current. Since then I've kept everything in good standing.
-                            I'm not making excuses. I'm simply asking that you take into consideration my overall payment history and the effort
-                            I've put into correcting the situation. I'm hoping you'll consider removing this late mark as a one-time courtesy or
-                            goodwill adjustment. It would really help me continue rebuilding and moving forward financially.
-                            Thank you for your time and for considering my request. I genuinely appreciate it.
-                            Sincerely[Your Full Name]">
-                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
-                                </button>
-                                <button class="dispute-flip-btn">← Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="dispute-prompt-card">
-                <div class="dispute-card-inner">
-                    <div class="dispute-card-front">
-                        <div class="dispute-card-header">
-                            <span class="dispute-ai-icon">🤖</span>
-                            <h3>Collection Account Dispute</h3>
-                        </div>
-                        <p class="dispute-card-description">Challenge a collection account that you believe is
-                            inaccurate or
-                            unverifiable.</p>
-                        <button class="dispute-flip-btn">View Prompt →</button>
-                    </div>
-                    <div class="dispute-card-back">
-                        <div class="dispute-prompt-content">
-                            <h4>Collection Account Dispute Prompt</h4>
-                            <pre><code>Write a dispute letter for a collection account from ABC Collections in the amount of $500. Request debt validation and state that this debt is not recognized. Include a request for original account documentation and verification of their right to collect.</code></pre>
-                            <div class="dispute-button-container">
-                                <button class="dispute-copy-btn"
-                                    data-prompt="Write a dispute letter for a collection account from ABC Collections in the amount of $500. Request debt validation and state that this debt is not recognized. Include a request for original account documentation and verification of their right to collect.">
-                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
-                                </button>
-                                <button class="dispute-flip-btn">← Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3: Hard Inquiry Removal -->
-            <div class="dispute-prompt-card">
-                <div class="dispute-card-inner">
-                    <div class="dispute-card-front">
-                        <div class="dispute-card-header">
-                            <span class="dispute-ai-icon">🤖</span>
-                            <h3>Hard Inquiry Removal</h3>
-                        </div>
-                        <p class="dispute-card-description">Request removal of unauthorized or outdated hard inquiries
-                            from your
-                            credit report.</p>
-                        <button class="dispute-flip-btn">View Prompt →</button>
-                    </div>
-                    <div class="dispute-card-back">
-                        <div class="dispute-prompt-content">
-                            <h4>Hard Inquiry Removal Prompt</h4>
-                            <pre><code>Write a dispute letter to Experian requesting removal of a hard inquiry from Chase Bank dated January 15, 2023. Explain that I never authorized this inquiry, I have no record of applying for credit with this company, and request verification or complete removal from my credit report.</code></pre>
-                            <div class="dispute-button-container">
-                                <button class="dispute-copy-btn"
-                                    data-prompt="Write a dispute letter to Experian requesting removal of a hard inquiry from Chase Bank dated January 15, 2023. Explain that I never authorized this inquiry, I have no record of applying for credit with this company, and request verification or complete removal from my credit report.">
-                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
-                                </button>
-                                <button class="dispute-flip-btn">← Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 4: Duplicate Account Dispute -->
-            <div class="dispute-prompt-card">
-                <div class="dispute-card-inner">
-                    <div class="dispute-card-front">
-                        <div class="dispute-card-header">
-                            <span class="dispute-ai-icon">🤖</span>
-                            <h3>Duplicate Account Dispute</h3>
-                        </div>
-                        <p class="dispute-card-description">Challenge duplicate accounts appearing on your credit report
-                            that
-                            are inflating your debt profile.</p>
-                        <button class="dispute-flip-btn">View Prompt →</button>
-                    </div>
-                    <div class="dispute-card-back">
-                        <div class="dispute-prompt-content">
-                            <h4>Duplicate Account Dispute Prompt</h4>
-                            <pre><code>Write a dispute letter to TransUnion regarding a duplicate Wells Fargo account appearing on my credit report. The original account number ends in 4567, while the duplicate shows the same balance and history but ends in 7890. Explain that this duplicate is artificially inflating my debt-to-income ratio and request its removal.</code></pre>
-                            <div class="dispute-button-container">
-                                <button class="dispute-copy-btn"
-                                    data-prompt="Write a dispute letter to TransUnion regarding a duplicate Wells Fargo account appearing on my credit report. The original account number ends in 4567, while the duplicate shows the same balance and history but ends in 7890. Explain that this duplicate is artificially inflating my debt-to-income ratio and request its removal.">
-                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
-                                </button>
-                                <button class="dispute-flip-btn">← Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 5: Identity Theft Item Removal -->
-            <div class="dispute-prompt-card">
-                <div class="dispute-card-inner">
-                    <div class="dispute-card-front">
-                        <div class="dispute-card-header">
-                            <span class="dispute-ai-icon">🤖</span>
-                            <h3>Identity Theft Item Removal</h3>
-                        </div>
-                        <p class="dispute-card-description">Dispute fraudulent accounts or charges that appeared on your
-                            credit
-                            report due to identity theft.</p>
-                        <button class="dispute-flip-btn">View Prompt →</button>
-                    </div>
-                    <div class="dispute-card-back">
-                        <div class="dispute-prompt-content">
-                            <h4>Identity Theft Item Removal Prompt</h4>
-                            <pre><code>Write a dispute letter to Equifax regarding a fraudulent Discover credit card account opened in my name on November 10, 2023. Include that I've filed a police report (case #12345), placed a fraud alert on my credit file, and never authorized this account. Request complete removal and include a request for identity theft victim assistance.</code></pre>
-                            <div class="dispute-button-container">
-                                <button class="dispute-copy-btn"
-                                    data-prompt="Write a dispute letter to Equifax regarding a fraudulent Discover credit card account opened in my name on November 10, 2023. Include that I've filed a police report (case #12345), placed a fraud alert on my credit file, and never authorized this account. Request complete removal and include a request for identity theft victim assistance.">
-                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
-                                </button>
-                                <button class="dispute-flip-btn">← Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 6: Goodwill Letter Request -->
-            <div class="dispute-prompt-card">
-                <div class="dispute-card-inner">
-                    <div class="dispute-card-front">
-                        <div class="dispute-card-header">
-                            <span class="dispute-ai-icon">🤖</span>
-                            <h3>Goodwill Letter Request</h3>
-                        </div>
-                        <p class="dispute-card-description">Request removal of negative items based on your positive
-                            payment
-                            history and relationship with the creditor.</p>
-                        <button class="dispute-flip-btn">View Prompt →</button>
-                    </div>
-                    <div class="dispute-card-back">
-                        <div class="dispute-prompt-content">
-                            <h4>Goodwill Letter Request Prompt</h4>
-                            <pre><code>Write a goodwill letter to American Express requesting removal of a 60-day late payment from August 2022. Explain that I've been a loyal customer for 5 years with an otherwise perfect payment history, the late payment was due to a medical emergency, and I've made all payments on time since then. Emphasize my commitment to financial responsibility and request this courtesy adjustment.</code></pre>
-                            <div class="dispute-button-container">
-                                <button class="dispute-copy-btn"
-                                    data-prompt="Write a goodwill letter to American Express requesting removal of a 60-day late payment from August 2022. Explain that I've been a loyal customer for 5 years with an otherwise perfect payment history, the late payment was due to a medical emergency, and I've made all payments on time since then. Emphasize my commitment to financial responsibility and request this courtesy adjustment.">
-                                    <span class="dispute-copy-icon">📋</span> Copy Prompt
-                                </button>
-                                <button class="dispute-flip-btn">← Back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CTA Section -->
         <div class="dispute-cta-section">
             <p>Need help with more dispute letters? Start Jam Engine to get our entire suite of dispute letters.</p>
-            <!--<button class="dispute-jam-button" id="disputeJamEngineBtn">Start JAM Engine</button>-->
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="dispute-toast" id="disputeCopyToast">Copied! 📋</div>
+                    </div>
+                            </div>
+                <div class="dispute-toast" id="${DISPUTE_CONFIG.toastId}">Copied! 📋</div>
 </section>
-
-<!-- Scripts -->
-<script src="https://link.msgsndr.com/js/form_embed.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('🚀 DISPUTE TOOL INITIALIZATION STARTED');
-
-        // Initialize dispute tool functionality with correct selectors
-        const disputeSection = document.querySelector('section.dispute-letters-section, section[class*="dispute"]');
-        console.log('📍 Dispute section found:', !!disputeSection);
-
-        const copyButtons = disputeSection ?
-            disputeSection.querySelectorAll('.dispute-copy-btn') :
-            document.querySelectorAll('.dispute-copy-btn');
-        const flipButtons = disputeSection ?
-            disputeSection.querySelectorAll('.dispute-flip-btn') :
-            document.querySelectorAll('.dispute-flip-btn');
-        const toast = document.querySelector('.dispute-toast');
-
-        console.log('📊 BUTTON DISCOVERY:');
-        console.log('   - Copy buttons found:', copyButtons.length);
-        console.log('   - Flip buttons found:', flipButtons.length);
-        console.log('   - Toast element found:', !!toast);
-
-        if (toast) {
-            console.log('🍞 TOAST DEBUG:', {
-                id: toast.id,
-                classes: toast.className,
-                text: toast.textContent,
-                display: getComputedStyle(toast).display,
-                visibility: getComputedStyle(toast).visibility,
-                position: getComputedStyle(toast).position,
-                zIndex: getComputedStyle(toast).zIndex
-            });
-        } else {
-            console.error('❌ TOAST ELEMENT NOT FOUND!');
-            console.log('   - Checking alternative selectors...');
-            console.log('   - All .dispute-toast:', document.querySelectorAll('.dispute-toast').length);
-            console.log('   - All #disputeCopyToast:', document.querySelectorAll('#disputeCopyToast').length);
+        `;
         }
 
-        if (copyButtons.length === 0) {
-            console.error('❌ NO COPY BUTTONS FOUND! Checking all possible selectors...');
-            console.log('   - All .dispute-copy-btn:', document.querySelectorAll('.dispute-copy-btn').length);
-            console.log('   - All [class*="copy"]:', document.querySelectorAll('[class*="copy"]').length);
-        }
-
-        if (flipButtons.length === 0) {
-            console.error('❌ NO FLIP BUTTONS FOUND! Checking all possible selectors...');
-            console.log('   - All .dispute-flip-btn:', document.querySelectorAll('.dispute-flip-btn').length);
-            console.log('   - All [class*="flip"]:', document.querySelectorAll('[class*="flip"]').length);
-        }
-
-        // Copy functionality with multiple event handlers
-        copyButtons.forEach(button => {
+        // Event Handler Functions
+        function handleCopy(button) {
             const prompt = button.getAttribute('data-prompt');
-            if (prompt) {
-                console.log('🔗 Setting up copy button:', button.textContent.trim());
-
-                // Primary click handler with immediate propagation stop
-                button.addEventListener('click', function (e) {
-                    console.log('🎯 COPY CLICK HANDLER FIRED:', this.textContent.trim());
-                    console.log('   - Event details:', {
-                        type: e.type,
-                        target: e.target.tagName,
-                        currentTarget: e.currentTarget.tagName,
-                        bubbles: e.bubbles,
-                        cancelable: e.cancelable,
-                        defaultPrevented: e.defaultPrevented
-                    });
-
-                    e.preventDefault();
-                    e.stopImmediatePropagation(); // Prevent other handlers from firing
-
-                    console.log('   - After preventDefault/stopPropagation');
-                    console.log('   - Prompt length:', prompt.length);
-                    console.log('   - Navigator clipboard available:', !!navigator.clipboard);
-
-                    if (navigator.clipboard) {
-                        console.log('   - Attempting clipboard write...');
-                        navigator.clipboard.writeText(prompt).then(() => {
-                            console.log('   ✅ COPY SUCCESS!');
-                            if (toast) {
-                                console.log('   - Showing toast notification');
-                                toast.classList.add('show');
-                                setTimeout(() => toast.classList.remove('show'), 2000);
-                            } else {
-                                console.log('   ⚠️ Toast element not found');
-                            }
-                        }).catch(err => {
-                            console.error('   ❌ COPY FAILED:', err);
-                        });
-                    } else {
-                        console.log('   ❌ Navigator clipboard not available');
-                    }
-                });
-
-                // Emergency mousedown handler as backup only
-                button.addEventListener('mousedown', function (e) {
-                    console.log('👆 COPY MOUSEDOWN HANDLER FIRED:', this.textContent.trim());
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // Small delay to avoid conflict with click handler
-                    setTimeout(() => {
-                        console.log('   - Mousedown backup executing after delay');
-                        if (navigator.clipboard) {
-                            navigator.clipboard.writeText(prompt).then(() => {
-                                console.log('   ✅ MOUSEDOWN COPY SUCCESS!');
-                                if (toast) {
-                                    toast.classList.add('show');
-                                    setTimeout(() => toast.classList.remove('show'), 2000);
-                                }
-                            }).catch(err => {
-                                console.error('   ❌ MOUSEDOWN COPY FAILED:', err);
-                            });
-                        }
-                    }, 100);
-                });
-            } else {
-                console.error('❌ Copy button has no data-prompt:', button);
+            if (!prompt) {
+                console.error('❌ Copy button has no data-prompt');
+                return;
             }
-        });
 
-        // Flip functionality with multiple event handlers
-        flipButtons.forEach(button => {
-            console.log('🔗 Setting up flip button:', button.textContent.trim());
+            console.log('📋 COPY HANDLER FIRED:', button.textContent.trim());
 
-            // Primary click handler with immediate propagation stop
-            button.addEventListener('click', function (e) {
-                console.log('🔄 FLIP CLICK HANDLER FIRED:', this.textContent.trim());
-                console.log('   - Event details:', {
-                    type: e.type,
-                    target: e.target.tagName,
-                    currentTarget: e.currentTarget.tagName,
-                    bubbles: e.bubbles,
-                    cancelable: e.cancelable,
-                    defaultPrevented: e.defaultPrevented
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(prompt.replace(/&quot;/g, '"')).then(() => {
+                    console.log('   ✅ COPY SUCCESS!');
+                    showToast();
+                }).catch(err => {
+                    console.error('   ❌ COPY FAILED:', err);
                 });
+            }
+        }
 
-                e.preventDefault();
-                e.stopImmediatePropagation(); // Prevent other handlers from firing
+        function handleFlip(button) {
+            console.log('🔄 FLIP HANDLER FIRED:', button.textContent.trim());
 
-                console.log('   - After preventDefault/stopPropagation');
+            const cardInner = button.closest('.dispute-card-inner');
+            if (!cardInner) {
+                console.error('❌ Card inner not found');
+                return;
+            }
 
-                const cardInner = this.closest('.dispute-card-inner');
-                console.log('   - Card inner found:', !!cardInner);
+            console.log('   - Card inner found:', !!cardInner);
 
-                if (cardInner) {
-                    const wasFlipped = cardInner.classList.contains('flipped');
-                    console.log('   - Card was flipped before click:', wasFlipped);
+            const frontCard = cardInner.querySelector('.dispute-card-front');
+            const backCard = cardInner.querySelector('.dispute-card-back');
 
-                    cardInner.classList.remove('flipping');
-                    if (cardInner.classList.contains('flipped')) {
-                        cardInner.classList.remove('flipped');
-                        cardInner.style.transform = 'rotateY(0deg)';
-                        console.log('   ✅ FLIPPED TO FRONT');
-                    } else {
-                        cardInner.classList.add('flipped');
-                        cardInner.style.transform = 'rotateY(180deg)';
-                        console.log('   ✅ FLIPPED TO BACK');
-                    }
+            if (!frontCard || !backCard) {
+                console.error('❌ Front or back card not found');
+                return;
+            }
 
-                    console.log('   - Card classes after flip:', cardInner.className);
-                    console.log('   - Card transform after flip:', cardInner.style.transform);
-                } else {
-                    console.error('   ❌ Card inner not found');
-                }
-            });
+            if (cardInner.classList.contains('flipped')) {
+                // Flipping back to front
+                console.log('   🔄 FLIPPING TO FRONT - Showing front card');
 
-            // Emergency mousedown handler as backup only  
-            button.addEventListener('mousedown', function (e) {
-                console.log('👆 FLIP MOUSEDOWN HANDLER FIRED:', this.textContent.trim());
-                e.preventDefault();
-                e.stopPropagation();
+                // Show front, hide back
+                frontCard.style.display = 'flex';
+                frontCard.style.zIndex = '10';
+                frontCard.style.visibility = 'visible';
+                frontCard.style.opacity = '1';
 
-                // Small delay to avoid conflict with click handler
+                backCard.style.display = 'none';
+                backCard.style.zIndex = '1';
+                backCard.style.visibility = 'hidden';
+                backCard.style.opacity = '0';
+
+                cardInner.classList.remove('flipped');
+                console.log('   ✅ FLIPPED TO FRONT - Front card now visible');
+            } else {
+                // Flipping to back
+                console.log('   🔄 FLIPPING TO BACK - Showing back card');
+
+                // Show back, hide front
+                backCard.style.display = 'flex';
+                backCard.style.zIndex = '10';
+                backCard.style.visibility = 'visible';
+                backCard.style.opacity = '1';
+
+                frontCard.style.display = 'none';
+                frontCard.style.zIndex = '1';
+                frontCard.style.visibility = 'hidden';
+                frontCard.style.opacity = '0';
+
+                cardInner.classList.add('flipped');
+                console.log('   ✅ FLIPPED TO BACK - Back card now visible');
+
+                // Debug: Check if back card is visible
                 setTimeout(() => {
-                    console.log('   - Mousedown backup executing after delay');
-                    const cardInner = this.closest('.dispute-card-inner');
-                    if (cardInner) {
-                        cardInner.classList.remove('flipping');
-                        if (cardInner.classList.contains('flipped')) {
-                            cardInner.classList.remove('flipped');
-                            cardInner.style.transform = 'rotateY(0deg)';
-                            console.log('   ✅ MOUSEDOWN FLIPPED TO FRONT');
-                        } else {
-                            cardInner.classList.add('flipped');
-                            cardInner.style.transform = 'rotateY(180deg)';
-                            console.log('   ✅ MOUSEDOWN FLIPPED TO BACK');
-                        }
-                    }
+                    const backRect = backCard.getBoundingClientRect();
+                    const computedStyle = window.getComputedStyle(backCard);
+                    console.log('   📏 Back card debug:', {
+                        width: backRect.width,
+                        height: backRect.height,
+                        display: backCard.style.display,
+                        computedDisplay: computedStyle.display,
+                        zIndex: backCard.style.zIndex,
+                        visibility: backCard.style.visibility,
+                        opacity: backCard.style.opacity,
+                        visible: backRect.width > 0 && backRect.height > 0,
+                        position: computedStyle.position,
+                        top: computedStyle.top,
+                        left: computedStyle.left
+                    });
                 }, 100);
-            });
-        });
+            }
 
-        // Auto-trigger system for near-miss clicks (now allowing all clicks since handlers aren't firing)
-        document.addEventListener('click', function (e) {
-            console.log('🎯 AUTO-TRIGGER CHECK:', {
-                targetClass: e.target.className,
-                inDisputeSection: !!e.target.closest('section[class*="dispute"]'),
-                isCopyBtn: e.target.classList.contains('dispute-copy-btn'),
-                isFlipBtn: e.target.classList.contains('dispute-flip-btn')
-            });
+            // Re-setup direct button listeners for the newly positioned content
+            setTimeout(() => {
+                setupDirectButtonListeners();
+                console.log('   🔗 Button listeners refreshed for new DOM position');
+            }, 50);
+        }
 
-            // Allow auto-trigger for all clicks in dispute section (direct or near-miss)
-            if (e.target.closest('section[class*="dispute"]')) {
+        function showToast() {
+            const toast = document.getElementById(DISPUTE_CONFIG.toastId);
+            if (toast) {
+                console.log('   - Showing toast notification');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            }
+        }
 
-                console.log('🎯 AUTO-TRIGGER: Checking for near-miss...');
+        // Enhanced Event Delegation Handler
+        function setupEventDelegation() {
+            console.log('🔗 Setting up enhanced event delegation');
 
-                const allButtons = document.querySelectorAll('.dispute-copy-btn, .dispute-flip-btn');
-                let nearestButton = null;
-                let minDistance = Infinity;
+            // Strategy 1: Document-level event capture (highest priority)
+            document.addEventListener('click', function (e) {
+                // Debug event path
+                console.log('📍 EVENT PATH:', e.composedPath().slice(0, 5).map(el => ({
+                    tag: el.tagName || 'unknown',
+                    class: el.className || '',
+                    id: el.id || '',
+                    hasDataAction: !!el.getAttribute?.('data-action')
+                })));
 
-                console.log('🔍 DISTANCE DEBUG: Checking all buttons...');
+                // Only handle clicks within our dispute tool
+                if (!e.target.closest(`#${DISPUTE_CONFIG.sectionId}`)) {
+                    return;
+                }
 
-                allButtons.forEach(btn => {
-                    const rect = btn.getBoundingClientRect();
-                    const btnCenterX = rect.left + rect.width / 2;
-                    const btnCenterY = rect.top + rect.height / 2;
-                    const distance = Math.sqrt(
-                        Math.pow(e.clientX - btnCenterX, 2) +
-                        Math.pow(e.clientY - btnCenterY, 2)
-                    );
-
-                    console.log(`   - Button: "${btn.textContent.trim()}" | Type: ${btn.classList.contains('dispute-copy-btn') ? 'COPY' : 'FLIP'} | Distance: ${Math.round(distance)}px`);
-                    console.log(`     Position: x=${Math.round(btnCenterX)}, y=${Math.round(btnCenterY)} | Size: ${Math.round(rect.width)}x${Math.round(rect.height)}`);
-
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        nearestButton = btn;
-                    }
+                console.log('🎯 DOCUMENT CLICK DETECTED:', {
+                    target: e.target.tagName + '.' + e.target.className,
+                    text: e.target.textContent?.trim().substring(0, 50),
+                    hasDataAction: !!e.target.getAttribute('data-action'),
+                    dataAction: e.target.getAttribute('data-action')
                 });
 
-                console.log(`🎯 AUTO-TRIGGER: Click coords: ${e.clientX}, ${e.clientY}`);
-                console.log('🎯 AUTO-TRIGGER: Nearest button distance:', Math.round(minDistance), 'px');
-
-                // Auto-trigger if very close (within 120px for better accessibility)
-                if (nearestButton && minDistance < 120) {
-                    console.log('🚀 AUTO-TRIGGER ACTIVATED for:', nearestButton.textContent.trim());
-
-                    if (nearestButton.classList.contains('dispute-copy-btn')) {
-                        const prompt = nearestButton.dataset.prompt;
-                        console.log('📋 COPY DEBUG:', {
-                            buttonText: nearestButton.textContent.trim(),
-                            hasPrompt: !!prompt,
-                            promptLength: prompt ? prompt.length : 0,
-                            clipboardAvailable: !!navigator.clipboard,
-                            toastElement: !!toast
-                        });
-
-                        if (prompt && navigator.clipboard) {
-                            console.log('   - Auto-triggering copy...');
-                            navigator.clipboard.writeText(prompt).then(() => {
-                                console.log('   ✅ AUTO-TRIGGER COPY SUCCESS!');
-                                console.log('   📤 Attempting to show toast...');
-
-                                if (toast) {
-                                    console.log('   🍞 Toast found, adding show class');
-                                    toast.classList.add('show');
-                                    console.log('   🍞 Toast classes after add:', toast.className);
-                                    setTimeout(() => {
-                                        console.log('   🍞 Removing show class from toast');
-                                        toast.classList.remove('show');
-                                    }, 2000);
-                                } else {
-                                    console.error('   ❌ Toast element is null!');
-                                }
-                            }).catch(err => {
-                                console.error('   ❌ AUTO-TRIGGER COPY FAILED:', err);
-                            });
-                        } else {
-                            console.error('   ❌ Copy failed - missing prompt or clipboard API');
-                        }
-                    }
-
-                    if (nearestButton.classList.contains('dispute-flip-btn')) {
-                        console.log('   - Auto-triggering flip...');
-                        const cardInner = nearestButton.closest('.dispute-card-inner');
-                        if (cardInner) {
-                            console.log('   - Button text:', nearestButton.textContent.trim());
-                            console.log('   - Card currently has "flipped" class:', cardInner.classList.contains('flipped'));
-                            console.log('   - Card current transform:', cardInner.style.transform);
-                            console.log('   - Card all classes:', cardInner.className);
-
-                            // Determine expected action based on button text
-                            const isBackButton = nearestButton.textContent.trim().includes('Back') || nearestButton.textContent.trim().includes('←');
-                            const isViewButton = nearestButton.textContent.trim().includes('View') || nearestButton.textContent.trim().includes('→');
-
-                            console.log('   - Is Back button:', isBackButton);
-                            console.log('   - Is View button:', isViewButton);
-
-                            if (isBackButton) {
-                                // Back button should always flip to front
-                                console.log('   - BACK BUTTON: Forcing flip to front');
-                                cardInner.classList.remove('flipped');
-                                cardInner.style.transform = 'rotateY(0deg)';
-                                console.log('   ✅ AUTO-TRIGGER FLIPPED TO FRONT (via back button)');
-                            } else if (isViewButton) {
-                                // View button should always flip to back
-                                console.log('   - VIEW BUTTON: Forcing flip to back');
-                                cardInner.classList.add('flipped');
-                                cardInner.style.transform = 'rotateY(180deg)';
-                                console.log('   ✅ AUTO-TRIGGER FLIPPED TO BACK (via view button)');
-                            } else {
-                                // Unknown button, use toggle logic
-                                console.log('   - UNKNOWN BUTTON: Using toggle logic');
-                                if (cardInner.classList.contains('flipped')) {
-                                    cardInner.classList.remove('flipped');
-                                    cardInner.style.transform = 'rotateY(0deg)';
-                                    console.log('   ✅ AUTO-TRIGGER FLIPPED TO FRONT (toggle)');
-                                } else {
-                                    cardInner.classList.add('flipped');
-                                    cardInner.style.transform = 'rotateY(180deg)';
-                                    console.log('   ✅ AUTO-TRIGGER FLIPPED TO BACK (toggle)');
-                                }
-                            }
-
-                            console.log('   - Card final classes:', cardInner.className);
-                            console.log('   - Card final transform:', cardInner.style.transform);
-                        }
-                    }
-                } else {
-                    console.log('🎯 AUTO-TRIGGER: Distance too far, no action taken');
+                // Try to find button with data-action
+                const button = e.target.closest('[data-action]');
+                if (button) {
+                    e.stopPropagation(); // Prevent other handlers
+                    handleButtonClick(button, e);
+                    return;
                 }
-            } else {
-                console.log('🎯 AUTO-TRIGGER: Skipped (outside dispute section)');
+
+                console.log('🔍 No direct button found - DOM positioning should handle this');
+            }, { capture: true }); // Use capture phase
+
+            // Strategy 2: Direct button listeners (after DOM updates)
+            setTimeout(() => {
+                setupDirectButtonListeners();
+            }, 100);
+
+            console.log('✅ Enhanced event delegation setup complete');
+        }
+
+        // Direct button event listeners
+        function setupDirectButtonListeners() {
+            console.log('🔗 Setting up direct button listeners');
+
+            const buttons = document.querySelectorAll(`#${DISPUTE_CONFIG.sectionId} [data-action]`);
+            console.log(`📍 Found ${buttons.length} buttons with data-action`);
+
+            buttons.forEach((button, index) => {
+                // Remove existing listeners to prevent duplicates
+                button.removeEventListener('click', directButtonHandler);
+
+                // Add new listener
+                button.addEventListener('click', directButtonHandler, { capture: true });
+
+                console.log(`✅ Direct listener added to button ${index + 1}:`, {
+                    action: button.getAttribute('data-action'),
+                    text: button.textContent.trim(),
+                    className: button.className
+                });
+            });
+        }
+
+        // Direct button click handler
+        function directButtonHandler(e) {
+            console.log('🎯 DIRECT BUTTON CLICK:', {
+                action: e.target.getAttribute('data-action'),
+                text: e.target.textContent.trim()
+            });
+
+            e.stopPropagation(); // Prevent bubbling
+            e.preventDefault(); // Prevent default behavior
+
+            handleButtonClick(e.target, e);
+        }
+
+
+
+        // Unified button click handler
+        function handleButtonClick(button, event) {
+            const action = button.getAttribute('data-action');
+            console.log('🎯 BUTTON ACTION TRIGGERED:', action, button.textContent.trim());
+
+            console.log('🔍 BUTTON DEBUG:', {
+                className: button.className,
+                dataAction: action,
+                dataPrompt: button.getAttribute('data-prompt'),
+                inContainer: !!button.closest('.dispute-button-container'),
+                cardBack: !!button.closest('.dispute-card-back'),
+                cardFront: !!button.closest('.dispute-card-front')
+            });
+
+            switch (action) {
+                case 'copy':
+                    handleCopy(button);
+                    break;
+                case 'flip':
+                    handleFlip(button);
+                    break;
+                default:
+                    console.warn('⚠️ Unknown action:', action);
             }
-        });
-
-        // JAM Engine button functionality
-        const jamEngineBtn = document.getElementById('disputeJamEngineBtn');
-        if (jamEngineBtn) {
-            jamEngineBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                if (typeof window.openQuizModal === 'function') {
-                    window.openQuizModal();
-                } else {
-                    const navQuizModal = document.getElementById('nav-quizModal');
-                    if (navQuizModal) {
-                        navQuizModal.style.display = 'flex';
-                        document.body.style.overflow = 'hidden';
-                        if (typeof showStep === 'function') {
-                            showStep(1);
-                        }
-                    }
-                }
-
-                if (typeof analytics !== 'undefined') {
-                    analytics.track('JamEngineStarted', {
-                        location: 'Dispute Tool',
-                        timestamp: new Date().toISOString()
-                    });
-                }
-            });
         }
 
-        // Clean up unused modal
-        const bookingModal = document.getElementById('disputeToolBookingModal');
-        if (bookingModal && bookingModal.parentNode) {
-            bookingModal.parentNode.removeChild(bookingModal);
+        // Initialize the module
+        function init() {
+            console.log('🔧 INITIALIZING DISPUTE TOOL MODULE');
+
+            // Find target container - prioritize specific ID, then data attribute
+            let container = document.getElementById('dispute-tool-container') ||
+                document.querySelector('[data-dispute-tool-container]');
+
+            if (!container) {
+                console.warn('⚠️ No dispute tool container found. Creating fallback container.');
+                container = document.createElement('div');
+                container.setAttribute('id', 'dispute-tool-container');
+                container.setAttribute('data-dispute-tool-container', 'true');
+                document.body.appendChild(container);
+            }
+
+            console.log('📍 Container found:', container.id || container.getAttribute('data-dispute-tool-container'));
+
+            // Generate and inject HTML
+            container.innerHTML = generateHTML();
+            console.log('✅ HTML generated and injected into container');
+
+            // Setup event handling
+            setupEventDelegation();
+
+            console.log('🎉 DISPUTE TOOL MODULE INITIALIZED SUCCESSFULLY');
+
+            // Expose module to global scope for debugging
+            window.JAMDisputeTool = {
+                config: DISPUTE_CONFIG,
+                reinit: init,
+                version: '1.0.0',
+                container: container
+            };
         }
 
-        // Document-level debugging to track all clicks
-        document.addEventListener('click', function (e) {
-            console.log('🌐 DOCUMENT CLICK:', {
-                target: e.target.tagName + ' ' + e.target.className,
-                text: e.target.textContent?.trim(),
-                coords: [e.clientX, e.clientY],
-                bubbles: e.bubbles,
-                defaultPrevented: e.defaultPrevented
-            });
-        }, true); // Capture phase
+        // Auto-initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
 
-        document.addEventListener('mousedown', function (e) {
-            console.log('🌐 DOCUMENT MOUSEDOWN:', {
-                target: e.target.tagName + ' ' + e.target.className,
-                text: e.target.textContent?.trim(),
-                coords: [e.clientX, e.clientY]
-            });
-        }, true); // Capture phase
-    });
+    })();
 </script>

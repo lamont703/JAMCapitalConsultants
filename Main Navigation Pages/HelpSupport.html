@@ -41,6 +41,8 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* Hero Section */
@@ -238,6 +240,9 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             padding: 40px;
             margin-bottom: 40px;
+            overflow: visible;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .faq-item {
@@ -246,13 +251,24 @@
         }
 
         .faq-question {
-            padding: 15px 0;
+            padding: 15px 30px;
             cursor: pointer;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: color 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            position: relative;
+            z-index: 1;
+            pointer-events: auto;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .faq-question:active {
+            transform: scale(0.98);
         }
 
         .faq-question:hover {
@@ -263,31 +279,69 @@
             color: var(--primary);
         }
 
-        .faq-question i {
-            transition: transform 0.3s ease;
-        }
-
-        .faq-question.active i {
-            transform: rotate(180deg);
-        }
-
         .faq-answer {
-            background: #ffffff;
             padding: 0;
-            border-top: 1px solid #e9ecef;
-            font-size: 0.9rem;
-            line-height: 1.4;
             max-height: 0;
             overflow: hidden;
             opacity: 0;
             visibility: hidden;
-            transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+            background-color: var(--white);
         }
 
         .faq-answer.open {
             opacity: 1;
             visibility: visible;
-            padding: 15px;
+            padding: 0;
+        }
+
+        .faq-answer div {
+            padding: 15px 30px;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 30px;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
         }
 
         /* CTA Section */
@@ -359,7 +413,28 @@
 
             .support-section,
             .faq-section {
-                padding: 30px 20px;
+                padding: 30px 15px;
+                margin-bottom: 30px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .faq-question {
+                padding: 15px 0;
+            }
+
+            .faq-answer.open {
+                padding: 0;
+            }
+
+            .faq-answer div {
+                padding: 16px 0;
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+
+            .typing-indicator {
+                padding: 15px 0;
             }
 
             .cta-section h2 {
@@ -375,10 +450,31 @@
 
         /* ENHANCED MOBILE RESPONSIVENESS */
 
+        /* Medium Devices (tablets, 992px and up) */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .faq-section {
+                padding: 40px 30px;
+            }
+        }
+
+        /* Large Devices (desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .container {
+                padding: 0 40px;
+                max-width: 1200px;
+            }
+
+            .faq-section {
+                padding: 50px;
+            }
+        }
+
         /* Extra Small Devices (phones, up to 575px) */
         @media (max-width: 575.98px) {
             .container {
-                padding: 0 15px;
+                padding: 0 10px;
+                width: 100%;
+                max-width: none;
             }
 
             .hero-section {
@@ -455,8 +551,11 @@
             }
 
             .faq-section {
-                padding: 40px 0;
-                background: #f8f9fa;
+                padding: 40px 15px;
+                background: var(--white);
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                margin-bottom: 40px;
             }
 
             .faq-section h2 {
@@ -464,6 +563,7 @@
                 margin-bottom: 25px;
                 text-align: center;
                 padding: 0 10px;
+                color: var(--primary);
             }
 
             .faq-container {
@@ -473,21 +573,18 @@
 
             .faq-item {
                 margin-bottom: 15px;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                border-bottom: 1px solid var(--gray-200);
             }
 
             .faq-question {
-                background: #ffffff;
-                padding: 15px;
-                border: none;
-                width: 100%;
-                text-align: left;
-                font-size: 1rem;
-                font-weight: 600;
+                padding: 15px 0;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                font-weight: 600;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: color 0.3s ease;
+                font-size: 1rem;
                 min-height: 44px;
                 touch-action: manipulation;
             }
@@ -516,7 +613,7 @@
             .faq-answer.open {
                 opacity: 1;
                 visibility: visible;
-                padding: 15px;
+                padding: 0;
             }
 
             .contact-section {
@@ -752,14 +849,19 @@
             }
 
             .faq-question {
-                padding: 12px;
+                padding: 12px 0;
                 font-size: 0.9rem;
                 min-height: 40px;
             }
 
-            .faq-answer {
-                padding: 12px;
+            .faq-answer.open {
+                padding: 0;
+            }
+
+            .faq-answer div {
+                padding: 12px 0;
                 font-size: 0.85rem;
+                line-height: 1.4;
             }
 
             .contact-section h2 {
@@ -1001,8 +1103,6 @@
                 border-top: 1px solid #e9ecef;
                 font-size: 0.9rem;
                 line-height: 1.6;
-                max-height: 0 !important;
-                overflow: hidden !important;
                 opacity: 0 !important;
                 visibility: hidden !important;
                 transition: max-height 0.5s ease, opacity 0.3s ease, visibility 0.3s ease !important;
@@ -1014,36 +1114,33 @@
             .faq-answer.open {
                 opacity: 1 !important;
                 visibility: visible !important;
-                padding: 20px 15px !important;
+                padding: 0 !important;
                 display: block !important;
             }
 
-            /* Ensure FAQ items have proper spacing */
-            .faq-item {
-                margin-bottom: 15px;
-                border-radius: 8px;
-                overflow: visible !important;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                background: #ffffff;
+            .faq-answer div {
+                padding: 15px 0 !important;
+                font-size: 0.9rem !important;
+                line-height: 1.4 !important;
             }
 
-            /* Improve question styling for better touch targets */
+            /* Ensure FAQ items maintain unified structure */
+            .faq-item {
+                margin-bottom: 15px;
+                border-bottom: 1px solid var(--gray-200);
+            }
+
+            /* Touch-friendly question styling */
             .faq-question {
-                background: #ffffff !important;
-                padding: 15px !important;
-                border: none;
-                width: 100%;
-                text-align: left;
-                font-size: 1rem;
+                padding: 15px 0 !important;
+                font-size: 1rem !important;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.2s ease;
                 min-height: 44px;
                 touch-action: manipulation;
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                border-radius: 8px 8px 0 0;
             }
 
             .faq-question:active {
@@ -1052,25 +1149,74 @@
         }
 
         @media (max-width: 767.98px) and (orientation: landscape) {
+            .faq-section {
+                padding: 15px 10px !important;
+                margin: 15px 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
             .faq-answer.open {
-                padding: 15px 12px !important;
+                padding: 0 !important;
+            }
+
+            .faq-answer div {
+                padding: 12px 0 !important;
+                font-size: 0.85rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .faq-answer {
+                line-height: 1.5 !important;
             }
         }
 
         /* Extra small devices specific fixes */
         @media (max-width: 575.98px) {
+            .faq-section {
+                padding: 20px 10px !important;
+                margin: 20px 0 !important;
+                overflow: visible !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
             .faq-answer {
                 font-size: 0.85rem !important;
-                line-height: 1.5 !important;
+                line-height: 1.6 !important;
+                overflow: visible !important;
             }
 
             .faq-answer.open {
-                padding: 15px !important;
+                padding: 0 !important;
+            }
+
+            .faq-answer div {
+                padding: 12px 0 !important;
+                font-size: 0.85rem !important;
+                line-height: 1.4 !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
             }
 
             .faq-question {
                 font-size: 0.95rem !important;
-                padding: 12px !important;
+                padding: 12px 0 !important;
+            }
+
+            .typing-indicator {
+                padding: 10px 0;
+                border-radius: 0;
+            }
+
+            .dots {
+                gap: 3px;
+                justify-content: center;
+            }
+
+            .dot {
+                width: 6px;
+                height: 6px;
             }
         }
     </style>
@@ -1080,7 +1226,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>We're Here to Help You Succeed</h1>
+            <h1>We're Here To Help You Succeed</h1>
             <p>Get personalized support and guidance throughout your credit dispute journey.</p>
         </div>
     </section>
@@ -1102,7 +1248,7 @@
                     </div>
                     <h3>Email Support</h3>
                     <p>Get detailed answers to your questions with our comprehensive email support.</p>
-                    <div class="hours">24/7 Availability</div>
+                    <div class="hours">Tue-Fri: 10am-6pm EST<br>Sat: 11am-3pm EST<br>Closed Sun-Mon</div>
                     <a href="mailto:support@jamcapitalconsultants.com" class="support-btn">Email Us</a>
                 </div>
 
@@ -1113,7 +1259,7 @@
                     </div>
                     <h3>Text Message Support</h3>
                     <p>Quick questions? Get fast responses through our text message support line.</p>
-                    <div class="hours">Mon-Fri: 9am-6pm EST</div>
+                    <div class="hours">Tue-Fri: 10am-6pm EST<br>Sat: 11am-3pm EST<br>Closed Sun-Mon</div>
                     <a href="sms:+18449844721" class="support-btn">Text Us</a>
                 </div>
 
@@ -1205,11 +1351,23 @@
                     How quickly can I expect a response to my support request?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    For email inquiries, we typically respond within 24 hours, though most customers receive a response
-                    much sooner. Text message support during business hours (9am-6pm EST, Monday-Friday) usually
-                    receives a response within 1-2 hours. For urgent matters, we recommend using text message support
-                    during business hours.
+                    <div>
+                        For email inquiries, we typically respond within 24 hours, though most customers receive a
+                        response
+                        much sooner. Text message support during business hours (Tuesday-Friday 10am-6pm EST, Saturday
+                        11am-3pm EST) usually
+                        receives a response within 1-2 hours. For urgent matters, we recommend using text message
+                        support
+                        during business hours.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1217,10 +1375,21 @@
                     What kind of support is included in my subscription?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    All paid plans include access to our email support (24/7) and text message support during business
-                    hours. The level of personalized guidance varies by plan - DIY plans receive general guidance, while
-                    Guided and Full-Service plans include more in-depth, personalized support and strategy sessions.
+                    <div>
+                        All paid plans include access to our email support (24/7) and text message support during
+                        business
+                        hours (Tuesday-Friday 10am-6pm EST, Saturday 11am-3pm EST). The level of personalized guidance
+                        varies by plan - DIY plans receive general guidance, while
+                        Guided and Full-Service plans include more in-depth, personalized support and strategy sessions.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1228,10 +1397,20 @@
                     Can I get help with understanding my credit report?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Absolutely! Our support team includes credit experts who can help you understand your credit report,
-                    identify potential errors, and develop strategies for improvement. For more in-depth analysis,
-                    consider our Guided or Full-Service plans which include personalized credit strategy sessions.
+                    <div>
+                        Absolutely! Our support team includes credit experts who can help you understand your credit
+                        report,
+                        identify potential errors, and develop strategies for improvement. For more in-depth analysis,
+                        consider our Guided or Full-Service plans which include personalized credit strategy sessions.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1239,11 +1418,22 @@
                     What if I need help outside of business hours?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Our email support is available 24/7, and we strive to respond to all inquiries as quickly as
-                    possible, even outside business hours. Additionally, our knowledge base and AI-powered JAM Dispute
-                    Bot are available around the clock to provide immediate assistance with common questions and credit
-                    dispute strategies.
+                    <div>
+                        Our email support is available 24/7, and we strive to respond to all inquiries as quickly as
+                        possible, even outside business hours. Additionally, our knowledge base and AI-powered JAM
+                        Dispute
+                        Bot are available around the clock to provide immediate assistance with common questions and
+                        credit
+                        dispute strategies.
+                    </div>
                 </div>
             </div>
             <div class="faq-item">
@@ -1251,17 +1441,27 @@
                     Do you offer support in languages other than English?
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
                 <div class="faq-answer">
-                    Yes, we currently offer support in English and Spanish. When contacting our support team, simply
-                    indicate your language preference, and we'll connect you with a team member who can assist you in
-                    your preferred language.
+                    <div>
+                        Yes, we currently offer support in English and Spanish. When contacting our support team, simply
+                        indicate your language preference, and we'll connect you with a team member who can assist you
+                        in
+                        your preferred language.
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- CTA Section -->
         <section class="cta-section">
-            <h2>Ready to Transform Your Credit?</h2>
+            <h2>Ready To Transform Your Credit?</h2>
             <p>Join thousands of satisfied customers who have improved their credit scores with our expert guidance and
                 support.</p>
             <div class="cta-buttons">
@@ -1273,59 +1473,111 @@
     </div>
 
     <script>
-        // Toggle FAQ answers
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', () => {
-                const answer = question.nextElementSibling;
-                const isOpen = answer.classList.contains('open');
+        // Toggle FAQ answers with typing indicator
+        document.querySelectorAll('.faq-question').forEach((question, index) => {
+            question.addEventListener('click', (e) => {
+                // Debug logging
+                console.log(`FAQ question ${index + 1} clicked:`, question.textContent.trim().substring(0, 50) + '...');
 
-                // Close all other answers
-                document.querySelectorAll('.faq-answer').forEach(item => {
-                    item.style.maxHeight = '0px';
-                    item.classList.remove('open');
-                });
+                // Prevent event bubbling
+                e.stopPropagation();
 
-                document.querySelectorAll('.faq-question').forEach(item => {
-                    item.classList.remove('active');
-                });
+                try {
+                    const typingIndicator = question.nextElementSibling;
+                    const answer = typingIndicator.nextElementSibling;
 
-                // Toggle current answer
-                if (!isOpen) {
-                    question.classList.add('active');
-                    answer.classList.add('open');
+                    // Verify DOM structure is correct
+                    if (!typingIndicator || !answer ||
+                        !typingIndicator.classList.contains('typing-indicator') ||
+                        !answer.classList.contains('faq-answer')) {
+                        console.error('FAQ DOM structure issue at index:', index);
+                        return;
+                    }
 
-                    // Calculate the full height after padding is applied
-                    setTimeout(() => {
-                        // First apply the open class to get proper padding
-                        answer.style.maxHeight = 'none';
-                        answer.style.height = 'auto';
+                    const isOpen = answer.classList.contains('open');
 
-                        // Force a reflow to ensure styles are applied
-                        answer.offsetHeight;
+                    // Close all other answers and hide typing indicators
+                    document.querySelectorAll('.faq-answer').forEach(item => {
+                        item.style.maxHeight = '0px';
+                        item.classList.remove('open');
+                    });
 
-                        // Get the full height including padding and content
-                        const fullHeight = answer.scrollHeight;
+                    document.querySelectorAll('.typing-indicator').forEach(item => {
+                        item.style.display = 'none';
+                    });
 
-                        // Reset to 0 for animation
+                    document.querySelectorAll('.faq-question').forEach(item => {
+                        item.classList.remove('active');
+                    });
+
+                    // Toggle current answer
+                    if (!isOpen) {
+                        question.classList.add('active');
+
+                        // Show typing indicator first
+                        typingIndicator.style.display = 'block';
+
+                        // After 1.5 seconds, hide typing indicator and show answer
+                        setTimeout(() => {
+                            typingIndicator.style.display = 'none';
+                            answer.classList.add('open');
+
+                            // Simplified logic for better reliability
+                            const isMobile = window.innerWidth <= 768;
+
+                            if (isMobile) {
+                                // Enhanced calculation for mobile
+                                answer.style.maxHeight = 'none';
+                                answer.style.height = 'auto';
+                                const actualHeight = answer.scrollHeight;
+                                const finalHeight = actualHeight + 50;
+                                answer.style.maxHeight = '0px';
+                                answer.style.height = '';
+                                requestAnimationFrame(() => {
+                                    answer.style.maxHeight = finalHeight + 'px';
+                                });
+                            } else {
+                                // Simple, reliable calculation for desktop
+                                const height = answer.scrollHeight + 20;
+                                answer.style.maxHeight = height + 'px';
+                            }
+                        }, 1500);
+                    } else {
+                        // If clicking on an already open item, close it
                         answer.style.maxHeight = '0px';
-                        answer.style.height = '';
-
-                        // Animate to full height with extra buffer
-                        requestAnimationFrame(() => {
-                            answer.style.maxHeight = (fullHeight + 20) + 'px';
-                        });
-                    }, 50);
-                } else {
-                    // If clicking on an already open item, close it
-                    answer.style.maxHeight = '0px';
-                    answer.classList.remove('open');
-                    question.classList.remove('active');
+                        answer.classList.remove('open');
+                        question.classList.remove('active');
+                        typingIndicator.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('FAQ toggle error at index:', index, error);
                 }
             });
         });
 
         // Initialize all FAQ answers as closed
         document.addEventListener('DOMContentLoaded', () => {
+            // Validate FAQ structure
+            const questions = document.querySelectorAll('.faq-question');
+            const indicators = document.querySelectorAll('.typing-indicator');
+            const answers = document.querySelectorAll('.faq-answer');
+
+            console.log(`FAQ Debug: Found ${questions.length} questions, ${indicators.length} indicators, ${answers.length} answers`);
+
+            // Check each FAQ item structure
+            questions.forEach((question, index) => {
+                const indicator = question.nextElementSibling;
+                const answer = indicator ? indicator.nextElementSibling : null;
+
+                if (!indicator || !indicator.classList.contains('typing-indicator')) {
+                    console.error(`FAQ ${index + 1}: Missing or invalid typing indicator`);
+                }
+                if (!answer || !answer.classList.contains('faq-answer')) {
+                    console.error(`FAQ ${index + 1}: Missing or invalid answer element`);
+                }
+            });
+
+            // Initialize states
             document.querySelectorAll('.faq-answer').forEach(answer => {
                 answer.style.maxHeight = '0px';
                 answer.classList.remove('open');
@@ -1334,17 +1586,32 @@
             document.querySelectorAll('.faq-question').forEach(question => {
                 question.classList.remove('active');
             });
+
+            document.querySelectorAll('.typing-indicator').forEach(indicator => {
+                indicator.style.display = 'none';
+            });
+
+            console.log('FAQ initialization complete');
         });
 
         // Handle window resize to recalculate heights if needed
         window.addEventListener('resize', () => {
             document.querySelectorAll('.faq-answer.open').forEach(answer => {
-                answer.style.maxHeight = 'none';
-                answer.style.height = 'auto';
-                answer.offsetHeight; // Force reflow
-                const fullHeight = answer.scrollHeight;
-                answer.style.height = '';
-                answer.style.maxHeight = (fullHeight + 20) + 'px';
+                const isMobile = window.innerWidth <= 768;
+
+                if (isMobile) {
+                    // Enhanced calculation for mobile
+                    answer.style.maxHeight = 'none';
+                    answer.style.height = 'auto';
+                    const actualHeight = answer.scrollHeight;
+                    const finalHeight = actualHeight + 50;
+                    answer.style.height = '';
+                    answer.style.maxHeight = finalHeight + 'px';
+                } else {
+                    // Simple calculation for desktop
+                    const height = answer.scrollHeight + 20;
+                    answer.style.maxHeight = height + 'px';
+                }
             });
         });
 

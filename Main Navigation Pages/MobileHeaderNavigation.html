@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Capital Consultants - Mobile Header Navigation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Header Navigation - Mobile First */
+        .header-nav {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0 15px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 90px;
+        }
+
+        /* Logo Section */
+        .nav-logo {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo img {
+            height: 100px;
+            width: auto;
+        }
+
+        .nav-logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-left: 8px;
+        }
+
+        /* Desktop Menu Section - Hidden on Mobile */
+        .nav-menu {
+            display: none;
+        }
+
+        /* CTA Button Section - Always visible */
+        .nav-cta {
+            flex: 0 0 auto;
+        }
+
+        .nav-cta-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+        }
+
+        .nav-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        .nav-cta-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Mobile Menu Toggle */
+        .nav-mobile-toggle {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .nav-mobile-toggle:hover {
+            background-color: var(--gray-100);
+        }
+
+        .nav-mobile-toggle span {
+            width: 24px;
+            height: 3px;
+            background: var(--gray-800);
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+            transform-origin: center;
+        }
+
+        /* Mobile Menu */
+        .nav-mobile-menu {
+            position: fixed;
+            top: 90px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: calc(100vh - 90px);
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            border-top: 1px solid var(--gray-200);
+            overflow-y: auto;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-mobile-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-mobile-menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .nav-mobile-menu-item {
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--gray-200);
+            width: 100%;
+        }
+
+        .nav-mobile-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-mobile-menu-link {
+            text-decoration: none;
+            color: var(--gray-800);
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 16px 0;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+            width: 100%;
+        }
+
+        .nav-mobile-menu-link:hover {
+            color: var(--primary);
+            background-color: var(--gray-100);
+            padding-left: 10px;
+        }
+
+        .nav-mobile-menu-link::after {
+            content: '→';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-300);
+            transition: all 0.3s ease;
+        }
+
+        .nav-mobile-menu-link:hover::after {
+            color: var(--primary);
+            right: 5px;
+        }
+
+        .nav-mobile-cta {
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 2px solid var(--gray-200);
+            width: 100%;
+        }
+
+        .nav-mobile-cta-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+        }
+
+        .nav-mobile-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+        }
+
+        .nav-mobile-cta-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Mobile Menu Active State */
+        .nav-mobile-toggle.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .nav-mobile-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .nav-mobile-toggle.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        /* Overlay for mobile menu */
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .header-nav {
+                padding: 0 20px;
+            }
+
+            .nav-container {
+                height: 90px;
+            }
+
+            .nav-logo img {
+                height: 100px;
+            }
+
+            .nav-logo-text {
+                font-size: 1.5rem;
+                margin-left: 10px;
+            }
+
+            .nav-menu {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .nav-menu-list {
+                display: flex;
+                list-style: none;
+                gap: 30px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .nav-menu-item {
+                position: relative;
+            }
+
+            .nav-menu-link {
+                text-decoration: none;
+                color: var(--gray-800);
+                font-weight: 500;
+                font-size: 0.95rem;
+                padding: 10px 0;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .nav-menu-link:hover {
+                color: var(--primary);
+            }
+
+            .nav-menu-link::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--primary);
+                transition: width 0.3s ease;
+            }
+
+            .nav-menu-link:hover::after {
+                width: 100%;
+            }
+
+            .nav-cta {
+                flex: 0 0 auto;
+                margin-left: 20px;
+            }
+
+            .nav-cta-btn {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: var(--white);
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+                box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            }
+
+            .nav-cta-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+            }
+
+            .nav-cta-btn:active {
+                transform: translateY(0);
+            }
+
+            .nav-mobile-toggle {
+                display: none;
+            }
+
+            .nav-mobile-menu {
+                display: none !important;
+            }
+
+            .nav-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Content spacing for fixed header */
+        .content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        @media (min-width: 769px) {
+            .content {
+                margin-top: 90px;
+            }
+        }
+
+        /* Mobile responsive adjustments for CTA button */
+        @media (max-width: 480px) {
+            .nav-cta-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .nav-mobile-toggle {
+                margin-left: 8px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .nav-cta-btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            .nav-mobile-toggle {
+                margin-left: 5px;
+            }
+        }
+
+        /* Demo content */
+        .demo-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .demo-content h1 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        @media (min-width: 769px) {
+            .demo-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .demo-content p {
+            color: var(--gray-600);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        @media (min-width: 769px) {
+            .demo-content p {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Navigation -->
+    <header class="header-nav">
+        <nav class="nav-container">
+            <!-- Logo Section -->
+            <div class="nav-logo">
+                <a href="https://jamcapitalconsultants.com/">
+                    <img src="https://assets.cdn.filesafe.space/gaOp7QAouTuwykUssx6C/media/68197e67ef825fea67348f8a.png"
+                        alt="JAM Logo" onerror="this.style.display='none'">
+                    <span class="nav-logo-text"></span>
+                </a>
+            </div>
+
+            <!-- Desktop Menu Section -->
+            <div class="nav-menu">
+                <ul class="nav-menu-list">
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/pricing" class="nav-menu-link">Pricing</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/money-back-guarantee"
+                            class="nav-menu-link">Money-Back Guarantee</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/help-and-support" class="nav-menu-link">Help &
+                            Support</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/creditjams459883" class="nav-menu-link">Blog</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/login" class="nav-menu-link">Login</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Desktop CTA Button Section -->
+            <div class="nav-cta">
+                <button class="nav-cta-btn" onclick="openJAMEngine();">Start JAM Engine</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="nav-mobile-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu Overlay - Moved outside header -->
+    <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Mobile Menu - Moved outside header -->
+    <div class="nav-mobile-menu" id="mobileMenu">
+        <ul class="nav-mobile-menu-list">
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/pricing" class="nav-mobile-menu-link">Pricing</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/money-back-guarantee" class="nav-mobile-menu-link">Money-Back
+                    Guarantee</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/help-and-support" class="nav-mobile-menu-link">Help &
+                    Support</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/creditjams459883" class="nav-mobile-menu-link">Blog</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/login" class="nav-mobile-menu-link">Login</a>
+            </li>
+        </ul>
+        <div class="nav-mobile-cta">
+            <button class="nav-mobile-cta-btn" onclick="openJAMEngine();">Start JAM Engine</button>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const mobileToggle = document.querySelector('.nav-mobile-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('navOverlay');
+            const body = document.body;
+
+            mobileToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (mobileMenu.classList.contains('active')) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const mobileToggle = document.querySelector('.nav-mobile-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('navOverlay');
+            const body = document.body;
+
+            mobileToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            body.style.overflow = '';
+        }
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-mobile-menu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+        });
+
+        // Close mobile menu when pressing Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const mobileToggle = document.querySelector('.nav-mobile-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('navOverlay');
+
+            // Don't close if clicking on the toggle button itself
+            if (mobileToggle && mobileToggle.contains(e.target)) {
+                return;
+            }
+
+            // Don't close if clicking inside the menu
+            if (mobileMenu && mobileMenu.contains(e.target)) {
+                return;
+            }
+
+            // Don't close if clicking on overlay (let overlay handle it)
+            if (overlay && overlay.contains(e.target)) {
+                return;
+            }
+
+            // Only close if menu is actually open and we clicked outside
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+
+        // JAM Engine function
+        function openJAMEngine() {
+            // Close mobile menu after clicking CTA button
+            closeMobileMenu();
+
+            // Add your JAM Engine opening logic here
+            alert('JAM Engine would open here! Replace this with your actual JAM Engine function.');
+        }
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header-nav');
+            if (window.scrollY > 50) {
+                header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Prevent zoom on double tap (iOS)
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Add touch feedback for mobile menu items
+        document.querySelectorAll('.nav-mobile-menu-link').forEach(link => {
+            link.addEventListener('touchstart', function () {
+                this.style.backgroundColor = 'var(--gray-100)';
+            });
+
+            link.addEventListener('touchend', function () {
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 150);
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

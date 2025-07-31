@@ -1,0 +1,24 @@
+{
+  "name": "jam-capital-credential-test",
+  "version": "1.0.0",
+  "description": "Test script for JAM Capital credential storage API",
+  "type": "module",
+  "main": "test-credentials.js",
+  "scripts": {
+    "test": "node test-credentials.js",
+    "test:interactive": "node test-credentials.js --interactive",
+    "test:production": "node test-credentials.js --production",
+    "help": "node test-credentials.js --help"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "keywords": [
+    "testing",
+    "api",
+    "credentials",
+    "jam-capital"
+  ],
+  "author": "JAM Capital Consultants",
+  "license": "MIT"
+} 

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Capital Consultants - About the CEO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+        }
+
+        .ceo-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .ceo-hero {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+            padding: 80px 0;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .ceo-hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 60px;
+        }
+
+        .ceo-hero-text {
+            text-align: left;
+        }
+
+        .ceo-hero-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 24px;
+            color: var(--primary-dark);
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .ceo-hero-text p {
+            font-size: 1.3rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .ceo-hero-image {
+            text-align: center;
+            position: relative;
+        }
+
+        /* Slideshow Container */
+        .ceo-slideshow-container {
+            position: relative;
+            max-width: 450px;
+            margin: 0 auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(9, 204, 252, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .ceo-slideshow-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(9, 204, 252, 0.2);
+        }
+
+        .ceo-slide {
+            display: none;
+            position: relative;
+        }
+
+        .ceo-slide.active {
+            display: block;
+        }
+
+        .ceo-slide img {
+            width: 100%;
+            max-height: 650px;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        /* Individual slide adjustments for optimal display */
+        .ceo-slide:nth-child(1) img {
+            /* Business District - tall portrait */
+            height: 600px;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .ceo-slide:nth-child(2) img {
+            /* Indoor Fountain - medium portrait */
+            height: 580px;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .ceo-slide:nth-child(3) img {
+            /* Abstract Art - tall portrait */
+            height: 600px;
+            object-fit: cover;
+            object-position: center 15%;
+        }
+
+        /* Navigation Arrows */
+        .ceo-prev,
+        .ceo-next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            margin-top: -22px;
+            padding: 12px 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            background-color: rgba(9, 204, 252, 0.9);
+            border: none;
+            border-radius: 50%;
+            transition: 0.3s ease;
+            -webkit-user-select: none;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .ceo-prev {
+            left: -15px;
+        }
+
+        .ceo-next {
+            right: -15px;
+        }
+
+        .ceo-prev:hover,
+        .ceo-next:hover {
+            background-color: rgba(9, 204, 252, 1);
+            transform: scale(1.1);
+        }
+
+        /* Navigation Dots */
+        .ceo-dots-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .ceo-dot {
+            cursor: pointer;
+            height: 15px;
+            width: 15px;
+            margin: 0 5px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .ceo-dot.active,
+        .ceo-dot:hover {
+            background-color: var(--primary);
+        }
+
+        /* Add a subtle overlay effect */
+        .ceo-hero-image::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+
+
+        /* Main Content Sections */
+        .ceo-content-section {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .ceo-section-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .ceo-content-section p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .ceo-content-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Values Section */
+        .ceo-values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .ceo-value-card {
+            background-color: var(--primary-light);
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .ceo-value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .ceo-value-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .ceo-value-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .ceo-value-card p {
+            color: var(--gray-600);
+            margin-bottom: 0;
+        }
+
+        /* Quote Section */
+        .ceo-quote-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 50px 40px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .ceo-quote-section::before {
+            content: '\f10d';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 3rem;
+            opacity: 0.2;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ceo-quote-section blockquote {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ceo-quote-section .ceo-quote-author {
+            font-size: 1.1rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* Experience Highlights */
+        .ceo-experience-list {
+            margin-top: 20px;
+        }
+
+        .ceo-experience-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: var(--gray-100);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .ceo-experience-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-right: 15px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .ceo-experience-content h4 {
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .ceo-experience-content p {
+            margin-bottom: 0;
+            color: var(--gray-600);
+        }
+
+        /* Contact CTA */
+        .ceo-cta-section {
+            background-color: var(--primary-light);
+            text-align: center;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+
+        .ceo-cta-section h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .ceo-cta-section p {
+            font-size: 1.2rem;
+            color: var(--gray-600);
+            margin-bottom: 30px;
+        }
+
+        .ceo-cta-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px 30px;
+            border-radius: 5px;
+            border: none;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .ceo-cta-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .ceo-hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 20px;
+            }
+
+            .ceo-hero-text {
+                text-align: center;
+            }
+
+            .ceo-hero-text h1 {
+                font-size: 2.2rem;
+            }
+
+            .ceo-hero-text p {
+                font-size: 1.1rem;
+            }
+
+            .ceo-slideshow-container {
+                max-width: 350px;
+            }
+
+            .ceo-prev {
+                left: -10px;
+            }
+
+            .ceo-next {
+                right: -10px;
+            }
+
+            .ceo-values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ceo-quote-section blockquote {
+                font-size: 1.2rem;
+            }
+
+            .ceo-container {
+                padding: 0 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ceo-container">
+        <!-- Hero Section -->
+        <section class="ceo-hero">
+            <div class="ceo-hero-content">
+                <div class="ceo-hero-text">
+                    <h1>About the CEO</h1>
+                    <p>Meet Carnelius Johnson, the visionary leader behind JAM Capital Consultants LLC and your trusted
+                        partner in financial transformation.</p>
+                </div>
+                <div class="ceo-hero-image">
+                    <div class="ceo-slideshow-container">
+                        <!-- Slide 1: Confident Professional in Business District -->
+                        <div class="ceo-slide active">
+                            <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/686e9522b43183bf4daefab9.jpeg"
+                                alt="Carnelius Johnson - Confident Professional in Business District">
+                        </div>
+
+                        <!-- Slide 2: Modern Executive Indoors by Decorative Fountain -->
+                        <div class="ceo-slide">
+                            <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/686e952267799043e93d4347.jpeg"
+                                alt="Carnelius Johnson - Modern Executive Indoors by Decorative Fountain">
+                        </div>
+
+                        <!-- Slide 3: Elegant Casual Look Against Abstract Art -->
+                        <div class="ceo-slide">
+                            <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/686e9522b431832123aefaba.jpeg"
+                                alt="Carnelius Johnson - Elegant Casual Look Against Abstract Art">
+                        </div>
+
+                        <!-- Navigation Arrows -->
+                        <button class="ceo-prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="ceo-next" onclick="changeSlide(1)">&#10095;</button>
+                    </div>
+
+                    <!-- Navigation Dots -->
+                    <div class="ceo-dots-container">
+                        <span class="ceo-dot active" onclick="currentSlide(1)"></span>
+                        <span class="ceo-dot" onclick="currentSlide(2)"></span>
+                        <span class="ceo-dot" onclick="currentSlide(3)"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Story Section -->
+        <section class="ceo-content-section">
+            <h2 class="ceo-section-title">Our Founder's Story</h2>
+            <p>At the heart of JAM Capital Consultants LLC is a simple belief: Everyone deserves a fair chance to
+                rebuild their credit and regain control over their financial future. Our Founder and CEO, Carnelius
+                Johnson, knows this firsthand. After facing his own challenges with credit, Carnelius made it his
+                mission to turn his experience into a way to help others rise above the same obstacles.</p>
+
+            <p>Carnelius is a dedicated credit professional with years of hands-on experience guiding individuals and
+                business owners through the complex world of credit repair and education. His approach is direct,
+                transparent, and focused on real results, not empty promises. Under his leadership, JAM Capital
+                Consultants has become a trusted resource for clients who want practical solutions and long-term
+                success.</p>
+        </section>
+
+        <!-- Quote Section -->
+        <section class="ceo-quote-section">
+            <blockquote>
+                "My story is proof that with the right guidance and determination, you can change your life and your
+                credit for the better."
+            </blockquote>
+            <div class="ceo-quote-author">- Carnelius Johnson, Founder & CEO</div>
+        </section>
+
+        <!-- Leadership Philosophy -->
+        <section class="ceo-content-section">
+            <h2 class="ceo-section-title">Leadership Philosophy</h2>
+            <p>Driven by a passion for empowering people, Carnelius has built JAM Capital Consultants to be more than
+                just a credit consulting company. It is a place where clients feel heard, supported, and equipped with
+                the knowledge to make confident financial decisions. Whether you are trying to buy a home, secure
+                funding for your business, or simply clean up past mistakes, Carnelius and his team are committed to
+                standing with you every step of the way.</p>
+        </section>
+
+        <!-- Core Values -->
+        <section class="ceo-content-section">
+            <h2 class="ceo-section-title">Core Values</h2>
+            <div class="ceo-values-grid">
+                <div class="ceo-value-card">
+                    <div class="ceo-value-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Transparency</h3>
+                    <p>Direct, honest communication with no empty promises - just real results and clear expectations.
+                    </p>
+                </div>
+                <div class="ceo-value-card">
+                    <div class="ceo-value-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Empowerment</h3>
+                    <p>Equipping clients with knowledge and tools to make confident financial decisions for lasting
+                        success.</p>
+                </div>
+                <div class="ceo-value-card">
+                    <div class="ceo-value-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Compassion</h3>
+                    <p>Understanding that financial challenges affect real people, and treating every client with
+                        dignity and respect.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Highlights -->
+        <section class="ceo-content-section">
+            <h2 class="ceo-section-title">Experience & Expertise</h2>
+            <div class="ceo-experience-list">
+                <div class="ceo-experience-item">
+                    <div class="ceo-experience-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="ceo-experience-content">
+                        <h4>Credit Repair Specialist</h4>
+                        <p>Years of hands-on experience helping individuals and businesses navigate complex credit
+                            challenges and achieve their financial goals.</p>
+                    </div>
+                </div>
+                <div class="ceo-experience-item">
+                    <div class="ceo-experience-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="ceo-experience-content">
+                        <h4>Financial Education Advocate</h4>
+                        <p>Passionate about creating accessible resources and sharing knowledge that makes credit repair
+                            understandable for everyone.</p>
+                    </div>
+                </div>
+                <div class="ceo-experience-item">
+                    <div class="ceo-experience-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="ceo-experience-content">
+                        <h4>Mentor & Leader</h4>
+                        <p>Dedicated to mentoring others and building a team that shares the same commitment to client
+                            success and ethical practices.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personal Mission -->
+        <section class="ceo-content-section">
+            <h2 class="ceo-section-title">Beyond Business</h2>
+            <p>When he is not working with clients, Carnelius enjoys mentoring others, sharing financial education, and
+                creating resources that make credit repair accessible to everyone. His commitment extends beyond the
+                office - he's passionate about building a community where financial literacy and empowerment are
+                available to all.</p>
+
+            <p>Carnelius believes that financial freedom is not just about numbers on a credit report - it's about
+                restoring hope, building confidence, and creating opportunities for individuals and families to achieve
+                their dreams.</p>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="ceo-cta-section">
+            <h2>Ready to Transform Your Financial Future?</h2>
+            <p>Experience firsthand the dedication and expertise that Carnelius Johnson brings to every client
+                relationship.</p>
+            <button class="ceo-cta-btn" onclick="openJAMEngine();">Get Started Today</button>
+        </section>
+    </div>
+
+    <script>
+        // Slideshow functionality
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.ceo-slide');
+        const dots = document.querySelectorAll('.ceo-dot');
+        let slideInterval;
+
+        function showSlide(index) {
+            // Hide all slides
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Show current slide
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            currentSlideIndex += direction;
+
+            if (currentSlideIndex >= slides.length) {
+                currentSlideIndex = 0;
+            } else if (currentSlideIndex < 0) {
+                currentSlideIndex = slides.length - 1;
+            }
+
+            showSlide(currentSlideIndex);
+            resetAutoSlide();
+        }
+
+        function currentSlide(index) {
+            currentSlideIndex = index - 1;
+            showSlide(currentSlideIndex);
+            resetAutoSlide();
+        }
+
+        function nextSlide() {
+            changeSlide(1);
+        }
+
+        function startAutoSlide() {
+            slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        }
+
+        function resetAutoSlide() {
+            clearInterval(slideInterval);
+            startAutoSlide();
+        }
+
+        // Pause auto-slide on hover
+        const slideshowContainer = document.querySelector('.ceo-slideshow-container');
+        slideshowContainer.addEventListener('mouseenter', () => {
+            clearInterval(slideInterval);
+        });
+
+        slideshowContainer.addEventListener('mouseleave', () => {
+            startAutoSlide();
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add loading animation and initialize slideshow
+        window.addEventListener('load', function () {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-in-out';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+
+            // Start auto-slide after page loads
+            startAutoSlide();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+    </script>
+</body>
+
+</html>

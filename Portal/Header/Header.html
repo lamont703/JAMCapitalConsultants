@@ -1591,9 +1591,9 @@
                                         <div class="header-user-menu-name" id="header-userMenuName"></div>
                                         <div class="header-user-menu-email" id="header-userMenuEmail"></div>
                                     </div>
-                                    <a href="#manage-subscription" class="header-user-menu-item">
+                                    <!--<a href="#manage-subscription" class="header-user-menu-item">
                                         <i class="fas fa-credit-card"></i> Manage Subscription
-                                    </a>
+                                    </a>-->
                                     <a href="#settings" class="header-user-menu-item">
                                         <i class="fas fa-cog"></i> Account Settings
                                     </a>
@@ -1722,6 +1722,18 @@
         // Clean up the Header.html - remove duplicates and fix all button handlers
         document.addEventListener('DOMContentLoaded', function () {
             console.log('DashboardHeader DOM loaded, setting up all buttons');
+
+            // Check if user has admin role - moved inside DOMContentLoaded scope
+            function hasAdminRole() {
+                try {
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const userRole = userData.role || userData.userRole || userData.type || 'user';
+                    return userRole === 'admin' || userRole === 'administrator' || userRole === 'super_admin';
+                } catch (error) {
+                    console.error('Error checking admin role:', error);
+                    return false;
+                }
+            }
 
             // Notification bell click handler
             const notificationIcon = document.querySelector('.header-notification-icon');

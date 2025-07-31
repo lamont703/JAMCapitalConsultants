@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Capital Consultants - Mobile Header Navigation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #09ccfc;
+            --primary-dark: #0099cc;
+            --primary-light: #e6f9ff;
+            --secondary: #4a6fa5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Header Navigation - Mobile First */
+        .header-nav {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 500;
+            padding: 0 15px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 100vw;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 90px;
+        }
+
+        /* Logo Section */
+        .nav-logo {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo img {
+            height: 100px;
+            width: auto;
+        }
+
+        .nav-logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-left: 8px;
+        }
+
+        /* Desktop Menu Section - Hidden on Mobile */
+        .nav-menu {
+            display: none;
+        }
+
+        /* CTA Button Section - Always visible */
+        .nav-cta {
+            flex: 0 0 auto;
+        }
+
+        .nav-cta-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(9, 204, 252, 0.2);
+        }
+
+        .nav-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.3);
+        }
+
+        .nav-cta-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Mobile Menu Toggle */
+        .nav-mobile-toggle {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .nav-mobile-toggle:hover {
+            background-color: var(--gray-100);
+        }
+
+        .nav-mobile-toggle span {
+            width: 24px;
+            height: 3px;
+            background: var(--gray-800);
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+            transform-origin: center;
+        }
+
+        /* Mobile Menu */
+        .nav-mobile-menu {
+            position: fixed;
+            top: 90px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: calc(100vh - 90px);
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            border-top: 1px solid var(--gray-200);
+            overflow-y: auto;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-mobile-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-mobile-menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .nav-mobile-menu-item {
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--gray-200);
+            width: 100%;
+        }
+
+        .nav-mobile-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-mobile-menu-link {
+            text-decoration: none;
+            color: var(--gray-800);
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 16px 0;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+            width: 100%;
+        }
+
+        .nav-mobile-menu-link:hover {
+            color: var(--primary);
+            background-color: var(--gray-100);
+            padding-left: 10px;
+        }
+
+        .nav-mobile-menu-link::after {
+            content: '→';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-300);
+            transition: all 0.3s ease;
+        }
+
+        .nav-mobile-menu-link:hover::after {
+            color: var(--primary);
+            right: 5px;
+        }
+
+        .nav-mobile-cta {
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 2px solid var(--gray-200);
+            width: 100%;
+        }
+
+        .nav-mobile-cta-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+        }
+
+        .nav-mobile-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+        }
+
+        .nav-mobile-cta-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Mobile Menu Active State */
+        .nav-mobile-toggle.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .nav-mobile-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .nav-mobile-toggle.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        /* Overlay for mobile menu */
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .header-nav {
+                padding: 0 20px;
+            }
+
+            .nav-container {
+                height: 90px;
+                max-width: 100vw
+            }
+
+            .nav-logo img {
+                height: 100px;
+            }
+
+            .nav-logo-text {
+                font-size: 1.5rem;
+                margin-left: 10px;
+            }
+
+            .nav-menu {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .nav-menu-list {
+                display: flex;
+                list-style: none;
+                gap: 30px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .nav-menu-item {
+                position: relative;
+            }
+
+            .nav-menu-link {
+                text-decoration: none;
+                color: var(--gray-800);
+                font-weight: 500;
+                font-size: 0.95rem;
+                padding: 10px 0;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .nav-menu-link:hover {
+                color: var(--primary);
+            }
+
+            .nav-menu-link::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--primary);
+                transition: width 0.3s ease;
+            }
+
+            .nav-menu-link:hover::after {
+                width: 100%;
+            }
+
+            .nav-cta {
+                flex: 0 0 auto;
+                margin-left: 20px;
+            }
+
+            .nav-cta-btn {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: var(--white);
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+                box-shadow: 0 4px 15px rgba(9, 204, 252, 0.2);
+            }
+
+            .nav-cta-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(9, 204, 252, 0.3);
+            }
+
+            .nav-cta-btn:active {
+                transform: translateY(0);
+            }
+
+            .nav-mobile-toggle {
+                display: none;
+            }
+
+            .nav-mobile-menu {
+                display: none !important;
+            }
+
+            .nav-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Content spacing for fixed header */
+        .content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        @media (min-width: 769px) {
+            .content {
+                margin-top: 90px;
+            }
+        }
+
+        /* Mobile responsive adjustments for CTA button */
+        @media (max-width: 480px) {
+            .nav-cta-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .nav-mobile-toggle {
+                margin-left: 8px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .nav-cta-btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            .nav-mobile-toggle {
+                margin-left: 5px;
+            }
+        }
+
+        /* Demo content */
+        .demo-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .demo-content h1 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        @media (min-width: 769px) {
+            .demo-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .demo-content p {
+            color: var(--gray-600);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        @media (min-width: 769px) {
+            .demo-content p {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<div id="jam-get-started-container"></div>
+
+<body>
+    <!-- Header Navigation -->
+    <header class="header-nav">
+        <nav class="nav-container">
+            <!-- Logo Section -->
+            <div class="nav-logo">
+                <a href="https://jamcapitalconsultants.com/">
+                    <img src="https://assets.cdn.filesafe.space/gaOp7QAouTuwykUssx6C/media/68197e67ef825fea67348f8a.png"
+                        alt="JAM Logo" onerror="this.style.display='none'">
+                    <span class="nav-logo-text"></span>
+                </a>
+            </div>
+
+            <!-- Desktop Menu Section -->
+            <div class="nav-menu">
+                <ul class="nav-menu-list">
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/pricing" class="nav-menu-link">Pricing</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/money-back-guarantee"
+                            class="nav-menu-link">Money-Back Guarantee</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/help-and-support" class="nav-menu-link">Help &
+                            Support</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/creditjams459883" class="nav-menu-link">Blog</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/about_ceo" class="nav-menu-link">About CEO</a>
+                    </li>
+                    <li class="nav-menu-item">
+                        <a href="https://jamcapitalconsultants.com/login" class="nav-menu-link">Login</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Desktop CTA Button Section -->
+            <div class="nav-cta">
+                <button class="nav-cta-btn" onclick="openJAMEngine();">Start JAM Engine</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="nav-mobile-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu Overlay - Moved outside header -->
+    <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Mobile Menu - Moved outside header -->
+    <div class="nav-mobile-menu" id="mobileMenu">
+        <ul class="nav-mobile-menu-list">
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/pricing" class="nav-mobile-menu-link">Pricing</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/money-back-guarantee" class="nav-mobile-menu-link">Money-Back
+                    Guarantee</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/help-and-support" class="nav-mobile-menu-link">Help &
+                    Support</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/creditjams459883" class="nav-mobile-menu-link">Blog</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/about_ceo" class="nav-mobile-menu-link">About CEO</a>
+            </li>
+            <li class="nav-mobile-menu-item">
+                <a href="https://jamcapitalconsultants.com/login" class="nav-mobile-menu-link">Login</a>
+            </li>
+        </ul>
+        <div class="nav-mobile-cta">
+            <button class="nav-mobile-cta-btn" onclick="openJAMEngine();">Start JAM Engine</button>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const mobileToggle = document.querySelector('.nav-mobile-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('navOverlay');
+            const body = document.body;
+
+            mobileToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (mobileMenu.classList.contains('active')) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const mobileToggle = document.querySelector('.nav-mobile-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('navOverlay');
+            const body = document.body;
+
+            mobileToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            body.style.overflow = '';
+        }
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-mobile-menu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                closeMobileMenu();
+            });
+        });
+
+        // Close mobile menu when pressing Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const mobileToggle = document.querySelector('.nav-mobile-toggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('navOverlay');
+
+            // Don't close if clicking on the toggle button itself
+            if (mobileToggle && mobileToggle.contains(e.target)) {
+                return;
+            }
+
+            // Don't close if clicking inside the menu
+            if (mobileMenu && mobileMenu.contains(e.target)) {
+                return;
+            }
+
+            // Don't close if clicking on overlay (let overlay handle it)
+            if (overlay && overlay.contains(e.target)) {
+                return;
+            }
+
+            // Only close if menu is actually open and we clicked outside
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+
+        // JAM Engine function
+        function openJAMEngine() {
+            console.log('🎯 === openJAMEngine() CALLED ===');
+            console.log('🔍 Timestamp:', new Date().toISOString());
+            console.log('🔍 Call stack:', new Error().stack);
+
+            // Close mobile menu after clicking CTA button
+            console.log('🔧 Closing mobile menu...');
+            closeMobileMenu();
+            console.log('✅ Mobile menu closed');
+
+            // Load and initialize JAM Get Started Module
+            console.log('🚀 Calling loadJAMGetStartedModule()...');
+            loadJAMGetStartedModule();
+            console.log('🏁 === openJAMEngine() COMPLETE ===');
+        }
+
+        // Debug function to check button state
+        function debugButtonState() {
+            console.log('🔍 === BUTTON STATE DEBUG ===');
+            const desktopBtn = document.querySelector('.nav-cta-btn');
+            const mobileBtn = document.querySelector('.nav-mobile-cta-btn');
+
+            console.log('🔍 Desktop button found:', !!desktopBtn);
+            if (desktopBtn) {
+                console.log('🔍 Desktop button onclick:', desktopBtn.onclick);
+                console.log('🔍 Desktop button getAttribute onclick:', desktopBtn.getAttribute('onclick'));
+                console.log('🔍 Desktop button disabled:', desktopBtn.disabled);
+                console.log('🔍 Desktop button style.display:', desktopBtn.style.display);
+            }
+
+            console.log('🔍 Mobile button found:', !!mobileBtn);
+            if (mobileBtn) {
+                console.log('🔍 Mobile button onclick:', mobileBtn.onclick);
+                console.log('🔍 Mobile button getAttribute onclick:', mobileBtn.getAttribute('onclick'));
+                console.log('🔍 Mobile button disabled:', mobileBtn.disabled);
+                console.log('🔍 Mobile button style.display:', mobileBtn.style.display);
+            }
+
+            // Check if openJAMEngine is still available globally
+            console.log('🔍 window.openJAMEngine exists:', typeof window.openJAMEngine);
+            console.log('🔍 openJAMEngine function:', window.openJAMEngine);
+        }
+
+        // Enhanced button click debugging
+        function setupButtonClickDebugging() {
+            console.log('🔧 Setting up button click debugging...');
+
+            // Add event listeners to debug clicks
+            document.addEventListener('click', function (e) {
+                const target = e.target;
+                if (target.classList.contains('nav-cta-btn') || target.classList.contains('nav-mobile-cta-btn')) {
+                    console.log('🎯 === BUTTON CLICK DETECTED ===');
+                    console.log('🔍 Button clicked:', target.className);
+                    console.log('🔍 Button text:', target.textContent);
+                    console.log('🔍 Button onclick:', target.onclick);
+                    console.log('🔍 Button getAttribute onclick:', target.getAttribute('onclick'));
+                    console.log('🔍 Event target:', target);
+                    console.log('🔍 Event type:', e.type);
+                    console.log('🔍 Event bubbles:', e.bubbles);
+                    console.log('🔍 Event cancelable:', e.cancelable);
+                    console.log('🔍 Event defaultPrevented:', e.defaultPrevented);
+
+                    // Check if openJAMEngine is available
+                    if (typeof window.openJAMEngine === 'function') {
+                        console.log('✅ openJAMEngine function is available');
+                        console.log('🚀 Manually calling openJAMEngine...');
+                        try {
+                            window.openJAMEngine();
+                        } catch (error) {
+                            console.error('❌ Error calling openJAMEngine:', error);
+                        }
+                    } else {
+                        console.error('❌ openJAMEngine function not available');
+                        console.log('🔍 typeof openJAMEngine:', typeof window.openJAMEngine);
+                    }
+                }
+            }, true); // Use capture phase
+
+            // Add global close button listener to catch ALL close button clicks
+            document.addEventListener('click', function (e) {
+                const target = e.target;
+
+                // Check for various close button patterns
+                const isCloseButton = target.classList.contains('nav-close-button') ||
+                    target.id === 'jam-close-btn' ||
+                    target.id === 'jam-close-x' ||
+                    target.textContent.includes('Close') ||
+                    target.textContent.includes('×') ||
+                    target.textContent.includes('✕');
+
+                if (isCloseButton) {
+                    console.log('🔴 === GLOBAL CLOSE BUTTON CLICK DETECTED ===');
+                    console.log('🔍 Close button details:', {
+                        tagName: target.tagName,
+                        className: target.className,
+                        id: target.id,
+                        textContent: target.textContent.trim(),
+                        innerHTML: target.innerHTML
+                    });
+                    console.log('🔍 Event details:', {
+                        type: e.type,
+                        bubbles: e.bubbles,
+                        cancelable: e.cancelable,
+                        defaultPrevented: e.defaultPrevented,
+                        eventPhase: e.eventPhase
+                    });
+
+                    // Check if jam-get-started-container exists
+                    const container = document.getElementById('jam-get-started-container');
+                    console.log('🔍 Container found during close:', !!container);
+                    if (container) {
+                        console.log('🔍 Container state during close:', {
+                            display: container.style.display,
+                            opacity: container.style.opacity,
+                            visibility: container.style.visibility,
+                            pointerEvents: container.style.pointerEvents
+                        });
+                    }
+                }
+            }, true); // Use capture phase to catch early
+
+            console.log('✅ Button click debugging setup complete');
+        }
+
+        // Setup custom close handler to hide container when modal closes
+        function setupCustomCloseHandler(modal, container) {
+            console.log('🔧 Setting up custom close handler...');
+
+            // Find close buttons in the modal
+            const closeButtons = modal.querySelectorAll('.nav-close-button, #jam-close-btn, #jam-close-x');
+            console.log('🔍 Found close buttons:', closeButtons.length);
+
+            closeButtons.forEach((button, index) => {
+                console.log(`🔧 Adding close handler to button ${index + 1}`);
+                console.log(`🔍 Button ${index + 1} details:`, {
+                    tagName: button.tagName,
+                    className: button.className,
+                    id: button.id,
+                    textContent: button.textContent.trim()
+                });
+
+                // Add our custom close handler
+                button.addEventListener('click', function customCloseHandler(e) {
+                    console.log('🔴 === CUSTOM CLOSE HANDLER TRIGGERED ===');
+                    console.log('🔍 Close button clicked:', button.className);
+                    console.log('🔍 Event details:', {
+                        type: e.type,
+                        target: e.target,
+                        currentTarget: e.currentTarget,
+                        bubbles: e.bubbles,
+                        cancelable: e.cancelable,
+                        defaultPrevented: e.defaultPrevented
+                    });
+
+                    // Log container state BEFORE hiding
+                    console.log('🔍 Container state BEFORE hiding:');
+                    console.log('  - display:', container.style.display);
+                    console.log('  - opacity:', container.style.opacity);
+                    console.log('  - visibility:', container.style.visibility);
+                    console.log('  - pointerEvents:', container.style.pointerEvents);
+                    console.log('  - zIndex:', container.style.zIndex);
+
+                    // Log modal state
+                    console.log('🔍 Modal state when closing:');
+                    console.log('  - display:', modal.style.display);
+                    console.log('  - visibility:', modal.style.visibility);
+                    console.log('  - opacity:', modal.style.opacity);
+
+                    // Hide the container to unblock page interactions
+                    setTimeout(() => {
+                        console.log('🧹 === HIDING CONTAINER TO UNBLOCK PAGE ===');
+                        console.log('🧹 Timestamp:', new Date().toISOString());
+
+                        // Store old values for comparison
+                        const oldDisplay = container.style.display;
+                        const oldOpacity = container.style.opacity;
+                        const oldVisibility = container.style.visibility;
+                        const oldPointerEvents = container.style.pointerEvents;
+
+                        // Apply hiding styles
+                        container.style.display = 'none';
+                        container.style.opacity = '0';
+                        container.style.visibility = 'hidden';
+                        container.style.pointerEvents = 'none';
+
+                        // Restore body scroll
+                        const oldBodyOverflow = document.body.style.overflow;
+                        document.body.style.overflow = '';
+
+                        console.log('🔍 Container style changes applied:');
+                        console.log('  - display:', oldDisplay, '→', container.style.display);
+                        console.log('  - opacity:', oldOpacity, '→', container.style.opacity);
+                        console.log('  - visibility:', oldVisibility, '→', container.style.visibility);
+                        console.log('  - pointerEvents:', oldPointerEvents, '→', container.style.pointerEvents);
+                        console.log('  - body overflow:', oldBodyOverflow, '→', document.body.style.overflow);
+
+                        // Verify the changes took effect
+                        console.log('🔍 Verification - container computed styles:');
+                        const computedStyles = window.getComputedStyle(container);
+                        console.log('  - computed display:', computedStyles.display);
+                        console.log('  - computed opacity:', computedStyles.opacity);
+                        console.log('  - computed visibility:', computedStyles.visibility);
+                        console.log('  - computed pointerEvents:', computedStyles.pointerEvents);
+
+                        // Check if container is still blocking interactions
+                        const containerRect = container.getBoundingClientRect();
+                        console.log('🔍 Container bounding rect:', {
+                            width: containerRect.width,
+                            height: containerRect.height,
+                            top: containerRect.top,
+                            left: containerRect.left
+                        });
+
+                        console.log('✅ Container hidden, page interactions should be restored');
+                        console.log('🧹 === CONTAINER HIDING COMPLETE ===');
+                    }, 100); // Small delay to let the modal close first
+                });
+            });
+
+            // Also handle clicking outside the modal
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    console.log('🔴 === CLICKED OUTSIDE MODAL ===');
+                    console.log('🔍 Outside click event:', {
+                        target: e.target,
+                        currentTarget: e.currentTarget,
+                        clientX: e.clientX,
+                        clientY: e.clientY
+                    });
+
+                    setTimeout(() => {
+                        console.log('🧹 === HIDING CONTAINER AFTER OUTSIDE CLICK ===');
+                        console.log('🧹 Timestamp:', new Date().toISOString());
+
+                        container.style.display = 'none';
+                        container.style.opacity = '0';
+                        container.style.visibility = 'hidden';
+                        container.style.pointerEvents = 'none';
+                        document.body.style.overflow = '';
+
+                        console.log('✅ Container hidden after outside click');
+                        console.log('🧹 === OUTSIDE CLICK HIDING COMPLETE ===');
+                    }, 100);
+                }
+            });
+
+            console.log('✅ Custom close handler setup complete');
+        }
+
+        // Function to load the JAM Get Started Module
+        function loadJAMGetStartedModule() {
+            console.log('🚀 === STARTING loadJAMGetStartedModule() ===');
+            console.log('🔍 Timestamp:', new Date().toISOString());
+
+            // Create the container that the module expects
+            let container = document.getElementById('jam-get-started-container');
+            console.log('🔍 Container lookup result:', container ? 'FOUND' : 'NOT FOUND');
+
+            if (!container) {
+                console.log('📦 Creating new container...');
+                container = document.createElement('div');
+                container.id = 'jam-get-started-container';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    z-index: 10000;
+                    display: block;
+                    opacity: 1;
+                    visibility: visible;
+                `;
+                document.body.appendChild(container);
+                console.log('✅ Created container: jam-get-started-container');
+                console.log('🔍 Container element:', container);
+            } else {
+                console.log('🔍 Container already exists, checking state...');
+                console.log('🔍 Container display:', container.style.display);
+                console.log('🔍 Container visibility:', container.style.visibility);
+                console.log('🔍 Container opacity:', container.style.opacity);
+                console.log('🔍 Container innerHTML length:', container.innerHTML.length);
+                console.log('🔍 Container children count:', container.children.length);
+            }
+
+            // Check if module is already loaded
+            console.log('🔍 Checking if JAMGetStartedModule exists...');
+            console.log('🔍 window.JAMGetStartedModule:', !!window.JAMGetStartedModule);
+
+            if (window.JAMGetStartedModule) {
+                console.log('🚀 === MODULE ALREADY LOADED PATH ===');
+                console.log('🔍 Module object:', window.JAMGetStartedModule);
+                console.log('🔍 Module methods available:', Object.keys(window.JAMGetStartedModule));
+
+                // Ensure container is visible and properly set up
+                console.log('🔧 Resetting container visibility...');
+                const oldDisplay = container.style.display;
+                const oldOpacity = container.style.opacity;
+                const oldVisibility = container.style.visibility;
+
+                container.style.display = 'block';
+                container.style.opacity = '1';
+                container.style.visibility = 'visible';
+
+                console.log('🔍 Container style changes:');
+                console.log('  - display:', oldDisplay, '→', container.style.display);
+                console.log('  - opacity:', oldOpacity, '→', container.style.opacity);
+                console.log('  - visibility:', oldVisibility, '→', container.style.visibility);
+
+                // Check module initialization status
+                console.log('🔍 Checking module initialization status...');
+                let isInitialized = false;
+                try {
+                    isInitialized = window.JAMGetStartedModule.isInitialized();
+                    console.log('🔍 Module isInitialized():', isInitialized);
+                } catch (error) {
+                    console.error('❌ Error checking initialization status:', error);
+                }
+
+                // Check for existing modal before deciding what to do
+                console.log('🔍 Checking for existing modal...');
+                const existingModal = document.querySelector('#nav-quizModal');
+                console.log('🔍 Existing modal found:', !!existingModal);
+
+                if (existingModal) {
+                    console.log('🔍 Existing modal display:', existingModal.style.display);
+                    console.log('🔍 Existing modal visibility:', existingModal.style.visibility);
+                    console.log('🔍 Existing modal opacity:', existingModal.style.opacity);
+
+                    // If modal exists but is hidden, show both container and modal
+                    if (existingModal.style.display !== 'flex') {
+                        console.log('🔧 === SHOWING EXISTING MODAL ===');
+
+                        // Show the container first
+                        container.style.display = 'block';
+                        container.style.opacity = '1';
+                        container.style.visibility = 'visible';
+                        container.style.pointerEvents = 'auto';
+
+                        // Then show the modal
+                        existingModal.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+
+                        console.log('✅ Container and modal shown directly');
+                        console.log('🏁 === MODULE ALREADY LOADED PATH COMPLETE ===');
+                        return;
+                    } else {
+                        console.log('✅ Modal is already visible');
+                        console.log('🏁 === MODULE ALREADY LOADED PATH COMPLETE ===');
+                        return;
+                    }
+                }
+
+                // If no modal exists or module not initialized, reinitialize
+                if (!isInitialized || !existingModal) {
+                    console.log('🔧 === REINITIALIZING MODULE ===');
+                    try {
+                        window.JAMGetStartedModule.init('jam-get-started-container');
+                        console.log('✅ Module reinitialization completed');
+                    } catch (error) {
+                        console.error('❌ Error during module reinitialization:', error);
+                    }
+                }
+
+                // Always try to open the quiz
+                console.log('🚀 === ATTEMPTING TO OPEN QUIZ ===');
+                try {
+                    console.log('🔧 Calling window.JAMGetStartedModule.openQuiz()...');
+                    window.JAMGetStartedModule.openQuiz();
+                    console.log('✅ openQuiz() call completed without error');
+
+                    // Double-check that the modal is actually visible after a short delay
+                    setTimeout(() => {
+                        console.log('🔍 === POST-OPEN VERIFICATION (100ms delay) ===');
+                        const modal = document.querySelector('#nav-quizModal');
+                        console.log('🔍 Modal found after open:', !!modal);
+
+                        if (modal) {
+                            console.log('🔍 Modal display after open:', modal.style.display);
+                            console.log('🔍 Modal visibility after open:', modal.style.visibility);
+                            console.log('🔍 Modal opacity after open:', modal.style.opacity);
+                            console.log('🔍 Modal computed display:', window.getComputedStyle(modal).display);
+
+                            if (modal.style.display !== 'flex') {
+                                console.log('🔧 === FORCING MODAL DISPLAY ===');
+                                console.log('🔧 Modal not visible, forcing display...');
+                                modal.style.display = 'flex';
+                                document.body.style.overflow = 'hidden';
+                                console.log('✅ Forced modal display to flex');
+                            } else {
+                                console.log('✅ Modal is properly displayed');
+                            }
+
+                            // Add custom close handler to hide container when modal closes
+                            setupCustomCloseHandler(modal, container);
+                        } else {
+                            console.error('❌ Modal not found after openQuiz() call');
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ === ERROR DURING OPEN QUIZ ===');
+                    console.error('❌ Error opening quiz:', error);
+                    console.error('❌ Error stack:', error.stack);
+
+                    // Fallback: try to show modal directly
+                    console.log('🔧 === FALLBACK: DIRECT MODAL CONTROL ===');
+                    const modal = document.querySelector('#nav-quizModal');
+                    console.log('🔍 Fallback modal found:', !!modal);
+
+                    if (modal) {
+                        console.log('🔧 Fallback: showing modal directly');
+                        modal.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                        console.log('✅ Fallback modal display set');
+                    } else {
+                        console.error('❌ No modal found for fallback');
+                    }
+                }
+
+                console.log('🏁 === MODULE ALREADY LOADED PATH COMPLETE ===');
+                return;
+            }
+
+            console.log('📦 === FIRST-TIME LOADING PATH ===');
+            console.log('📦 JAM Get Started Module not found, loading...');
+
+            // Load the module script by fetching and executing it
+            console.log('🔧 Fetching NavGetStarted.html...');
+            fetch('/Main Navigation Pages/NavGetStarted.html')
+                .then(response => {
+                    console.log('🔍 Fetch response status:', response.status);
+                    console.log('🔍 Fetch response ok:', response.ok);
+                    return response.text();
+                })
+                .then(html => {
+                    console.log('🔍 HTML content length:', html.length);
+
+                    // Extract the script content from the HTML
+                    console.log('🔧 Extracting script content...');
+                    const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
+                    console.log('🔍 Script match found:', !!scriptMatch);
+
+                    if (scriptMatch) {
+                        const scriptContent = scriptMatch[1];
+                        console.log('🔍 Script content length:', scriptContent.length);
+
+                        // Create and execute the script
+                        console.log('🔧 Creating and executing script...');
+                        const script = document.createElement('script');
+                        script.textContent = scriptContent;
+                        document.head.appendChild(script);
+
+                        console.log('✅ JAM Get Started Module script loaded and executed');
+
+                        // Wait for the module to initialize
+                        console.log('⏳ Waiting 300ms for module to initialize...');
+                        setTimeout(() => {
+                            console.log('🔍 === POST-LOAD VERIFICATION (300ms delay) ===');
+                            console.log('🔍 window.JAMGetStartedModule exists:', !!window.JAMGetStartedModule);
+
+                            if (window.JAMGetStartedModule) {
+                                console.log('✅ === MODULE AVAILABLE AFTER LOADING ===');
+                                console.log('🔍 Module object:', window.JAMGetStartedModule);
+                                console.log('🔍 Module methods:', Object.keys(window.JAMGetStartedModule));
+
+                                console.log('🔧 Initializing module with container...');
+                                try {
+                                    window.JAMGetStartedModule.init('jam-get-started-container');
+                                    console.log('✅ Module initialization completed');
+                                } catch (initError) {
+                                    console.error('❌ Error during initialization:', initError);
+                                    showFallbackMessage();
+                                    return;
+                                }
+
+                                console.log('🚀 === ATTEMPTING TO OPEN QUIZ (FIRST TIME) ===');
+                                try {
+                                    console.log('🔧 Calling openQuiz()...');
+                                    window.JAMGetStartedModule.openQuiz();
+                                    console.log('✅ openQuiz() call completed');
+
+                                    // Double-check that the modal is actually visible
+                                    setTimeout(() => {
+                                        console.log('🔍 === POST-OPEN VERIFICATION (FIRST TIME, 100ms delay) ===');
+                                        const modal = document.querySelector('#nav-quizModal');
+                                        console.log('🔍 Modal found after first open:', !!modal);
+
+                                        if (modal) {
+                                            console.log('🔍 Modal display after first open:', modal.style.display);
+                                            console.log('🔍 Modal visibility after first open:', modal.style.visibility);
+                                            console.log('🔍 Modal computed display:', window.getComputedStyle(modal).display);
+
+                                            if (modal.style.display !== 'flex') {
+                                                console.log('🔧 === FORCING MODAL DISPLAY (FIRST TIME) ===');
+                                                console.log('🔧 Modal not visible after init, forcing display...');
+                                                modal.style.display = 'flex';
+                                                document.body.style.overflow = 'hidden';
+                                                console.log('✅ Forced modal display (first time)');
+                                            } else {
+                                                console.log('✅ Modal properly displayed (first time)');
+                                            }
+                                        } else {
+                                            console.error('❌ Modal not found after first openQuiz() call');
+                                            showFallbackMessage();
+                                        }
+                                    }, 100);
+                                } catch (error) {
+                                    console.error('❌ === ERROR OPENING QUIZ (FIRST TIME) ===');
+                                    console.error('❌ Error opening quiz after init:', error);
+                                    console.error('❌ Error stack:', error.stack);
+                                    showFallbackMessage();
+                                }
+                            } else {
+                                console.error('❌ === MODULE NOT AVAILABLE AFTER LOADING ===');
+                                console.error('❌ JAM Get Started Module not available after loading');
+                                console.log('🔍 window object keys containing "JAM":', Object.keys(window).filter(key => key.includes('JAM')));
+                                showFallbackMessage();
+                            }
+                        }, 300);
+                    } else {
+                        console.error('❌ === SCRIPT EXTRACTION FAILED ===');
+                        console.error('❌ Could not extract script from NavGetStarted.html');
+                        console.log('🔍 HTML preview (first 500 chars):', html.substring(0, 500));
+                        showFallbackMessage();
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ === FETCH FAILED ===');
+                    console.error('❌ Failed to load JAM Get Started Module:', error);
+                    console.error('❌ Error details:', error.message);
+                    showFallbackMessage();
+                });
+
+            function showFallbackMessage() {
+                // Create a simple fallback modal
+                const fallbackModal = document.createElement('div');
+                fallbackModal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0, 0, 0, 0.8);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    box-sizing: border-box;
+                `;
+
+                fallbackModal.innerHTML = `
+                    <div style="
+                        background: white;
+                        border-radius: 12px;
+                        padding: 2rem;
+                        max-width: 500px;
+                        width: 100%;
+                        text-align: center;
+                        position: relative;
+                    ">
+                        <button onclick="this.parentElement.parentElement.remove(); document.body.style.overflow = '';" style="
+                            position: absolute;
+                            top: 1rem;
+                            right: 1rem;
+                            background: none;
+                            border: none;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                            color: #666;
+                        ">×</button>
+                        
+                        <h2 style="color: #002742; margin-bottom: 1rem;">🚀 Start Your Credit Journey</h2>
+                        <p style="color: #666; margin-bottom: 2rem;">Ready to improve your credit? Let's get you started!</p>
+                        
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button onclick="window.location.href='https://jamcapitalconsultants.com/signup'" style="
+                                flex: 1;
+                                background: linear-gradient(135deg, #09ccfc 0%, #0099cc 100%);
+                                color: white;
+                                border: none;
+                                padding: 1rem 2rem;
+                                border-radius: 8px;
+                                font-size: 1.1rem;
+                                font-weight: 600;
+                                cursor: pointer;
+                                min-width: 150px;
+                            ">
+                                Get Started Now
+                            </button>
+                            <button onclick="this.parentElement.parentElement.parentElement.remove(); document.body.style.overflow = '';" style="
+                                background: transparent;
+                                color: #666;
+                                border: 2px solid #ddd;
+                                padding: 1rem 1.5rem;
+                                border-radius: 8px;
+                                cursor: pointer;
+                            ">
+                                Maybe Later
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(fallbackModal);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header-nav');
+            if (window.scrollY > 50) {
+                header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Prevent zoom on double tap (iOS)
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Add touch feedback for mobile menu items
+        document.querySelectorAll('.nav-mobile-menu-link').forEach(link => {
+            link.addEventListener('touchstart', function () {
+                this.style.backgroundColor = 'var(--gray-100)';
+            });
+
+            link.addEventListener('touchend', function () {
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 150);
+            });
+        });
+
+        // Initialize button debugging
+        setupButtonClickDebugging();
+
+        // Expose debug functions globally for manual testing
+        window.debugButtonState = debugButtonState;
+        window.setupButtonClickDebugging = setupButtonClickDebugging;
+
+        console.log('🔧 Navigation debugging initialized');
+        console.log('💡 Use debugButtonState() in console to check button state');
+        console.log('💡 Use setupButtonClickDebugging() to reinitialize click debugging');
+
+
+    </script>
+</body>
+
+</html>

@@ -9,10 +9,17 @@ export const authController = {
         try {
             const { name, email, password, phone, company, securityQuestion, securityAnswer, ...otherData } = req.body;
             
+            console.log('🔍 === REGISTRATION DEBUG START ===');
             console.log('🔍 Registration started for:', email);
+            console.log('🔍 Request body keys:', Object.keys(req.body));
+            console.log('🔍 Environment check:');
+            console.log('  - JWT_SECRET exists:', !!process.env.JWT_SECRET);
+            console.log('  - JWT_SECRET length:', process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 'undefined');
             
             // Get CosmosService from app.locals
             const cosmosService = req.app.locals.cosmosService;
+            console.log('🔍 CosmosService check:', !!cosmosService);
+            
             if (!cosmosService) {
                 console.error('❌ CosmosService not available');
                 return res.status(503).json({
@@ -23,12 +30,14 @@ export const authController = {
 
             // Validate security question and answer
             if (!securityQuestion || !securityAnswer) {
+                console.log('❌ Missing security question/answer');
                 return res.status(400).json({
                     success: false,
                     message: 'Security question and answer are required'
                 });
             }
 
+            console.log('🔍 Checking for existing user...');
             // Check if user already exists
             const existingUser = await cosmosService.getUserByEmail(email);
             if (existingUser) {
@@ -38,18 +47,24 @@ export const authController = {
                     message: 'User already exists with this email'
                 });
             }
+            console.log('✅ No existing user found');
 
+            console.log('🔍 Hashing password...');
             // Hash password
             const saltRounds = 12;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
+            console.log('✅ Password hashed successfully');
 
+            console.log('🔍 Hashing security answer...');
             // Hash security answer with salt
             const securitySalt = crypto.randomBytes(16).toString('hex');
             const normalizedAnswer = securityAnswer.trim().toLowerCase();
             const securityAnswerHash = crypto
                 .pbkdf2Sync(normalizedAnswer, securitySalt, 10000, 64, 'sha512')
                 .toString('hex');
+            console.log('✅ Security answer hashed successfully');
 
+            console.log('🔍 Creating User model...');
             // Create user using User model to ensure Free Tier subscription is assigned
             const user = new User({
                 name: name.trim(),
@@ -63,59 +78,159 @@ export const authController = {
                 ghlContactId: null,
                 ghlSyncStatus: 'pending'
             });
+            console.log('✅ User model created');
 
             console.log('💾 Saving user to database...');
             // Save user using User model's save method to ensure proper validation and subscription assignment
             const savedUser = await user.save();
             console.log('✅ User saved to database:', savedUser.id);
 
+            console.log('🔍 Starting GHL sync...');
             // Sync to GoHighLevel CRM
-            console.log('🔄 Starting GHL sync for user:', savedUser.email);
-            
-            const ghlResult = await ghlSyncMiddleware.syncNewUser({
-                id: savedUser.id,
-                name: savedUser.name,
-                email: savedUser.email,
-                phone: savedUser.phone,
-                company: savedUser.company,
-                ...otherData
-            });
-
-            console.log('📊 GHL sync result:', JSON.stringify(ghlResult, null, 2));
-
-            // Update user record with GHL contact ID if successful
-            if (ghlResult.success && ghlResult.ghlContactId) {
-                console.log('✅ GHL sync successful, updating user record...');
-                await cosmosService.updateDocument(savedUser.id, 'user', {
-                    ghlContactId: ghlResult.ghlContactId,
-                    ghlSyncStatus: 'synced',
-                    updatedAt: new Date().toISOString()
-                });
-                console.log('✅ User record updated with GHL contact ID:', ghlResult.ghlContactId);
-            } else if (!ghlResult.success) {
-                console.log('❌ GHL sync failed, updating status...');
-                await cosmosService.updateDocument(savedUser.id, 'user', {
-                    ghlSyncStatus: 'failed',
-                    updatedAt: new Date().toISOString()
-                });
-                console.log('❌ GHL sync error:', ghlResult.error);
+            try {
+                let ghlService = req.app.locals.ghlService;
+                console.log('🔍 GHL Service from app.locals:', !!ghlService);
+                console.log('🔍 Global GHL Service:', !!global.ghlService);
+                
+                // Use the working GHL service (prefer app.locals, fallback to global)
+                let workingGhlService = ghlService || global.ghlService;
+                
+                // If no service is available, create and initialize our own (like the manual script)
+                if (!workingGhlService) {
+                    console.log('❌ No GHL service available anywhere - attempting to create new instance...');
+                    
+                    try {
+                        // Import GoHighLevelService dynamically to avoid startup issues
+                        const { GoHighLevelService } = await import('../services/ghlService.js');
+                        
+                        console.log('🔄 Creating new GoHighLevel service instance...');
+                        const newGhlService = new GoHighLevelService();
+                        const initialized = await newGhlService.initialize();
+                        
+                        if (initialized) {
+                            console.log('✅ Successfully created and initialized new GHL service');
+                            workingGhlService = newGhlService;
+                            
+                            // Update app.locals for future requests
+                            req.app.locals.ghlService = newGhlService;
+                            global.ghlService = newGhlService;
+                        } else {
+                            console.log('❌ New GHL service initialization failed');
+                        }
+                    } catch (createError) {
+                        console.error('❌ Failed to create new GHL service:', createError.message);
+                    }
+                }
+                
+                if (!workingGhlService) {
+                    console.log('❌ Unable to create or find working GHL service - skipping sync');
+                    await cosmosService.updateDocument(savedUser.id, 'user', {
+                        ghlSyncStatus: 'skipped_no_service',
+                        updatedAt: new Date().toISOString()
+                    });
+                } else {
+                    console.log('✅ Using GHL service for sync');
+                    
+                    // 🎯 PROACTIVE TOKEN REFRESH - Check token validity before sync
+                    try {
+                        console.log('🔍 Checking GHL token validity before sync...');
+                        const tokenInfo = await workingGhlService.getTokenInfo();
+                        
+                        if (!tokenInfo.success || tokenInfo.tokenInfo.isExpired) {
+                            console.log('⚠️ Token expired or invalid, attempting refresh...');
+                            // Force re-initialization to refresh token
+                            await workingGhlService.initialize();
+                        } else {
+                            console.log('✅ Token is valid for sync operation');
+                        }
+                    } catch (tokenError) {
+                        console.log('⚠️ Token check failed, continuing with sync attempt:', tokenError.message);
+                    }
+                    
+                    const ghlResult = await ghlSyncMiddleware.syncNewUser({
+                        id: savedUser.id,
+                        name: savedUser.name,
+                        email: savedUser.email,
+                        phone: savedUser.phone,
+                        company: savedUser.company,
+                        ...otherData
+                    }, workingGhlService);
+                    
+                    if (ghlResult.success) {
+                        console.log('✅ GHL sync successful');
+                        savedUser.ghlContactId = ghlResult.ghlContactId;
+                        savedUser.ghlSyncStatus = 'synced';
+                        
+                        // Update the user in the database with GHL contact ID
+                        console.log('🔄 Updating user with GHL contact ID...');
+                        await cosmosService.updateDocument(savedUser.id, 'user', {
+                            ghlContactId: ghlResult.ghlContactId,
+                            ghlSyncStatus: 'synced',
+                            updatedAt: new Date().toISOString()
+                        });
+                        console.log('✅ User updated with GHL contact ID');
+                    } else {
+                        console.log('❌ GHL sync failed:', ghlResult.error);
+                        savedUser.ghlSyncStatus = 'failed';
+                        
+                        // Update the user in the database with failed status
+                        await cosmosService.updateDocument(savedUser.id, 'user', {
+                            ghlSyncStatus: 'failed',
+                            ghlSyncError: ghlResult.error,
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+                }
+            } catch (ghlError) {
+                console.error('❌ GHL sync threw exception:', ghlError);
+                // Continue with registration even if GHL fails
             }
 
+            console.log('🔍 Generating JWT token...');
+            console.log('🔍 JWT_SECRET check before signing:', !!process.env.JWT_SECRET);
+            
             // Generate JWT token
-            const token = jwt.sign(
-                { 
-                    userId: savedUser.id, 
-                    email: savedUser.email,
-                    role: savedUser.role || 'user'
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: '7d' }
-            );
+            let token;
+            try {
+                token = jwt.sign(
+                    { 
+                        userId: savedUser.id, 
+                        email: savedUser.email,
+                        role: savedUser.role || 'user'
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '7d' }
+                );
+                console.log('✅ JWT token generated successfully');
+            } catch (jwtError) {
+                console.error('❌ JWT token generation failed:', jwtError);
+                throw new Error(`JWT generation failed: ${jwtError.message}`);
+            }
 
+            console.log('🔍 Preparing response...');
             // Remove sensitive data from response
-            const { password: _, securityAnswerHash: __, securitySalt: ___, ...userResponse } = savedUser;
+            // Create a completely clean object to avoid any circular references
+            const userResponse = {
+                id: String(savedUser.id || ''),
+                name: String(savedUser.name || ''),
+                email: String(savedUser.email || ''),
+                phone: String(savedUser.phone || ''),
+                company: String(savedUser.company || ''),
+                role: String(savedUser.role || 'user'),
+                subscription: savedUser.subscription ? {
+                    tier: String(savedUser.subscription.tier || 'free'),
+                    credits: Number(savedUser.subscription.credits || 0),
+                    maxCredits: Number(savedUser.subscription.maxCredits || 2)
+                } : { tier: 'free', credits: 0, maxCredits: 2 },
+                credits: Number(savedUser.credits || 0),
+                createdAt: String(savedUser.createdAt || new Date().toISOString()),
+                updatedAt: String(savedUser.updatedAt || new Date().toISOString()),
+                ghlContactId: String(savedUser.ghlContactId || ''),
+                ghlSyncStatus: String(savedUser.ghlSyncStatus || 'pending')
+            };
 
             console.log('✅ Registration successful for:', email);
+            console.log('🔍 === REGISTRATION DEBUG END ===');
 
             res.status(201).json({
                 success: true,
@@ -125,7 +240,13 @@ export const authController = {
             });
 
         } catch (error) {
-            console.error('❌ Registration error:', error);
+            console.error('❌ === REGISTRATION ERROR DETAILS ===');
+            console.error('❌ Error name:', error.name);
+            console.error('❌ Error message:', error.message);
+            console.error('❌ Error stack:', error.stack);
+            console.error('❌ Full error object:', error);
+            console.error('❌ === END ERROR DETAILS ===');
+            
             res.status(500).json({ 
                 success: false, 
                 error: 'Registration failed. Please try again.' 
@@ -269,6 +390,51 @@ export const authController = {
             res.status(500).json({ 
                 success: false, 
                 error: 'Login failed. Please try again.' 
+            });
+        }
+    },
+
+    // TEST ENDPOINT - Remove after testing
+    async generateTestToken(req, res) {
+        try {
+            // Create test user data matching your system
+            const testUser = {
+                id: 'test_user_123',
+                email: 'test@jamcapital.com', 
+                role: 'user',
+                name: 'Test User',
+                phone: '555-0123',
+                company: 'Test Company'
+            };
+
+            // Generate token using same structure as login
+            const token = jwt.sign(
+                { 
+                    id: testUser.id,
+                    email: testUser.email,
+                    role: testUser.role
+                },
+                process.env.JWT_SECRET || 'your-secret-key',
+                { expiresIn: '24h' }
+            );
+
+            res.json({
+                success: true,
+                message: 'Test token generated',
+                token: token,
+                user: testUser,
+                instructions: {
+                    token: 'Copy this token to your test page',
+                    userId: 'Use the user.id as your test user ID',
+                    expires: '24 hours'
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Test token generation error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to generate test token'
             });
         }
     },
@@ -437,25 +603,55 @@ export const authController = {
 
     async getSecurityQuestion(req, res) {
         try {
+            console.log('🔍 === GET SECURITY QUESTION DEBUG START ===');
+            console.log('🔍 Request body:', req.body);
+            
             const { email } = req.body;
 
             if (!email) {
+                console.log('❌ No email provided in request');
                 return res.status(400).json({
                     success: false,
                     error: 'Email is required'
                 });
             }
 
+            console.log('🔍 Email provided:', email);
+            console.log('🔍 Checking cosmosService availability...');
+            
             const cosmosService = req.app.locals.cosmosService;
+            console.log('🔍 CosmosService exists:', !!cosmosService);
+            
+            if (!cosmosService) {
+                console.error('❌ CosmosService not available in app.locals');
+                console.log('🔍 Available app.locals keys:', Object.keys(req.app.locals));
+                return res.status(503).json({
+                    success: false,
+                    error: 'Database service not available'
+                });
+            }
+
+            console.log('🔍 Attempting to get user by email...');
             const user = await cosmosService.getUserByEmail(email.toLowerCase().trim());
+            
+            console.log('🔍 User found:', !!user);
+            console.log('🔍 User has securityQuestion:', !!(user && user.securityQuestion));
+            
+            if (user && user.securityQuestion) {
+                console.log('🔍 User security question key:', user.securityQuestion);
+            }
 
             if (!user) {
+                console.log('❌ No user found with email:', email);
                 return res.status(404).json({
                     success: false,
                     error: 'No account found with this email address'
                 });
             }
 
+            console.log('✅ User found, returning security question');
+            console.log('🔍 === GET SECURITY QUESTION DEBUG END ===');
+            
             res.json({
                 success: true,
                 securityQuestion: user.securityQuestion
@@ -463,6 +659,7 @@ export const authController = {
 
         } catch (error) {
             console.error('❌ Get security question error:', error);
+            console.error('❌ Error stack:', error.stack);
             res.status(500).json({
                 success: false,
                 error: 'Failed to retrieve security question'
