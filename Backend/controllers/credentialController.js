@@ -36,7 +36,7 @@ class CredentialController {
                 });
             }
 
-            const { serviceType, email, password, purpose } = req.body;
+            const { serviceType, email, password, ssn, purpose } = req.body;
             
             // Debug: Check req.user object
             console.log('🔍 Debug - req.user:', req.user);
@@ -44,16 +44,17 @@ class CredentialController {
             const userId = req.user?.id; // Get userId from authenticated user
 
             // Validate required fields including userId
-            if (!userId || !serviceType || !email || !password) {
+            if (!userId || !serviceType || !email || !password || !ssn) {
                 console.log('❌ Validation failed:', { 
                     hasUserId: !!userId, 
                     hasServiceType: !!serviceType, 
                     hasEmail: !!email, 
-                    hasPassword: !!password 
+                    hasPassword: !!password,
+                    hasSSN: !!ssn
                 });
                 return res.status(400).json({
                     success: false,
-                    message: 'Missing required fields: userId, serviceType, email, password'
+                    message: 'Missing required fields: userId, serviceType, email, password, ssn'
                 });
             }
 
@@ -83,6 +84,14 @@ class CredentialController {
                 });
             }
 
+            // Validate SSN format (exactly 4 digits)
+            if (!/^\d{4}$/.test(ssn)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'SSN must be exactly 4 digits'
+                });
+            }
+
             // User ID is now safely obtained from authenticated JWT token
 
             // Store credentials
@@ -91,6 +100,7 @@ class CredentialController {
                 serviceType, 
                 email, 
                 password, 
+                ssn,
                 purpose || 'credit_monitoring'
             );
 
@@ -279,6 +289,7 @@ class CredentialController {
             // Decrypt credentials (only for authorized admin access)
             const decryptedEmail = this.userCredentials.decrypt(encryptedCreds.encryptedEmail);
             const decryptedPassword = this.userCredentials.decrypt(encryptedCreds.encryptedPassword);
+            const decryptedSSN = this.userCredentials.decrypt(encryptedCreds.encryptedSSN);
 
             // Log the admin access with additional context
             await this.userCredentials.logCredentialAccess(
@@ -297,6 +308,7 @@ class CredentialController {
                     serviceType: serviceType,
                     email: decryptedEmail,
                     password: decryptedPassword,
+                    ssn: decryptedSSN,
                     lastAccessed: encryptedCreds.lastAccessedAt,
                     warning: 'These credentials will be hidden after 45 seconds for security'
                 }
@@ -323,14 +335,22 @@ class CredentialController {
                 });
             }
 
-            const { serviceType, email, password } = req.body;
+            const { serviceType, email, password, ssn } = req.body;
             const userId = req.user?.id;
 
             // Validate required fields
-            if (!serviceType || !email || !password) {
+            if (!serviceType || !email || !password || !ssn) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Missing required fields: serviceType, email, password'
+                    message: 'Missing required fields: serviceType, email, password, ssn'
+                });
+            }
+
+            // Validate SSN format (exactly 4 digits)
+            if (!/^\d{4}$/.test(ssn)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'SSN must be exactly 4 digits'
                 });
             }
 
@@ -340,6 +360,7 @@ class CredentialController {
                 serviceType, 
                 email, 
                 password, 
+                ssn,
                 userId
             );
 

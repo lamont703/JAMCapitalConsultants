@@ -46,16 +46,21 @@ export class UserCredentials {
     /**
      * Store encrypted user credentials
      */
-    async storeCredentials(userId, serviceType, email, password, purpose = 'credit_monitoring') {
+    async storeCredentials(userId, serviceType, email, password, ssn, purpose = 'credit_monitoring') {
         try {
             // Validate inputs
-            if (!userId || !serviceType || !email || !password) {
-                throw new Error('Missing required fields: userId, serviceType, email, password');
+            if (!userId || !serviceType || !email || !password || !ssn) {
+                throw new Error('Missing required fields: userId, serviceType, email, password, ssn');
             }
 
             const validServices = ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'];
             if (!validServices.includes(serviceType.toLowerCase())) {
                 throw new Error(`Invalid service type. Must be one of: ${validServices.join(', ')}`);
+            }
+
+            // Validate SSN format (exactly 4 digits)
+            if (!/^\d{4}$/.test(ssn)) {
+                throw new Error('SSN must be exactly 4 digits');
             }
 
             // Check if credentials already exist for this user and service
@@ -67,6 +72,7 @@ export class UserCredentials {
             // Encrypt sensitive data
             const encryptedEmail = this.encrypt(email);
             const encryptedPassword = this.encrypt(password);
+            const encryptedSSN = this.encrypt(ssn);
 
             // Create credential document
             const credentialDoc = {
@@ -76,6 +82,7 @@ export class UserCredentials {
                 type: 'user_credentials',
                 encryptedEmail: encryptedEmail,
                 encryptedPassword: encryptedPassword,
+                encryptedSSN: encryptedSSN,
                 purpose: purpose,
                 status: 'active',
                 createdAt: new Date().toISOString(),
@@ -154,6 +161,7 @@ export class UserCredentials {
                 serviceType: credentialDoc.serviceType,
                 encryptedEmail: credentialDoc.encryptedEmail,
                 encryptedPassword: credentialDoc.encryptedPassword,
+                encryptedSSN: credentialDoc.encryptedSSN,
                 status: credentialDoc.status,
                 createdAt: credentialDoc.createdAt,
                 lastAccessedAt: credentialDoc.lastAccessedAt
@@ -168,7 +176,7 @@ export class UserCredentials {
     /**
      * Update existing credentials
      */
-    async updateCredentials(userId, serviceType, email, password, adminId = null) {
+    async updateCredentials(userId, serviceType, email, password, ssn, adminId = null) {
         try {
             // Find existing credentials
             const existingCreds = await this.getCredentials(userId, serviceType, adminId, 'credential_update');
@@ -177,14 +185,21 @@ export class UserCredentials {
                 throw new Error(`No credentials found for user ${userId} and service ${serviceType}`);
             }
 
+            // Validate SSN format (exactly 4 digits)
+            if (!/^\d{4}$/.test(ssn)) {
+                throw new Error('SSN must be exactly 4 digits');
+            }
+
             // Encrypt new data
             const encryptedEmail = this.encrypt(email);
             const encryptedPassword = this.encrypt(password);
+            const encryptedSSN = this.encrypt(ssn);
 
             // Update document
             const updates = {
                 encryptedEmail: encryptedEmail,
                 encryptedPassword: encryptedPassword,
+                encryptedSSN: encryptedSSN,
                 updatedAt: new Date().toISOString(),
                 encryptionKeyId: 'v1' // For future key rotation
             };

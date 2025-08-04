@@ -389,6 +389,244 @@
             transform: translateY(-2px);
         }
 
+        /* Professional Credentials Styles */
+        .ceo-credentials-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+            align-items: start;
+        }
+
+        .ceo-credential-badge {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(9, 204, 252, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .ceo-credential-badge:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(9, 204, 252, 0.25);
+        }
+
+        .ceo-badge-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .ceo-badge-text h4 {
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .ceo-badge-text p {
+            color: var(--gray-600);
+            margin-bottom: 0;
+            font-size: 1rem;
+        }
+
+        .ceo-certificate-display {
+            text-align: center;
+        }
+
+        .ceo-certificate-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ceo-certificate-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .ceo-certificate-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        .ceo-certificate-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(9, 204, 252, 0.9);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .ceo-certificate-container:hover .ceo-certificate-overlay {
+            opacity: 1;
+        }
+
+        .ceo-certificate-overlay i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .ceo-certificate-overlay span {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .ceo-certificate-caption {
+            margin-top: 15px;
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .ceo-certificate-caption strong {
+            color: var(--primary-dark);
+        }
+
+        /* Certificate Modal */
+        .ceo-certificate-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .ceo-certificate-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .ceo-modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .ceo-modal-image {
+            max-width: 85%;
+            max-height: 85%;
+            width: auto;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .ceo-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: var(--white);
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            z-index: 10;
+        }
+
+        .ceo-modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Trust Badge in Hero */
+        .ceo-hero-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .ceo-hero-badge:hover {
+            transform: scale(1.1);
+        }
+
+        .ceo-hero-badge img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        /* CTA Section Badge */
+        .ceo-cta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px 25px;
+            background: var(--white);
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .ceo-cta-badge img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .ceo-cta-badge span {
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .ceo-hero-content {
@@ -431,6 +669,41 @@
 
             .ceo-container {
                 padding: 0 15px;
+            }
+
+            .ceo-credentials-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .ceo-credential-badge {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .ceo-badge-logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .ceo-hero-badge {
+                position: static;
+                margin-top: 20px;
+            }
+
+            .ceo-modal-content {
+                max-width: 95%;
+                max-height: 85%;
+                padding: 15px;
+            }
+
+            .ceo-modal-close {
+                top: 10px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 25px;
             }
         }
     </style>
@@ -515,6 +788,36 @@
                 standing with you every step of the way.</p>
         </section>
 
+        <!-- Professional Credentials Section -->
+        <section class="ceo-content-section">
+            <h2 class="ceo-section-title">Professional Credentials</h2>
+            <div class="ceo-credentials-container">
+                <div class="ceo-credential-badge">
+                    <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/688912d5f3ce83b35b4e4aa4.png"
+                        alt="Credit Consultants Association Certified Badge" class="ceo-badge-logo">
+                    <div class="ceo-badge-text">
+                        <h4>Board Certified Credit Consultant</h4>
+                        <p>Officially Certified by the Credit Consultants Association</p>
+                    </div>
+                </div>
+                <div class="ceo-certificate-display">
+                    <div class="ceo-certificate-container" onclick="openCertificateModal()">
+                        <img src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/68890eabc4f6bc54ed3423d4.jpeg"
+                            alt="Board Certified Credit Consultant Certificate - Carnelius Johnson"
+                            class="ceo-certificate-image">
+                        <div class="ceo-certificate-overlay">
+                            <i class="fas fa-search-plus"></i>
+                            <span>Click to view certificate</span>
+                        </div>
+                    </div>
+                    <p class="ceo-certificate-caption">
+                        <strong>Board Certified Credit Consultant</strong><br>
+                        Credit Consultants Association • Valid through June 2027
+                    </p>
+                </div>
+            </div>
+        </section>
+
         <!-- Core Values -->
         <section class="ceo-content-section">
             <h2 class="ceo-section-title">Core Values</h2>
@@ -542,6 +845,14 @@
                     <h3>Compassion</h3>
                     <p>Understanding that financial challenges affect real people, and treating every client with
                         dignity and respect.</p>
+                </div>
+                <div class="ceo-value-card">
+                    <div class="ceo-value-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Excellence</h3>
+                    <p>Committed to delivering superior results through meticulous attention to detail and continuous
+                        improvement in every aspect of our service.</p>
                 </div>
             </div>
         </section>
@@ -603,6 +914,16 @@
                 relationship.</p>
             <button class="ceo-cta-btn" onclick="openJAMEngine();">Get Started Today</button>
         </section>
+    </div>
+
+    <!-- Certificate Modal -->
+    <div id="certificateModal" class="ceo-certificate-modal" onclick="closeCertificateModal()">
+        <div class="ceo-modal-content" onclick="event.stopPropagation()">
+            <span class="ceo-modal-close" onclick="closeCertificateModal()">&times;</span>
+            <img id="modalCertificateImage" class="ceo-modal-image"
+                src="https://storage.googleapis.com/msgsndr/gaOp7QAouTuwykUssx6C/media/68890eabc4f6bc54ed3423d4.jpeg"
+                alt="Board Certified Credit Consultant Certificate - Carnelius Johnson">
+        </div>
     </div>
 
     <script>
@@ -697,6 +1018,30 @@
                 changeSlide(1);
             }
         });
+
+        // Certificate Modal Functions
+        function openCertificateModal() {
+            document.getElementById('certificateModal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeCertificateModal() {
+            document.getElementById('certificateModal').classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeCertificateModal();
+            }
+        });
+
+        // Ensure openJAMEngine function exists or add placeholder
+        function openJAMEngine() {
+            // Add your JAM Engine opening logic here
+            alert('JAM Engine functionality will be implemented here');
+        }
     </script>
 </body>
 
