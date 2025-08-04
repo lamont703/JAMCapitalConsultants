@@ -2120,6 +2120,11 @@
                                     <input type="password" id="smartcredit-password" name="password" required>
                                 </div>
 
+                                <div class="form-group">
+                                    <label for="smartcredit-ssn">Last 4 Digits of SSN:</label>
+                                    <input type="text" id="smartcredit-ssn" name="ssn" placeholder="1234" pattern="[0-9]{4}" maxlength="4" required>
+                                </div>
+
                                 <button type="submit" class="submit-btn" id="smartcredit-submit-btn">
                                     <i class="fas fa-key"></i>
                                     <span id="smartcredit-submit-text">Provide SmartCredit Access</span>
@@ -2177,6 +2182,11 @@
                                 <div class="form-group">
                                     <label for="identityiq-password">IdentityIQ Password:</label>
                                     <input type="password" id="identityiq-password" name="password" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="identityiq-ssn">Last 4 Digits of SSN:</label>
+                                    <input type="text" id="identityiq-ssn" name="ssn" placeholder="1234" pattern="[0-9]{4}" maxlength="4" required>
                                 </div>
 
                                 <button type="submit" class="submit-btn" id="identityiq-submit-btn">
@@ -2238,6 +2248,11 @@
                                     <input type="password" id="myscoreiq-password" name="password" required>
                                 </div>
 
+                                <div class="form-group">
+                                    <label for="myscoreiq-ssn">Last 4 Digits of SSN:</label>
+                                    <input type="text" id="myscoreiq-ssn" name="ssn" placeholder="1234" pattern="[0-9]{4}" maxlength="4" required>
+                                </div>
+
                                 <button type="submit" class="submit-btn" id="myscoreiq-submit-btn">
                                     <i class="fas fa-chart-bar"></i>
                                     <span id="myscoreiq-submit-text">Provide MyScoreIQ Access</span>
@@ -2297,6 +2312,11 @@
                                     <input type="password" id="cfpb-password" name="password" required>
                                 </div>
 
+                                <div class="form-group">
+                                    <label for="cfpb-ssn">Last 4 Digits of SSN:</label>
+                                    <input type="text" id="cfpb-ssn" name="ssn" placeholder="1234" pattern="[0-9]{4}" maxlength="4" required>
+                                </div>
+
                                 <button type="submit" class="submit-btn" id="cfpb-submit-btn">
                                     <i class="fas fa-shield-halved"></i>
                                     <span id="cfpb-submit-text">Provide CFPB Access</span>
@@ -2354,6 +2374,11 @@
                                 <div class="form-group">
                                     <label for="annualcreditreport-password">AnnualCreditReport.com Password:</label>
                                     <input type="password" id="annualcreditreport-password" name="password" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="annualcreditreport-ssn">Last 4 Digits of SSN:</label>
+                                    <input type="text" id="annualcreditreport-ssn" name="ssn" placeholder="1234" pattern="[0-9]{4}" maxlength="4" required>
                                 </div>
 
                                 <button type="submit" class="submit-btn" id="annualcreditreport-submit-btn">
@@ -2997,7 +3022,14 @@
                         e.preventDefault();
                         const email = container.querySelector('#smartcredit-email').value;
                         const password = container.querySelector('#smartcredit-password').value;
+                        const ssn = container.querySelector('#smartcredit-ssn').value;
                         const submitButton = smartCreditForm.querySelector('button[type="submit"]');
+
+                        // Validate SSN format (exactly 4 digits)
+                        if (!/^\d{4}$/.test(ssn)) {
+                            alert('SSN must be exactly 4 digits');
+                            return;
+                        }
 
                         // Show loading state
                         const originalButtonText = submitButton.innerHTML;
@@ -3063,6 +3095,7 @@
                                     serviceType: 'smartcredit',
                                     email: email,
                                     password: password,
+                                    ssn: ssn,
                                     purpose: 'credit_monitoring'
                                 })
                             });
@@ -3083,6 +3116,8 @@
 
                                 // Reset form
                                 smartCreditForm.reset();
+                                // Clear SSN field specifically
+                                container.querySelector('#smartcredit-ssn').value = '';
                                 const updateWarning = container.querySelector('#smartcredit-update-warning');
                                 const cancelBtn = container.querySelector('#smartcredit-cancel-btn');
                                 if (updateWarning) updateWarning.style.display = 'none';
@@ -3156,27 +3191,38 @@
                         // Get form elements
                         const emailField = container.querySelector('#identityiq-email');
                         const passwordField = container.querySelector('#identityiq-password');
+                        const ssnField = container.querySelector('#identityiq-ssn');
                         const submitButton = identityIQForm.querySelector('button[type="submit"]');
 
                         console.log('🔧 [DEBUG] Form elements found:', {
                             emailField: !!emailField,
                             passwordField: !!passwordField,
+                            ssnField: !!ssnField,
                             submitButton: !!submitButton
                         });
 
                         const email = emailField ? emailField.value : '';
                         const password = passwordField ? passwordField.value : '';
+                        const ssn = ssnField ? ssnField.value : '';
 
                         console.log('🔧 [DEBUG] Form values:', {
                             email: email ? 'PROVIDED' : 'EMPTY',
                             password: password ? 'PROVIDED' : 'EMPTY',
+                            ssn: ssn ? 'PROVIDED' : 'EMPTY',
                             emailLength: email.length,
-                            passwordLength: password.length
+                            passwordLength: password.length,
+                            ssnLength: ssn.length
                         });
 
-                        if (!email || !password) {
-                            console.error('❌ [DEBUG] Missing email or password');
-                            alert('Please fill in both email and password fields.');
+                        if (!email || !password || !ssn) {
+                            console.error('❌ [DEBUG] Missing email, password, or SSN');
+                            alert('Please fill in email, password, and last 4 digits of SSN fields.');
+                            return;
+                        }
+
+                        // Validate SSN format (exactly 4 digits)
+                        if (!/^\d{4}$/.test(ssn)) {
+                            alert('SSN must be exactly 4 digits');
                             return;
                         }
 
@@ -3245,6 +3291,7 @@
                                 serviceType: 'identityiq',
                                 email: email,
                                 password: password,
+                                ssn: ssn,
                                 purpose: 'credit_monitoring'
                             };
 
@@ -3285,6 +3332,8 @@
 
                                 // Reset form
                                 identityIQForm.reset();
+                                // Clear SSN field specifically
+                                container.querySelector('#identityiq-ssn').value = '';
                                 const updateWarning = container.querySelector('#identityiq-update-warning');
                                 const cancelBtn = container.querySelector('#identityiq-cancel-btn');
                                 if (updateWarning) updateWarning.style.display = 'none';
@@ -3412,7 +3461,14 @@
                         e.preventDefault();
                         const email = container.querySelector('#myscoreiq-email').value;
                         const password = container.querySelector('#myscoreiq-password').value;
+                        const ssn = container.querySelector('#myscoreiq-ssn').value;
                         const submitButton = myScoreIQForm.querySelector('button[type="submit"]');
+
+                        // Validate SSN format (exactly 4 digits)
+                        if (!/^\d{4}$/.test(ssn)) {
+                            alert('SSN must be exactly 4 digits');
+                            return;
+                        }
 
                         // Show loading state
                         const originalButtonText = submitButton.innerHTML;
@@ -3478,6 +3534,7 @@
                                     serviceType: 'myscoreiq',
                                     email: email,
                                     password: password,
+                                    ssn: ssn,
                                     purpose: 'credit_monitoring'
                                 })
                             });
@@ -3496,6 +3553,8 @@
 
                                 // Reset form
                                 myScoreIQForm.reset();
+                                // Clear SSN field specifically
+                                container.querySelector('#myscoreiq-ssn').value = '';
                                 const updateWarning = container.querySelector('#myscoreiq-update-warning');
                                 const cancelBtn = container.querySelector('#myscoreiq-cancel-btn');
                                 if (updateWarning) updateWarning.style.display = 'none';
@@ -3543,7 +3602,14 @@
                         e.preventDefault();
                         const email = container.querySelector('#cfpb-email').value;
                         const password = container.querySelector('#cfpb-password').value;
+                        const ssn = container.querySelector('#cfpb-ssn').value;
                         const submitButton = cfpbForm.querySelector('button[type="submit"]');
+
+                        // Validate SSN format (exactly 4 digits)
+                        if (!/^\d{4}$/.test(ssn)) {
+                            alert('SSN must be exactly 4 digits');
+                            return;
+                        }
 
                         // Show loading state
                         const originalButtonText = submitButton.innerHTML;
@@ -3609,6 +3675,7 @@
                                     serviceType: 'cfpb',
                                     email: email,
                                     password: password,
+                                    ssn: ssn,
                                     purpose: 'credit_monitoring'
                                 })
                             });
@@ -3627,6 +3694,8 @@
 
                                 // Reset form
                                 cfpbForm.reset();
+                                // Clear SSN field specifically
+                                container.querySelector('#cfpb-ssn').value = '';
                                 const updateWarning = container.querySelector('#cfpb-update-warning');
                                 const cancelBtn = container.querySelector('#cfpb-cancel-btn');
                                 if (updateWarning) updateWarning.style.display = 'none';
@@ -3674,7 +3743,14 @@
                         e.preventDefault();
                         const email = container.querySelector('#annualcreditreport-email').value;
                         const password = container.querySelector('#annualcreditreport-password').value;
+                        const ssn = container.querySelector('#annualcreditreport-ssn').value;
                         const submitButton = annualCreditReportForm.querySelector('button[type="submit"]');
+
+                        // Validate SSN format (exactly 4 digits)
+                        if (!/^\d{4}$/.test(ssn)) {
+                            alert('SSN must be exactly 4 digits');
+                            return;
+                        }
 
                         // Show loading state
                         const originalButtonText = submitButton.innerHTML;
@@ -3740,6 +3816,7 @@
                                     serviceType: 'annualcreditreport',
                                     email: email,
                                     password: password,
+                                    ssn: ssn,
                                     purpose: 'credit_monitoring'
                                 })
                             });
@@ -3758,6 +3835,8 @@
 
                                 // Reset form
                                 annualCreditReportForm.reset();
+                                // Clear SSN field specifically
+                                container.querySelector('#annualcreditreport-ssn').value = '';
                                 const updateWarning = container.querySelector('#annualcreditreport-update-warning');
                                 const cancelBtn = container.querySelector('#annualcreditreport-cancel-btn');
                                 if (updateWarning) updateWarning.style.display = 'none';

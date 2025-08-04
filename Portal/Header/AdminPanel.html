@@ -4917,6 +4917,13 @@
                         </button>
                     </div>
                     <div class="credential-item">
+                        <span class="credential-label">Last 4 Digits of SSN:</span>
+                        <input type="text" class="credential-value" value="${data.ssn || 'N/A'}" readonly>
+                        <button class="copy-btn" onclick="window.jamAdminPanel.copyToClipboard('${data.ssn || 'N/A'}', this)">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="credential-item">
                         <span class="credential-label">Last Accessed:</span>
                         <span class="credential-value">${data.lastAccessed ? new Date(data.lastAccessed).toLocaleString() : 'Never'}</span>
                     </div>
