@@ -287,9 +287,57 @@ class CredentialController {
             }
 
             // Decrypt credentials (only for authorized admin access)
-            const decryptedEmail = this.userCredentials.decrypt(encryptedCreds.encryptedEmail);
-            const decryptedPassword = this.userCredentials.decrypt(encryptedCreds.encryptedPassword);
-            const decryptedSSN = this.userCredentials.decrypt(encryptedCreds.encryptedSSN);
+            let decryptedEmail, decryptedPassword, decryptedSSN;
+            let decryptionErrors = [];
+
+            try {
+                decryptedEmail = this.userCredentials.decrypt(encryptedCreds.encryptedEmail);
+            } catch (error) {
+                console.error(`❌ Email decryption failed for ${serviceType}:`, error.message);
+                decryptionErrors.push(`Email: ${error.message}`);
+                decryptedEmail = 'DECRYPTION_FAILED';
+            }
+
+            try {
+                decryptedPassword = this.userCredentials.decrypt(encryptedCreds.encryptedPassword);
+            } catch (error) {
+                console.error(`❌ Password decryption failed for ${serviceType}:`, error.message);
+                decryptionErrors.push(`Password: ${error.message}`);
+                decryptedPassword = 'DECRYPTION_FAILED';
+            }
+
+            try {
+                decryptedSSN = this.userCredentials.decrypt(encryptedCreds.encryptedSSN);
+            } catch (error) {
+                console.error(`❌ SSN decryption failed for ${serviceType}:`, error.message);
+                decryptionErrors.push(`SSN: ${error.message}`);
+                decryptedSSN = 'DECRYPTION_FAILED';
+            }
+
+            // Check if any decryption failed
+            if (decryptionErrors.length > 0) {
+                console.warn(`⚠️ Decryption warnings for ${serviceType}:`, decryptionErrors);
+                
+                // Return a warning response instead of failing completely
+                res.json({
+                    success: true,
+                    message: 'Credentials retrieved with decryption warnings',
+                    data: {
+                        serviceType: serviceType,
+                        email: decryptedEmail,
+                        password: decryptedPassword,
+                        ssn: decryptedSSN,
+                        lastAccessed: encryptedCreds.lastAccessedAt,
+                        warning: `Some credentials could not be decrypted: ${decryptionErrors.join(', ')}. These credentials may be corrupted and should be re-entered.`,
+                        decryptionStatus: {
+                            email: decryptedEmail !== 'DECRYPTION_FAILED',
+                            password: decryptedPassword !== 'DECRYPTION_FAILED',
+                            ssn: decryptedSSN !== 'DECRYPTION_FAILED'
+                        }
+                    }
+                });
+                return;
+            }
 
             // Log the admin access with additional context
             await this.userCredentials.logCredentialAccess(

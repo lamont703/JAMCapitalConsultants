@@ -29,6 +29,10 @@ export class UserCredentials {
      */
     decrypt(encryptedText) {
         try {
+            if (!encryptedText) {
+                throw new Error('No encrypted text provided');
+            }
+
             const bytes = CryptoJS.AES.decrypt(encryptedText, this.encryptionKey);
             const decrypted = bytes.toString(CryptoJS.enc.Utf8);
             
@@ -39,7 +43,66 @@ export class UserCredentials {
             return decrypted;
         } catch (error) {
             console.error('❌ Decryption error:', error);
+            if (error.message.includes('Malformed UTF-8 data')) {
+                throw new Error('Data corruption detected - credential may be encrypted with different key');
+            }
             throw new Error('Failed to decrypt data');
+        }
+    }
+
+    /**
+     * Validate credential data integrity
+     */
+    async validateCredentialIntegrity(credentialId) {
+        try {
+            const query = `SELECT * FROM c WHERE c.id = @credentialId AND c.type = @type`;
+            const parameters = [
+                { name: '@credentialId', value: credentialId },
+                { name: '@type', value: 'user_credentials' }
+            ];
+
+            const results = await this.cosmosService.queryDocuments(query, parameters);
+            if (results.length === 0) {
+                return { valid: false, error: 'Credential not found' };
+            }
+
+            const cred = results[0];
+            const validation = {
+                valid: true,
+                errors: [],
+                warnings: []
+            };
+
+            // Check required fields
+            if (!cred.encryptedEmail) validation.errors.push('Missing encrypted email');
+            if (!cred.encryptedPassword) validation.errors.push('Missing encrypted password');
+            if (!cred.encryptedSSN) validation.errors.push('Missing encrypted SSN');
+
+            // Test decryption
+            try {
+                if (cred.encryptedEmail) this.decrypt(cred.encryptedEmail);
+            } catch (error) {
+                validation.errors.push(`Email decryption failed: ${error.message}`);
+            }
+
+            try {
+                if (cred.encryptedPassword) this.decrypt(cred.encryptedPassword);
+            } catch (error) {
+                validation.errors.push(`Password decryption failed: ${error.message}`);
+            }
+
+            try {
+                if (cred.encryptedSSN) this.decrypt(cred.encryptedSSN);
+            } catch (error) {
+                validation.errors.push(`SSN decryption failed: ${error.message}`);
+            }
+
+            validation.valid = validation.errors.length === 0;
+            return validation;
+
+        } catch (error) {
+            console.error('❌ Error validating credential integrity:', error);
+            return { valid: false, error: error.message };
         }
     }
 

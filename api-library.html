@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM Capital API Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 80vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e1e5e9;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .auth-section {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .auth-section h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-group {
+            margin-bottom: 20px;
+        }
+
+        .endpoint-group h3 {
+            color: #333;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .endpoint-group h3:hover {
+            background: #e0e0e0;
+        }
+
+        .endpoint-list {
+            display: none;
+            padding-left: 10px;
+        }
+
+        .endpoint-list.active {
+            display: block;
+        }
+
+        .endpoint-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-item:hover {
+            background: #f5f5f5;
+            border-color: #667eea;
+        }
+
+        .endpoint-item.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .method {
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-right: 8px;
+        }
+
+        .method.GET {
+            background: #4caf50;
+            color: white;
+        }
+
+        .method.POST {
+            background: #2196f3;
+            color: white;
+        }
+
+        .method.PUT {
+            background: #ff9800;
+            color: white;
+        }
+
+        .method.DELETE {
+            background: #f44336;
+            color: white;
+        }
+
+        .endpoint-details {
+            display: none;
+        }
+
+        .endpoint-details.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+
+        .response-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .response-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .response-content {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .status-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-error {
+            background: #f44336;
+            color: white;
+        }
+
+        .status-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .auth-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .auth-status.authenticated {
+            background: #4caf50;
+            color: white;
+        }
+
+        .auth-status.unauthenticated {
+            background: #f44336;
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Enhanced styles for better UX */
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d73a49;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e1e5e9, transparent);
+            margin: 20px 0;
+        }
+
+        .endpoint-item:active {
+            transform: scale(0.98);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar,
+        .content::-webkit-scrollbar,
+        .response-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track,
+        .content::-webkit-scrollbar-track,
+        .response-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb,
+        .content::-webkit-scrollbar-thumb,
+        .response-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover,
+        .content::-webkit-scrollbar-thumb:hover,
+        .response-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .response-content {
+            border: 1px solid #e1e5e9;
+        }
+
+        .json-syntax {
+            color: #e2e8f0;
+        }
+
+        .json-syntax .json-key {
+            color: #79b8ff;
+            font-weight: bold;
+        }
+
+        .json-syntax .json-string {
+            color: #9ecbff;
+        }
+
+        .json-syntax .json-number {
+            color: #79b8ff;
+        }
+
+        .json-syntax .json-boolean {
+            color: #ffab70;
+            font-weight: bold;
+        }
+
+        .json-syntax .json-null {
+            color: #f97583;
+            font-weight: bold;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin: 10px 0;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin: 10px 0;
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+            margin: 10px 0;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+            z-index: 1000;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-required {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #fed7d7;
+        }
+
+        .badge-optional {
+            background: #f0fff4;
+            color: #38a169;
+            border: 1px solid #c6f6d5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        .json-key {
+            color: #79b8ff;
+        }
+
+        .json-string {
+            color: #9ecbff;
+        }
+
+        .json-number {
+            color: #79b8ff;
+        }
+
+        .json-boolean {
+            color: #ffab70;
+        }
+
+        .json-null {
+            color: #f97583;
+        }
+
+        .parameter-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .required {
+            color: #f44336;
+        }
+
+        .optional {
+            color: #4caf50;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: #f5f5f5;
+        }
+
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 300px;
+            }
+
+            .auth-status {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 JAM Capital API Explorer</h1>
+            <p>Interactive API testing and documentation interface</p>
+        </div>
+
+        <div class="auth-status" id="authStatus">🔒 Not Authenticated</div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <!-- Authentication Section -->
+                <div class="auth-section">
+                    <h3>🔐 Authentication</h3>
+                    <div class="form-group">
+                        <label for="authEmail">Email:</label>
+                        <input type="email" id="authEmail" placeholder="admin@jamcapital.com"
+                            value="lamont703@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="authPassword">Password:</label>
+                        <input type="password" id="authPassword" placeholder="Enter password" value="10God$on02">
+                    </div>
+                    <div class="form-group">
+                        <label for="authType">Login Type:</label>
+                        <select id="authType">
+                            <option value="admin">Admin Login</option>
+                            <option value="user">User Login</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="authenticate()">🔓 Login</button>
+                    <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+                </div>
+
+                <!-- API Base URL -->
+                <div class="form-group">
+                    <label for="apiBaseUrl">API Base URL:</label>
+                    <select id="apiBaseUrl">
+                        <option value="http://localhost:3000/api">Local Development</option>
+                        <option value="https://jam-capital-backend.azurewebsites.net/api">Production</option>
+                    </select>
+                    <div class="parameter-info">
+                        💡 Local is selected since your server is running
+                    </div>
+                </div>
+
+                <!-- Server Status -->
+                <div class="form-group">
+                    <button class="btn" onclick="checkServerStatus()" style="width: 100%; font-size: 14px;">
+                        🔍 Check Server Status
+                    </button>
+                    <div id="serverStatus" class="parameter-info"></div>
+                </div>
+
+                <!-- Endpoint Groups -->
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('health')">📊 Health & Status</h3>
+                    <div class="endpoint-list" id="health-endpoints">
+                        <div class="endpoint-item" onclick="selectEndpoint('health', 'GET', '/health')">
+                            <span class="method GET">GET</span>/health
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('healthDetailed', 'GET', '/health/detailed')">
+                            <span class="method GET">GET</span>/health/detailed
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('healthGhl', 'GET', '/health/ghl')">
+                            <span class="method GET">GET</span>/health/ghl
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('auth')">🔐 Authentication</h3>
+                    <div class="endpoint-list" id="auth-endpoints">
+                        <div class="endpoint-item" onclick="selectEndpoint('register', 'POST', '/auth/register')">
+                            <span class="method POST">POST</span>/auth/register
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('adminLogin', 'POST', '/auth/login')">
+                            <span class="method POST">POST</span>/auth/login
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('logout', 'POST', '/auth/logout')">
+                            <span class="method POST">POST</span>/auth/logout
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('forgotPassword', 'POST', '/auth/forgot-password')">
+                            <span class="method POST">POST</span>/auth/forgot-password
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('resetPassword', 'POST', '/auth/reset-password')">
+                            <span class="method POST">POST</span>/auth/reset-password
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getSecurityQuestion', 'POST', '/auth/get-security-question')">
+                            <span class="method POST">POST</span>/auth/get-security-question
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('users')">👥 User Management</h3>
+                    <div class="endpoint-list" id="users-endpoints">
+                        <div class="endpoint-item" onclick="selectEndpoint('userProfile', 'GET', '/user/profile')">
+                            <span class="method GET">GET</span>/user/profile
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('updateProfile', 'PUT', '/user/profile')">
+                            <span class="method PUT">PUT</span>/user/profile
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getUserNotifications', 'GET', '/user/notifications')">
+                            <span class="method GET">GET</span>/user/notifications
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getUserDisputeReports', 'GET', '/user/dispute-reports/{userId}')">
+                            <span class="method GET">GET</span>/user/dispute-reports/{userId}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('credentials')">🔑 Credentials</h3>
+                    <div class="endpoint-list" id="credentials-endpoints">
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('storeCredentials', 'POST', '/credentials/store')">
+                            <span class="method POST">POST</span>/credentials/store
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getCredentialStatus', 'GET', '/credentials/status')">
+                            <span class="method GET">GET</span>/credentials/status
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('updateCredentials', 'PUT', '/credentials/update')">
+                            <span class="method PUT">PUT</span>/credentials/update
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('deleteCredentials', 'DELETE', '/credentials/delete')">
+                            <span class="method DELETE">DELETE</span>/credentials/delete
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('retrieveCredentials', 'POST', '/credentials/admin/retrieve')">
+                            <span class="method POST">POST</span>/credentials/admin/retrieve
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('credentialAuditTrail', 'GET', '/credentials/admin/audit/{credentialId}')">
+                            <span class="method GET">GET</span>/credentials/admin/audit/{credentialId}
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('adminAuditLog', 'GET', '/credentials/admin/audit-log')">
+                            <span class="method GET">GET</span>/credentials/admin/audit-log
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('chat')">💬 Chat & AI</h3>
+                    <div class="endpoint-list" id="chat-endpoints">
+                        <div class="endpoint-item" onclick="selectEndpoint('sendMessage', 'POST', '/chat/send')">
+                            <span class="method POST">POST</span>/chat/send
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('analyzeReports', 'POST', '/chat/analyze')">
+                            <span class="method POST">POST</span>/chat/analyze
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('analyzeUserReports', 'GET', '/chat/analyze')">
+                            <span class="method GET">GET</span>/chat/analyze
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('generateLetter', 'POST', '/chat/generate-letter')">
+                            <span class="method POST">POST</span>/chat/generate-letter
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('generateMultipleLetters', 'POST', '/chat/generate-letters')">
+                            <span class="method POST">POST</span>/chat/generate-letters
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getUserDisputeLetters', 'GET', '/chat/user-letters')">
+                            <span class="method GET">GET</span>/chat/user-letters
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('deleteDisputeLetter', 'DELETE', '/chat/dispute-letter')">
+                            <span class="method DELETE">DELETE</span>/chat/dispute-letter
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('downloadLetterPDF', 'GET', '/chat/download-letter/{letterId}')">
+                            <span class="method GET">GET</span>/chat/download-letter/{letterId}
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('manageCacheStats', 'GET', '/chat/manage-cache?action=stats')">
+                            <span class="method GET">GET</span>/chat/manage-cache?action=stats
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('clearCache', 'GET', '/chat/manage-cache?action=clear')">
+                            <span class="method GET">GET</span>/chat/manage-cache?action=clear
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('subscriptions')">💰 Subscriptions</h3>
+                    <div class="endpoint-list" id="subscriptions-endpoints">
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getSubscriptionDashboard', 'GET', '/subscriptions/dashboard')">
+                            <span class="method GET">GET</span>/subscriptions/dashboard
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getSubscriptionTiers', 'GET', '/subscriptions/tiers')">
+                            <span class="method GET">GET</span>/subscriptions/tiers
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('canGenerateDispute', 'GET', '/subscriptions/can-generate-dispute')">
+                            <span class="method GET">GET</span>/subscriptions/can-generate-dispute
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getPaymentHistory', 'GET', '/subscriptions/payment-history')">
+                            <span class="method GET">GET</span>/subscriptions/payment-history
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('getUsage', 'GET', '/subscriptions/usage')">
+                            <span class="method GET">GET</span>/subscriptions/usage
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('upgradeSubscription', 'POST', '/subscriptions/upgrade')">
+                            <span class="method POST">POST</span>/subscriptions/upgrade
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('consumeCredits', 'POST', '/subscriptions/consume-credits')">
+                            <span class="method POST">POST</span>/subscriptions/consume-credits
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('fixCredits', 'POST', '/subscriptions/fix-credits')">
+                            <span class="method POST">POST</span>/subscriptions/fix-credits
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('cancelSubscription', 'POST', '/subscriptions/cancel')">
+                            <span class="method POST">POST</span>/subscriptions/cancel
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('admin')">🔧 Admin</h3>
+                    <div class="endpoint-list" id="admin-endpoints">
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('sendNotification', 'POST', '/admin/send-notification')">
+                            <span class="method POST">POST</span>/admin/send-notification
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('sendDisputeUpdate', 'POST', '/admin/send-dispute-update')">
+                            <span class="method POST">POST</span>/admin/send-dispute-update
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('uploadReport', 'POST', '/admin/upload-report')">
+                            <span class="method POST">POST</span>/admin/upload-report
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('saveActivity', 'POST', '/admin/save-activity')">
+                            <span class="method POST">POST</span>/admin/save-activity
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getActivity', 'GET', '/admin/get-activity')">
+                            <span class="method GET">GET</span>/admin/get-activity
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('updateUserRole', 'PATCH', '/admin/update-user-role')">
+                            <span class="method PATCH">PATCH</span>/admin/update-user-role
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('subscriptionOverview', 'GET', '/admin/subscriptions/overview')">
+                            <span class="method GET">GET</span>/admin/subscriptions/overview
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('subscriptionUsers', 'GET', '/admin/subscriptions/users')">
+                            <span class="method GET">GET</span>/admin/subscriptions/users
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-group">
+                    <h3 onclick="toggleGroup('ghl')">🔗 GoHighLevel</h3>
+                    <div class="endpoint-list" id="ghl-endpoints">
+                        <div class="endpoint-item" onclick="selectEndpoint('syncContact', 'POST', '/ghl/sync-contact')">
+                            <span class="method POST">POST</span>/ghl/sync-contact
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('testConnection', 'GET', '/ghl/test-connection')">
+                            <span class="method GET">GET</span>/ghl/test-connection
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('createContact', 'POST', '/ghl/create-contact')">
+                            <span class="method POST">POST</span>/ghl/create-contact
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('getContact', 'GET', '/ghl/get-contact/{contactId}')">
+                            <span class="method GET">GET</span>/ghl/get-contact/{contactId}
+                        </div>
+                        <div class="endpoint-item" onclick="selectEndpoint('tokenStatus', 'GET', '/ghl/token-status')">
+                            <span class="method GET">GET</span>/ghl/token-status
+                        </div>
+                        <div class="endpoint-item"
+                            onclick="selectEndpoint('locationInfo', 'GET', '/ghl/location-info')">
+                            <span class="method GET">GET</span>/ghl/location-info
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div id="endpointDetails">
+                    <h2>👋 Welcome to JAM Capital API Explorer</h2>
+                    <p>Select an endpoint from the sidebar to start testing your API.</p>
+                    <br>
+                    <h3>🚀 Quick Start:</h3>
+                    <ol>
+                        <li><strong>Authenticate:</strong> Enter your credentials in the sidebar and click "Login"</li>
+                        <li><strong>Select Endpoint:</strong> Choose any endpoint from the categories</li>
+                        <li><strong>Configure Request:</strong> Fill in the required parameters</li>
+                        <li><strong>Send Request:</strong> Click "Send Request" to test the endpoint</li>
+                        <li><strong>View Response:</strong> See the real-time API response below</li>
+                    </ol>
+                    <br>
+                    <h3>✨ Features:</h3>
+                    <ul>
+                        <li>🔐 <strong>Authentication Management:</strong> Automatic token handling</li>
+                        <li>📊 <strong>Real-time Testing:</strong> Test all endpoints instantly</li>
+                        <li>🎨 <strong>Beautiful Interface:</strong> Clean, professional design</li>
+                        <li>📱 <strong>Mobile Friendly:</strong> Works on all devices</li>
+                        <li>🔍 <strong>Response Analysis:</strong> Enhanced JSON syntax highlighting</li>
+                        <li>⚡ <strong>Quick Actions:</strong> Pre-filled test data</li>
+                        <li>🚨 <strong>Smart Notifications:</strong> Non-intrusive status messages</li>
+                        <li>🎯 <strong>Visual Feedback:</strong> Interactive animations and effects</li>
+                    </ul>
+                </div>
+
+                <div class="response-section" id="responseSection" style="display: none;">
+                    <h3>📤 Response</h3>
+                    <div id="responseStatus"></div>
+                    <div class="response-content" id="responseContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let authToken = null;
+        let currentEndpoint = null;
+
+        // API endpoint configurations
+        const endpointConfigs = {
+            health: {
+                title: '📊 Health Check',
+                description: 'Check API health status',
+                method: 'GET',
+                path: '/health',
+                requiresAuth: false,
+                parameters: []
+            },
+            healthDetailed: {
+                title: '📊 Detailed Health Check',
+                description: 'Get detailed health information including memory and services',
+                method: 'GET',
+                path: '/health/detailed',
+                requiresAuth: false,
+                parameters: []
+            },
+            healthGhl: {
+                title: '📊 GHL Health Check',
+                description: 'Check GoHighLevel integration health',
+                method: 'GET',
+                path: '/health/ghl',
+                requiresAuth: false,
+                parameters: []
+            },
+            adminLogin: {
+                title: '🔐 Admin Login',
+                description: 'Authenticate admin user',
+                method: 'POST',
+                path: '/auth/login',
+                requiresAuth: false,
+                parameters: [
+                    { name: 'email', type: 'email', required: true, description: 'Admin email address' },
+                    { name: 'password', type: 'password', required: true, description: 'Admin password' }
+                ],
+                defaultBody: {
+                    email: 'lamont703@gmail.com',
+                    password: '10God$on02'
+                }
+            },
+            register: {
+                title: '📝 User Registration',
+                description: 'Register a new user account',
+                method: 'POST',
+                path: '/auth/register',
+                requiresAuth: false,
+                parameters: [
+                    { name: 'name', type: 'text', required: true, description: 'Full name' },
+                    { name: 'email', type: 'email', required: true, description: 'Email address' },
+                    { name: 'password', type: 'password', required: true, description: 'Password' },
+                    { name: 'phone', type: 'text', required: false, description: 'Phone number' },
+                    { name: 'company', type: 'text', required: false, description: 'Company name' }
+                ],
+                defaultBody: {
+                    name: 'John Doe',
+                    email: 'john@example.com',
+                    password: 'password123',
+                    phone: '+1234567890',
+                    company: 'Example Corp'
+                }
+            },
+            forgotPassword: {
+                title: '🔑 Forgot Password',
+                description: 'Request password reset',
+                method: 'POST',
+                path: '/auth/forgot-password',
+                requiresAuth: false,
+                parameters: [
+                    { name: 'email', type: 'email', required: true, description: 'Email address' }
+                ],
+                defaultBody: {
+                    email: 'user@example.com'
+                }
+            },
+            resetPassword: {
+                title: '🔄 Reset Password',
+                description: 'Reset password with token',
+                method: 'POST',
+                path: '/auth/reset-password',
+                requiresAuth: false,
+                parameters: [
+                    { name: 'token', type: 'text', required: true, description: 'Reset token' },
+                    { name: 'newPassword', type: 'password', required: true, description: 'New password' }
+                ],
+                defaultBody: {
+                    token: 'reset_token_here',
+                    newPassword: 'newpassword123'
+                }
+            },
+            getSecurityQuestion: {
+                title: '❓ Get Security Question',
+                description: 'Get user security question',
+                method: 'POST',
+                path: '/auth/get-security-question',
+                requiresAuth: false,
+                parameters: [
+                    { name: 'email', type: 'email', required: true, description: 'Email address' }
+                ],
+                defaultBody: {
+                    email: 'user@example.com'
+                }
+            },
+            logout: {
+                title: '🚪 Logout',
+                description: 'Logout current user',
+                method: 'POST',
+                path: '/auth/logout',
+                requiresAuth: true,
+                parameters: []
+            },
+            userProfile: {
+                title: '👤 Get User Profile',
+                description: 'Get current user profile information',
+                method: 'GET',
+                path: '/user/profile',
+                requiresAuth: true,
+                parameters: []
+            },
+            updateProfile: {
+                title: '✏️ Update Profile',
+                description: 'Update user profile information',
+                method: 'PUT',
+                path: '/user/profile',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'name', type: 'text', required: false, description: 'User full name' },
+                    { name: 'phone', type: 'text', required: false, description: 'Phone number' },
+                    { name: 'email', type: 'email', required: false, description: 'Email address' },
+                    { name: 'company', type: 'text', required: false, description: 'Company name' }
+                ],
+                defaultBody: {
+                    name: 'John Doe',
+                    phone: '+1234567890',
+                    email: 'john@example.com',
+                    company: 'Example Corp'
+                }
+            },
+            getUserNotifications: {
+                title: '🔔 Get User Notifications',
+                description: 'Get notifications for current user',
+                method: 'GET',
+                path: '/user/notifications',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'limit', type: 'number', required: false, description: 'Maximum results (default: 10)' },
+                    { name: 'unread', type: 'checkbox', required: false, description: 'Filter unread notifications' }
+                ],
+                queryParams: true
+            },
+            getUserDisputeReports: {
+                title: '📄 Get User Dispute Reports',
+                description: 'Get dispute reports for a specific user',
+                method: 'GET',
+                path: '/user/dispute-reports/{userId}',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'userId', type: 'text', required: true, description: 'User ID' }
+                ],
+                pathParams: true
+            },
+            storeCredentials: {
+                title: '💾 Store Credentials',
+                description: 'Store user credentials for a service',
+                method: 'POST',
+                path: '/credentials/store',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'serviceType', type: 'select', options: ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'], required: true, description: 'Service type' },
+                    { name: 'email', type: 'email', required: true, description: 'Service email' },
+                    { name: 'password', type: 'password', required: true, description: 'Service password' },
+                    { name: 'ssn', type: 'text', required: true, description: 'Last 4 digits of SSN' },
+                    { name: 'purpose', type: 'text', required: true, description: 'Purpose for storing credentials' }
+                ],
+                defaultBody: {
+                    serviceType: 'smartcredit',
+                    email: 'user@creditservice.com',
+                    password: 'service-password',
+                    ssn: '1234',
+                    purpose: 'credit_monitoring'
+                }
+            },
+            getCredentialStatus: {
+                title: '📊 Get Credential Status',
+                description: 'Get status of user credentials',
+                method: 'GET',
+                path: '/credentials/status',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'serviceType', type: 'select', options: ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'], required: false, description: 'Filter by service type' }
+                ],
+                queryParams: true
+            },
+            updateCredentials: {
+                title: '✏️ Update Credentials',
+                description: 'Update existing user credentials',
+                method: 'PUT',
+                path: '/credentials/update',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'serviceType', type: 'select', options: ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'], required: true, description: 'Service type' },
+                    { name: 'email', type: 'email', required: false, description: 'New service email' },
+                    { name: 'password', type: 'password', required: false, description: 'New service password' },
+                    { name: 'ssn', type: 'text', required: false, description: 'New last 4 digits of SSN' }
+                ],
+                defaultBody: {
+                    serviceType: 'smartcredit',
+                    email: 'newemail@creditservice.com',
+                    password: 'new-password'
+                }
+            },
+            deleteCredentials: {
+                title: '🗑️ Delete Credentials',
+                description: 'Delete user credentials for a service',
+                method: 'DELETE',
+                path: '/credentials/delete',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'serviceType', type: 'select', options: ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'], required: true, description: 'Service type' }
+                ],
+                defaultBody: {
+                    serviceType: 'smartcredit'
+                }
+            },
+            retrieveCredentials: {
+                title: '🔐 Retrieve Credentials (Admin)',
+                description: 'Retrieve user credentials (Admin only)',
+                method: 'POST',
+                path: '/credentials/admin/retrieve',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'userEmail', type: 'email', required: true, description: 'User email address' },
+                    { name: 'serviceType', type: 'select', options: ['smartcredit', 'identityiq', 'myscoreiq', 'cfpb', 'annualcreditreport'], required: true, description: 'Service type' },
+                    { name: 'purpose', type: 'text', required: true, description: 'Purpose for retrieval' }
+                ],
+                defaultBody: {
+                    userEmail: 'lashaikevans@gmail.com',
+                    serviceType: 'smartcredit',
+                    purpose: 'api_testing'
+                }
+            },
+            credentialAuditTrail: {
+                title: '📋 Credential Audit Trail',
+                description: 'Get audit trail for specific credential (Admin only)',
+                method: 'GET',
+                path: '/credentials/admin/audit/{credentialId}',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'credentialId', type: 'text', required: true, description: 'Credential ID' }
+                ],
+                pathParams: true
+            },
+            adminAuditLog: {
+                title: '📜 Admin Audit Log',
+                description: 'Get admin audit log (Admin only)',
+                method: 'GET',
+                path: '/credentials/admin/audit-log',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'limit', type: 'number', required: false, description: 'Maximum results' },
+                    { name: 'startDate', type: 'date', required: false, description: 'Start date filter' },
+                    { name: 'endDate', type: 'date', required: false, description: 'End date filter' }
+                ],
+                queryParams: true
+            },
+            sendMessage: {
+                title: '💬 Send Chat Message',
+                description: 'Send message to AI chat system',
+                method: 'POST',
+                path: '/chat/send',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'message', type: 'textarea', required: true, description: 'Message to send' },
+                    { name: 'context', type: 'text', required: false, description: 'Chat context' },
+                    { name: 'userId', type: 'text', required: false, description: 'User ID' }
+                ],
+                defaultBody: {
+                    message: 'Help me understand my credit report',
+                    context: 'dispute_assistance'
+                }
+            },
+            analyzeReports: {
+                title: '📊 Analyze Credit Reports',
+                description: 'Upload and analyze credit reports',
+                method: 'POST',
+                path: '/chat/analyze',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'reports', type: 'file', required: true, description: 'Credit report files to analyze (multiple files allowed)' },
+                    { name: 'userId', type: 'text', required: false, description: 'User ID' }
+                ],
+                isFileUpload: true
+            },
+            analyzeUserReports: {
+                title: '📋 Analyze User Reports',
+                description: 'Analyze already uploaded reports by user email',
+                method: 'GET',
+                path: '/chat/analyze',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'userEmail', type: 'email', required: true, description: 'User email address' }
+                ],
+                queryParams: true
+            },
+            generateLetter: {
+                title: '📝 Generate Dispute Letter',
+                description: 'Generate a single dispute letter',
+                method: 'POST',
+                path: '/chat/generate-letter',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'disputeType', type: 'text', required: true, description: 'Type of dispute' },
+                    { name: 'userInfo', type: 'textarea', required: true, description: 'User information (JSON)' },
+                    { name: 'selectedItems', type: 'textarea', required: true, description: 'Selected items to dispute (JSON)' }
+                ],
+                defaultBody: {
+                    disputeType: 'inaccurate_information',
+                    userInfo: '{"name": "John Doe", "address": "123 Main St"}',
+                    selectedItems: '[{"account": "ABC123", "issue": "incorrect balance"}]'
+                }
+            },
+            generateMultipleLetters: {
+                title: '📝 Generate Multiple Letters',
+                description: 'Generate multiple dispute letters',
+                method: 'POST',
+                path: '/chat/generate-letters',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'disputes', type: 'textarea', required: true, description: 'Array of dispute requests (JSON)' },
+                    { name: 'userInfo', type: 'textarea', required: true, description: 'User information (JSON)' }
+                ],
+                defaultBody: {
+                    disputes: '[{"disputeType": "inaccurate_information", "selectedItems": []}]',
+                    userInfo: '{"name": "John Doe", "address": "123 Main St"}'
+                }
+            },
+            getUserDisputeLetters: {
+                title: '📄 Get User Dispute Letters',
+                description: 'Get saved dispute letters for user',
+                method: 'GET',
+                path: '/chat/user-letters',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'userId', type: 'text', required: false, description: 'User ID' },
+                    { name: 'limit', type: 'number', required: false, description: 'Maximum results' }
+                ],
+                queryParams: true
+            },
+            deleteDisputeLetter: {
+                title: '🗑️ Delete Dispute Letter',
+                description: 'Delete a dispute letter',
+                method: 'DELETE',
+                path: '/chat/dispute-letter',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'letterId', type: 'text', required: true, description: 'Letter ID to delete' }
+                ],
+                defaultBody: {
+                    letterId: 'letter_id_here'
+                }
+            },
+            downloadLetterPDF: {
+                title: '📥 Download Letter PDF',
+                description: 'Download dispute letter as PDF',
+                method: 'GET',
+                path: '/chat/download-letter/{letterId}',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'letterId', type: 'text', required: true, description: 'Letter ID' }
+                ],
+                pathParams: true
+            },
+            manageCacheStats: {
+                title: '📊 Get Cache Stats',
+                description: 'Get cache statistics',
+                method: 'GET',
+                path: '/chat/manage-cache?action=stats',
+                requiresAuth: true,
+                parameters: []
+            },
+            clearCache: {
+                title: '🧹 Clear Cache',
+                description: 'Clear application cache',
+                method: 'GET',
+                path: '/chat/manage-cache?action=clear',
+                requiresAuth: true,
+                parameters: []
+            },
+            uploadDocument: {
+                title: '📤 Upload Document',
+                description: 'Upload a document',
+                method: 'POST',
+                path: '/documents/upload',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'document', type: 'file', required: true, description: 'Document file to upload' },
+                    { name: 'type', type: 'text', required: false, description: 'Document type' },
+                    { name: 'description', type: 'text', required: false, description: 'Document description' }
+                ],
+                isFileUpload: true
+            },
+            getDocuments: {
+                title: '📄 Get Documents',
+                description: 'Get user documents',
+                method: 'GET',
+                path: '/documents',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'type', type: 'text', required: false, description: 'Filter by document type' },
+                    { name: 'limit', type: 'number', required: false, description: 'Maximum results' },
+                    { name: 'page', type: 'number', required: false, description: 'Page number' }
+                ],
+                queryParams: true
+            },
+            deleteDocument: {
+                title: '🗑️ Delete Document',
+                description: 'Delete a document',
+                method: 'DELETE',
+                path: '/documents/{id}',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'id', type: 'text', required: true, description: 'Document ID to delete' }
+                ],
+                pathParams: true
+            },
+            getNotifications: {
+                title: '🔔 Get Notifications',
+                description: 'Get user notifications',
+                method: 'GET',
+                path: '/notifications',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'unread', type: 'checkbox', required: false, description: 'Filter unread notifications' },
+                    { name: 'type', type: 'text', required: false, description: 'Filter by notification type' },
+                    { name: 'limit', type: 'number', required: false, description: 'Maximum results' }
+                ],
+                queryParams: true
+            },
+            markRead: {
+                title: '✅ Mark Notification Read',
+                description: 'Mark notification as read',
+                method: 'PUT',
+                path: '/notifications/{id}/read',
+                requiresAuth: true,
+                parameters: [
+                    { name: 'id', type: 'text', required: true, description: 'Notification ID' }
+                ],
+                pathParams: true
+            }
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            updateAuthStatus();
+            // Auto-expand first group
+            toggleGroup('health');
+            // Check server status on load
+            setTimeout(() => checkServerStatus(), 1000);
+        });
+
+        // Toggle endpoint groups
+        function toggleGroup(groupName) {
+            const endpoints = document.getElementById(groupName + '-endpoints');
+            endpoints.classList.toggle('active');
+        }
+
+        // Select an endpoint
+        function selectEndpoint(endpointKey, method, path) {
+            // Clear previous selection
+            document.querySelectorAll('.endpoint-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Mark current selection
+            event.target.classList.add('active');
+
+            currentEndpoint = endpointKey;
+            const config = endpointConfigs[endpointKey];
+
+            if (!config) {
+                console.error('Endpoint configuration not found:', endpointKey);
+                return;
+            }
+
+            displayEndpointDetails(config);
+        }
+
+        // Display endpoint details
+        function displayEndpointDetails(config) {
+            const detailsDiv = document.getElementById('endpointDetails');
+
+            let html = `
+                <h2>${config.title}</h2>
+                <p><strong>Description:</strong> ${config.description}</p>
+                <p><strong>Method:</strong> <span class="method ${config.method}">${config.method}</span></p>
+                <p><strong>Path:</strong> <code>${config.path}</code></p>
+                <p><strong>Authentication:</strong> ${config.requiresAuth ? '🔒 Required' : '🔓 Not Required'}</p>
+                <hr style="margin: 20px 0;">
+            `;
+
+            if (config.parameters && config.parameters.length > 0) {
+                html += '<h3>📝 Parameters</h3>';
+
+                config.parameters.forEach(param => {
+                    const isRequired = param.required;
+                    const requiredClass = isRequired ? 'badge badge-required' : 'badge badge-optional';
+                    const requiredText = isRequired ? 'Required' : 'Optional';
+
+                    html += `
+                        <div class="form-group">
+                            <label for="param_${param.name}">
+                                ${param.name} 
+                                <span class="${requiredClass}">(${requiredText})</span>
+                            </label>
+                    `;
+
+                    if (param.type === 'select') {
+                        html += `<select id="param_${param.name}">`;
+                        html += '<option value="">-- Select --</option>';
+                        param.options.forEach(option => {
+                            html += `<option value="${option}">${option}</option>`;
+                        });
+                        html += '</select>';
+                    } else if (param.type === 'textarea') {
+                        html += `<textarea id="param_${param.name}" rows="4" placeholder="${param.description}"></textarea>`;
+                    } else if (param.type === 'checkbox') {
+                        html += `<input type="checkbox" id="param_${param.name}">`;
+                    } else if (param.type === 'file') {
+                        html += `<input type="file" id="param_${param.name}">`;
+                    } else {
+                        html += `<input type="${param.type}" id="param_${param.name}" placeholder="${param.description}">`;
+                    }
+
+                    html += `<div class="parameter-info">${param.description}</div></div>`;
+                });
+            }
+
+            // Add default body for POST/PUT requests
+            if ((config.method === 'POST' || config.method === 'PUT') && config.defaultBody && !config.isFileUpload) {
+                html += `
+                    <h3>📄 Request Body (JSON)</h3>
+                    <div class="form-group">
+                        <textarea id="requestBody" rows="8" placeholder="Enter JSON request body">${JSON.stringify(config.defaultBody, null, 2)}</textarea>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-success" onclick="sendRequest()">
+                        🚀 Send Request
+                    </button>
+                    <button class="btn" onclick="fillTestData()">
+                        🧪 Fill Test Data
+                    </button>
+                    <button class="btn" onclick="clearForm()">
+                        🧹 Clear Form
+                    </button>
+                </div>
+            `;
+
+            detailsDiv.innerHTML = html;
+            detailsDiv.classList.add('fade-in');
+
+            // Fill test data by default
+            setTimeout(() => fillTestData(), 100);
+        }
+
+        // Fill test data
+        function fillTestData() {
+            const config = endpointConfigs[currentEndpoint];
+            if (!config) return;
+
+            // Fill parameters with test data
+            config.parameters?.forEach(param => {
+                const element = document.getElementById(`param_${param.name}`);
+                if (!element) return;
+
+                let testValue = '';
+                switch (param.name) {
+                    case 'email':
+                    case 'userEmail':
+                        testValue = 'lashaikevans@gmail.com';
+                        break;
+                    case 'password':
+                        testValue = 'test-password';
+                        break;
+                    case 'serviceType':
+                        testValue = 'smartcredit';
+                        break;
+                    case 'purpose':
+                        testValue = 'api_testing';
+                        break;
+                    case 'message':
+                        testValue = 'Help me understand my credit report';
+                        break;
+                    case 'context':
+                        testValue = 'dispute_assistance';
+                        break;
+                    case 'limit':
+                        testValue = '10';
+                        break;
+                    case 'page':
+                        testValue = '1';
+                        break;
+                    case 'name':
+                        testValue = 'John Doe';
+                        break;
+                    case 'phone':
+                        testValue = '+1234567890';
+                        break;
+                    case 'address':
+                        testValue = '123 Main St';
+                        break;
+                    case 'ssn':
+                        testValue = '1234';
+                        break;
+                    case 'type':
+                        testValue = 'credit_report';
+                        break;
+                    case 'description':
+                        testValue = 'Test document';
+                        break;
+                    case 'id':
+                        testValue = 'test_id_123';
+                        break;
+                    default:
+                        if (param.options && param.options.length > 0) {
+                            testValue = param.options[0];
+                        }
+                }
+
+                if (param.type === 'checkbox') {
+                    element.checked = false;
+                } else {
+                    element.value = testValue;
+                }
+            });
+        }
+
+        // Clear form
+        function clearForm() {
+            const config = endpointConfigs[currentEndpoint];
+            if (!config) return;
+
+            config.parameters?.forEach(param => {
+                const element = document.getElementById(`param_${param.name}`);
+                if (element) {
+                    if (param.type === 'checkbox') {
+                        element.checked = false;
+                    } else {
+                        element.value = '';
+                    }
+                }
+            });
+
+            const requestBody = document.getElementById('requestBody');
+            if (requestBody) {
+                requestBody.value = '';
+            }
+        }
+
+        // Authentication
+        async function authenticate() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const authType = document.getElementById('authType').value;
+            const baseUrl = document.getElementById('apiBaseUrl').value;
+
+            console.log('🔐 Starting authentication...');
+            console.log('📧 Email:', email);
+            console.log('🔑 Auth Type:', authType);
+            console.log('🌐 Base URL:', baseUrl);
+
+            if (!email || !password) {
+                showMessage('❌ Please enter email and password', 'warning');
+                return;
+            }
+
+            const endpoint = authType === 'admin' ? '/auth/login' : '/auth/user/login';
+            const fullUrl = baseUrl + endpoint;
+
+            console.log('🎯 Full URL:', fullUrl);
+
+            try {
+                showLoading('Authenticating...');
+
+                const requestBody = { email, password };
+                console.log('📤 Request body:', requestBody);
+
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response headers:', Object.fromEntries(response.headers));
+
+                const data = await response.json();
+                console.log('📥 Response data:', data);
+
+                if (response.ok && data.success) {
+                    authToken = data.token;
+                    console.log('✅ Token received:', authToken ? authToken.substring(0, 20) + '...' : 'null');
+                    updateAuthStatus();
+                    showResponse(response.status, data);
+                    showMessage('✅ Authentication successful!', 'success');
+                } else {
+                    console.log('❌ Authentication failed:', data);
+                    showResponse(response.status, data);
+                    showMessage('❌ Authentication failed: ' + (data.message || data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('❌ Network error:', error);
+                showResponse(0, { error: error.message });
+                showMessage('❌ Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            if (authToken) {
+                try {
+                    const baseUrl = document.getElementById('apiBaseUrl').value;
+                    await fetch(baseUrl + '/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (error) {
+                    console.log('Logout request failed, clearing local auth anyway');
+                }
+            }
+
+            authToken = null;
+            updateAuthStatus();
+            showMessage('✅ Logged out successfully', 'success');
+        }
+
+        // Update authentication status
+        function updateAuthStatus() {
+            const statusElement = document.getElementById('authStatus');
+            if (authToken) {
+                statusElement.textContent = '🔓 Authenticated';
+                statusElement.className = 'auth-status authenticated';
+            } else {
+                statusElement.textContent = '🔒 Not Authenticated';
+                statusElement.className = 'auth-status unauthenticated';
+            }
+        }
+
+        // Send API request
+        async function sendRequest() {
+            const config = endpointConfigs[currentEndpoint];
+            if (!config) return;
+
+            const baseUrl = document.getElementById('apiBaseUrl').value;
+            let url = baseUrl + config.path;
+            let body = null;
+            let headers = {
+                'Content-Type': 'application/json'
+            };
+
+            // Add authentication header if required
+            if (config.requiresAuth) {
+                if (!authToken) {
+                    showMessage('❌ Authentication required. Please login first.', 'warning');
+                    // Add pulse effect to login button
+                    const loginBtn = document.querySelector('.auth-section .btn');
+                    if (loginBtn) {
+                        loginBtn.classList.add('pulse');
+                        setTimeout(() => loginBtn.classList.remove('pulse'), 3000);
+                    }
+                    return;
+                }
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            // Handle path parameters
+            if (config.pathParams) {
+                config.parameters?.forEach(param => {
+                    const element = document.getElementById(`param_${param.name}`);
+                    if (element && element.value) {
+                        url = url.replace(`{${param.name}}`, encodeURIComponent(element.value));
+                    }
+                });
+            }
+
+            // Handle query parameters
+            if (config.queryParams) {
+                const queryParams = new URLSearchParams();
+                config.parameters?.forEach(param => {
+                    const element = document.getElementById(`param_${param.name}`);
+                    if (element) {
+                        let value = '';
+                        if (param.type === 'checkbox') {
+                            value = element.checked ? 'true' : '';
+                        } else {
+                            value = element.value;
+                        }
+
+                        if (value) {
+                            queryParams.append(param.name, value);
+                        }
+                    }
+                });
+
+                const queryString = queryParams.toString();
+                if (queryString) {
+                    url += '?' + queryString;
+                }
+            }
+
+            // Handle request body
+            if (config.method === 'POST' || config.method === 'PUT') {
+                if (config.isFileUpload) {
+                    // Handle file upload
+                    const formData = new FormData();
+                    config.parameters?.forEach(param => {
+                        const element = document.getElementById(`param_${param.name}`);
+                        if (element) {
+                            if (param.type === 'file') {
+                                if (element.files[0]) {
+                                    formData.append(param.name, element.files[0]);
+                                }
+                            } else {
+                                if (element.value) {
+                                    formData.append(param.name, element.value);
+                                }
+                            }
+                        }
+                    });
+                    body = formData;
+                    delete headers['Content-Type']; // Let browser set it for FormData
+                } else {
+                    // Handle JSON body
+                    const requestBodyElement = document.getElementById('requestBody');
+                    if (requestBodyElement && requestBodyElement.value.trim()) {
+                        try {
+                            body = JSON.stringify(JSON.parse(requestBodyElement.value));
+                        } catch (error) {
+                            showMessage('❌ Invalid JSON in request body: ' + error.message, 'error');
+                            return;
+                        }
+                    } else if (!config.queryParams && !config.pathParams) {
+                        // Build body from parameters
+                        const bodyData = {};
+                        config.parameters?.forEach(param => {
+                            const element = document.getElementById(`param_${param.name}`);
+                            if (element) {
+                                let value = '';
+                                if (param.type === 'checkbox') {
+                                    value = element.checked;
+                                } else {
+                                    value = element.value;
+                                }
+
+                                if (value !== '' && value !== false) {
+                                    bodyData[param.name] = value;
+                                }
+                            }
+                        });
+
+                        if (Object.keys(bodyData).length > 0) {
+                            body = JSON.stringify(bodyData);
+                        }
+                    }
+                }
+            }
+
+            try {
+                showLoading('Sending request...');
+
+                const response = await fetch(url, {
+                    method: config.method,
+                    headers: headers,
+                    body: body
+                });
+
+                let responseData;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = { message: await response.text() };
+                }
+
+                showResponse(response.status, responseData);
+
+            } catch (error) {
+                showResponse(0, { error: error.message });
+            }
+        }
+
+        // Show loading state
+        function showLoading(message) {
+            const responseSection = document.getElementById('responseSection');
+            const responseStatus = document.getElementById('responseStatus');
+            const responseContent = document.getElementById('responseContent');
+
+            responseSection.style.display = 'block';
+            responseStatus.innerHTML = `<div class="loading"></div>${message}`;
+            responseContent.textContent = 'Loading...';
+        }
+
+        // Show response
+        function showResponse(status, data) {
+            const responseSection = document.getElementById('responseSection');
+            const responseStatus = document.getElementById('responseStatus');
+            const responseContent = document.getElementById('responseContent');
+
+            responseSection.style.display = 'block';
+
+            // Status indicator
+            let statusClass = 'status-success';
+            let statusText = 'Success';
+
+            if (status === 0) {
+                statusClass = 'status-error';
+                statusText = 'Network Error';
+            } else if (status >= 400) {
+                statusClass = 'status-error';
+                statusText = 'Error';
+            } else if (status >= 300) {
+                statusClass = 'status-warning';
+                statusText = 'Redirect';
+            }
+
+            responseStatus.innerHTML = `
+                <span class="status-indicator ${statusClass}">${status} ${statusText}</span>
+                <span>Response Time: ${new Date().toLocaleTimeString()}</span>
+            `;
+
+            // Format JSON response
+            responseContent.textContent = JSON.stringify(data, null, 2);
+
+            // Scroll to response
+            responseSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Show message function
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${type}-message fade-in`;
+            messageDiv.textContent = message;
+
+            // Insert at the top of the content area
+            const content = document.querySelector('.content');
+            content.insertBefore(messageDiv, content.firstChild);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            messageDiv.parentNode.removeChild(messageDiv);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        // Enhanced JSON syntax highlighting
+        function highlightJSON(json) {
+            return json
+                .replace(/(".*?"):/g, '<span class="json-key">$1</span>:')
+                .replace(/: (".*?")/g, ': <span class="json-string">$1</span>')
+                .replace(/: (\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+                .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>')
+                .replace(/: (null)/g, ': <span class="json-null">$1</span>');
+        }
+
+        // Apply JSON highlighting to response
+        function formatJSONResponse(data) {
+            const jsonString = JSON.stringify(data, null, 2);
+            const highlighted = highlightJSON(jsonString);
+            return `<div class="json-syntax">${highlighted}</div>`;
+        }
+
+        // Check server status
+        async function checkServerStatus() {
+            const baseUrl = document.getElementById('apiBaseUrl').value;
+            const statusDiv = document.getElementById('serverStatus');
+
+            statusDiv.innerHTML = '<div class="loading"></div>Checking server status...';
+
+            try {
+                const response = await fetch(baseUrl + '/health', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `✅ Server is online (${response.status})`;
+                    statusDiv.className = 'parameter-info success-message';
+                } else {
+                    statusDiv.innerHTML = `⚠️ Server responded with ${response.status}`;
+                    statusDiv.className = 'parameter-info warning-message';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `❌ Server is offline or unreachable`;
+                statusDiv.className = 'parameter-info error-message';
+                console.error('Server status check failed:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

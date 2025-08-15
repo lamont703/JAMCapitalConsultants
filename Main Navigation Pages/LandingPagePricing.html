@@ -89,9 +89,12 @@
 
         .pricing-plans {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 30px;
             margin-bottom: 50px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Full-Service Plans Section Header */
@@ -459,6 +462,7 @@
         @media (max-width: 768px) {
             .pricing-plans {
                 grid-template-columns: 1fr;
+                max-width: 100%;
             }
 
             .comparison-table {
@@ -543,6 +547,7 @@
                 grid-template-columns: 1fr;
                 gap: 15px;
                 margin-bottom: 25px;
+                max-width: 100%;
             }
 
             /* Full-Service Plans Section Header - Mobile */
@@ -916,6 +921,7 @@
                 grid-template-columns: 1fr;
                 gap: 20px;
                 margin-bottom: 35px;
+                max-width: 100%;
             }
 
             .pricing-plan {
@@ -1085,13 +1091,9 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 25px;
                 margin-bottom: 40px;
-            }
-
-            /* Handle odd number of plans in grid */
-            .pricing-plan:nth-last-child(1):nth-child(odd) {
-                grid-column: 1 / -1;
-                max-width: 400px;
-                margin: 0 auto;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .pricing-plan {
@@ -1209,8 +1211,11 @@
             }
 
             .pricing-plans {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 30px;
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .comparison-section {
@@ -1704,6 +1709,7 @@
             .pricing-plans {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 25px;
+                max-width: 900px;
             }
         }
 
@@ -1711,6 +1717,7 @@
             .pricing-plans {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 20px;
+                max-width: 800px;
             }
         }
 
@@ -1718,6 +1725,7 @@
             .pricing-plans {
                 grid-template-columns: 1fr;
                 gap: 20px;
+                max-width: 100%;
             }
         }
 
@@ -2012,7 +2020,7 @@
                 <div class="pricing-plan">
                     <div class="pricing-header">
                         <h3 class="plan-name">Elite JumpStart</h3>
-                        <div class="plan-price">$399<span class="plan-period"> setup + $197/month</span></div>
+                        <div class="plan-price">$399<span class="plan-period"> setup + $169/month</span></div>
                         <div class="plan-target">Quick start with affordable setup</div>
                     </div>
                     <div class="pricing-body">
@@ -2038,7 +2046,7 @@
                     <div class="popular-tag">Most Popular</div>
                     <div class="pricing-header">
                         <h3 class="plan-name">Momentum Builder</h3>
-                        <div class="plan-price">2 x $250<span class="plan-period"> weekly + $197/month</span></div>
+                        <div class="plan-price">2 x $250<span class="plan-period"> weekly + $169/month</span></div>
                         <div class="plan-target">Spread your startup cost</div>
                     </div>
                     <div class="pricing-body">
@@ -2063,7 +2071,7 @@
                 <div class="pricing-plan">
                     <div class="pricing-header">
                         <h3 class="plan-name">Strategic Start</h3>
-                        <div class="plan-price">4 x $150<span class="plan-period"> weekly + $197/month</span></div>
+                        <div class="plan-price">4 x $150<span class="plan-period"> weekly + $169/month</span></div>
                         <div class="plan-target">Most budget-friendly start</div>
                     </div>
                     <div class="pricing-body">
@@ -2141,9 +2149,9 @@
                         </tr>
                         <tr>
                             <td>Monthly Service Fee</td>
-                            <td>$197/month</td>
-                            <td>$197/month</td>
-                            <td>$197/month</td>
+                            <td>$169/month</td>
+                            <td>$169/month</td>
+                            <td>$169/month</td>
                             <td>Included for 6 months</td>
                         </tr>
                         <tr>
@@ -2246,9 +2254,9 @@
                         <div>
                             All our plans provide identical premium full-service credit dispute service with a dedicated
                             specialist. The only difference is the payment structure: <strong>Elite JumpStart</strong>
-                            ($399 setup + $197/month), <strong>Momentum Builder</strong> (2 weekly $250 payments +
-                            $197/month - Most Popular), <strong>Strategic Start</strong> (4 weekly $150 payments +
-                            $197/month), and <strong>Platinum Commitment</strong> ($1,499 one-time includes 6 months).
+                            ($399 setup + $169/month), <strong>Momentum Builder</strong> (2 weekly $250 payments +
+                            $169/month - Most Popular), <strong>Strategic Start</strong> (4 weekly $150 payments +
+                            $169/month), and <strong>Platinum Commitment</strong> ($1,499 one-time includes 6 months).
                             Choose the payment option that best fits your budget.
                         </div>
                     </div>
@@ -2291,7 +2299,7 @@
                         <div>
                             <strong>Momentum Builder</strong> is our most popular choice. It allows you to spread your
                             initial investment with 2 weekly payments of $250 each, then transition to the monthly
-                            service fee of $197. This provides a good balance between affordability and getting started
+                            service fee of $169. This provides a good balance between affordability and getting started
                             quickly with our premium service.
                         </div>
                     </div>
@@ -2353,7 +2361,7 @@
                     <div class="faq-answer">
                         <div>
                             Once you've completed your initial payment structure (setup fees or weekly payments), all
-                            plans transition to the same $197/month service fee. The Platinum Commitment plan includes 6
+                            plans transition to the same $169/month service fee. The Platinum Commitment plan includes 6
                             months of service, after which you can continue at the standard monthly rate or pause your
                             service as needed.
                         </div>
